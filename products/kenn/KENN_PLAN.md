@@ -950,6 +950,8 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     Jack: where it's hosted (Ollama registry or our own server), the Qwen3 weight
     licence and the fine-tune's terms, and the minimum Mac (16 GB Apple Silicon is
     the working guess). Counts toward the 15-minute setup above.
+    Since 5 Oct MLX is no longer the zero-config default: with no provider set, KENN uses
+    Ollama and says when no model is configured, rather than answering with MLX's 1.5B.
 - [ ] **R4 — Run the existing release qualifier.** Evaluate all 15 named checks at the
   exact release source and artifacts; preserve profile-specific requirements. Required
   failed, pending or unmeasured gates prevent a qualified release. Optional current-Live

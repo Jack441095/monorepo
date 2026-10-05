@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from kenn.llm import llm_rewrite
 from kenn.llm.llm_rewrite import answering_model, mlx_selected
 
@@ -34,15 +32,26 @@ def test_mlx_answers_only_when_chosen(monkeypatch) -> None:
 
 def test_health_names_the_model_that_will_answer(monkeypatch) -> None:
     monkeypatch.setattr(llm_rewrite, "load_env", lambda: None)
+    for name in ("KENN_LLM_MODEL_REWRITE", "AUDIO_TOO_LLM_MODEL_REWRITE", "KENN_LLM_PROVIDER_REWRITE"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("KENN_LLM_ENABLED", "0")
+    assert answering_model()["enabled"] is False
+    monkeypatch.setenv("KENN_LLM_ENABLED", "1")
     monkeypatch.setenv("KENN_USE_MLX", "0")
     monkeypatch.setenv("KENN_LLM_PROVIDER", "ollama")
     monkeypatch.setenv("KENN_LLM_MODEL", "kenn-brain-qwen3-8b")
-    assert answering_model() == {"provider": "ollama", "model": "kenn-brain-qwen3-8b"}
+    assert answering_model() == {"enabled": True, "provider": "ollama", "model": "kenn-brain-qwen3-8b"}
     monkeypatch.setenv("KENN_USE_MLX", "1")
+    monkeypatch.setattr(llm_rewrite, "_mlx_engine_answers", lambda task="rewrite": True)
     assert answering_model()["provider"] == "mlx"
 
 
-def test_the_shipped_launch_agent_runs_the_8b_brain_on_ollama() -> None:
-    plist = (Path(__file__).resolve().parents[5] / "apps/desktop/launchd/com.shenrendao.kenn.companion.plist").read_text()
-    assert "<key>KENN_USE_MLX</key>\n        <string>0</string>" in plist
-    assert "<string>kenn-brain-qwen3-8b</string>" in plist
+def test_mlx_chosen_but_not_installed_reports_the_fallback(monkeypatch) -> None:
+    # _chat_completion falls through to the provider when mlx_lm is missing, so health must say so too.
+    monkeypatch.setattr(llm_rewrite, "load_env", lambda: None)
+    monkeypatch.setattr(llm_rewrite, "_mlx_engine_answers", lambda task="rewrite": False)
+    monkeypatch.setenv("KENN_LLM_ENABLED", "1")
+    monkeypatch.setenv("KENN_USE_MLX", "1")
+    monkeypatch.setenv("KENN_LLM_PROVIDER", "ollama")
+    assert answering_model()["provider"] == "ollama"
+

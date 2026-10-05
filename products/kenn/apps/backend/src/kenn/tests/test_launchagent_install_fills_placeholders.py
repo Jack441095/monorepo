@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import plistlib
 import re
 import stat
 import subprocess
@@ -34,3 +35,11 @@ def test_the_installed_launch_agent_points_at_the_real_server(tmp_path):
     installed = _install(tmp_path)
     assert f"{PRODUCT_ROOT}/apps/backend/src/kenn/server.py" in installed
     assert (PRODUCT_ROOT / "apps" / "backend" / "src" / "kenn" / "server.py").is_file()
+
+
+def test_the_installed_launch_agent_answers_with_the_8b_brain(tmp_path):
+    # Regression (5 Oct): the template set KENN_USE_MLX=1, so the installed app answered with MLX's 1.5B.
+    env = plistlib.loads(_install(tmp_path).encode())["EnvironmentVariables"]
+    assert env["KENN_LLM_ENABLED"] == "1"
+    assert env["KENN_USE_MLX"] == "0"
+    assert (env["KENN_LLM_PROVIDER"], env["KENN_LLM_MODEL"]) == ("ollama", "kenn-brain-qwen3-8b")

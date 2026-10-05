@@ -1088,7 +1088,7 @@ def _cache_key(cfg: dict, messages: list[dict[str, str]], output: dict | None = 
 
 def _http_generation_contract(cfg: dict, answer_mode: str, json_mode: bool, json_schema: dict | None) -> dict:
     # Read the builders rather than copying their caps and temperatures into the cache policy.
-    # An unconfigured provider can still use MLX, so this lookup must tolerate a missing model.
+    # MLX answers without a provider model name, so this lookup must tolerate a missing model.
     request_cfg = {**cfg, "model": cfg.get("model", "")}
     native = _ollama_think_off(cfg, json_schema)
     if native:
@@ -1273,9 +1273,8 @@ def _chat_completion(
         except Exception:
             pass
 
-    # Below the MLX branch on purpose: on-device inference answers without a provider model name, and
-    # mlx_selected() treats an unconfigured provider as its own. Checking above it would fail a Mac that has
-    # mlx_lm installed and nothing set, which answers today.
+    # Below the MLX branch on purpose: on-device inference answers without a provider model name, so checking
+    # above it would fail a Mac that chose MLX and set no model. A Mac that chose nothing lands here (5 Oct).
     missing = missing_model_message(cfg, task)
     if missing:
         raise RuntimeError(missing)
@@ -1707,7 +1706,7 @@ def mlx_selected(task: str = "rewrite") -> bool:
     load_env()
     explicit = os.environ.get("KENN_USE_MLX")
     if explicit is not None:
-        return explicit.strip().lower() in {"1", "true", "yes"}
+        return explicit.strip().lower() in {"1", "true", "yes", "on"}
     suffix = f"_{task.upper()}" if task != "rewrite" else ""
     providers = [os.environ.get(name, "").strip().lower() for name in (
         f"KENN_LLM_PROVIDER{suffix}", f"AUDIO_TOO_LLM_PROVIDER{suffix}", "KENN_LLM_PROVIDER", "AUDIO_TOO_LLM_PROVIDER")]
@@ -1715,16 +1714,21 @@ def mlx_selected(task: str = "rewrite") -> bool:
 
 
 def answering_model() -> dict:
-    """Which provider and model will answer chat, as /api/health reports it.
+    """Which provider and model will write chat answers, as /api/health reports it.
 
     Health used to report only the index, so a gate run couldn't tell the 1.5B MLX default from Qwen3 8B (5 Oct).
+    Chat answers only: follow-ups go through the paraphrase task, which can be routed elsewhere.
     """
-    if mlx_selected():
+    cfg = config()
+    if not cfg["enabled"]:
+        return {"enabled": False, "provider": None, "model": None}
+    if _mlx_engine_answers():
         from kenn.llm.mlx_inference_engine import DEFAULT_MLX_MODEL
 
-        return {"provider": "mlx", "model": DEFAULT_MLX_MODEL}
-    cfg = config()
-    return {"provider": cfg["provider"], "model": cfg["model"] or None}
+        # DEFAULT_MLX_MODEL is read at import, which can come before load_env(); the engine loads this name.
+        return {"enabled": True, "provider": "mlx", "model": os.environ.get("KENN_MLX_MODEL", DEFAULT_MLX_MODEL)}
+    return {"enabled": True, "provider": cfg["provider"], "model": cfg["model"] or None}
+
 
 def _mlx_engine_answers(task: str = "rewrite") -> bool:
     if not mlx_selected(task):
@@ -2071,8 +2075,8 @@ def status_message() -> str:
 def public_status() -> dict:
     """Report whether rewrite configuration permits an attempt, without checking runtime health."""
     cfg = config()
-    # Ollama enablement alone does not supply a model. The selected MLX path
-    # can answer without that provider field, so keep its existing alternative.
+    # Ollama enablement alone does not supply a model. MLX, when chosen, answers
+    # without that provider field.
     ready = is_enabled() and (not missing_model_message(cfg) or _mlx_engine_answers())
     return {
         "enabled": cfg["enabled"],
