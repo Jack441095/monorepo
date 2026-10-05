@@ -168,7 +168,7 @@ def test_llm_route_query_uses_the_native_think_off_route_for_qwen3() -> None:
         posted["url"] = url
         posted["json"] = json
         request = httpx.Request("POST", url)
-        return httpx.Response(200, json={"message": {"content": "production"}}, request=request)
+        return httpx.Response(200, json={"message": {"content": '{"route": "production"}'}}, request=request)
 
     env = {
         "KENN_LLM_ENABLED": "1",

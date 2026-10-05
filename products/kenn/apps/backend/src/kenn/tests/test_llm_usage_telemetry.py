@@ -92,7 +92,7 @@ def test_native_reply_preserves_phase_durations_in_nanoseconds(offline, monkeypa
 
 
 def test_direct_route_call_is_counted_with_its_native_metrics(offline, monkeypatch):
-    _post(monkeypatch, {**METRICS, "message": {"content": "production"}})
+    _post(monkeypatch, {**METRICS, "message": {"content": '{"route": "production"}'}})
     with llm_rewrite.capture_usage() as calls:
         assert llm_rewrite.llm_route_query("Explain compression") == "production"
     assert len(calls) == 1 and calls[0].task == "route"

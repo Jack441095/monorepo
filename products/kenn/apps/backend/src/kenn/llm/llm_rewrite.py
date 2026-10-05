@@ -1571,7 +1571,7 @@ def chat_completion_stream(
 # ---------------------------------------------------------------------------
 
 ROUTE_CLASSIFICATION_PROMPT = """Classify the following user query into one of these categories.
-Reply with ONLY a single word from the list below — no explanation, no punctuation, no extra text.
+{reply_rule}
 
 Categories:
 - ableton — Specific Ableton Live features, devices, routing, shortcuts, warp, automation, freezing, MIDI, clips, Session View, Arrangement View
@@ -1587,6 +1587,33 @@ Query: {query}
 
 VALID_ROUTE_WORDS = ("ableton", "production", "mix_review", "game_audio", "conversation", "out_of_scope")
 
+ROUTE_WORD_REPLY_RULE = "Reply with ONLY a single word from the list below — no explanation, no punctuation, no extra text."
+ROUTE_JSON_REPLY_RULE = 'Reply with ONLY a JSON object of the form {"route": "<category>"}, using a category name from the list below.'
+
+# Native Ollama decodes against this, so the reply cannot name a route outside the list or more than one.
+ROUTE_JSON_SCHEMA = {
+    "type": "object",
+    "properties": {"route": {"type": "string", "enum": list(VALID_ROUTE_WORDS)}},
+    "required": ["route"],
+    "additionalProperties": False,
+}
+
+
+def _route_from_json(content: str) -> str | None:
+    try:
+        data = json.loads(content)
+    except ValueError:
+        return None
+    route = data.get("route") if isinstance(data, dict) else None
+    return route if route in VALID_ROUTE_WORDS else None
+
+
+def _route_from_words(content: str) -> str | None:
+    # The OpenAI-compatible route has no decoding constraint here, so read the free text, but only when it names
+    # exactly one route: "Not ableton, this is production." used to come back as the first word found, "ableton".
+    found = {word.strip(".,!?\"'") for word in content.lower().split()} & set(VALID_ROUTE_WORDS)
+    return found.pop() if len(found) == 1 else None
+
 
 def llm_route_query(query: str) -> str | None:
     """Use the LLM to classify a query when keyword routing fails.
@@ -1598,8 +1625,6 @@ def llm_route_query(query: str) -> str | None:
     """
     if not is_enabled("route"):
         return None
-    user_msg = ROUTE_CLASSIFICATION_PROMPT.format(query=query[:500])
-    messages = [{"role": "user", "content": user_msg}]
     cfg = config("route")
     # This one returns None rather than raising: routing has always degraded to its keyword matcher on any
     # LLM failure, with the reason printed, and a caller that classifies a query should not have to guard
@@ -1621,6 +1646,9 @@ def llm_route_query(query: str) -> str | None:
     # system and it is still a full serial generation in front of answer generation,
     # so it is worth having working rather than worth having at all.
     native = _ollama_think_off(cfg, None)
+    reply_rule = ROUTE_JSON_REPLY_RULE if native else ROUTE_WORD_REPLY_RULE
+    user_msg = ROUTE_CLASSIFICATION_PROMPT.format(reply_rule=reply_rule, query=query[:500])
+    messages = [{"role": "user", "content": user_msg}]
     if native:
         url = f"{_native_ollama_base(cfg['base_url'])}/api/chat"
         payload = {
@@ -1629,8 +1657,10 @@ def llm_route_query(query: str) -> str | None:
             "stream": False,
             "think": False,
             "keep_alive": KEEP_ALIVE_DURATION,
-            # Same 20-token cap and near-zero temperature the OpenAI-compatible route used.
+            # Same 20-token cap and near-zero temperature the OpenAI-compatible route used;
+            # {"route": "out_of_scope"} fits well inside it.
             "options": {"temperature": 0.05, "num_predict": 20},
+            "format": ROUTE_JSON_SCHEMA,
         }
     else:
         url = f"{cfg['base_url']}/chat/completions"
@@ -1664,11 +1694,10 @@ def llm_route_query(query: str) -> str | None:
                     print("WARNING: llm_route_query got no choices -- falling through to keyword routing")
                     return None
                 message = choices[0].get("message") or {}
-        content = str(message.get("content") or "").strip().lower()
-        for word in content.split():
-            word = word.strip(".,!?\"'")
-            if word in VALID_ROUTE_WORDS:
-                return word
+        content = str(message.get("content") or "").strip()
+        route = _route_from_json(content) if native else _route_from_words(content)
+        if route:
+            return route
         print(
             f"WARNING: llm_route_query got no route word back "
             f"(model={cfg['model']!r}, native={native}, content={content[:80]!r}) -- "
