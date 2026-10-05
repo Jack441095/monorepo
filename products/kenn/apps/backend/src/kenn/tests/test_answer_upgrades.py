@@ -45,6 +45,19 @@ def test_a_rejected_upgrade_says_why_it_was_rejected(monkeypatch) -> None:
     assert result["reason"] == "generated answer introduced unsupported measurements"
 
 
+def test_a_weak_match_says_the_model_was_not_asked_and_forgets_the_last_answer(monkeypatch) -> None:
+    # Review 5 Oct 2026: this early return set no reason, so an older answer's reason on the thread could stand in.
+    from kenn.core import chat_answer, route_log
+
+    monkeypatch.setattr(route_log, "record", lambda *a, **k: None)
+    monkeypatch.setattr(chat_answer, "build_template_answer", lambda *a, **k: "template")
+    monkeypatch.setattr(chat_answer, "results_are_weak", lambda *a: True)
+    chat_answer._log_generation_outcome(False, {"warnings": ["an earlier answer's reason"]}, 1.0)
+
+    assert chat_answer.make_answer("what is a pad", []) == ("template", False)
+    assert chat_answer.last_generation_outcome() == "model not asked: weak results or intent guard"
+
+
 def test_a_model_failure_is_a_rejection_not_a_crash() -> None:
     def broken():
         raise TimeoutError("ollama")

@@ -968,6 +968,8 @@ def make_answer(
 ) -> tuple[str, bool]:
     import time as _time, sys as _sys
     _ma_t0 = _time.perf_counter()
+    # Every return below says why, and nothing from an earlier answer on this thread may stand in for it.
+    _last_outcome.reason = ""
     template = build_template_answer(
         query,
         results,
@@ -984,6 +986,7 @@ def make_answer(
         results_are_weak(query, results) or intent_guard_failed(query, results)
     ) and not timeline_context:
         print(f"  make_answer: template={_ma_template_ms:.0f}ms (weak, early return)", file=_sys.stderr, flush=True)
+        _last_outcome.reason = "model not asked: weak results or intent guard"
         return template, False
     # Exact hardware behaviour is a source boundary, not a creative-writing
     # opportunity.  The deterministic response already states the gap and
@@ -995,6 +998,7 @@ def make_answer(
         return template, False
     if not allow_llm:
         print(f"  make_answer: template={_ma_template_ms:.0f}ms (llm disabled)", file=_sys.stderr, flush=True)
+        _last_outcome.reason = "model not asked: llm disabled for this call"
         return template, False
     _ma_t1 = _time.perf_counter()
     confidence = "high" if timeline_context else confidence_level(query, results)
