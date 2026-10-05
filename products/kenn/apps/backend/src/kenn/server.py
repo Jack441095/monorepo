@@ -952,6 +952,12 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 subsystems["knowledge_index"] = {"available": False, "error": str(exc)}
             try:
+                from kenn.llm.llm_rewrite import answering_model
+
+                subsystems["answer_model"] = answering_model()
+            except Exception as exc:
+                subsystems["answer_model"] = {"available": False, "error": str(exc)}
+            try:
                 from kenn.core.live_action_service import runtime_state_counts
                 from kenn.core.live_control_planner import pending_proposal_count
 

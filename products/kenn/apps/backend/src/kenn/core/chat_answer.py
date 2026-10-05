@@ -1033,6 +1033,9 @@ def make_answer(
         _last_outcome.reason = "model not asked: should_use_llm_rewrite said no"
         return template, False
     _ma_t2 = _time.perf_counter()
+    # Read once and handed to both the prompt's allowed-figures list and the gate below, so a stem-scan figure the
+    # gate would pass is never left off the list the model is told to stay within.
+    specialist_evidence = _specialist_evidence_context(query, history)
     enhanced = llm_enhance_answer(
         query,
         template,
@@ -1045,6 +1048,7 @@ def make_answer(
         route=route,
         timeline_context=timeline_context,
         skill_level=_skill_level_for_session(session_id),
+        additional_evidence_text=specialist_evidence,
     )
     if enhanced:
         from kenn.llm.linter import lint_response
@@ -1060,7 +1064,7 @@ def make_answer(
                 confidence=confidence,
                 answer_mode=mode,
                 timeline_context=timeline_context,
-                additional_evidence_text=_specialist_evidence_context(query, history),
+                additional_evidence_text=specialist_evidence,
             )
 
         # The 128-token cap leaves most answers stopped mid-sentence. Judge and show the cleaner ending, but
@@ -1867,6 +1871,8 @@ def _answer_payload_stream_raw(
     yield {"event": "metadata", "data": initial_metadata}
 
     if llm_active:
+        # The same text the stream guard and the full gate below read, so the prompt's figure list and the gate agree.
+        specialist_evidence = _specialist_evidence_context(relevance_query, history)
         generator = llm_enhance_answer_stream(
             query,
             template,
@@ -1879,6 +1885,7 @@ def _answer_payload_stream_raw(
             route=route,
             timeline_context=timeline_context,
             skill_level=_skill_level_for_session(session_id),
+            additional_evidence_text=specialist_evidence,
         )
         generated_parts = []
         cut_short = ""
@@ -1892,7 +1899,7 @@ def _answer_payload_stream_raw(
             evidence_measurements(
                 results,
                 timeline_context=timeline_context,
-                additional_evidence_text=_specialist_evidence_context(relevance_query, history),
+                additional_evidence_text=specialist_evidence,
             )
         )
         held = None
@@ -1946,7 +1953,7 @@ def _answer_payload_stream_raw(
                 confidence=confidence,
                 answer_mode=answer_mode,
                 timeline_context=timeline_context,
-                additional_evidence_text=_specialist_evidence_context(relevance_query, history),
+                additional_evidence_text=specialist_evidence,
             )
             generation_validation = {
                 "attempted": True,

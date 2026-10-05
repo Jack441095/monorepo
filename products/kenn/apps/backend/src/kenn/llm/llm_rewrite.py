@@ -82,6 +82,8 @@ Rules:
   id exactly as printed on the excerpt. An id that is not on an excerpt above is counted as invented.
 - When the excerpts do not hold the answer, write one line and stop: Insufficient context: <the specific
   fact you are missing>. That line is a whole answer. Put no number, estimate or step after it.
+- Use only numbers that are printed in an excerpt. If no excerpt gives a figure for it, say it in words
+  ("a fast attack") instead of guessing a frequency, time or dB value.
 - Keep every step actionable in Ableton Live or the relevant workflow.
 - Address only the current question. Ignore irrelevant history.
 - Say plainly whether the question has an objective/technical answer (clipping, phase, LUFS, a
@@ -112,6 +114,8 @@ Rules:
 - If context is insufficient, name the specific gap (e.g. "We need a note on parallel compression").
 - Tag every number you state with the id of the excerpt it came from, like 150 ms [#3f2a9c1b7e40]. Copy the id exactly as printed on the excerpt. An id that is not on an excerpt above is counted as invented.
 - When the excerpts do not hold the answer, write one line and stop: Insufficient context: <the specific fact you are missing>. That line is a whole answer. Put no number, estimate or step after it.
+- Use only numbers that are printed in an excerpt. If no excerpt gives a figure for it, say it in words
+  ("a fast attack") instead of guessing a frequency, time or dB value.
 - Keep every step actionable in Ableton Live or the relevant workflow.
 - Address only the current question. Ignore irrelevant history.
 - Say plainly whether the question has an objective/technical answer (clipping, phase, LUFS, a measurable fault) or is a subjective/creative call (brightness, width, "should it sound bigger").
@@ -669,6 +673,9 @@ MAX_TOKENS_BY_MODE = {
     "command": _COMMAND_MAX_TOKENS,
 }
 DEFAULT_MAX_TOKENS = _GENERAL_MAX_TOKENS
+# Tried 0.0 on 5 Oct to steady the probe score. The 8B then made the same mistakes every run, and accepted
+# answers fell from 31 to 25 of 46, so prose keeps a little freedom.
+PROSE_TEMPERATURE = 0.35
 
 
 def _build_payload(
@@ -681,7 +688,7 @@ def _build_payload(
         # Command plans are a constrained machine-readable contract.  A
         # deterministic decode reduces variation and the bounded output cap
         # keeps local shadow calls from spending time on explanatory prose.
-        "temperature": 0.0 if json_mode else 0.35,
+        "temperature": 0.0 if json_mode else PROSE_TEMPERATURE,
         "max_tokens": MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS),
         "stream": stream,
     }
@@ -739,8 +746,8 @@ def _build_native_ollama_payload(cfg: dict, messages: list[dict], *, stream: boo
         "stream": stream,
         "think": False,
         "keep_alive": KEEP_ALIVE_DURATION,
-        # Same temperatures as the OpenAI-compatible route: exact for plans, a little freedom for prose.
-        "options": {"temperature": 0.0 if json_schema is not None else 0.35,
+        # Same temperatures as the OpenAI-compatible route.
+        "options": {"temperature": 0.0 if json_schema is not None else PROSE_TEMPERATURE,
                     "num_predict": MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS)},
     }
     if json_schema is not None:
@@ -819,6 +826,19 @@ def build_system_prompt(
     if acoustic_instr:
         base_prompt += f"\n{acoustic_instr}"
 
+    cap = MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS)
+    if answer_mode != "voice" and cap <= _GENERAL_MAX_TOKENS:
+        # 4 Oct probe: 21 of 23 accepted answers were cut off by the cap, because the five-section structure above
+        # asks for roughly twice what 128 tokens hold. A word is about 1.3 tokens and each [#id] tag costs ~9, so
+        # we quote about half the cap in words and drop the two sections nobody misses when they are short.
+        # The Check and the mode's own line ("Mastering boundary:", "Live safety:") stay, because
+        # answer_quality_report() scores them: a missing check costs 8 points and a missing boundary 10, against 62.
+        base_prompt += (
+            f"\nLength: your whole answer is cut off after about {cap * 55 // 100} words, so it has to finish inside "
+            "that. Write the Short answer, two Try this steps, the Check and any boundary line asked for above, "
+            "each in one sentence, then stop. Leave out Why it matters and You could also ask."
+        )
+
     return base_prompt
 
 
@@ -863,6 +883,11 @@ def _truncate_on_word_boundary(text: str, limit: int) -> str:
 # The extra ~207 characters cost ~50 prompt tokens against a measured 0.055 s prefill for 462 tokens.
 _CONTEXT_CHUNK_CHARS = 400
 _CONTEXT_BLOCK_CHARS = 1200
+
+# Most figures we list in one prompt. Measured 5 Oct on the gate index: the 44 probe and 64 held-out prompts that
+# reach the model list a median of 1 figure, 6-8 at the 90th percentile and 14 at most, so 12 only trims the one
+# or two longest lists while a review timeline full of LUFS readings cannot balloon the prompt.
+_ALLOWED_FIGURES_SHOWN = 12
 
 # How far down the ranked list we are willing to look before giving up, counted in ranked slots rather than in
 # chunks that survive cleaning. A fixed slice was wrong here: _clean_chunk_for_synthesis returns "" for a note's
@@ -1088,7 +1113,7 @@ def _cache_key(cfg: dict, messages: list[dict[str, str]], output: dict | None = 
 
 def _http_generation_contract(cfg: dict, answer_mode: str, json_mode: bool, json_schema: dict | None) -> dict:
     # Read the builders rather than copying their caps and temperatures into the cache policy.
-    # An unconfigured provider can still use MLX, so this lookup must tolerate a missing model.
+    # MLX answers without a provider model name, so this lookup must tolerate a missing model.
     request_cfg = {**cfg, "model": cfg.get("model", "")}
     native = _ollama_think_off(cfg, json_schema)
     if native:
@@ -1273,9 +1298,8 @@ def _chat_completion(
         except Exception:
             pass
 
-    # Below the MLX branch on purpose: on-device inference answers without a provider model name, and
-    # mlx_selected() treats an unconfigured provider as its own. Checking above it would fail a Mac that has
-    # mlx_lm installed and nothing set, which answers today.
+    # Below the MLX branch on purpose: on-device inference answers without a provider model name, so checking
+    # above it would fail a Mac that chose MLX and set no model. A Mac that chose nothing lands here (5 Oct).
     missing = missing_model_message(cfg, task)
     if missing:
         raise RuntimeError(missing)
@@ -1696,18 +1720,39 @@ def format_turn_directives(
 def mlx_selected(task: str = "rewrite") -> bool:
     """Whether the on-device MLX engine should answer instead of the configured provider.
 
-    An explicit choice wins: KENN_USE_MLX on or off, or a provider named for this task. Only when nothing is configured
-    does MLX take over when installed. It used to take over whenever installed, so a Mac set up for Qwen3 8B on Ollama
-    was silently answered by the 1.5B MLX default (found 26 Sept).
+    Only an explicit choice: KENN_USE_MLX on, or "mlx" named as the provider. It used to take over whenever installed,
+    so a Mac set up for Qwen3 8B on Ollama was silently answered by the 1.5B MLX default (found 26 Sept). The fix for
+    that still let MLX take over when no provider was named, and setting only the model name doesn't name one: main's
+    .env sets AUDIO_TOO_LLM_MODEL alone, so the 5 Oct gate baseline was the 1.5B model too, failing 32 answers on
+    structure. With nothing chosen we stay on Ollama, which says out loud when it has no model.
     """
+    # The checks below read os.environ, and nothing else guarantees the .env has been read by the time we're asked;
+    # the companion's warm-up thread asks before any config() call.
+    load_env()
     explicit = os.environ.get("KENN_USE_MLX")
     if explicit is not None:
-        return explicit.strip().lower() in {"1", "true", "yes"}
+        return explicit.strip().lower() in {"1", "true", "yes", "on"}
     suffix = f"_{task.upper()}" if task != "rewrite" else ""
     providers = [os.environ.get(name, "").strip().lower() for name in (
         f"KENN_LLM_PROVIDER{suffix}", f"AUDIO_TOO_LLM_PROVIDER{suffix}", "KENN_LLM_PROVIDER", "AUDIO_TOO_LLM_PROVIDER")]
-    chosen = next((p for p in providers if p), "")
-    return chosen in {"", "mlx"}
+    return next((p for p in providers if p), "") == "mlx"
+
+
+def answering_model() -> dict:
+    """Which provider and model will write chat answers, as /api/health reports it.
+
+    Health used to report only the index, so a gate run couldn't tell the 1.5B MLX default from Qwen3 8B (5 Oct).
+    Chat answers only: follow-ups go through the paraphrase task, which can be routed elsewhere.
+    """
+    cfg = config()
+    if not cfg["enabled"]:
+        return {"enabled": False, "provider": None, "model": None}
+    if _mlx_engine_answers():
+        from kenn.llm.mlx_inference_engine import DEFAULT_MLX_MODEL
+
+        # DEFAULT_MLX_MODEL is read at import, which can come before load_env(); the engine loads this name.
+        return {"enabled": True, "provider": "mlx", "model": os.environ.get("KENN_MLX_MODEL", DEFAULT_MLX_MODEL)}
+    return {"enabled": True, "provider": cfg["provider"], "model": cfg["model"] or None}
 
 
 def _mlx_engine_answers(task: str = "rewrite") -> bool:
@@ -1734,8 +1779,12 @@ def _build_synthesis_messages(
     route: str = "unknown",
     timeline_context: str | None = None,
     skill_level: str = "",
+    additional_evidence_text: str = "",
 ) -> tuple[list[dict], list[tuple[float, dict, str]]]:
     """Build the messages array for answer synthesis, and the excerpts behind it.
+
+    ``additional_evidence_text`` is the specialist observation text the gate also accepts figures from (classifier
+    and stem-scan packets). It only feeds the allowed-figures list; the model already sees it through the draft.
 
     Instead of asking the LLM to 'improve' a pre-built template answer, we:
     1. Give the LLM the raw source excerpts
@@ -1779,6 +1828,37 @@ def _build_synthesis_messages(
             "Draft answer from the local index (use this as a reference for structure and facts, "
             "but prefer synthesising directly from the source excerpts above):\n"
             f"{template_answer[:draft_chars]}"
+        )
+
+    # The figures the gate will accept, spelled out. "Use only numbers printed in an excerpt" in the system prompt
+    # was not enough. On the 5 Oct 8B baseline (index v-5f6964698b76) unsupported measurements were the biggest
+    # single reason a model answer was thrown away: 8 of 15 rejections on the probe and 14 of 32 on the holdout,
+    # usually a textbook value like "3 dB" or "2 kHz" the excerpts never gave. With this list the 4B went from
+    # 28/28/26 to 30/30/30 on the probe and 35 to 45 of 72 on the holdout (5 Oct, quiet Mac). The list reads the
+    # same text the gate checks, specialist observations included, so nothing on it can be rejected. Only
+    # unit-bearing values are listed because those are all the gate checks; a 4:1 ratio or "step 3" is left
+    # alone. Imported here because chat_grounding imports this module at load time.
+    from kenn.core.chat_grounding import _gate_evidence_text, measurements_in_order
+
+    allowed = measurements_in_order(_gate_evidence_text(shown, timeline_context, additional_evidence_text))
+    if len(allowed) > _ALLOWED_FIGURES_SHOWN:
+        # A long review timeline can carry dozens of LUFS and dBTP readings, and every listed figure is prompt the
+        # Mac reads at ~75 tokens/s. Past the cap the list stops claiming to be complete, because the gate still
+        # accepts the unlisted ones and telling the model otherwise would make it drop a grounded number.
+        user_parts.append(
+            "Figures from the excerpts you may use: " + ", ".join(allowed[:_ALLOWED_FIGURES_SHOWN]) + ", and others "
+            "printed in the excerpts. Any frequency, level or time not printed there goes in words."
+        )
+    elif allowed:
+        user_parts.append(
+            "Figures you may use (the excerpts contain these and no others): " + ", ".join(allowed) + ".\n"
+            "Any other frequency, level or time goes in words, for example 'a gentle cut' rather than a number."
+        )
+    else:
+        # Nothing to list is still worth saying: a question about routing or arrangement gets no figure
+        # from the notes, and that is exactly when the model reaches for one of its own.
+        user_parts.append(
+            "The excerpts give no figures. Describe every frequency, level and time in words, not numbers."
         )
 
     if history_context:
@@ -1886,6 +1966,7 @@ def enhance_stream(
     route: str = "unknown",
     timeline_context: str | None = None,
     skill_level: str = "",
+    additional_evidence_text: str = "",
 ):
     """Stream LLM-enhanced answer with usage tracking.
 
@@ -1908,6 +1989,7 @@ def enhance_stream(
         route=route,
         timeline_context=timeline_context,
         skill_level=skill_level,
+        additional_evidence_text=additional_evidence_text,
     )
 
     generator = chat_completion_stream(messages, "rewrite", answer_mode=answer_mode)
@@ -1984,6 +2066,7 @@ def enhance(
     route: str = "unknown",
     timeline_context: str | None = None,
     skill_level: str = "",
+    additional_evidence_text: str = "",
 ) -> str | None:
     """Non-streaming LLM enhancement with dynamic system prompt and raw-context synthesis.
 
@@ -2005,6 +2088,7 @@ def enhance(
         route=route,
         timeline_context=timeline_context,
         skill_level=skill_level,
+        additional_evidence_text=additional_evidence_text,
     )
 
     try:
@@ -2055,8 +2139,8 @@ def status_message() -> str:
 def public_status() -> dict:
     """Report whether rewrite configuration permits an attempt, without checking runtime health."""
     cfg = config()
-    # Ollama enablement alone does not supply a model. The selected MLX path
-    # can answer without that provider field, so keep its existing alternative.
+    # Ollama enablement alone does not supply a model. MLX, when chosen, answers
+    # without that provider field.
     ready = is_enabled() and (not missing_model_message(cfg) or _mlx_engine_answers())
     return {
         "enabled": cfg["enabled"],

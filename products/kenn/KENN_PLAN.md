@@ -943,6 +943,15 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   validation, clean-account setup under 15 minutes, supported matrix, feedback channel,
   privacy-preserving diagnostics, tester sign-off and exercised rollback. Do not invite
   testers or publish from a historical “ready” assertion.
+  - [ ] **First-run model download.** The answering model (kenn-brain-qwen3-8b, about
+    5 GB) isn't in the app, so first run fetches it with progress and a resume, checks
+    its digest, and says plainly when the Mac can't run it. Until it's there, chat says
+    no model is installed rather than falling back to anything smaller. Blocked on
+    Jack: where it's hosted (Ollama registry or our own server), the Qwen3 weight
+    licence and the fine-tune's terms, and the minimum Mac (16 GB Apple Silicon is
+    the working guess). Counts toward the 15-minute setup above.
+    Since 5 Oct MLX is no longer the zero-config default: with no provider set, KENN uses
+    Ollama and says when no model is configured, rather than answering with MLX's 1.5B.
 - [ ] **R4 — Run the existing release qualifier.** Evaluate all 15 named checks at the
   exact release source and artifacts; preserve profile-specific requirements. Required
   failed, pending or unmeasured gates prevent a qualified release. Optional current-Live

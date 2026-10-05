@@ -17,7 +17,17 @@ NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 _WORD = re.compile(r"[a-z0-9]+")
 
 
+# "What's your advice on drum bus compression?" matched "what's ... on ... bus" below and got "'Drum Bus' has:
+# Compressor." back in the 5 Oct probe; the model was never asked. Asking for advice on something is never an
+# inventory question, whatever track it names.
+_ASKS_FOR_ADVICE = re.compile(
+    r"\b(?:advice|tips?|thoughts?|opinion|take|approach|recommendations?|suggestions?)\s+(?:on|for|about)\b"
+)
+
+
 def _question_kind(lower: str) -> str | None:
+    if _ASKS_FOR_ADVICE.search(lower):
+        return None
     if re.search(r"\bwhich\b.*\bsend(?:s|ing)?\b.*\bto\b", lower) or re.search(r"\bwho\b.*\bsends?\b", lower):
         return "sends_to"
     if re.search(r"\bwhat(?:'s| is)\b.*\b(?:threshold|ratio|attack|release|output|gain|frequency|dry/?wet|drive|makeup|knee)\b", lower):

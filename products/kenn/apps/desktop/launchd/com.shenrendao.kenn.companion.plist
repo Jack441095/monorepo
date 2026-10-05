@@ -27,8 +27,16 @@
     <dict>
         <key>KENN_PORT</key>
         <string>8090</string>
-        <key>KENN_USE_MLX</key>
+        <!-- These win over any .env (load_env never overwrites a set variable), so the installed app always
+             answers with the 8B brain. Without KENN_LLM_ENABLED it answered from templates alone. -->
+        <key>KENN_LLM_ENABLED</key>
         <string>1</string>
+        <key>KENN_USE_MLX</key>
+        <string>0</string>
+        <key>KENN_LLM_PROVIDER</key>
+        <string>ollama</string>
+        <key>KENN_LLM_MODEL</key>
+        <string>kenn-brain-qwen3-8b</string>
         <key>PYTHONUNBUFFERED</key>
         <string>1</string>
         <key>PYTHONPATH</key>
