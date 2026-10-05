@@ -180,3 +180,33 @@ def test_the_longest_rejection_route_name_survives_the_logs_64_char_field():
     routes = [f"generation:{r}" for r in reasons]
     assert max(len(r) for r in routes) <= 64, routes
     assert len({r[:64] for r in routes}) == len(routes), "two rejection reasons truncate to the same route"
+
+def test_a_model_answer_the_quality_gate_swaps_out_is_not_credited_to_the_model(tmp_path, monkeypatch):
+    # Audit, 5 Oct 2026: llm_enhanced stayed True after the swap, so the upgrade offered the clarifying reply
+    # as the model's answer.
+    from kenn.core import chat_retrieval, session_memory
+    from kenn.tests.test_streamed_generation_prefix_guard import CHUNKS, QUERY
+
+    monkeypatch.setattr(session_memory, "DB_PATH", tmp_path / "memory.db")
+    monkeypatch.setattr(route_log, "record", lambda *a, **k: None)
+    monkeypatch.setattr(chat_answer, "_critique_and_save_trace", lambda **kwargs: None)
+    terms = {"total_docs": 0, "avg_len": 1.0, "lengths": [], "idf": {}, "postings": {}}
+    for module in (chat_retrieval, chat_answer):
+        monkeypatch.setattr(module, "load_chunks", lambda: [c for _, c in CHUNKS])
+        monkeypatch.setattr(module, "load_terms", lambda: terms)
+        monkeypatch.setattr(module, "search", lambda *args, **kwargs: list(CHUNKS))
+    monkeypatch.setattr(chat_answer, "results_are_weak", lambda *a: False)
+    monkeypatch.setattr(chat_answer, "intent_guard_failed", lambda *a: False)
+
+    def model_answered(*args, **kwargs):
+        chat_answer._log_generation_outcome(True, {"warnings": []}, 1.0)
+        return "Short answer: a model answer the gate will not like.", True
+
+    monkeypatch.setattr(chat_answer, "make_answer", model_answered)
+    monkeypatch.setattr(chat_answer, "answer_quality_report", lambda *a, **k: {"score": 0, "warnings": []})
+
+    payload = chat_answer.answer_payload(QUERY, session_id="gate", record_session=False)
+
+    assert payload["weak_match"] is True
+    assert payload["llm_enhanced"] is False
+    assert chat_answer.last_generation_outcome() == "quality gate: answer quality below threshold"

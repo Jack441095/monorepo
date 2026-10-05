@@ -2679,14 +2679,16 @@ def _answer_payload_raw(
         answer = weak_match_answer(query, answer_mode=answer_mode)
         weak_match = True
         confidence = "low"
+        gate_warning = "grounding below answer threshold" if mode == "weak" else "answer quality below threshold"
+        if llm_used:
+            # The model's text is gone by here, so this isn't a model answer any more. Left True, the
+            # background upgrade counted the clarifying reply as accepted and the probe credited it to
+            # the model (audit, 5 Oct 2026).
+            llm_used = False
+            _last_outcome.reason = f"quality gate: {gate_warning}"
         grounding = {
             **grounding,
-            "warnings": [
-                *grounding.get("warnings", []),
-                "grounding below answer threshold"
-                if mode == "weak"
-                else "answer quality below threshold",
-            ],
+            "warnings": [*grounding.get("warnings", []), gate_warning],
         }
         quality = {
             **quality,
