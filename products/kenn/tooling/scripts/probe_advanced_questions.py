@@ -98,6 +98,23 @@ def follow_upgrade(endpoint: str, session_id: str, upgrade: dict, wait: float, s
     return result
 
 
+def rejection_reason(payload: dict, upgrade: dict, delivered_by_model: bool) -> str:
+    if delivered_by_model:
+        return ""
+    # The template's own `warnings` are empty on the background path, which is why 34 rejected rows on 4 Oct
+    # said nothing. The reason lives on the upgrade.
+    if upgrade.get("status") == "rejected":
+        return str(upgrade.get("reason") or upgrade.get("error") or "no reason given")
+    # A poll that broke says nothing about the model, but it still cost the row, so it gets counted too.
+    if upgrade.get("status") == "error":
+        return f"probe poll failed: {upgrade.get('error') or 'unknown'}"
+    if upgrade:
+        return f"upgrade still {upgrade.get('status') or 'unknown'} when the wait ran out"
+    # No upgrade: KENN_LLM_BACKGROUND=0, or a route that never offers one.
+    warnings = (payload.get("generation_validation") or {}).get("warnings") or []
+    return str(payload.get("generation_outcome") or (warnings[0] if warnings else ""))
+
+
 def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
     started = time.perf_counter()
     row: dict = {"id": case["id"], "category": case["category"], "expect": case["expect"],
@@ -126,10 +143,7 @@ def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
         "model_attempted": attempted,
         "llm_available": bool(payload.get("llm_available")),
         "upgrade_status": upgrade.get("status", ""),
-        # The template's own `warnings` are empty on the background path, which is why 34 rejected rows on 4 Oct
-        # said nothing. The reason lives on the upgrade.
-        "rejection_reason": (str(upgrade.get("reason") or upgrade.get("error") or "no reason given")
-                             if upgrade.get("status") == "rejected" else ""),
+        "rejection_reason": rejection_reason(payload, upgrade, upgrade_accepted or inline_accepted),
         "warnings": list(validation.get("warnings") or [])[:4],
         "unsupported_measurements": len(validation.get("unsupported_measurements") or []),
         "fabricated_sources": len(validation.get("fabricated_sources") or []),

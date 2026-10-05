@@ -24,5 +24,6 @@ def pytest_collection_modifyitems(config, items):
         return
     marker = pytest.mark.skip(reason="requires the local KENN corpus/index, excluded from public CI")
     for item in items:
-        if item.nodeid.split("tests/", 1)[-1] in NEEDS_INDEX:
+        # Match on the file and test name only: the part of the node id before them depends on where pytest ran.
+        if any(item.nodeid == name or item.nodeid.endswith("/" + name) for name in NEEDS_INDEX):
             item.add_marker(marker)
