@@ -1,6 +1,6 @@
 # Cloud session handoff, 5 Oct 2026
 
-Jack is travelling, so the next KENN session runs in the cloud. This page covers where things stand, what you can do
+Jack is travelling, so the next KENN session runs in the cloud on Tuesday 6 Oct. This page covers where things stand, what you can do
 without the Mac, the rules, and how to hand the work back so Jack can pull it locally.
 
 ## The goal and where it stands
@@ -34,18 +34,19 @@ Items you can do from the cloud, in plan order:
    - `packages/chat/tests/conftest.py` matches on `nodeid.split("tests/", 1)`, so it depends on the checkout path.
      Match on the trailing `file::test` instead.
    - Poll-transport errors in the probe aren't counted as a reason.
-2. **Stop a template counting as a model answer.** In `chat_answer.py`, around lines 2646–2676, `llm_enhanced` stays
-   True after the quality gate swaps in `weak_match_answer`. That is finding 4 of the 5 Oct code audit. Check whether
-   it inflates the gate count before you change anything. If it does, the true score is lower than 27, and the plan
-   must say so.
+   - Split "generation returned no answer" into two reasons: the request failed or timed out, or the answer failed
+     the structure check. Until then, nobody can tell whether truncation (audit finding 2) is the cause.
+2. **Stop a template counting as a model answer.** Checked 5 Oct: no row in the last four runs was counted this way, so
+   it's a correctness fix, not a gate fix. In `chat_answer.py`, around lines 2646–2676, `llm_enhanced` stays
+   True after the quality gate swaps in `weak_match_answer`. That is finding 4 of the 5 Oct code audit.
 3. **Unsupported measurements prompt fix.** The prompt and draft snippets invite the model to repeat earlier numbers,
    which the measurement check then rejects. One candidate is to strip numbers from the draft snippet. The checks
    themselves stay as they are (see the fixed values below).
 4. **Answers that fit 128 tokens.** Start from branch `draft/answer-fits-128-tokens` (`6d670900`, `61c4206a`). The
    128-token cap stays: changing it is Jack's call. The fix is to make answers finish within the cap.
-5. **Stop the background upgrade from repeating template work.** It reruns the whole template pipeline before it
-   decodes. At 4.94–8.46 tok/s, the decode alone takes 15–26 s, so every second spent before it counts. This is
-   audit finding 5.
+5. **Advice questions that name a track go to the model.** "What's your advice on drum bus compression?" is routed
+   to Live inspection and answered "'Drum Bus' has: Compressor.", so the model is never asked. (Repeating the
+   template work, from the audit, was dropped: it costs 70–120 ms. See the plan.)
 
 Work on one item per branch: `draft/<short-name>` off `main`.
 

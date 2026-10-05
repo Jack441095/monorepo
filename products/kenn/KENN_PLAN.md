@@ -1073,13 +1073,25 @@ only passes on three clean runs in a row at 31/44 or better; a single good run m
   Run 1 (5 Oct, 02:09) doesn't count for timing: the Mac dropped to battery at 02:11, and model answers took 26–30 s
   where the 30 Sept runs took about 10 s. It scored 8/44, with 34 of 44 delivered by the model. The reasons for the 10
   template rows still hold: unsupported measurements 4, no answer 3, model not asked 2, blank 1. Rerun on mains.
-- [ ] Check the 5 Oct code audit's findings against those reasons and the code; keep only what's confirmed.
+- [x] Check the 5 Oct code audit's findings against those reasons and the code; keep only what's confirmed.
+  Checked 5 Oct against run 1 and the three 30 Sept runs. Confirmed: a quality-gate swap leaves `llm_enhanced` True
+  (finding 4), but no probe row in the four runs was counted that way, so the 27–31 scores stand. Trimming and
+  salvage already exist on the background path (8 answers saved by dropping sentences in run 1). The four
+  unsupported-measurement rejections are answers where that still wasn't enough. Wrong for this gate: finding 5. The
+  template side of an upgrade costs 70–120 ms, and the rest is the model, so item 8 below is dropped. Not checkable
+  yet: finding 2 (truncation), because "no answer" lumps a failed request and a failed structure check together.
+  New: `followup-drums` ("What's your advice on drum bus compression?") is routed to Live inspection and answered
+  "'Drum Bus' has: Compressor.", so the model is never asked.
 - [ ] Review follow-ups: a real-path test for the reason, count inline rejections too, match the chat-test skip on
-  the test name rather than a `tests/` path segment.
-- [ ] Stop a template counting as a model answer when the quality check swaps it in after generation.
+  the test name rather than a `tests/` path segment. Also split "generation returned no answer" into request
+  failed or timed out vs failed the structure check, so finding 2 can be checked.
+- [ ] Stop a template counting as a model answer when the quality check swaps it in after generation. A correctness
+  fix; it didn't change any of the last four scores.
 - [ ] Unsupported measurements: show the model which numbers the notes contain and have it describe others in words.
 - [ ] Answers that fit 128 tokens instead of being cut and rejected (`draft/answer-fits-128-tokens`).
-- [ ] Stop the background upgrade repeating the template's retrieval and scoring.
+- [ ] ~~Stop the background upgrade repeating the template's retrieval and scoring.~~ Dropped 5 Oct: it costs
+  70–120 ms of a 10 s answer.
+- [ ] Advice questions that name a track ("advice on drum bus compression") go to the model, not Live inspection.
 - [ ] Lower prose temperature, measured on its own.
 - [ ] Reference-numbers note for the values the model keeps inventing (needs Jack and a box rebuild).
 - [ ] Three clean runs in a row at 31/44 or better.
