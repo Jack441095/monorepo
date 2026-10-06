@@ -18,6 +18,13 @@ def test_a_hyphenated_query_word_also_searches_its_parts() -> None:
     assert "linear" in terms and "phase" in terms
 
 
+def test_re_amp_searches_amp_and_not_the_re_left_over_from_contractions() -> None:
+    # Review of 6 Oct 2026: "re" has idf 3.96 in the live index because "you're" tokenizes to it.
+    terms = with_hyphen_parts("How do I re-amp a guitar?", ["re-amp", "guitar"])
+
+    assert "amp" in terms and "re" not in terms
+
+
 def test_linear_phase_with_a_hyphen_finds_the_note_that_writes_it_with_a_space() -> None:
     # 5 Oct 2026: "linear-phase" stayed one token, so "linear" never scored and a minimum-phase note won on "phase eq".
     passages = [

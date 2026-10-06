@@ -419,8 +419,9 @@ def hybrid_search(
     order = sorted(candidates, key=lambda idx: -fused[idx])[: max(limit, 40)]
 
     # Scores stay on the BM25 scale that the relevance thresholds (MIN_RELEVANT_SCORE) expect: each result
-    # carries the best boosted BM25 score at or below its rank. The top score, which decides "I don't know",
-    # is therefore unchanged, and an embedding-only hit inherits evidence instead of scoring 0.
+    # carries the best boosted BM25 score at or below its rank, and an embedding-only hit inherits evidence
+    # instead of scoring 0. The top score decides "I don't know". It can only rise when an embedding-only hit
+    # outscores the BM25 leader on its own keywords, and then by at most the embedding boost (0.25 x emb_weight).
     #
     # An embedding-only hit used to score 0 whenever no BM25 hit sat below it, and display_results drops a
     # second note under 55% of the first, so the right note could rank 2nd and still never reach the model. On
@@ -735,7 +736,9 @@ def with_hyphen_parts(query: str, query_terms: list[str]) -> list[str]:
         for token in tokenize(canonical_audio_query(query))
         if "-" in token
         for part in token.split("-")
-        if part and part not in query_terms
+        # Two-letter parts are mostly contraction debris: the tokenizer leaves "re" from "you're" in the index
+        # at idf 3.96, so "re-amp" would have boosted every chunk written in a chatty voice. "amp" carries the query.
+        if len(part) >= 3 and part not in STOPWORDS and part not in query_terms
     ]
     return query_terms + list(dict.fromkeys(extra))
 
