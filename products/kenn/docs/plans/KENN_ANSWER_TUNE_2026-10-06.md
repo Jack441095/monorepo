@@ -1,15 +1,15 @@
-# KENN answer tune: status at 11:50, 6 Oct 2026
+# KENN answer tune: teacher pass finished 13:10, 7 Oct 2026
 
 This is the "Answer fine-tune on a 4B, agreed 5 Oct 2026" section of `KENN_PLAN.md`. The teacher pass was cut at 225
 questions at 11:00, then run for about 40 more minutes and stopped at 329 questions, because Jack was travelling
-for work.
+for work. It was restarted at 09:40 on 7 Oct and finished at 13:10 with 948 of the 977 questions recorded.
 
 ## Where it stands
 
 | Step | State |
 | --- | --- |
 | Questions from approved notes, leaving out the probe and held-out sets and anything near them | Done: 977 questions from 385 notes |
-| Teacher answers from `qwen3:32b` through KENN's real answer path, gate-accepted, 128 tokens or fewer | Stopped at 329: 174 kept |
+| Teacher answers from `qwen3:32b` through KENN's real answer path, gate-accepted, 128 tokens or fewer | Done: 948 recorded, 505 kept |
 | Jack grades about 40 kept answers | Page is ready, nothing graded yet |
 | LoRA on GPU 0 in `c6/venv`, with early stopping | Ready to start, not started (see below) |
 | Merge, GGUF Q4_K_M, serve through Ollama on the Mac | Scripted inside the training job; the Modelfile is ready |
@@ -27,21 +27,28 @@ for work.
 - The 0.60 cosine was calibrated by hand on 6 Oct. Pairs that ask about the same thing in different words scored 0.62
   (a precedence question) and 0.83 (a sidechain question). Unrelated pairs scored 0.38 to 0.48.
 
-**Teacher answers** (329 of the 977 questions)
+**Teacher answers** (948 of the 977 questions)
 
-| | At 11:00 | Final, 11:50 |
-| --- | --- | --- |
-| Questions recorded | 225 | 329 |
-| Answers kept | 114 (51%) | 174 (53%) |
-| Notes the kept answers come from | 71 | 106 |
-| Train / valid | 105 / 9 | 156 / 18 (valid from 10 held-back notes) |
+| | 6 Oct, 11:00 | 6 Oct, 11:50 | Final, 7 Oct 13:10 |
+| --- | --- | --- | --- |
+| Questions recorded | 225 | 329 | 948 |
+| Answers kept | 114 (51%) | 174 (53%) | 505 (53%) |
+| Notes the kept answers come from | 71 | 106 | 292 |
+| Train / valid | 105 / 9 | 156 / 18 (valid from 10 held-back notes) | 448 / 57 (valid from 29 held-back notes) |
 
-- None was dropped for hitting the 128-token cap.
+- **Correction (7 Oct):** the 6 Oct version of this doc said no answer was dropped for hitting the 128-token cap.
+  That was wrong; the 6 Oct runner did not count them. The 7 Oct run did: 614 of its 1046 tries were gate-accepted
+  answers cut off at the cap, so the cap, not the gate, is now the main reason a question yields nothing. Raising the
+  cap is off the table (KENN answers at 128 tokens), so the useful fix is a shorter-answer instruction to the teacher
+  if we ever need more data.
+- 29 questions were never recorded: a second pass tried them 54 times, none was kept or cut off, and it stopped
+  because it added nothing. They are left out.
 - The split holds back whole notes for validation, so related questions never sit on both sides.
-- Training targets now have a median of 87 words and a longest of 104, with the Sources block removed (next
-  section). With it, the median was 103 words.
-- At about 2.5 questions a minute, the remaining 648 questions would take about 4 more hours, for roughly 340 more
-  examples. Rerunning the answers step resumes from `progress.jsonl`.
+- Training targets have a median of 86 words and a longest of 108, with the Sources block removed (next section).
+  0 of the 505 targets contain "Sources:"; the phrase only appears in the system prompt, telling the model not to
+  write one.
+- The 6 Oct estimate of "roughly 340 more examples" from the rest of the run was high: it came in at 331, because of
+  the cap cut-offs above.
 
 **Correctness.** The gate checks that an answer is grounded in the excerpts, not that it is right. In the 2-question
 smoke test it let one answer through that gave Utility an HP/LP filter. Utility has no filter. The grades are the
@@ -89,13 +96,13 @@ scp tooling/scripts/train_kenn_command_lora_cuda.py $O/../answer1_box.sh <box>:/
 ssh <box> 'cd /mnt/data/kenn-bakeoff/c6 && (setsid nohup ./answer1_box.sh > answer1_box.out 2>&1 < /dev/null &)'
 ```
 
-With 156 examples, one epoch is about 20 optimiser steps, so training should take minutes, not hours. When
+With 448 training examples, one epoch is about 56 optimiser steps, so training should still take minutes, not hours. When
 `answer1_box.out` says `BOX DONE`, copy `answer1-q4km.gguf` into `kenn-evaluation-data/2026-10-06-answer-tune/` and run
 `ollama create kenn-answer1 -f Modelfile.answer1` there. The Modelfile is the plain 4B's template with `FROM` changed.
 
 ## Grading
 
-40 answers, sampled with seed 0 from the 114 kept at 11:00 (all 40 are still in the final 174):
+40 answers, sampled with seed 0 from the 114 kept at 11:00 (all 40 are in the final 505, at the same `examples.jsonl` index):
 https://claude.ai/artifact/BrcSDREy6ZLLRxskoDdq3J
 
 Each card shows the question, the excerpts the model saw, and the answer, with Good / Fixable / Wrong buttons and a
@@ -104,14 +111,14 @@ note. Grades save as you go, so it can be done in pieces. Which sample id maps t
 
 How the grades decide what happens:
 
-- **Mostly good.** Train on all 174, or finish the teacher pass first for more data.
+- **Mostly good.** Train on all 505.
 - **More than a few wrong.** Drop the wrong ones from `train.jsonl`. Then decide whether the gate needs a check for
   the kind of error that got through, before generating more answers.
 
 ## Decisions for Jack
 
-1. Start the box job above now on 156 examples, or finish the teacher pass first (about 4 hours, about 510 examples).
-   156 is small. The 25 Sept style LoRA had 345 examples and failed, though for other reasons: it was trained on its
-   own answers and its targets were long.
+1. Start the box job above on the final 448 / 57 split (decided: the teacher pass is finished). The 25 Sept style
+   LoRA had 345 examples and failed, but for other reasons: it was trained on its own answers and its targets were
+   long.
 2. Whether to train before grading. The plan says grade first. Training first only costs GPU time, and nothing ships
    until the grades and the benchmark are both in.
