@@ -22,11 +22,17 @@ _WORD = re.compile(r"[a-z0-9]+")
 # inventory question, whatever track it names.
 # That fixed the "advice on" wording but not the same ask put as a value: "what's a good attack for the drum bus
 # compressor?" still matched the parameter regex and read back "Attack is 1.00 ms." (found 7 Oct 2026 while chasing
-# `followup-drums`). A "good/best/ideal/recommended" value, or one the user "should" use, is a question for the
-# notes. The cost is a track actually named "Best Vocal" going to the notes for a value read, which is a safe miss.
+# `followup-drums`). So the second alternative matches an advice word sitting next to a parameter ("a good attack",
+# "the best starting release", "ideal ratio"; up to 2 words between) or "should I" / "I should" plus
+# use/set/put/have/try. It is deliberately not a bare-word veto: the first cut vetoed on "good", "should" or "best"
+# anywhere and sent "is anything muted that should not be?", "what's on Best Take?" and "...gain on the compressor,
+# it sounds good" to the notes (review of 30782ed8). A track literally named "Best Release" would still miss; that
+# is rare enough to accept.
 _ASKS_FOR_ADVICE = re.compile(
     r"\b(?:advice|tips?|thoughts?|opinion|take|approach|recommendations?|suggestions?)\s+(?:on|for|about)\b"
-    r"|\b(?:good|best|better|ideal|recommended|typical|usual|should)\b"
+    r"|\b(?:good|best|ideal|recommended|typical|usual)\s+(?:\w+\s+){0,2}"
+    r"(?:threshold|ratio|attack|release|output|gain|frequency|dry/?wet|drive|makeup|knee|settings?|values?)\b"
+    r"|\b(?:should\s+(?:i|we)|(?:i|we)\s+should)\s+(?:use|set|put|have|try)\b"
 )
 
 

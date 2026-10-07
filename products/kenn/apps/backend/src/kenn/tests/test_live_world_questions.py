@@ -82,6 +82,35 @@ def test_asking_for_a_good_value_is_advice_not_the_current_value(question: str) 
 
 
 @pytest.mark.parametrize(
+    "question",
+    [
+        "Is anything muted that should not be?",
+        "What's on the drum bus that should not be there?",
+        "What's the threshold on the Drum Bus compressor? It should be around -20.",
+        "What is the gain on the drum bus compressor, it sounds good",
+        "Is the key right? What key is the song in, it should be C",
+    ],
+)
+def test_a_should_or_good_inside_an_inspection_question_does_not_make_it_advice(question: str) -> None:
+    # Review of 30782ed8: a bare "should"/"good" anywhere vetoed every question kind, so these stopped reading Live.
+    from kenn.core.live_session_questions import answer_live_session_question
+
+    result = answer_live_session_question(question, service=LiveActionService(_live()))
+    assert result is not None and result["status"] == "inspected"
+
+
+@pytest.mark.parametrize("track", ["Best Take", "Good Vocal", "Usual Suspects"])
+def test_a_track_named_with_an_advice_word_still_reads_live(track: str) -> None:
+    # Same review: the new advice words are only advice next to a parameter, not inside a track's name.
+    from kenn.core.live_session_questions import answer_live_session_question
+
+    live = _live()
+    live.set_track_name(3, track)  # index 3 is the Drum Bus, the track with the Compressor
+    result = answer_live_session_question(f"What's on the {track} track?", service=LiveActionService(live))
+    assert result is not None and f"'{track}' has: Compressor." in result["answer"]
+
+
+@pytest.mark.parametrize(
     ("question", "expected"),
     [
         ("What's on the Drum Bus?", "'Drum Bus' has: Compressor."),
