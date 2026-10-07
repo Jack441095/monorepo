@@ -463,6 +463,30 @@ def explicit_abstain_gap(answer: str) -> str:
     return ""
 
 
+# 3 words: shortest gap that still says what is missing ("the notes never cover phase"). "more." or "more detail."
+# is the model acknowledging the rule without naming anything, which the 7 Oct 2026 review showed a one-word filler
+# gap could pass.
+ABSTAIN_MIN_GAP_WORDS = 3
+
+
+def whole_reply_abstain_gap(answer: str) -> str:
+    """The gap when the whole reply is one "Insufficient context: <gap>" line, else "".
+
+    explicit_abstain_gap() finds the prefix on any line, so a full answer with the prefix tacked on the end, or a
+    decline followed by advice, plugin names or a made-up Sources list, would read as a decline. A decline is
+    only a decline when nothing else is said: one non-empty line, the exact prefix (case-sensitive, as both
+    prompts ask for it) and a gap of at least ABSTAIN_MIN_GAP_WORDS words. Anything else goes through the normal
+    gate, which is where advice that happens to mention missing context belongs.
+    """
+    stripped = answer.strip()
+    if "\n" in stripped or not stripped.startswith(ABSTAIN_PREFIX):
+        return ""
+    gap = stripped[len(ABSTAIN_PREFIX):].strip()
+    # Words that carry a letter or digit, so a lone "." or "-" cannot pad a filler gap up to the minimum.
+    words = [word for word in gap.split() if any(ch.isalnum() for ch in word)]
+    return gap if len(words) >= ABSTAIN_MIN_GAP_WORDS else ""
+
+
 _STRUCTURE_TERMS = {
     "short", "answer", "try", "this", "check", "sources", "source", "step",
     "steps", "first", "then", "use", "using", "based", "notes", "note",
@@ -1016,11 +1040,13 @@ def generated_answer_validation(
     # same shown list as the aggregate check above, so a claim can never be placed against a chunk the model
     # never read.
     citations = verify_claim_citations(answer, shown)
-    # An abstain is only an abstain if it names the gap and asserts no number. "Insufficient context: ... we would
-    # want a note on the 48 kHz setting" has already answered, so it goes through every check below like any other
-    # answer and the word costs it nothing.
+    # An abstain is only an abstain if the whole reply is one line that names the gap and asserts no number.
+    # "Insufficient context: ... we would want a note on the 48 kHz setting" has already answered, and a reply
+    # that carries advice or a Sources list after the line is an answer with a disclaimer, so both go through every
+    # check below like any other answer and the prefix costs them nothing. abstain_gap stays the loose reading
+    # (what the model said was missing, wherever it said it) so capture rows still show it for those replies.
     abstain_gap = explicit_abstain_gap(answer)
-    abstained = bool(abstain_gap) and not citations["total"]
+    abstained = bool(whole_reply_abstain_gap(answer)) and not citations["total"]
     warnings = []
     # The eight conditions below are unchanged and keep their order, so route_latency_report.py still groups on
     # the same first warning. The two claim-level conditions are appended after them for the same reason: a report

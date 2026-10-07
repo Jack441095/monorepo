@@ -2727,9 +2727,10 @@ def _answer_payload_raw(
         grounding=grounding,
         timeline_context=timeline_context,
     )
-    # make_answer() already ran the grounding gate on this text, so a decline here is one that named its gap and
-    # asserted no number and no Live change. We read the gap back from the text because the thread-local only says
-    # that the model declined, and the payload wants the sentence too.
+    # make_answer() already ran the grounding gate on this text, so a decline here is a whole reply of one
+    # "Insufficient context: <gap>" line with a gap of 3+ words, no number and no claimed Live change. We read the
+    # gap back from the text because the thread-local only says that the model declined, and the payload wants the
+    # sentence too.
     abstained = bool(llm_used) and last_generation_abstained()
     abstain_gap = explicit_abstain_gap(answer) if abstained else ""
     if (

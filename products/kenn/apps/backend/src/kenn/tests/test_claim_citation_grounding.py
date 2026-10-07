@@ -328,7 +328,9 @@ def test_an_abstain_cannot_excuse_a_claim_that_it_changed_the_set() -> None:
     for a change that never happened."""
     result = validate("Insufficient context: we hold no note on the send.\n\nI've already muted the hats.")
 
-    assert result["abstained"] is True
+    # Not a whole-reply decline any more (7 Oct 2026): the second line makes it an answer, so it is rejected for
+    # the claim below rather than waved through as a refusal. This test used to pin abstained True for it.
+    assert result["abstained"] is False
     assert result["claims_live_change"] is True
     assert result["accepted"] is False
     assert "generated answer claims it changed the Live set" in result["warnings"]

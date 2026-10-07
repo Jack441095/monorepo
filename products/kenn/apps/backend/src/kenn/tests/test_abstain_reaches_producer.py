@@ -18,9 +18,11 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+import pytest
 from scripts import probe_advanced_questions as probe
 
 from kenn.core import answer_upgrades, chat_answer, chat_retrieval, route_log, session_memory
+from kenn.core.chat_grounding import generated_answer_validation
 from kenn.llm import llm_rewrite as llm
 from kenn.tests.test_streamed_generation_prefix_guard import (
     ACCEPTED_ANSWER,
@@ -32,6 +34,11 @@ from kenn.tests.test_streamed_generation_prefix_guard import (
 
 GAP = "the excerpts do not address how a linear-phase EQ differs from a minimum-phase one."
 ABSTAIN = f"Insufficient context: {GAP}"
+
+
+def _validate(reply: str) -> dict:
+    return generated_answer_validation(QUERY, list(CHUNKS), reply, route="production", confidence="high",
+                                       answer_mode="mix_diagnosis")
 
 
 def _model_writes(monkeypatch, text: str) -> None:
@@ -258,3 +265,44 @@ def test_the_background_swap_measure_reports_a_decline_as_its_own_status() -> No
     assert module.swap_status_of({"status": "accepted", "abstained": True}) == "abstained"
     assert module.swap_status_of({"status": "accepted"}) == "accepted"
     assert module.swap_status_of({"status": "rejected"}) == "rejected"
+
+
+# 7 Oct 2026 adversary review: abstain was "any line starts with the prefix", so each of these replies, which
+# still advises, cites or answers, was kept as a decline and skipped the quality gate, calibration and Sources.
+NOT_A_DECLINE = {
+    "answer_with_the_prefix_as_its_last_line": (
+        "Short answer: Use a slow release.\n\nTry this:\n1. Set the release to 200 ms.\n2. Lower the ratio.\n\n"
+        f"{ABSTAIN}"
+    ),
+    "advice_after_the_decline": f"{ABSTAIN}\n\nTry a slow release and a gentle ratio on the bus.",
+    "invented_sources_after_the_decline": f"{ABSTAIN}\n\nSources:\n- Fake Note (fake-note.md)",
+    "a_plugin_recommendation_after_the_decline": f"{ABSTAIN}\nTry Serum or FabFilter Pro-C.",
+    "a_ratio_after_the_decline": f"{ABSTAIN}\nUse a ratio of four to one.",
+    "lowercase_prefix": f"insufficient context: {GAP}",
+    "no_gap_but_a_full_stop": "Insufficient context: .",
+    "one_word_gap": "Insufficient context: more.",
+    "two_word_gap": "Insufficient context: more detail.",
+}
+
+
+@pytest.mark.parametrize("reply", NOT_A_DECLINE.values(), ids=NOT_A_DECLINE.keys())
+def test_only_a_whole_one_line_decline_counts_as_one(reply, monkeypatch, tmp_path) -> None:
+    assert llm.is_abstain_reply(reply) is False
+    assert _validate(reply)["abstained"] is False
+
+    # Through the real producer path: it must not be kept as a marked decline, and the reply's own text must not
+    # have skipped the checks the same text gets without the prefix.
+    _model_writes(monkeypatch, reply)
+    payload = _ask_for_payload(monkeypatch, tmp_path)
+    assert payload["answer_abstained"] is False
+    assert payload["abstain_gap"] == ""
+    assert "fake-note.md" not in payload["answer"]
+
+
+def test_a_decline_with_a_three_word_gap_is_a_decline() -> None:
+    reply = "Insufficient context: the notes never cover phase."
+
+    assert llm.is_abstain_reply(reply) is True
+    assert _validate(reply)["abstained"] is True
+    # Surrounding blank space is not content.
+    assert llm.is_abstain_reply(f"\n  {reply}\n") is True

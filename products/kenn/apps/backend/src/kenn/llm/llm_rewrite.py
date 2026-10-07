@@ -54,21 +54,21 @@ PROJECT_ROOT = ROOT.parent.parent
 CLAIM_CITATION_RE = re.compile(r"\[\s*#\s*([^\]\s]{1,32})\s*\]")
 
 # The line the model writes instead of an answer when the excerpts do not hold one. Read back by
-# chat_grounding.explicit_abstain_gap(), which is why the wording is a fixed prefix and not a tone instruction:
+# chat_grounding.whole_reply_abstain_gap(), which is why the wording is a fixed prefix and not a tone instruction:
 # an abstain the gate cannot parse is the same as no abstain at all.
 ABSTAIN_PREFIX = "Insufficient context:"
 
 
 def is_abstain_reply(text: str) -> bool:
-    """True when the model declined and named the gap, which is the only shape of decline we let through.
+    """True when the whole reply is one line declining and naming the gap, the only shape of decline we let through.
 
-    Defers to chat_grounding.explicit_abstain_gap() so there is one parser. It is imported here and not at the
-    top because chat_grounding imports ABSTAIN_PREFIX from this module. Whether the decline also passes the
-    no-number and no-claimed-action rules is the grounding gate's call, not this check's.
+    Defers to chat_grounding.whole_reply_abstain_gap() so the gate and this check share one parser. It is imported
+    here and not at the top because chat_grounding imports ABSTAIN_PREFIX from this module. Whether the decline
+    also passes the no-number and no-claimed-action rules is the grounding gate's call, not this check's.
     """
-    from kenn.core.chat_grounding import explicit_abstain_gap
+    from kenn.core.chat_grounding import whole_reply_abstain_gap
 
-    return bool(explicit_abstain_gap(text))
+    return bool(whole_reply_abstain_gap(text))
 
 SYSTEM_PROMPT_TEMPLATE = """You are KENN, senior audio engineer assistant and trusted studio partner for Audio_Too.
 
