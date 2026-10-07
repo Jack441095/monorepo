@@ -62,6 +62,7 @@ from kenn.core.chat_grounding import (
     drop_unsupported_sentences,
     end_on_a_whole_sentence,
     evidence_measurements,
+    explicit_abstain_gap,
     generated_answer_validation,
     grounding_mode,
     grounding_report,
@@ -970,6 +971,7 @@ def make_answer(
     _ma_t0 = _time.perf_counter()
     # Every return below says why, and nothing from an earlier answer on this thread may stand in for it.
     _last_outcome.reason = ""
+    _last_outcome.abstained = False
     template = build_template_answer(
         query,
         results,
@@ -1146,6 +1148,11 @@ def last_generation_outcome() -> str:
     return getattr(_last_outcome, "reason", "")
 
 
+def last_generation_abstained() -> bool:
+    """Whether the model text the last make_answer() on this thread kept was an honest decline, not an answer."""
+    return bool(getattr(_last_outcome, "abstained", False))
+
+
 def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) -> None:
     """Record one line per generated answer with the reason it was kept or dropped.
 
@@ -1154,19 +1161,55 @@ def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) ->
     change after a prompt or model change. Never raises -- a logging failure must not cost the producer an answer,
     which is the same rule log_outcome() in answer_upgrades follows.
     """
-    _last_outcome.reason = "accepted" if accepted else "rejected"
+    # A decline the gate accepted is kept for the producer but is not the model answering the question, so it gets
+    # its own outcome and never the brain=True that "generation:accepted" carries.
+    abstained = accepted and bool(validation.get("abstained"))
+    _last_outcome.abstained = abstained
+    _last_outcome.reason = "abstained" if abstained else "accepted" if accepted else "rejected"
     try:
         warnings = [str(w) for w in (validation.get("warnings") or [])]
         reason = warnings[0] if warnings else _last_outcome.reason
         _last_outcome.reason = reason
         from kenn.core import route_log
 
-        route = f"generation:{'accepted' if accepted else reason}"
+        route = "generation:abstained" if abstained else f"generation:{'accepted' if accepted else reason}"
         detail = _last_call_timing()
         detail += [f"unsupported measurement: {m}" for m in (validation.get("unsupported_measurements") or [])]
         detail += [f"fabricated source: {s}" for s in (validation.get("fabricated_sources") or [])]
         detail += [f"dropped sentence with: {m}" for m in (validation.get("salvaged") or [])]
-        route_log.record(route, seconds * 1000.0, brain=accepted, proposal=False, detail=detail)
+        brain = accepted and not abstained
+        if brain and getattr(_last_outcome, "hold", False):
+            # answer_payload() runs a quality check after make_answer() that can still swap this text for the
+            # template. Crediting the model now would leave "generation:accepted" brain=True in the log for an
+            # answer the producer never saw, so the row waits for that verdict (see _settle_held_generation_row).
+            _last_outcome.held = (route, seconds * 1000.0, detail)
+            return
+        route_log.record(route, seconds * 1000.0, brain=brain, proposal=False, detail=detail)
+    except Exception:
+        logging.getLogger("kenn.core.chat_answer").debug("generation outcome logging failed", exc_info=True)
+
+
+def _settle_held_generation_row(swapped_for: str = "") -> None:
+    """Write the accepted-generation row make_answer() held back: as brain work if the answer stood, else as a rejection.
+
+    swapped_for is the quality-gate warning when the template replaced the model's text, "" when the text stood.
+    Never raises, for the same reason _log_generation_outcome() never does.
+    """
+    held = getattr(_last_outcome, "held", None)
+    _last_outcome.held = None
+    if held is None:
+        return
+    route, milliseconds, detail = held
+    try:
+        from kenn.core import route_log
+
+        if swapped_for:
+            # Same route shape make_answer() uses for its own rejections, and short enough for route_log's 64
+            # character route field (the longest of the two gate warnings gives 54).
+            route_log.record(f"generation:quality gate: {swapped_for}", milliseconds, brain=False, proposal=False,
+                             detail=detail)
+        else:
+            route_log.record(route, milliseconds, brain=True, proposal=False, detail=detail)
     except Exception:
         logging.getLogger("kenn.core.chat_answer").debug("generation outcome logging failed", exc_info=True)
 
@@ -1964,10 +2007,18 @@ def _answer_payload_stream_raw(
                 ),
                 "fabricated_sources": list(validation["fabricated_sources"]),
                 "evidence_overlap": validation["evidence_overlap"],
+                # Same marker the non-stream path carries, so held-out runs on the stream surface can tell a
+                # decline from a model answer.
+                "abstained": bool(validation.get("abstained")),
+                "abstain_gap": validation.get("abstain_gap") or "",
             }
             if validation["accepted"]:
-                final_answer = calibrate_answer_for_grounding(
-                    candidate, validation["grounding"]
+                # A decline is already on the wire in full; calibration would only add a caveat about evidence
+                # the model said it did not have.
+                final_answer = (
+                    candidate
+                    if generation_validation["abstained"]
+                    else calibrate_answer_for_grounding(candidate, validation["grounding"])
                 )
                 grounding = validation["grounding"]
                 quality = validation["quality"]
@@ -2011,7 +2062,8 @@ def _answer_payload_stream_raw(
         final_metadata = {
             **initial_metadata,
             "answer": final_answer,
-            "llm_enhanced": llm_active,
+            # A kept decline is not the model answering, so it must not count as llm_enhanced.
+            "llm_enhanced": llm_active and not generation_validation.get("abstained", False),
             "llm_usage": llm_usage,
             "generation_validation": generation_validation,
             "grounding": grounding,
@@ -2636,16 +2688,22 @@ def _answer_payload_raw(
     if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
         return {}
     started = time.perf_counter()
-    answer, llm_used = make_answer(
-        relevance_query,
-        results,
-        history=_history_for_answer(history, use_history),
-        allow_llm=allow_llm,
-        route=route,
-        timeline_context=timeline_context,
-        answer_mode=answer_mode,
-        session_id=session_id,
-    )
+    # Hold the accepted-generation log row until the quality check below has judged the text.
+    _last_outcome.hold = True
+    _last_outcome.held = None
+    try:
+        answer, llm_used = make_answer(
+            relevance_query,
+            results,
+            history=_history_for_answer(history, use_history),
+            allow_llm=allow_llm,
+            route=route,
+            timeline_context=timeline_context,
+            answer_mode=answer_mode,
+            session_id=session_id,
+        )
+    finally:
+        _last_outcome.hold = False
     timings["answer_ms"] = (time.perf_counter() - started) * 1000
 
     started = time.perf_counter()
@@ -2669,8 +2727,17 @@ def _answer_payload_raw(
         grounding=grounding,
         timeline_context=timeline_context,
     )
+    # make_answer() already ran the grounding gate on this text, so a decline here is a whole reply of one
+    # "Insufficient context: <gap>" line with a gap of 3+ words, no number and no claimed Live change. We read the
+    # gap back from the text because the thread-local only says that the model declined, and the payload wants the
+    # sentence too.
+    abstained = bool(llm_used) and last_generation_abstained()
+    abstain_gap = explicit_abstain_gap(answer) if abstained else ""
     if (
         not weak_match
+        and not abstained
+        # A decline scores under ANSWER_QUALITY_MIN_SCORE (no steps, no sources, nothing to ground), so the check
+        # below would swap the honest reply for the template: the exact answer the model just declined to give.
         and (mode == "weak" or quality["score"] < ANSWER_QUALITY_MIN_SCORE)
         and not timeline_context
         and diagnostic_plan_for(query) is None
@@ -2694,6 +2761,7 @@ def _answer_payload_raw(
             # the model (audit, 5 Oct 2026).
             llm_used = False
             _last_outcome.reason = f"quality gate: {gate_warning}"
+            _settle_held_generation_row(gate_warning)
         grounding = {
             **grounding,
             "warnings": [*grounding.get("warnings", []), gate_warning],
@@ -2702,7 +2770,9 @@ def _answer_payload_raw(
             **quality,
             "warnings": [*quality.get("warnings", []), "answer withheld by quality gate"],
         }
-    elif not weak_match and not timeline_context:
+    elif not weak_match and not timeline_context and not abstained:
+        # Calibration prepends hedges for medium/low grounding; on a one-line decline that would bury the gap
+        # under a caveat about evidence the model already said it did not have.
         answer = calibrate_answer_for_grounding(answer, grounding)
         quality = answer_quality_report(
             query,
@@ -2714,6 +2784,8 @@ def _answer_payload_raw(
             grounding=grounding,
             timeline_context=timeline_context,
         )
+    # The text stood (or was never the model's), so whatever make_answer() held is now safe to write as it was.
+    _settle_held_generation_row()
     self_check = answer_self_check(
         relevance_query,
         results,
@@ -2766,9 +2838,13 @@ def _answer_payload_raw(
         "grounding_mode": grounding_mode(grounding),
         "related_questions": followups,
         "used_history": use_history,
-        "llm_enhanced": llm_used,
+        # A decline is kept for the producer but is not the model answering, so every counter of llm_enhanced stays
+        # honest by reading False; answer_abstained is what the upgrade, the probe and the route report key on.
+        "llm_enhanced": llm_used and not abstained,
+        "answer_abstained": abstained,
+        "abstain_gap": abstain_gap,
         # With KENN_LLM_BACKGROUND=0 there is no upgrade to carry the reason, so the inline answer carries it.
-        "generation_outcome": "" if llm_used else last_generation_outcome(),
+        "generation_outcome": "abstained" if abstained else "" if llm_used else last_generation_outcome(),
         "llm_available": llm_enabled(),
         "llm_usage": llm_used and _get_llm_usage_stats(),
         "session": None,

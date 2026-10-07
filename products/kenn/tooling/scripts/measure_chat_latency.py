@@ -307,7 +307,10 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             "surface": surface,
             "provider_calls": [usage.to_dict() for usage in provider_calls],
             "attempted": bool(validation.get("attempted")),
-            "accepted": bool(validation.get("accepted")),
+            # The gate accepts a named-gap decline, but a decline is not a correct model answer, so it stays out of
+            # "accepted" (which feeds the 70% gate and the accepted-only timings) and out of "rejected" too.
+            "accepted": bool(validation.get("accepted")) and not validation.get("abstained"),
+            "abstained": bool(validation.get("accepted")) and bool(validation.get("abstained")),
             "warnings": [str(w) for w in (validation.get("warnings") or [])],
             # The warning names the class of fault but not the value, so a measure built on these receipts could
             # count rejections without saying which measurement or citation was at fault. Both are regex-extracted.
@@ -321,7 +324,8 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
 
     attempted = [r for r in rows if r["attempted"]]
     accepted = [r for r in rows if r["accepted"]]
-    rejected = [r for r in attempted if not r["accepted"]]
+    abstained = [r for r in attempted if r["abstained"]]
+    rejected = [r for r in attempted if not r["accepted"] and not r["abstained"]]
     reasons = Counter(w for r in rejected for w in r["warnings"])
     top_reason, top_count = reasons.most_common(1)[0] if reasons else ("", 0)
     calls = [call for row in rows for call in row["provider_calls"]]
@@ -334,6 +338,7 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             "asked": len(rows),
             "llm_attempted": len(attempted),
             "llm_accepted": len(accepted),
+            "llm_abstained": len(abstained),
             "llm_rejected": len(rejected),
             "errors": sum(1 for r in rows if r["error"]),
             "provider_attempts": sum(call["provider_attempted"] for call in calls),
@@ -383,6 +388,8 @@ def render(report: dict) -> str:
         f"  brain attempted    {attempted}",
         f"  brain accepted     {counts['llm_accepted']}"
         + (f"  ({100 * counts['llm_accepted'] / attempted:.0f}% of attempts)" if attempted else ""),
+        # .get: receipts written before 7 Oct 2026 have no llm_abstained and still get rendered.
+        f"  brain abstained    {counts.get('llm_abstained', 0)}",
         f"  brain rejected     {counts['llm_rejected']}",
         f"  errors             {counts['errors']}",
         f"  all answers        median {seconds['all_median']}s   p95 {seconds['all_p95']}s",

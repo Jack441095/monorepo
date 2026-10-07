@@ -60,6 +60,17 @@ def _percentile(values: list[float], fraction: float) -> float | None:
     return ordered[min(len(ordered) - 1, max(0, round(fraction * (len(ordered) - 1))))]
 
 
+def swap_status_of(settled: dict) -> str:
+    """The row status for a settled upgrade: a kept decline is "abstained", not "accepted".
+
+    The server reports a decline as an accepted swap (it does replace the template) with abstained set, so reading
+    status alone would credit the model with an answer it declined to give.
+    """
+    if settled.get("status") == "accepted" and settled.get("abstained"):
+        return "abstained"
+    return str(settled["status"])
+
+
 def _median(values: list[float]) -> float | None:
     return statistics.median(values) if values else None
 
@@ -126,7 +137,7 @@ def measure(cases: list[dict], *, allow_llm: bool = True, timeout_s: float = 300
                 while time.perf_counter() - started < timeout_s:
                     settled = answer_upgrades.get(upgrade_id, session_id=session_id)
                     if settled.get("status") in {"accepted", "rejected", "expired"}:
-                        status = str(settled["status"])
+                        status = swap_status_of(settled)
                         swap_seconds = time.perf_counter() - started
                         break
                     time.sleep(0.5)
@@ -143,7 +154,8 @@ def measure(cases: list[dict], *, allow_llm: bool = True, timeout_s: float = 300
             "swap_seconds": round(swap_seconds, 3) if swap_seconds is not None else None,
             # What the producer actually waits for before the screen can change: the template, plus one poll interval
             # before the app looks, plus the write if it landed.
-            "answer_visible_seconds": round(template_seconds + (swap_seconds if status == "accepted" else 0.0), 3),
+            "answer_visible_seconds": round(
+                template_seconds + (swap_seconds if status in {"accepted", "abstained"} else 0.0), 3),
             "upgrade_id": upgrade_id,
             "error": error,
         })
@@ -162,6 +174,7 @@ def measure(cases: list[dict], *, allow_llm: bool = True, timeout_s: float = 300
             "asked": len(rows),
             "swaps_started": len(started_rows) - sum(1 for r in started_rows if r["swap_status"] == "busy"),
             "swaps_accepted": len(accepted),
+            "swaps_abstained": sum(1 for r in started_rows if r["swap_status"] == "abstained"),
             "swaps_rejected": sum(1 for r in started_rows if r["swap_status"] == "rejected"),
             "swaps_busy": sum(1 for r in started_rows if r["swap_status"] == "busy"),
             "swaps_timeout": sum(1 for r in started_rows if r["swap_status"] == "timeout"),
@@ -191,6 +204,8 @@ def render(report: dict) -> str:
         f"  swaps started      {started}",
         f"  swap accepted      {counts['swaps_accepted']}"
         + (f"  ({counts['swaps_accepted'] / started:.0%} of swaps)" if started else ""),
+        # .get: receipts written before 7 Oct 2026 have no swaps_abstained and still get rendered.
+        f"  swap abstained     {counts.get('swaps_abstained', 0)}",
         f"  swap rejected      {counts['swaps_rejected']}",
         f"  busy (model still writing the last one)  {counts['swaps_busy']}",
     ]

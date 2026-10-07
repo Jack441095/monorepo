@@ -210,3 +210,45 @@ def test_a_model_answer_the_quality_gate_swaps_out_is_not_credited_to_the_model(
     assert payload["weak_match"] is True
     assert payload["llm_enhanced"] is False
     assert chat_answer.last_generation_outcome() == "quality gate: answer quality below threshold"
+
+
+def _payload_with_model_answer(tmp_path, monkeypatch, score: int) -> list[tuple[str, bool]]:
+    """answer_payload() with a model answer the quality check scores as given; returns the (route, brain) rows logged."""
+    from kenn.core import chat_retrieval, session_memory
+    from kenn.tests.test_streamed_generation_prefix_guard import CHUNKS, QUERY
+
+    rows: list[tuple[str, bool]] = []
+    monkeypatch.setattr(session_memory, "DB_PATH", tmp_path / "memory.db")
+    monkeypatch.setattr(route_log, "record", lambda route, ms, **k: rows.append((route, bool(k.get("brain")))))
+    monkeypatch.setattr(chat_answer, "_critique_and_save_trace", lambda **kwargs: None)
+    terms = {"total_docs": 0, "avg_len": 1.0, "lengths": [], "idf": {}, "postings": {}}
+    for module in (chat_retrieval, chat_answer):
+        monkeypatch.setattr(module, "load_chunks", lambda: [c for _, c in CHUNKS])
+        monkeypatch.setattr(module, "load_terms", lambda: terms)
+        monkeypatch.setattr(module, "search", lambda *args, **kwargs: list(CHUNKS))
+    monkeypatch.setattr(chat_answer, "results_are_weak", lambda *a: False)
+    monkeypatch.setattr(chat_answer, "intent_guard_failed", lambda *a: False)
+
+    def model_answered(*args, **kwargs):
+        chat_answer._log_generation_outcome(True, {"warnings": []}, 1.0)
+        return "Short answer: a model answer.", True
+
+    monkeypatch.setattr(chat_answer, "make_answer", model_answered)
+    monkeypatch.setattr(chat_answer, "answer_quality_report", lambda *a, **k: {"score": score, "warnings": []})
+    chat_answer.answer_payload(QUERY, session_id="gate-rows", record_session=False)
+    return [row for row in rows if row[0].startswith("generation:")]
+
+
+def test_a_swapped_out_model_answer_leaves_no_brain_row_in_the_route_log(tmp_path, monkeypatch):
+    # 25c31773 (5 Oct 2026) made llm_enhanced and the outcome truthful after the quality gate's swap, but
+    # make_answer had already logged "generation:accepted" with brain=True, so the route report still counted the
+    # template as the model's work.
+    rows = _payload_with_model_answer(tmp_path, monkeypatch, score=0)
+
+    assert rows == [("generation:quality gate: answer quality below threshold", False)]
+
+
+def test_a_model_answer_the_quality_gate_keeps_is_still_logged_as_brain_work(tmp_path, monkeypatch):
+    rows = _payload_with_model_answer(tmp_path, monkeypatch, score=100)
+
+    assert rows == [("generation:accepted", True)]

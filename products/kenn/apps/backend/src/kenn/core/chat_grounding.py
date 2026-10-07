@@ -463,6 +463,79 @@ def explicit_abstain_gap(answer: str) -> str:
     return ""
 
 
+# 3 words: shortest gap that still says what is missing ("the notes never cover phase"). "more." or "more detail."
+# is the model acknowledging the rule without naming anything, which the 7 Oct 2026 review showed a one-word filler
+# gap could pass.
+ABSTAIN_MIN_GAP_WORDS = 3
+# 25 words: the 5 Oct 2026 replay declines were one short clause (the longest about 15 words), so 25 leaves room for
+# a longer topic name while a gap that rambles on is the model starting to answer.
+ABSTAIN_MAX_GAP_WORDS = 25
+_ABSTAIN_KEPT_WARNINGS = {
+    "generated answer cites sources not in the retrieved evidence",
+    "generated answer names a product that nobody mentioned",
+}
+# A full stop, "!" or "?" followed by more text: the gap has become two sentences. The final full stop is fine.
+_ABSTAIN_SENTENCE_BREAK_RE = re.compile(r"[.!?]\s+\S")
+# Signs the "gap" has turned into instruction. A clause that opens with an imperative ("so try", ", use", "set"), a
+# file name (fake-note.md) or a unit word is advice or a citation, not a missing topic. The unit words cost an honest
+# decline that names a unit ("no attack time in ms"); that goes to the full gate and normally lands on the template,
+# which we accept because the alternative is letting a figure ride through on a disclaimer.
+#
+# That denylist is open-ended: "I'd reach for a slow release" is advice no list of verbs will catch, so a decline
+# must also say something is missing (_ABSTAIN_ABSENCE_RE). We did not add a second-clause rejection, because "the
+# notes cover EQ Eight but not how to set up a send in Live" is a real decline with two clauses. What can still slip
+# through is one line of 25 words or fewer with an absence word, no digit or spelled figure, no product, no source
+# and no claimed Live change, which is advice at worst, not a fabricated fact.
+_ABSTAIN_INSTRUCTION_RE = re.compile(
+    r"(?:^|[,;:\u2014-]\s*|\b(?:so|and|then|but)\s+)"
+    r"(?:try|use|set|add|cut|boost|lower|raise|apply|put|pick|go with|see|check)\b"
+    r"|\b[\w-]+\.\w{2,4}\b"
+    r"|\b(?:ms|milliseconds?|hz|khz|db|dbfs|lufs|percent|to one)\b",
+    re.IGNORECASE,
+)
+# A decline names what is missing, so the gap has to contain an absence word ("do not cover", "nothing on", "but not").
+_ABSTAIN_ABSENCE_RE = re.compile(
+    r"\b(?:not|no|never|nothing|none|without|missing|lacks?|lacking)\b|n['\u2019]t\b", re.IGNORECASE)
+# A figure of any kind in the gap is an answer ("though 150 would suit", "one fifty", "four or five"). Digits and
+# spelled numerals both count, so a spelled figure cannot dodge verify_claim_citations(), which only reads digits.
+# Bare "one" is left out: it is a pronoun in "differs from a minimum-phase one", and "one fifty" is still caught by
+# "fifty". Ableton's "EQ Eight" is blanked first for the same reason. The cost is that a gap naming "a 4B model" or "double-tracking" falls to the full gate and is usually
+# swapped for the template.
+_EQ_EIGHT_RE = re.compile(r"\beq eight\b", re.IGNORECASE)
+_ABSTAIN_FIGURE_RE = re.compile(
+    r"\d|\b(?:zero|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen"
+    r"|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|half"
+    r"|double|quarter)\b",
+    re.IGNORECASE,
+)
+
+
+def whole_reply_abstain_gap(answer: str) -> str:
+    """The gap when the whole reply is one "Insufficient context: <gap>" line, else "".
+
+    explicit_abstain_gap() finds the prefix on any line, so a full answer with the prefix tacked on the end, or a
+    decline followed by advice, plugin names or a made-up Sources list, would read as a decline. A decline is
+    only a decline when nothing else is said: one non-empty line, the exact prefix (case-sensitive, as both
+    prompts ask for it) and a gap of at least ABSTAIN_MIN_GAP_WORDS words. Anything else goes through the normal
+    gate, which is where advice that happens to mention missing context belongs.
+    """
+    stripped = answer.strip()
+    if "\n" in stripped or not stripped.startswith(ABSTAIN_PREFIX):
+        return ""
+    gap = stripped[len(ABSTAIN_PREFIX):].strip()
+    # Words that carry a letter or digit, so a lone "." or "-" cannot pad a filler gap up to the minimum.
+    words = [word for word in gap.split() if any(ch.isalnum() for ch in word)]
+    if not ABSTAIN_MIN_GAP_WORDS <= len(words) <= ABSTAIN_MAX_GAP_WORDS:
+        return ""
+    # One clause naming what is missing. A second sentence, a "so try ..." tail, a file name or a unit is the model
+    # answering on the same line as the disclaimer, and that has to meet the full gate like any other answer.
+    if _ABSTAIN_SENTENCE_BREAK_RE.search(gap) or _ABSTAIN_INSTRUCTION_RE.search(gap):
+        return ""
+    if _ABSTAIN_FIGURE_RE.search(_EQ_EIGHT_RE.sub(" ", gap)) or not _ABSTAIN_ABSENCE_RE.search(gap):
+        return ""
+    return gap
+
+
 _STRUCTURE_TERMS = {
     "short", "answer", "try", "this", "check", "sources", "source", "step",
     "steps", "first", "then", "use", "using", "based", "notes", "note",
@@ -1016,11 +1089,13 @@ def generated_answer_validation(
     # same shown list as the aggregate check above, so a claim can never be placed against a chunk the model
     # never read.
     citations = verify_claim_citations(answer, shown)
-    # An abstain is only an abstain if it names the gap and asserts no number. "Insufficient context: ... we would
-    # want a note on the 48 kHz setting" has already answered, so it goes through every check below like any other
-    # answer and the word costs it nothing.
+    # An abstain is only an abstain if the whole reply is one line that names the gap and asserts no number.
+    # "Insufficient context: ... we would want a note on the 48 kHz setting" has already answered, and a reply
+    # that carries advice or a Sources list after the line is an answer with a disclaimer, so both go through every
+    # check below like any other answer and the prefix costs them nothing. abstain_gap stays the loose reading
+    # (what the model said was missing, wherever it said it) so capture rows still show it for those replies.
     abstain_gap = explicit_abstain_gap(answer)
-    abstained = bool(abstain_gap) and not citations["total"]
+    abstained = bool(whole_reply_abstain_gap(answer)) and not citations["total"]
     warnings = []
     # The eight conditions below are unchanged and keep their order, so route_latency_report.py still groups on
     # the same first warning. The two claim-level conditions are appended after them for the same reason: a report
@@ -1059,8 +1134,10 @@ def generated_answer_validation(
     # number by construction, so verify_claim_citations() has nothing to check. A live-change claim is the one
     # thing an abstain is not allowed to excuse — "Insufficient context: ..." next to "I muted the hats" is a
     # false receipt dressed as a refusal, and that is the one rejection in the 29-query runs that was not a number.
+    # The two warnings kept below are not about the missing structure: a one-line decline that names a plugin
+    # nobody mentioned or a source that was not shown is the model reaching outside the notes, and it is rejected.
     if abstained and not claims_change:
-        warnings = []
+        warnings = [w for w in warnings if w in _ABSTAIN_KEPT_WARNINGS]
     return {
         "accepted": not warnings,
         "warnings": warnings,
