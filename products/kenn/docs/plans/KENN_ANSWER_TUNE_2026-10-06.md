@@ -79,10 +79,10 @@ resource). Jack needs to run it or approve it. Everything is staged:
 - Disk: `/mnt/data` has 24 GB free. The job's peak is about 16 GB: an 8 GB merged model plus an 8 GB bf16 GGUF.
   Afterwards only the Q4 (about 2.5 GB) and the adapter remain.
 
-To start it, run on the Mac from the answer-tune worktree (`<box>` is the usual ssh target and port):
+To start it, run on the Mac from the answer-tune worktree (`<box>` is the usual ssh target and port, `$KENN_DATA` the folder beside the monorepo that holds `kenn-evaluation-data`):
 
 ```bash
-O=/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/kenn-evaluation-data/2026-10-06-answer-tune/answers
+O=$KENN_DATA/kenn-evaluation-data/2026-10-06-answer-tune/answers
 ssh <box> 'mkdir -p /mnt/data/kenn-bakeoff/c6/data_answer1'
 scp $O/train.jsonl $O/valid.jsonl <box>:/mnt/data/kenn-bakeoff/c6/data_answer1/
 scp tooling/scripts/train_kenn_command_lora_cuda.py $O/../answer1_box.sh <box>:/mnt/data/kenn-bakeoff/c6/
