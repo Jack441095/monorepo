@@ -1213,6 +1213,21 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
 - [ ] Retrieval ranking for the five rows above: find which boost pushes "Sends And Returns" to 688 while the PDC
   note scores 0, and why dedicated notes sit at ranks 4–12. Measure on coverage, the held-out set and the probe
   together.
+  Status 7 Oct: `draft/retrieval-ranking` (merge commit 974c9245, main merged in cleanly, 4493 passed, 9 skipped)
+  passed adversary review as "merge pending the quiet-Mac benchmark". Retrieval only, no model calls yet:
+  - **Covering-note ranks, main → branch:** `eq-linear` 4, 6–9 → 1–6; `live-pdc` PDC note outside the top 12 → 1–3,
+    with Sends And Returns pushed to 4; oversampling stays at 10–12; precedence stays at 4 (not "none in the top
+    12" as the table above says); pre/post sends stays at 1–6.
+  - **Why 688:** the topic synonym expansion adds 49 routing and mixing terms with a 3.45 topic multiplier, which
+    favours the short Sends And Returns note. On main the PDC note sat 108th in BM25, outside the scored slice, so
+    it showed 0. The branch scores the full corpus, so the PDC note gets its BM25 back. The synonym inflation itself
+    is not fixed; that is a separate, larger change.
+  - **Recall at 3 (hybrid):** questions.json 0.931 → 0.948; sealed holdout 0.367 → 0.373 (+2, −1: 018 and 020
+    gain, 114 lost). Sealed top-1 slips 0.200 → 0.193 (066 and 068 go 1 → 2), so the sealed set is neutral.
+  - **Watch in the benchmark:** an embedding-only top hit used to score 0 and was flagged weak by accident. Now 14
+    sealed and device-purpose questions flip weak → answered; 9 of them have no matching note in the top 16, so the
+    abstain gate has to catch them. Also watch sealed-purpose 066, 068, 069 and 114.
+  - **Next:** probe ×3 and held-out against main with Live closed and the Mac on mains. Merge only if both hold or rise.
 - [x] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
   reaches the producer instead of a template that pretends to answer. Merged to main 7 Oct (`draft/honest-answers`
   243df63e, four adversary passes). Only a whole-reply decline counts: one line, 3–25 words naming what is missing,
