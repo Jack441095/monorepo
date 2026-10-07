@@ -1,16 +1,27 @@
 """A stem-scan or classifier figure the gate accepts must reach the model, with enough of its context to be used.
 
-Leftover from the review of draft/allowed-figures. The allowed-figures list read the specialist text
-last, so the 12-figure cap dropped it first while the prompt told the model any unlisted figure goes in words.
+Leftovers from the review of draft/allowed-figures. The allowed-figures list read the specialist text last, so the
+12-figure cap dropped it first while the prompt told the model any unlisted figure goes in words. The model also met
+that text only through the 300-character draft, and the template puts the "Evidence from your supplied analysis"
+lines at its very end, which is exactly the part a 300-character cut removes.
 """
 
 from __future__ import annotations
 
-from kenn.llm.llm_rewrite import _ALLOWED_FIGURES_SHOWN, _build_synthesis_messages
-from kenn.tests.test_allowed_figures import QUERY, SIDECHAIN
+from kenn.llm.llm_rewrite import _ALLOWED_FIGURES_SHOWN, _SPECIALIST_BLOCK_CHARS, _build_synthesis_messages
+from kenn.tests.test_allowed_figures import QUERY, SIDECHAIN, _prompt
+
+SPECIALIST_HEADER = "Results from the analysis you ran on the supplied audio"
 
 # Twenty LUFS readings are more than the cap, the way a long review timeline is.
 TIMELINE = {"text": " ".join(f"Bar {n}: {-20 + n} LUFS." for n in range(1, 21))}
+
+# A specialist observation placed past the 300-character draft cut, ending on a figure only it carries.
+LONG_SCAN = (
+    "The supplied stem-energy proxy flagged the Bass + Piano pair in the bass band, with competing energy in "
+    "45.4% of frames. Treat this as a listening-check priority, not proof of audible masking, a responsible "
+    "track, or an automatic EQ move. The kick stem peaks near 62 Hz."
+)
 
 
 def _messages(results: list, specialist: str, template: str = "Short answer: duck the bass under the kick.") -> str:
@@ -41,3 +52,37 @@ def test_the_note_figures_keep_their_reading_order_behind_the_specialist_ones() 
 
     listed = _figure_line(prompt).split(": ", 1)[1].rstrip(".").split(", ")
     assert listed[:4] == ["55 Hz", "150 ms", "5 ms", "6 dB"]
+
+
+def test_specialist_text_past_the_draft_cut_still_reaches_the_model() -> None:
+    template = "Short answer: " + "duck the bass under the kick. " * 30 + "\n" + LONG_SCAN
+    prompt = _messages([(10.0, SIDECHAIN)], LONG_SCAN, template)
+
+    assert "62 Hz" not in template[:300], "the fixture must put the figure beyond the draft cut"
+    block = prompt.split(SPECIALIST_HEADER, 1)[1].split("\n\n", 1)[0]
+    assert "Bass + Piano" in block and "45.4%" in block and "62 Hz" in block
+    assert "not proof of audible masking" in block, "the tool's own limit travels with its figure"
+
+
+def test_the_draft_and_the_note_excerpts_keep_their_own_windows() -> None:
+    template = "Short answer: " + "duck the bass under the kick. " * 30
+    prompt = _messages([(10.0, SIDECHAIN)], LONG_SCAN, template)
+
+    draft = prompt.split("prefer synthesising directly from the source excerpts above):\n", 1)[1].split("\n\n", 1)[0]
+    assert draft == template[:300]
+    assert "Keep the overlap at 60-120 Hz in check." in prompt.split("Draft answer", 1)[0]
+
+
+def test_a_very_long_specialist_text_is_cut_to_its_budget() -> None:
+    prompt = _messages([(10.0, SIDECHAIN)], " ".join(f"Pair {n} competes at {n} Hz." for n in range(1, 200)))
+
+    block = prompt.split(SPECIALIST_HEADER, 1)[1].split("\n", 1)[1].split("\n\n", 1)[0]
+    assert len(block) <= _SPECIALIST_BLOCK_CHARS
+    assert block.endswith("...")
+
+
+def test_no_specialist_text_adds_no_block_and_changes_nothing_else() -> None:
+    with_none = _messages([(10.0, SIDECHAIN)], "")
+
+    assert SPECIALIST_HEADER not in with_none
+    assert with_none == _prompt([(10.0, SIDECHAIN)])[0]

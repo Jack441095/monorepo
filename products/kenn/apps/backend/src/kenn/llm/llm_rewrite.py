@@ -901,6 +901,18 @@ _CONTEXT_BLOCK_CHARS = 1200
 # or two longest lists while a review timeline full of LUFS readings cannot balloon the prompt.
 _ALLOWED_FIGURES_SHOWN = 12
 
+# Characters of specialist (stem-scan and classifier) observation text we show the model beside the excerpts.
+# Before this block the model met that text only through template_answer[:300], and the template appends its
+# "Evidence from your supplied analysis" lines last, so the 300-character draft cut removed exactly them: a listed
+# figure like "45.4%" reached the model with none of its context, and nothing said which pair or stem it described.
+# 700 is sized from the observation text the evidence builders produce (7 Oct 2026, the packets in
+# tests/test_evidence.py): a stem-scan turn renders ~260 characters and a classifier turn ~300, so 700 holds one
+# of each at ~570 with room for a longer pair name or a second limitation. It costs ~175 prompt tokens, and only on
+# turns that carry a specialist packet; none of the 44 probe and 64 held-out prompts measured above did. The note
+# excerpts (_CONTEXT_BLOCK_CHARS) and the draft (300) keep the windows they were measured at, because the 41%-to-27%
+# acceptance drop in the comment below came from moving the note window, not from this text.
+_SPECIALIST_BLOCK_CHARS = 700
+
 # How far down the ranked list we are willing to look before giving up, counted in ranked slots rather than in
 # chunks that survive cleaning. A fixed slice was wrong here: _clean_chunk_for_synthesis returns "" for a note's
 # "Related questions" section, which is a list of question phrasings and no substance, and those chunks rank high
@@ -1824,7 +1836,8 @@ def _build_synthesis_messages(
     """Build the messages array for answer synthesis, and the excerpts behind it.
 
     ``additional_evidence_text`` is the specialist observation text the gate also accepts figures from (classifier
-    and stem-scan packets). It only feeds the allowed-figures list; the model already sees it through the draft.
+    and stem-scan packets). It feeds the allowed-figures list, ahead of the note figures, and is shown to the model
+    in its own block of up to _SPECIALIST_BLOCK_CHARS characters, because the 300-character draft cuts it off.
 
     Instead of asking the LLM to 'improve' a pre-built template answer, we:
     1. Give the LLM the raw source excerpts
@@ -1868,6 +1881,15 @@ def _build_synthesis_messages(
             "Draft answer from the local index (use this as a reference for structure and facts, "
             "but prefer synthesising directly from the source excerpts above):\n"
             f"{template_answer[:draft_chars]}"
+        )
+
+    if additional_evidence_text.strip():
+        # Cut on a word boundary at the budget; the allowed-figures list below still reads the whole text, so a
+        # figure that falls past the cut is listed and just loses its sentence, which is the same trade the note
+        # excerpts make.
+        user_parts.append(
+            "Results from the analysis you ran on the supplied audio (state them as measured, with the limits they "
+            "carry):\n" + _truncate_on_word_boundary(additional_evidence_text.strip(), _SPECIALIST_BLOCK_CHARS)
         )
 
     # The figures the gate will accept, spelled out. "Use only numbers printed in an excerpt" in the system prompt
