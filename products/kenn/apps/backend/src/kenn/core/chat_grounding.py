@@ -470,21 +470,42 @@ ABSTAIN_MIN_GAP_WORDS = 3
 # 25 words: the 5 Oct 2026 replay declines were one short clause (the longest about 15 words), so 25 leaves room for
 # a longer topic name while a gap that rambles on is the model starting to answer.
 ABSTAIN_MAX_GAP_WORDS = 25
-# A full stop, "!" or "?" followed by more text: the gap has become two sentences. The final full stop is fine.
 _ABSTAIN_KEPT_WARNINGS = {
     "generated answer cites sources not in the retrieved evidence",
     "generated answer names a product that nobody mentioned",
 }
+# A full stop, "!" or "?" followed by more text: the gap has become two sentences. The final full stop is fine.
 _ABSTAIN_SENTENCE_BREAK_RE = re.compile(r"[.!?]\s+\S")
 # Signs the "gap" has turned into instruction. A clause that opens with an imperative ("so try", ", use", "set"), a
 # file name (fake-note.md) or a unit word is advice or a citation, not a missing topic. The unit words cost an honest
 # decline that names a unit ("no attack time in ms"); that goes to the full gate and normally lands on the template,
 # which we accept because the alternative is letting a figure ride through on a disclaimer.
+#
+# That denylist is open-ended: "I'd reach for a slow release" is advice no list of verbs will catch, so a decline
+# must also say something is missing (_ABSTAIN_ABSENCE_RE). We did not add a second-clause rejection, because "the
+# notes cover EQ Eight but not how to set up a send in Live" is a real decline with two clauses. What can still slip
+# through is one line of 25 words or fewer with an absence word, no digit or spelled figure, no product, no source
+# and no claimed Live change, which is advice at worst, not a fabricated fact.
 _ABSTAIN_INSTRUCTION_RE = re.compile(
     r"(?:^|[,;:\u2014-]\s*|\b(?:so|and|then|but)\s+)"
     r"(?:try|use|set|add|cut|boost|lower|raise|apply|put|pick|go with|see|check)\b"
     r"|\b[\w-]+\.\w{2,4}\b"
     r"|\b(?:ms|milliseconds?|hz|khz|db|dbfs|lufs|percent|to one)\b",
+    re.IGNORECASE,
+)
+# A decline names what is missing, so the gap has to contain an absence word ("do not cover", "nothing on", "but not").
+_ABSTAIN_ABSENCE_RE = re.compile(
+    r"\b(?:not|no|never|nothing|none|without|missing|lacks?|lacking)\b|n['\u2019]t\b", re.IGNORECASE)
+# A figure of any kind in the gap is an answer ("though 150 would suit", "one fifty", "four or five"). Digits and
+# spelled numerals both count, so a spelled figure cannot dodge verify_claim_citations(), which only reads digits.
+# Bare "one" is left out: it is a pronoun in "differs from a minimum-phase one", and "one fifty" is still caught by
+# "fifty". Ableton's "EQ Eight" is blanked first for the same reason. The cost is that a gap naming "a 4B model" or "double-tracking" falls to the full gate and is usually
+# swapped for the template.
+_EQ_EIGHT_RE = re.compile(r"\beq eight\b", re.IGNORECASE)
+_ABSTAIN_FIGURE_RE = re.compile(
+    r"\d|\b(?:zero|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen"
+    r"|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|half"
+    r"|double|quarter)\b",
     re.IGNORECASE,
 )
 
@@ -509,6 +530,8 @@ def whole_reply_abstain_gap(answer: str) -> str:
     # One clause naming what is missing. A second sentence, a "so try ..." tail, a file name or a unit is the model
     # answering on the same line as the disclaimer, and that has to meet the full gate like any other answer.
     if _ABSTAIN_SENTENCE_BREAK_RE.search(gap) or _ABSTAIN_INSTRUCTION_RE.search(gap):
+        return ""
+    if _ABSTAIN_FIGURE_RE.search(_EQ_EIGHT_RE.sub(" ", gap)) or not _ABSTAIN_ABSENCE_RE.search(gap):
         return ""
     return gap
 

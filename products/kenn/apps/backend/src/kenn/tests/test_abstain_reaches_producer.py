@@ -356,3 +356,37 @@ def test_a_decline_that_names_a_product_nobody_asked_about_is_still_rejected() -
 
     assert "generated answer names a product that nobody mentioned" in result["warnings"]
     assert result["accepted"] is False
+
+
+# 7 Oct 2026 third review: a figure tucked into the gap, or open-ended advice the denylist never names, still rode
+# through as a decline. A decline has to name something missing and say no number at all.
+NUMBER_IN_THE_GAP = {
+    "a_digit": "Insufficient context: the notes do not cover release times for a bass bus compressor, though 150 would suit.",
+    "a_spelled_figure": "Insufficient context: the notes do not cover release times for a bass bus, the sweet spot is one fifty.",
+    "a_spelled_range": "Insufficient context: the notes do not cover release times for a bass bus, around four or five is typical.",
+}
+ADVICE_WITH_NO_ABSENCE_WORD = {
+    "i_would_reach_for": "Insufficient context: the notes cover little here, so I'd reach for a slow release on the bass bus.",
+    "maybe_a_plugin_type": "Insufficient context: the notes cover little here, maybe a multiband compressor on the bass bus.",
+    "i_would_sidechain": "Insufficient context: the notes cover little here, I would sidechain the bass to the kick.",
+    "generally_a_setting": "Insufficient context: the notes cover little here, generally a slower setting suits bass.",
+}
+
+
+@pytest.mark.parametrize("reply", [*NUMBER_IN_THE_GAP.values(), *ADVICE_WITH_NO_ABSENCE_WORD.values()],
+                         ids=[*NUMBER_IN_THE_GAP, *ADVICE_WITH_NO_ABSENCE_WORD])
+def test_a_figure_or_unflagged_advice_in_the_gap_is_not_a_decline(reply) -> None:
+    assert llm.is_abstain_reply(reply) is False
+    assert _validate(reply)["abstained"] is False
+
+
+@pytest.mark.parametrize("reply", [
+    "Insufficient context: the excerpts do not cover how to set sidechain in Live",
+    "Insufficient context: nothing on attack and release in the notes",
+    "Insufficient context: the notes do not mention how to use sidechain compression on a return track",
+    "Insufficient context: the notes don't explain what a limiter ceiling is",
+    "Insufficient context: the notes cover EQ Eight but not how to set up a send in Live",
+])
+def test_a_gap_that_names_what_is_missing_stays_a_decline(reply) -> None:
+    assert llm.is_abstain_reply(reply) is True
+    assert _validate(reply)["abstained"] is True
