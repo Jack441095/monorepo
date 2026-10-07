@@ -26,18 +26,23 @@ def main() -> int:
     # one `generation:<reason>` row per attempt, so this is a group-by over rows already in the log.
     reasons: dict[str, int] = {}
     for route, row in report.items():
-        if route.startswith("generation:") and not route.endswith(":accepted"):
+        # An honest decline is kept for the producer, so it is neither dropped nor counted as a model answer;
+        # it is reported on its own line below.
+        if route.startswith("generation:") and not route.endswith((":accepted", ":abstained")):
             reasons[route.split(":", 1)[1]] = row["requests"]
     if reasons:
         total = sum(reasons.values())
         print(f"generated answers dropped, by reason (of {total} dropped): "
               + ", ".join(f"{count} {reason}" for reason, count in
                           sorted(reasons.items(), key=lambda kv: -kv[1])))
+    declined = report.get("generation:abstained", {}).get("requests", 0)
+    if declined:
+        print(f"generated answers kept as an honest decline (not model answers, not dropped): {declined}")
     upgrades = route_log.upgrade_summary(args.log)
     if upgrades["attempts"]:
         rate = f"{upgrades['accepted_rate']:.0%}"
         print(f"model answers (upgrades): {upgrades['attempts']} started, {upgrades['accepted']} accepted ({rate}), "
-              f"{upgrades['rejected']} rejected, {upgrades['error']} failed, {upgrades['busy']} skipped because the model was busy; "
+              f"{upgrades['abstained']} declined, {upgrades['rejected']} rejected, {upgrades['error']} failed, {upgrades['busy']} skipped because the model was busy; "
               f"accepted ones took a median {upgrades['accepted_p50_s']} s, p95 {upgrades['accepted_p95_s']} s")
     return 0
 

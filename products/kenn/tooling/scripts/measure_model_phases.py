@@ -77,7 +77,9 @@ def answer_outcome(payload: dict, usages, surface: str) -> dict:
         "attempted": bool(validation.get("attempted")) or any(
             usage.task == "rewrite" and usage.provider_attempted for usage in usages
         ),
-        "accepted": bool(payload.get("llm_enhanced")) if surface == "payload"
+        # A kept decline reads llm_enhanced False now, but the gate accepted it (the stream surface counts it
+        # already), so the payload surface adds it back here to keep the two surfaces comparable.
+        "accepted": bool(payload.get("llm_enhanced")) or bool(payload.get("answer_abstained")) if surface == "payload"
         else bool(validation.get("accepted")),
         "abstained": any(line.strip().lower().startswith(ABSTAIN_PREFIX.lower())
                          for line in (payload.get("answer") or "").splitlines()),

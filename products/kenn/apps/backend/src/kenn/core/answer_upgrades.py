@@ -116,10 +116,15 @@ def start(write: Callable[[], dict[str, Any]], *, session_id: str = "", turn_id:
 
             with background_budget():
                 payload = write()
-            accepted = bool(payload.get("llm_enhanced"))
+            # A decline is offered to the producer like an answer (it replaces a template that answers a question
+            # the notes never covered) but is flagged, so nothing counting "the model wrote this" credits it.
+            abstained = bool(payload.get("answer_abstained"))
+            accepted = bool(payload.get("llm_enhanced")) or abstained
             entry = {"status": "accepted" if accepted else "rejected",
                      "answer": str(payload.get("answer") or "") if accepted else "",
                      "sources": payload.get("sources") if accepted else None}
+            if abstained:
+                entry["abstained"] = True
             if not accepted:
                 from kenn.core.chat_answer import last_generation_outcome
 
@@ -135,7 +140,7 @@ def start(write: Callable[[], dict[str, Any]], *, session_id: str = "", turn_id:
                 if delivered:
                     _RESULTS[upgrade_id] = entry
                 _BUSY.release()
-        outcome = entry["status"] if "error" not in entry else "error"
+        outcome = "error" if "error" in entry else "abstained" if entry.get("abstained") else entry["status"]
         log_outcome(outcome if delivered else "expired", entry["seconds"] * 1000.0)
 
     threading.Thread(target=run, name=f"kenn-answer-upgrade-{upgrade_id}", daemon=True).start()

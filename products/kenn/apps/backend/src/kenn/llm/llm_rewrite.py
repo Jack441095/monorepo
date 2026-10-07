@@ -58,6 +58,18 @@ CLAIM_CITATION_RE = re.compile(r"\[\s*#\s*([^\]\s]{1,32})\s*\]")
 # an abstain the gate cannot parse is the same as no abstain at all.
 ABSTAIN_PREFIX = "Insufficient context:"
 
+
+def is_abstain_reply(text: str) -> bool:
+    """True when the model declined and named the gap, which is the only shape of decline we let through.
+
+    Defers to chat_grounding.explicit_abstain_gap() so there is one parser. It is imported here and not at the
+    top because chat_grounding imports ABSTAIN_PREFIX from this module. Whether the decline also passes the
+    no-number and no-claimed-action rules is the grounding gate's call, not this check's.
+    """
+    from kenn.core.chat_grounding import explicit_abstain_gap
+
+    return bool(explicit_abstain_gap(text))
+
 SYSTEM_PROMPT_TEMPLATE = """You are KENN, senior audio engineer assistant and trusted studio partner for Audio_Too.
 
 Specialty: {route_description}
@@ -1963,6 +1975,11 @@ def valid_response(text: str, answer_mode: str = "", route: str = "unknown") -> 
         return len(stripped.split()) >= 10 and not any(
             err in stripped.lower() for err in ("[error]", "traceback", "exception occurred")
         )
+    # 5 Oct 2026 replay: the 4B answered "Insufficient context: the excerpts do not address ..." when retrieval
+    # ranked the wrong notes, and this check dropped it for having no Short answer section, so the template went
+    # out in its place. A decline has no steps to give. The gate still judges it for numbers and claimed actions.
+    if is_abstain_reply(stripped):
+        return True
     return valid_structure(stripped)
 
 
@@ -2028,7 +2045,8 @@ def enhance_stream(
                 streamed.append(token)
                 yield {"event": "token", "token": token}
             if usage:
-                if usage.total_tokens > 0 and "sources:" not in "".join(streamed).lower():
+                written = "".join(streamed)
+                if usage.total_tokens > 0 and "sources:" not in written.lower() and not is_abstain_reply(written):
                     block = sources_block(shown, source_label)
                     if block:
                         yield {"event": "token", "token": f"\n\n{block}"}
@@ -2071,6 +2089,9 @@ def _with_sources(text: str, shown: list[tuple[float, dict, str]], source_label)
     # A local model often writes a good answer but forgets the "Sources:" line, and the whole answer used to be
     # thrown away for it. KENN knows exactly which notes it gave the model, so it adds them itself.
     if "sources:" in text.lower():
+        return text
+    # A decline cites nothing, and a Sources list under it would suggest the notes backed it.
+    if is_abstain_reply(text):
         return text
     block = sources_block(shown, source_label)
     return f"{text.rstrip()}\n\n{block}" if block else text

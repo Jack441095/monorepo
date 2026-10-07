@@ -147,16 +147,23 @@ def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
     upgrade_accepted = upgrade.get("status") == "accepted" and bool(upgrade.get("answer"))
     inline_accepted = bool(payload.get("llm_enhanced")) or bool(validation.get("accepted"))
     answer = str(upgrade["answer"]) if upgrade_accepted else template
+    # A decline the server kept (honest "Insufficient context: <gap>") arrives accepted but flagged. It is its own
+    # delivery: not a correct model answer, which would inflate the gate, and not a template, which it replaced.
+    if upgrade_accepted:
+        declined = bool(upgrade.get("abstained"))
+    else:
+        declined = bool(payload.get("answer_abstained")) or (bool(validation.get("accepted")) and bool(validation.get("abstained")))
+    model_answered = (upgrade_accepted or inline_accepted) and not declined
     attempted = (bool(validation.get("attempted")) or bool(upgrade_meta.get("id"))
                  or upgrade.get("status") in {"accepted", "rejected"})
     return {
         **row,
         "answer": answer,
-        "delivered_by": "model" if (upgrade_accepted or inline_accepted) else "template",
+        "delivered_by": "abstain" if declined else "model" if model_answered else "template",
         "model_attempted": attempted,
         "llm_available": bool(payload.get("llm_available")),
         "upgrade_status": upgrade.get("status", ""),
-        "rejection_reason": rejection_reason(payload, upgrade, upgrade_accepted or inline_accepted),
+        "rejection_reason": rejection_reason(payload, upgrade, model_answered or declined),
         "warnings": list(validation.get("warnings") or [])[:4],
         "unsupported_measurements": len(validation.get("unsupported_measurements") or []),
         "fabricated_sources": len(validation.get("fabricated_sources") or []),
@@ -218,6 +225,7 @@ def summarise(rows: list[dict], endpoint: str, cases_path: Path, provenance: dic
             **extra,
             "questions": len(subset),
             "delivered_by_model": sum(r.get("delivered_by") == "model" for r in subset),
+            "delivered_by_abstain": sum(r.get("delivered_by") == "abstain" for r in subset),
             "delivered_by_template": sum(r.get("delivered_by") == "template" for r in subset),
             "model_attempted": sum(bool(r.get("model_attempted")) for r in subset),
             "abstained": sum(bool(r.get("abstained")) for r in subset),
