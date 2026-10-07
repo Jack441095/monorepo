@@ -1125,7 +1125,11 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
 - [ ] Answers that fit 128 tokens instead of being cut and rejected (`draft/answer-fits-128-tokens`).
 - [ ] ~~Stop the background upgrade repeating the template's retrieval and scoring.~~ Dropped 5 Oct: it costs
   70–120 ms of a 10 s answer.
-- [ ] Advice questions that name a track ("advice on drum bus compression") go to the model, not Live inspection.
+- [x] Advice questions that name a track ("advice on drum bus compression") go to the model, not Live inspection.
+  Merged to main 7 Oct (`draft/track-advice-to-model` f98f85cc, three adversary passes). The exact `followup-drums`
+  wording already reached the model after `3018af79`, so its 5 Oct failure was a rejected answer, not routing. What
+  still leaked was advice put as a value ("what's a good attack for the drum bus compressor" read back "Attack is
+  1.00 ms."); a good/right/ideal value or "should I set" next to a parameter now goes to the notes.
 - [ ] Lower prose temperature, measured on its own.
 - [ ] Reference-numbers note for the values the model keeps inventing (needs Jack and a box rebuild).
 - [x] Three clean runs in a row at 31/44 or better. 32 / 33 / 31 on 5 Oct, 4B with allowed figures (below).
