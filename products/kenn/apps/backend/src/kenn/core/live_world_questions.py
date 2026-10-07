@@ -20,8 +20,13 @@ _WORD = re.compile(r"[a-z0-9]+")
 # "What's your advice on drum bus compression?" matched "what's ... on ... bus" below and got "'Drum Bus' has:
 # Compressor." back in the 5 Oct probe; the model was never asked. Asking for advice on something is never an
 # inventory question, whatever track it names.
+# That fixed the "advice on" wording but not the same ask put as a value: "what's a good attack for the drum bus
+# compressor?" still matched the parameter regex and read back "Attack is 1.00 ms." (found 7 Oct 2026 while chasing
+# `followup-drums`). A "good/best/ideal/recommended" value, or one the user "should" use, is a question for the
+# notes. The cost is a track actually named "Best Vocal" going to the notes for a value read, which is a safe miss.
 _ASKS_FOR_ADVICE = re.compile(
     r"\b(?:advice|tips?|thoughts?|opinion|take|approach|recommendations?|suggestions?)\s+(?:on|for|about)\b"
+    r"|\b(?:good|best|better|ideal|recommended|typical|usual|should)\b"
 )
 
 

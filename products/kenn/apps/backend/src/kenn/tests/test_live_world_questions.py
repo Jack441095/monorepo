@@ -62,8 +62,40 @@ def test_advice_that_names_a_track_goes_to_the_notes_not_the_inventory(question:
     assert answer_world_question(question, _live()) is None
 
 
-def test_asking_what_is_on_the_bus_still_reads_live() -> None:
-    assert "'Drum Bus' has: Compressor." in answer_world_question("What's on the Drum Bus?", _live())["answer"]
+@pytest.mark.parametrize(
+    "question",
+    [
+        # The exact probe row. Routed to the model since 3018af79; pinned through the session entry the chat uses.
+        "What's your advice on drum bus compression?",
+        "What's a good attack for the Drum Bus compressor?",
+        "What's the best release for the drum bus compressor?",
+        "What's the ideal ratio on the Drum Bus?",
+        "What's the threshold I should use on the drum bus compressor?",
+    ],
+)
+def test_asking_for_a_good_value_is_advice_not_the_current_value(question: str) -> None:
+    # Probe row `followup-drums`, 5 Oct 2026: advice naming the Drum Bus was answered from the inventory. 3018af79
+    # fixed "advice on"; "what's a good attack for the drum bus compressor?" still got "Attack is 1.00 ms." back.
+    from kenn.core.live_session_questions import answer_live_session_question
+
+    assert answer_live_session_question(question, service=LiveActionService(_live())) is None
+
+
+@pytest.mark.parametrize(
+    ("question", "expected"),
+    [
+        ("What's on the Drum Bus?", "'Drum Bus' has: Compressor."),
+        ("What devices are on Drum Bus", "'Drum Bus' has: Compressor."),
+        ("what is on the drum bus", "'Drum Bus' has: Compressor."),
+        ("What's the attack on the drum bus compressor?", "Attack is 1.00 ms."),
+        ("What's the current release on the Drum Bus compressor?", "Release is 30.0 ms"),
+    ],
+)
+def test_inspection_questions_about_the_bus_still_read_live(question: str, expected: str) -> None:
+    from kenn.core.live_session_questions import answer_live_session_question
+
+    result = answer_live_session_question(question, service=LiveActionService(_live()))
+    assert result["status"] == "inspected" and expected in result["answer"]
 
 
 def test_world_questions_reach_the_command_path_read_only() -> None:
