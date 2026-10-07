@@ -467,6 +467,26 @@ def explicit_abstain_gap(answer: str) -> str:
 # is the model acknowledging the rule without naming anything, which the 7 Oct 2026 review showed a one-word filler
 # gap could pass.
 ABSTAIN_MIN_GAP_WORDS = 3
+# 25 words: the 5 Oct 2026 replay declines were one short clause (the longest about 15 words), so 25 leaves room for
+# a longer topic name while a gap that rambles on is the model starting to answer.
+ABSTAIN_MAX_GAP_WORDS = 25
+# A full stop, "!" or "?" followed by more text: the gap has become two sentences. The final full stop is fine.
+_ABSTAIN_KEPT_WARNINGS = {
+    "generated answer cites sources not in the retrieved evidence",
+    "generated answer names a product that nobody mentioned",
+}
+_ABSTAIN_SENTENCE_BREAK_RE = re.compile(r"[.!?]\s+\S")
+# Signs the "gap" has turned into instruction. A clause that opens with an imperative ("so try", ", use", "set"), a
+# file name (fake-note.md) or a unit word is advice or a citation, not a missing topic. The unit words cost an honest
+# decline that names a unit ("no attack time in ms"); that goes to the full gate and normally lands on the template,
+# which we accept because the alternative is letting a figure ride through on a disclaimer.
+_ABSTAIN_INSTRUCTION_RE = re.compile(
+    r"(?:^|[,;:\u2014-]\s*|\b(?:so|and|then|but)\s+)"
+    r"(?:try|use|set|add|cut|boost|lower|raise|apply|put|pick|go with|see|check)\b"
+    r"|\b[\w-]+\.\w{2,4}\b"
+    r"|\b(?:ms|milliseconds?|hz|khz|db|dbfs|lufs|percent|to one)\b",
+    re.IGNORECASE,
+)
 
 
 def whole_reply_abstain_gap(answer: str) -> str:
@@ -484,7 +504,13 @@ def whole_reply_abstain_gap(answer: str) -> str:
     gap = stripped[len(ABSTAIN_PREFIX):].strip()
     # Words that carry a letter or digit, so a lone "." or "-" cannot pad a filler gap up to the minimum.
     words = [word for word in gap.split() if any(ch.isalnum() for ch in word)]
-    return gap if len(words) >= ABSTAIN_MIN_GAP_WORDS else ""
+    if not ABSTAIN_MIN_GAP_WORDS <= len(words) <= ABSTAIN_MAX_GAP_WORDS:
+        return ""
+    # One clause naming what is missing. A second sentence, a "so try ..." tail, a file name or a unit is the model
+    # answering on the same line as the disclaimer, and that has to meet the full gate like any other answer.
+    if _ABSTAIN_SENTENCE_BREAK_RE.search(gap) or _ABSTAIN_INSTRUCTION_RE.search(gap):
+        return ""
+    return gap
 
 
 _STRUCTURE_TERMS = {
@@ -1085,8 +1111,10 @@ def generated_answer_validation(
     # number by construction, so verify_claim_citations() has nothing to check. A live-change claim is the one
     # thing an abstain is not allowed to excuse — "Insufficient context: ..." next to "I muted the hats" is a
     # false receipt dressed as a refusal, and that is the one rejection in the 29-query runs that was not a number.
+    # The two warnings kept below are not about the missing structure: a one-line decline that names a plugin
+    # nobody mentioned or a source that was not shown is the model reaching outside the notes, and it is rejected.
     if abstained and not claims_change:
-        warnings = []
+        warnings = [w for w in warnings if w in _ABSTAIN_KEPT_WARNINGS]
     return {
         "accepted": not warnings,
         "warnings": warnings,

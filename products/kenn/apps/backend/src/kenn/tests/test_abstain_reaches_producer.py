@@ -306,3 +306,53 @@ def test_a_decline_with_a_three_word_gap_is_a_decline() -> None:
     assert _validate(reply)["abstained"] is True
     # Surrounding blank space is not content.
     assert llm.is_abstain_reply(f"\n  {reply}\n") is True
+
+
+# 7 Oct 2026 second review: advice on the same line as the prefix still read as a decline and skipped the gate,
+# which hid the unasked-product, fabricated-source and overlap warnings it would otherwise have earned.
+ADVICE_ON_THE_SAME_LINE = {
+    "a_second_sentence_of_advice": (
+        "Insufficient context: the notes do not cover release times. Try a slow release and a gentle ratio on "
+        "the bass bus."),
+    "so_try_a_plugin": (
+        "Insufficient context: the notes do not cover bass compression, so try Serum or FabFilter Pro-C on the bass."),
+    "so_use_a_ratio": (
+        "Insufficient context: the notes do not cover release, so use four to one with a release of one fifty "
+        "milliseconds."),
+    "a_filename": "Insufficient context: see fake-note.md for release times on the bass bus.",
+    "a_gap_that_runs_to_advice": (
+        "Insufficient context: the notes do not say how the release should sit against the kick on a dense "
+        "bass bus in a sparse arrangement with a long reverb tail while the sidechain is also pulling the "
+        "whole mix down and the master is limiting."),
+    "a_unit_word": "Insufficient context: the notes give no attack time in ms for this compressor.",
+}
+
+
+@pytest.mark.parametrize("reply", ADVICE_ON_THE_SAME_LINE.values(), ids=ADVICE_ON_THE_SAME_LINE.keys())
+def test_advice_on_the_decline_line_makes_it_an_answer_not_a_decline(reply, monkeypatch, tmp_path) -> None:
+    assert llm.is_abstain_reply(reply) is False
+    assert _validate(reply)["abstained"] is False
+
+    _model_writes(monkeypatch, reply)
+    payload = _ask_for_payload(monkeypatch, tmp_path)
+    assert payload["answer_abstained"] is False
+    assert "fake-note.md" not in payload["answer"]
+
+
+def test_the_real_5_oct_declines_still_count_as_declines() -> None:
+    for reply in (
+        "Insufficient context: the excerpts do not address linear-phase pre-ringing on transients",
+        "Insufficient context: the excerpts do not address linear-phase pre-ringing on transients.",
+        "Insufficient context: the excerpts do not address how a linear-phase EQ differs from a minimum-phase one.",
+    ):
+        assert llm.is_abstain_reply(reply) is True, reply
+        assert _validate(reply)["abstained"] is True, reply
+
+
+def test_a_decline_that_names_a_product_nobody_asked_about_is_still_rejected() -> None:
+    # Only the overlap and structure warnings are irrelevant to a one-line decline. A product name the question never
+    # mentioned is the model reaching for outside knowledge, which the decline is not allowed to excuse.
+    result = _validate("Insufficient context: the notes do not say how Serum handles this.")
+
+    assert "generated answer names a product that nobody mentioned" in result["warnings"]
+    assert result["accepted"] is False
