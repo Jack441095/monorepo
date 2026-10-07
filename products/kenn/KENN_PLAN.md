@@ -1118,16 +1118,22 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
 - [ ] Review follow-ups: a real-path test for the reason, count inline rejections too, match the chat-test skip on
   the test name rather than a `tests/` path segment. Also split "generation returned no answer" into request
   failed or timed out vs failed the structure check, so finding 2 can be checked.
-- [ ] Stop a template counting as a model answer when the quality check swaps it in after generation. A correctness
-  fix; it didn't change any of the last four scores.
-- [ ] Unsupported measurements: show the model which numbers the notes contain and have it describe others in words.
+- [x] Stop a template counting as a model answer when the quality check swaps it in after generation. A correctness
+  fix; it didn't change any of the last four scores. Merged to main 7 Oct (`draft/honest-answers` 0fd4b7b1): the
+  `brain=True` log row now waits for the quality check, and a swap logs `generation:quality gate: <reason>` instead.
+- [x] Unsupported measurements: show the model which numbers the notes contain and have it describe others in words.
+  Merged to main 5 Oct (`draft/allowed-figures` 314f1e78).
 - [ ] Answers that fit 128 tokens instead of being cut and rejected (`draft/answer-fits-128-tokens`).
 - [ ] ~~Stop the background upgrade repeating the template's retrieval and scoring.~~ Dropped 5 Oct: it costs
   70–120 ms of a 10 s answer.
-- [ ] Advice questions that name a track ("advice on drum bus compression") go to the model, not Live inspection.
+- [x] Advice questions that name a track ("advice on drum bus compression") go to the model, not Live inspection.
+  Merged to main 7 Oct (`draft/track-advice-to-model` f98f85cc, three adversary passes). The exact `followup-drums`
+  wording already reached the model after `3018af79`, so its 5 Oct failure was a rejected answer, not routing. What
+  still leaked was advice put as a value ("what's a good attack for the drum bus compressor" read back "Attack is
+  1.00 ms."); a good/right/ideal value or "should I set" next to a parameter now goes to the notes.
 - [ ] Lower prose temperature, measured on its own.
 - [ ] Reference-numbers note for the values the model keeps inventing (needs Jack and a box rebuild).
-- [ ] Three clean runs in a row at 31/44 or better.
+- [x] Three clean runs in a row at 31/44 or better. 32 / 33 / 31 on 5 Oct, 4B with allowed figures (below).
 
 5 Oct 2026, 8B against 4B on a quiet Mac. Same code (`dffd1551`, steady-short), gate index `v-5f6964698b76`, fake
 Live, mains power, no builds or other model servers running. Runs earlier that day were discarded: opencode was
@@ -1183,11 +1189,36 @@ on. The 8B stays as the comparison. Raw runs are in `/tmp/kenn-quiet{8b,4b}-{run
 - **Tests.** Full suite: 4382 passed, 1 failed (`test_fastapi_suggest`, already fixed on `draft/suggest-test`).
 - **Next.** Adversary review, then merge.
 
+Review fixes (`draft/allowed-figures` 314f1e78): the list now includes the stem-scan and classifier figures the gate
+already accepts, is capped at 12 (measured median 1, 90th percentile 6-8, max 14 over 44 probe and 64 held-out
+prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Same 4B, same quiet conditions:
+
+| | Probe runs 1 / 2 / 3 (gate 31) | Accepted when asked | Median final | Held-out inside 15 s |
+|---|---|---|---|---|
+| 4B + allowed figures, review fixes | 32 / 33 / 31 | 31–33 of 47 | 6.1 s | 42/72 (58%) |
+
+- **Probe half of the gate: passed.** Three runs in a row at 31 or better. Run 3 sits exactly on the line, so a
+  bad run could still drop below; the ranking fix below is the margin.
+- **Held-out.** 42 against 45 before the fixes, inside the run-to-run spread we have seen; 15 unsupported-measurement
+  rejections, same as before. Still 9 short of the 51 needed, so the held-out half rests on ranking and the fine-tune.
+- **Merged to main locally 5 Oct** (not pushed), with `draft/ship-ollama-brain` and `draft/suggest-test`. Full suite
+  on the merged tree: 4389 passed, 9 skipped.
+- **Review leftovers, not blocking:** the cap can drop a stem-scan figure while the prompt says unlisted figures go
+  in words (list specialist figures first); a listed stem-scan figure reaches the model with only 300 characters
+  of its context; no test yet that `make_answer` passes the specialist text through. Done 7 Oct (`draft/allowed-figures-leftovers`
+  f908a774, three adversary passes): specialist figures are listed first, and the specialist text gets its own
+  block of up to 900 characters, labelled as tool output and wrapped so a stem file name reads as a label, not a
+  result. An end-to-end `make_answer` test pins it. Acceptance with the block is unmeasured.
+
 - [ ] Retrieval ranking for the five rows above: find which boost pushes "Sends And Returns" to 688 while the PDC
   note scores 0, and why dedicated notes sit at ranks 4–12. Measure on coverage, the held-out set and the probe
   together.
-- [ ] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
-  reaches the producer instead of a template that pretends to answer.
+- [x] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
+  reaches the producer instead of a template that pretends to answer. Merged to main 7 Oct (`draft/honest-answers`
+  243df63e, four adversary passes). Only a whole-reply decline counts: one line, 3–25 words naming what is missing,
+  with no figure, unit, file name, instruction or product. Anything else goes through the full gate as before. Probe
+  and held-out reports count declines apart from model answers. Known leftovers, harmless: "a dozen"/"a few" still
+  pass, and "silent on"/"cannot say" declines fall to the template.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 

@@ -90,7 +90,10 @@ def upgrade_summary(path: Path | None = None) -> dict[str, Any]:
     accepted_ms.sort()
     return {
         "attempts": attempts,
-        "accepted": counts.get("accepted", 0), "rejected": counts.get("rejected", 0),
+        # Declines are attempts the model answered honestly, so they count in attempts and in neither
+        # accepted nor rejected: the landing rate must not rise because the model said it did not know.
+        "accepted": counts.get("accepted", 0), "abstained": counts.get("abstained", 0),
+        "rejected": counts.get("rejected", 0),
         "error": counts.get("error", 0), "busy": counts.get("busy", 0),
         "expired": counts.get("expired", 0),
         "accepted_rate": round(counts.get("accepted", 0) / attempts, 3) if attempts else None,
