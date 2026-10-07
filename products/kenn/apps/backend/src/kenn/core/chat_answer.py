@@ -1177,7 +1177,39 @@ def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) ->
         detail += [f"unsupported measurement: {m}" for m in (validation.get("unsupported_measurements") or [])]
         detail += [f"fabricated source: {s}" for s in (validation.get("fabricated_sources") or [])]
         detail += [f"dropped sentence with: {m}" for m in (validation.get("salvaged") or [])]
-        route_log.record(route, seconds * 1000.0, brain=accepted and not abstained, proposal=False, detail=detail)
+        brain = accepted and not abstained
+        if brain and getattr(_last_outcome, "hold", False):
+            # answer_payload() runs a quality check after make_answer() that can still swap this text for the
+            # template. Crediting the model now would leave "generation:accepted" brain=True in the log for an
+            # answer the producer never saw, so the row waits for that verdict (see _settle_held_generation_row).
+            _last_outcome.held = (route, seconds * 1000.0, detail)
+            return
+        route_log.record(route, seconds * 1000.0, brain=brain, proposal=False, detail=detail)
+    except Exception:
+        logging.getLogger("kenn.core.chat_answer").debug("generation outcome logging failed", exc_info=True)
+
+
+def _settle_held_generation_row(swapped_for: str = "") -> None:
+    """Write the accepted-generation row make_answer() held back: as brain work if the answer stood, else as a rejection.
+
+    swapped_for is the quality-gate warning when the template replaced the model's text, "" when the text stood.
+    Never raises, for the same reason _log_generation_outcome() never does.
+    """
+    held = getattr(_last_outcome, "held", None)
+    _last_outcome.held = None
+    if held is None:
+        return
+    route, milliseconds, detail = held
+    try:
+        from kenn.core import route_log
+
+        if swapped_for:
+            # Same route shape make_answer() uses for its own rejections, and short enough for route_log's 64
+            # character route field (the longest of the two gate warnings gives 54).
+            route_log.record(f"generation:quality gate: {swapped_for}", milliseconds, brain=False, proposal=False,
+                             detail=detail)
+        else:
+            route_log.record(route, milliseconds, brain=True, proposal=False, detail=detail)
     except Exception:
         logging.getLogger("kenn.core.chat_answer").debug("generation outcome logging failed", exc_info=True)
 
@@ -2656,16 +2688,22 @@ def _answer_payload_raw(
     if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
         return {}
     started = time.perf_counter()
-    answer, llm_used = make_answer(
-        relevance_query,
-        results,
-        history=_history_for_answer(history, use_history),
-        allow_llm=allow_llm,
-        route=route,
-        timeline_context=timeline_context,
-        answer_mode=answer_mode,
-        session_id=session_id,
-    )
+    # Hold the accepted-generation log row until the quality check below has judged the text.
+    _last_outcome.hold = True
+    _last_outcome.held = None
+    try:
+        answer, llm_used = make_answer(
+            relevance_query,
+            results,
+            history=_history_for_answer(history, use_history),
+            allow_llm=allow_llm,
+            route=route,
+            timeline_context=timeline_context,
+            answer_mode=answer_mode,
+            session_id=session_id,
+        )
+    finally:
+        _last_outcome.hold = False
     timings["answer_ms"] = (time.perf_counter() - started) * 1000
 
     started = time.perf_counter()
@@ -2722,6 +2760,7 @@ def _answer_payload_raw(
             # the model (audit, 5 Oct 2026).
             llm_used = False
             _last_outcome.reason = f"quality gate: {gate_warning}"
+            _settle_held_generation_row(gate_warning)
         grounding = {
             **grounding,
             "warnings": [*grounding.get("warnings", []), gate_warning],
@@ -2744,6 +2783,8 @@ def _answer_payload_raw(
             grounding=grounding,
             timeline_context=timeline_context,
         )
+    # The text stood (or was never the model's), so whatever make_answer() held is now safe to write as it was.
+    _settle_held_generation_row()
     self_check = answer_self_check(
         relevance_query,
         results,
