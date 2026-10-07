@@ -1205,7 +1205,10 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   on the merged tree: 4389 passed, 9 skipped.
 - **Review leftovers, not blocking:** the cap can drop a stem-scan figure while the prompt says unlisted figures go
   in words (list specialist figures first); a listed stem-scan figure reaches the model with only 300 characters
-  of its context; no test yet that `make_answer` passes the specialist text through.
+  of its context; no test yet that `make_answer` passes the specialist text through. Done 7 Oct (`draft/allowed-figures-leftovers`
+  f908a774, three adversary passes): specialist figures are listed first, and the specialist text gets its own
+  block of up to 900 characters, labelled as tool output and wrapped so a stem file name reads as a label, not a
+  result. An end-to-end `make_answer` test pins it. Acceptance with the block is unmeasured.
 
 - [ ] Retrieval ranking for the five rows above: find which boost pushes "Sends And Returns" to 688 while the PDC
   note scores 0, and why dedicated notes sit at ranks 4–12. Measure on coverage, the held-out set and the probe
