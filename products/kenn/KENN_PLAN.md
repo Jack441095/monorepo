@@ -1118,8 +1118,9 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
 - [ ] Review follow-ups: a real-path test for the reason, count inline rejections too, match the chat-test skip on
   the test name rather than a `tests/` path segment. Also split "generation returned no answer" into request
   failed or timed out vs failed the structure check, so finding 2 can be checked.
-- [ ] Stop a template counting as a model answer when the quality check swaps it in after generation. A correctness
-  fix; it didn't change any of the last four scores.
+- [x] Stop a template counting as a model answer when the quality check swaps it in after generation. A correctness
+  fix; it didn't change any of the last four scores. Merged to main 7 Oct (`draft/honest-answers` 0fd4b7b1): the
+  `brain=True` log row now waits for the quality check, and a swap logs `generation:quality gate: <reason>` instead.
 - [x] Unsupported measurements: show the model which numbers the notes contain and have it describe others in words.
   Merged to main 5 Oct (`draft/allowed-figures` 314f1e78).
 - [ ] Answers that fit 128 tokens instead of being cut and rejected (`draft/answer-fits-128-tokens`).
@@ -1209,8 +1210,12 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
 - [ ] Retrieval ranking for the five rows above: find which boost pushes "Sends And Returns" to 688 while the PDC
   note scores 0, and why dedicated notes sit at ranks 4–12. Measure on coverage, the held-out set and the probe
   together.
-- [ ] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
-  reaches the producer instead of a template that pretends to answer.
+- [x] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
+  reaches the producer instead of a template that pretends to answer. Merged to main 7 Oct (`draft/honest-answers`
+  243df63e, four adversary passes). Only a whole-reply decline counts: one line, 3–25 words naming what is missing,
+  with no figure, unit, file name, instruction or product. Anything else goes through the full gate as before. Probe
+  and held-out reports count declines apart from model answers. Known leftovers, harmless: "a dozen"/"a few" still
+  pass, and "silent on"/"cannot say" declines fall to the template.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
