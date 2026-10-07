@@ -1880,7 +1880,15 @@ def _build_synthesis_messages(
     # alone. Imported here because chat_grounding imports this module at load time.
     from kenn.core.chat_grounding import _gate_evidence_text, measurements_in_order
 
-    allowed = measurements_in_order(_gate_evidence_text(shown, timeline_context, additional_evidence_text))
+    # Specialist figures go first. The cap below keeps the head of the list, and a stem-scan or classifier reading
+    # is the figure the user's own audio produced and the notes cannot supply, whereas a long timeline offers
+    # dozens of readings of which any dozen will do. With the specialist text last, a timeline of 12 or more
+    # readings pushed the stem-scan figure off the list while the prompt told the model any unlisted figure goes in
+    # words (found in the review of draft/allowed-figures). Joining with a space is safe because
+    # measurements_in_order() de-duplicates, so a figure in both places is listed once, at its specialist position.
+    allowed = measurements_in_order(
+        f"{additional_evidence_text} {_gate_evidence_text(shown, timeline_context)}"
+    )
     if len(allowed) > _ALLOWED_FIGURES_SHOWN:
         # A long review timeline can carry dozens of LUFS and dBTP readings, and every listed figure is prompt the
         # Mac reads at ~75 tokens/s. Past the cap the list stops claiming to be complete, because the gate still
