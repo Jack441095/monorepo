@@ -8,8 +8,15 @@ lines at its very end, which is exactly the part a 300-character cut removes.
 
 from __future__ import annotations
 
+import json
+
+from kenn.core import chat_answer, chat_retrieval, route_log, session_memory
+from kenn.core.evidence import MARKER
+from kenn.llm import llm_rewrite as llm
 from kenn.llm.llm_rewrite import _ALLOWED_FIGURES_SHOWN, _SPECIALIST_BLOCK_CHARS, _build_synthesis_messages
 from kenn.tests.test_allowed_figures import QUERY, SIDECHAIN, _prompt
+from kenn.tests.test_streamed_generation_prefix_guard import ACCEPTED_ANSWER, CHUNKS
+from kenn.tests.test_streamed_generation_prefix_guard import QUERY as SIDECHAIN_QUERY
 
 SPECIALIST_HEADER = "Results from the analysis you ran on the supplied audio"
 
@@ -86,3 +93,49 @@ def test_no_specialist_text_adds_no_block_and_changes_nothing_else() -> None:
 
     assert SPECIALIST_HEADER not in with_none
     assert with_none == _prompt([(10.0, SIDECHAIN)])[0]
+
+
+def _history_with_stem_scan() -> list[dict]:
+    packet = {
+        "schema": "kenn.evidence.v1",
+        "source": "stem_masking_analysis",
+        "facts": [
+            {"name": "masking_candidate_count", "value": 2, "unit": "candidates"},
+            {"name": "masking_highest_competing_frame_fraction", "value": 0.454, "unit": "ratio"},
+            {"name": "masking_highest_pair", "value": "Bass + Piano"},
+            {"name": "masking_highest_band", "value": "bass"},
+        ],
+        "limitations": ["Not a perceptual masking model."],
+    }
+    return [{"role": "user", "content": MARKER + json.dumps(packet)}]
+
+
+def test_make_answer_carries_a_stem_scan_into_the_prompt_the_model_reads(monkeypatch, tmp_path) -> None:
+    # Only the model call is faked: the template, the specialist read, the real prompt builder and the real gate
+    # all run, so a stem-scan figure that stops short of the prompt anywhere along that path fails here.
+    seen: list[list[dict]] = []
+
+    def fake_completion(messages, *args, **kwargs):
+        seen.append(messages)
+        return ACCEPTED_ANSWER, None
+
+    monkeypatch.setattr(session_memory, "DB_PATH", tmp_path / "memory.db")
+    monkeypatch.setattr(route_log, "record", lambda *a, **k: None)
+    monkeypatch.setattr(llm, "is_enabled", lambda *a, **k: True)
+    monkeypatch.setattr(llm, "_chat_completion", fake_completion)
+    monkeypatch.setattr(chat_answer, "llm_enhance_answer", llm.enhance)
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *a, **k: True)
+    monkeypatch.setattr(chat_answer, "results_are_weak", lambda *a: False)
+    monkeypatch.setattr(chat_answer, "intent_guard_failed", lambda *a: False)
+    terms = {"total_docs": 0, "avg_len": 1.0, "lengths": [], "idf": {}, "postings": {}}
+    for module in (chat_retrieval, chat_answer):
+        monkeypatch.setattr(module, "load_chunks", lambda: [c for _, c in CHUNKS])
+        monkeypatch.setattr(module, "load_terms", lambda: terms)
+
+    chat_answer.make_answer(SIDECHAIN_QUERY, list(CHUNKS), history=_history_with_stem_scan(), route="production")
+
+    assert seen, "the model was never asked"
+    prompt = seen[0][-1]["content"]
+    block = prompt.split(SPECIALIST_HEADER, 1)[1]
+    assert "Bass + Piano" in block and "45.4%" in block
+    assert "45.4%" in _figure_line(prompt)
