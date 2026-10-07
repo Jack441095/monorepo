@@ -71,6 +71,13 @@ def test_advice_that_names_a_track_goes_to_the_notes_not_the_inventory(question:
         "What's the best release for the drum bus compressor?",
         "What's the ideal ratio on the Drum Bus?",
         "What's the threshold I should use on the drum bus compressor?",
+        # Re-review of 97de3829: other ways of asking for a good value that still read back the current one.
+        "what's a good starting point for the drum bus compressor attack",
+        "what's a decent ratio for the drum bus compressor",
+        "what's the right threshold for the drum bus compressor",
+        "what's a sensible ratio on the drum bus",
+        "what's the optimal release for the drum bus compressor",
+        "what's the threshold, and should I set it lower on the drum bus compressor?",
     ],
 )
 def test_asking_for_a_good_value_is_advice_not_the_current_value(question: str) -> None:
@@ -89,6 +96,11 @@ def test_asking_for_a_good_value_is_advice_not_the_current_value(question: str) 
         "What's the threshold on the Drum Bus compressor? It should be around -20.",
         "What is the gain on the drum bus compressor, it sounds good",
         "Is the key right? What key is the song in, it should be C",
+        # A trailing "I should ..." is the user's aside after the question, not a request for advice.
+        "What's on the drum bus? I should set it up",
+        "What key is the song in? I should put it in C",
+        "What's the attack on the drum bus compressor, I should set it faster?",
+        "What's the gain on the right side of the drum bus compressor?",
     ],
 )
 def test_a_should_or_good_inside_an_inspection_question_does_not_make_it_advice(question: str) -> None:
@@ -132,3 +144,14 @@ def test_world_questions_reach_the_command_path_read_only() -> None:
     result = handle_command("Which tracks send to the reverb?", session_id="world-q", service=LiveActionService(live))
     assert result["changed"] is False and "Lead Vocal" in result["answer"]
     assert [w for w in live.writes if w[0] != "send" and w[0] != "mute"] == []
+
+
+def test_a_parameter_question_on_a_track_named_with_an_advice_word_still_reads_live() -> None:
+    # The wider word gap for "good starting point" must not reach across to a track name: "Best Vocal" sits after
+    # the parameter here, so this is a value read, not advice.
+    from kenn.core.live_session_questions import answer_live_session_question
+
+    live = _live()
+    live.set_track_name(3, "Best Vocal")
+    result = answer_live_session_question("What's the output on the Best Vocal track?", service=LiveActionService(live))
+    assert result is not None and result["intent"]["action"] == "inspect_parameter_value"
