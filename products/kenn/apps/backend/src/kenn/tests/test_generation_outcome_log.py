@@ -288,7 +288,8 @@ def test_make_answer_names_why_the_model_wrote_nothing(tmp_path, monkeypatch):
     monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *a, **k: True)
 
     def cut_off(*a, **k):
-        llm_rewrite._enhance_failure.reason = "structure check"
+        # monkeypatch, so the reason doesn't stay set on the pytest thread for the next make_answer test.
+        monkeypatch.setattr(llm_rewrite._enhance_failure, "reason", "structure check", raising=False)
         return None
 
     monkeypatch.setattr(chat_answer, "llm_enhance_answer", cut_off)

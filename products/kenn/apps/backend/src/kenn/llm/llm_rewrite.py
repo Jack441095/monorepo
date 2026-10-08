@@ -2181,12 +2181,14 @@ def build_context_block(results: list[tuple[float, dict]], source_label) -> str:
 
 # Why the last enhance() on this thread returned None. "generation returned no answer" used to cover both a request
 # that failed and an answer that failed the structure check, so the 5 Oct probe couldn't say whether the 128-token cap
-# was cutting answers off. make_answer runs on the upgrade's own thread, so a thread-local is enough. Kept short:
-# route_log cuts route names at 64 characters. "request failed" covers timeouts too; the transport wraps both.
+# was cutting answers off. make_answer runs on the upgrade's own thread, so a thread-local is enough. The reasons are
+# a word or two because route_log cuts route names at 64 characters. "request failed" covers timeouts too; the
+# transport wraps both.
 _enhance_failure = threading.local()
 
 
 def last_enhance_failure() -> str:
+    """Why the last enhance() on this thread returned None; empty if it returned text."""
     return getattr(_enhance_failure, "reason", "")
 
 
