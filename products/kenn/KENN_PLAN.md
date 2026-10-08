@@ -1210,7 +1210,7 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   block of up to 900 characters, labelled as tool output and wrapped so a stem file name reads as a label, not a
   result. An end-to-end `make_answer` test pins it. Acceptance with the block is unmeasured.
 
-- [ ] Retrieval ranking for the five rows above: find which boost pushes "Sends And Returns" to 688 while the PDC
+- [x] Retrieval ranking for the five rows above: find which boost pushes "Sends And Returns" to 688 while the PDC
   note scores 0, and why dedicated notes sit at ranks 4–12. Measure on coverage, the held-out set and the probe
   together.
   Status 7 Oct: `draft/retrieval-ranking` (merge commit 974c9245, main merged in cleanly, 4493 passed, 9 skipped)
@@ -1227,7 +1227,23 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   - **Watch in the benchmark:** an embedding-only top hit used to score 0 and was flagged weak by accident. Now 14
     sealed and device-purpose questions flip weak → answered; 9 of them have no matching note in the top 16, so the
     abstain gate has to catch them. Also watch sealed-purpose 066, 068, 069 and 114.
-  - **Next:** probe ×3 and held-out against main with Live closed and the Mac on mains. Merge only if both hold or rise.
+  - **Benchmark 7 Oct, evening:** 4B, pinned index, fake Live, Live quit, mains, minilm loaded on both sides
+    (no BM25 fallback in either log). Main and branch alternated run by run.
+
+    | | Probe runs 1 / 2 / 3 (gate 31) | Median final | Held-out inside 15 s |
+    |---|---|---|---|
+    | main 18e58d6e | 32 / 28 / 30 | 5.7–6.1 s | 44/72 |
+    | branch 974c9245 | 33 / 34 / 32 | 5.7–7.2 s | 45/72 |
+
+    On the probe, `live-pdc` passes for the first time, in all three runs, and `eq-linear-vs-min-phase` passes in two
+    of three. On main both abstain every time. Oversampling, precedence and pre/post sends still abstain on both
+    sides. On the held-out set, 12 rows flip between the sides (6 gains, 6 losses), but 9 of the 12 had the same top
+    3 sources on both sides, so those flips are the model, not the ranking. Of the 3 whose sources changed, 2 gained
+    (q012, q208) and 1 was lost (q080).
+  - **Merged to main 8 Oct** (bdec8fb5). The synonym inflation stays open as its own item, below.
+- [ ] Topic synonym inflation: the 49 routing and mixing terms and the 3.45 topic multiplier still lift the short
+  Sends And Returns note to 688 on routing-flavoured questions. Separately, find out why the oversampling (10–12)
+  and precedence (4) notes still rank too low to reach the model; that cause is not yet known. Measure on coverage, the held-out set and the probe together, like the ranking change.
 - [x] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
   reaches the producer instead of a template that pretends to answer. Merged to main 7 Oct (`draft/honest-answers`
   243df63e, four adversary passes). Only a whole-reply decline counts: one line, 3–25 words naming what is missing,
