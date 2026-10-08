@@ -345,7 +345,10 @@ def hybrid_search(
 
     Falls back to pure BM25 if no embedding index is available.
     """
-    bm25_results = bm25_search(query, chunks, terms, limit=max(limit * 3, 60), rerank=False)
+    # Every chunk with any BM25 score, not just the top 60. Only the top 60 take part in the rank fusion below,
+    # exactly as before; the rest are kept so an embedding-only hit can be scored on its own keywords.
+    bm25_all = bm25_search(query, chunks, terms, limit=len(chunks), rerank=False)
+    bm25_results = bm25_all[: max(limit * 3, 60)]
     if not bm25_results:
         return []
 
@@ -416,10 +419,21 @@ def hybrid_search(
     order = sorted(candidates, key=lambda idx: -fused[idx])[: max(limit, 40)]
 
     # Scores stay on the BM25 scale that the relevance thresholds (MIN_RELEVANT_SCORE) expect: each result
-    # carries the best boosted BM25 score at or below its rank. The top score, which decides "I don't know",
-    # is therefore unchanged, and an embedding-only hit inherits evidence instead of scoring 0.
+    # carries the best boosted BM25 score at or below its rank, and an embedding-only hit inherits evidence
+    # instead of scoring 0. The top score decides "I don't know". It can only rise when an embedding-only hit
+    # outscores the BM25 leader on its own keywords, and then by at most the embedding boost (0.25 x emb_weight).
+    #
+    # An embedding-only hit used to score 0 whenever no BM25 hit sat below it, and display_results drops a
+    # second note under 55% of the first, so the right note could rank 2nd and still never reach the model. On
+    # 5 Oct the PDC probe row showed "Sends And Returns" at 688 and the Live 12 delay-compensation note at 0:
+    # the note does mention delay compensation and lookahead, but generic send/return "Try this" sections had
+    # filled BM25's top 60. Scoring it on its own BM25 terms puts it in the displayed three. Probe concepts in
+    # the displayed excerpts went from 141 to 147 of 163 with the hyphen change; coverage held at 121 of 128.
+    all_scores: dict[int, float] = {}
+    for score, chunk in bm25_all:
+        all_scores.setdefault(chunk_id_to_idx.get(chunk.get("id", ""), -1), score)
     raw = [
-        bm25_scores_dict[idx] + (emb_weight * float(cos_norm[idx]) * 0.25) if idx in bm25_scores_dict else 0.0
+        all_scores[idx] + (emb_weight * float(cos_norm[idx]) * 0.25) if idx in all_scores else 0.0
         for idx in order
     ]
     running = 0.0
@@ -709,6 +723,26 @@ def expanded_query_terms(query: str) -> list[str]:
     return ordered
 
 
+def with_hyphen_parts(query: str, query_terms: list[str]) -> list[str]:
+    """`query_terms` plus the parts of every hyphenated word the user typed.
+
+    The tokenizer keeps "linear-phase" whole, and the notes mostly write "linear phase" with a space, so the
+    hyphenated query term matched 2 chunks and the word "linear" never reached BM25 at all. On 5 Oct the linear-phase
+    probe row had generic "Try this" EQ sections in its top 3 and the two dedicated linear-phase notes at 4 and 6;
+    with the parts added they rank first. Coverage stayed at 121 of 128 with the same failing rows.
+    """
+    extra = [
+        part
+        for token in tokenize(canonical_audio_query(query))
+        if "-" in token
+        for part in token.split("-")
+        # Two-letter parts are mostly contraction debris: the tokenizer leaves "re" from "you're" in the index
+        # at idf 3.96, so "re-amp" would have boosted every chunk written in a chatty voice. "amp" carries the query.
+        if len(part) >= 3 and part not in STOPWORDS and part not in query_terms
+    ]
+    return query_terms + list(dict.fromkeys(extra))
+
+
 @lru_cache(maxsize=8192)
 def _extract_tags_cached(text: str) -> frozenset[str]:
     tags: set[str] = set()
@@ -797,6 +831,7 @@ def bm25_search(
 
     inverted = terms.get("inverted_index")
     candidate_scores: dict[int, float] = {}
+    query_terms = with_hyphen_parts(query, query_terms)
 
     if inverted:
         for term in query_terms:
