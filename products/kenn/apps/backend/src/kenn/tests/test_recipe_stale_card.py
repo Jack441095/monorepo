@@ -71,6 +71,8 @@ def test_a_stale_second_step_rolls_back_the_first_step_it_already_wrote(live) ->
     receipt = result["receipt"]
     assert receipt["status"] == "failed_rolled_back"
     assert "send value changed" in receipt["error"]
+    # One step was written; without this the test would still pass if a later change stopped step 1 writing at all.
+    assert receipt["step_count"] == 1
     assert fake.get_track_send(vocal, 0) == pytest.approx(reverb_before, abs=1e-4)
     # The producer's own 40 % stays; rollback only reverses what the recipe wrote.
     assert fake.get_track_send(vocal, 1) == pytest.approx(0.4, abs=1e-4)
