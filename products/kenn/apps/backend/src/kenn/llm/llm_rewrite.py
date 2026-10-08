@@ -2179,6 +2179,19 @@ def build_context_block(results: list[tuple[float, dict]], source_label) -> str:
     return build_raw_context_block(results, source_label, max_chars=3200)
 
 
+# Why the last enhance() on this thread returned None. "generation returned no answer" used to cover both a request
+# that failed and an answer that failed the structure check, so the 5 Oct probe couldn't say whether the 128-token cap
+# was cutting answers off. make_answer runs on the upgrade's own thread, so a thread-local is enough. The reasons are
+# a word or two because route_log cuts route names at 64 characters. "request failed" covers timeouts too; the
+# transport wraps both.
+_enhance_failure = threading.local()
+
+
+def last_enhance_failure() -> str:
+    """Why the last enhance() on this thread returned None; empty if it returned text."""
+    return getattr(_enhance_failure, "reason", "")
+
+
 def enhance(
     query: str,
     template_answer: str,
@@ -2199,7 +2212,9 @@ def enhance(
     Returns the enhanced text, or None if the LLM was unavailable or the result
     failed the structure check.
     """
+    _enhance_failure.reason = ""
     if not is_enabled():
+        _enhance_failure.reason = "llm disabled"
         return None
 
     messages, shown = _build_synthesis_messages(
@@ -2231,12 +2246,14 @@ def enhance(
         # (see this function's own docstring). Every other _chat_completion
         # caller in this file already catches broad Exception; matching
         # that here instead of chasing the exact exception-type list again.
+        _enhance_failure.reason = "request failed"
         return None
 
     text = re.sub(r"^#+\s*", "", text, flags=re.M).strip()
     from kenn.llm.linter import lint_response
     text = _with_sources(lint_response(text, answer_mode), shown, source_label)
     if not valid_response(text, answer_mode, route=route):
+        _enhance_failure.reason = "structure check"
         return None
     return text
 

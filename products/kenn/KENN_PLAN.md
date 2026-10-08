@@ -1118,6 +1118,9 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
 - [ ] Review follow-ups: a real-path test for the reason, count inline rejections too, match the chat-test skip on
   the test name rather than a `tests/` path segment. Also split "generation returned no answer" into request
   failed or timed out vs failed the structure check, so finding 2 can be checked.
+  The real-path test and inline counts landed in `2d8d779d`. The no-answer split merged 8 Oct (`draft/no-answer-cause`):
+  the route now ends `: request failed`, `: structure check` or `: llm disabled`, so the next probe can say how many
+  answers the cap cut off. The streamed path still logs the bare reason. The chat-test skip match is not yet checked.
 - [x] Stop a template counting as a model answer when the quality check swaps it in after generation. A correctness
   fix; it didn't change any of the last four scores. Merged to main 7 Oct (`draft/honest-answers` 0fd4b7b1): the
   `brain=True` log row now waits for the quality check, and a swap logs `generation:quality gate: <reason>` instead.

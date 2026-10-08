@@ -14,7 +14,7 @@ from kenn.llm.llm_rewrite import (  # noqa: E402
     guard_cache_writes,
 )
 
-from kenn.llm.llm_rewrite import enhance as llm_enhance_answer, enhance_stream as llm_enhance_answer_stream
+from kenn.llm.llm_rewrite import enhance as llm_enhance_answer, enhance_stream as llm_enhance_answer_stream, last_enhance_failure
 from kenn.llm.llm_rewrite import is_enabled as llm_enabled
 from kenn.core.session_memory import (
     build_session_context as _build_session_context,
@@ -1106,7 +1106,10 @@ def make_answer(
     else:
         # The model wrote nothing usable: timed out, unavailable, or failed the structure check in enhance().
         # Distinct from a rejected answer, so the two do not average into one meaningless "the swap failed" number.
-        _log_generation_outcome(False, {"warnings": ["generation returned no answer"]}, _time.perf_counter() - _ma_t2)
+        # The cause rides after a colon so anything matching the old prefix still matches.
+        cause = last_enhance_failure()
+        reason = f"generation returned no answer: {cause}" if cause else "generation returned no answer"
+        _log_generation_outcome(False, {"warnings": [reason]}, _time.perf_counter() - _ma_t2)
     _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
     print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (fallback)", file=_sys.stderr, flush=True)
     return template, False
