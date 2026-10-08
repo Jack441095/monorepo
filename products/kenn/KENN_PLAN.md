@@ -1311,18 +1311,28 @@ phrasings, so this run stops early and is judged only on sets it never saw.
 
   Run 11's GGUF stays, because it's the only copy left. Older copies (`kenn-GPU`, `kenn-regression-20260910`,
   `kenn_retrieval`) are still waiting for Jack.
-- [ ] Questions from the approved notes, a few thousand. Leave out the 44 probe rows, the 75 held-out ids and
-  anything near them, reusing the near-test filter in `tooling/scripts/build_brain_style_corpus.py`.
-- [ ] Teacher answers from `qwen3:32b`, each given the real retrieved excerpts and the allowed-figures prompt. Keep
-  only the answers KENN's own grounding gate accepts at 128 tokens or under.
-- [ ] Jack grades about 40 of the kept answers before training.
-- [ ] LoRA on GPU 0 in the existing `c6/venv` (peft 0.21, transformers 5.17, torch 2.9), with early stopping.
-  Nothing new is installed. Never on a soak night.
-- [ ] Merge, convert to GGUF Q4_K_M, serve through Ollama on the Mac. Then 3 probe runs plus the held-out set against
-  the plain 4B, on a quiet machine on mains power.
-- [ ] Keep it only if:
-  - both the probe and the held-out set rise
-  - the median time is no slower
-  - the negative-advice guard holds
+- [x] Questions from the approved notes. 977 were written, not a few thousand. No held-out question appears in any
+  training prompt (substring check, 8 Oct).
+- [x] Teacher answers from `qwen3:32b`. 505 were kept: 448 train and 57 valid.
+- [ ] Jack grades about 40 of the kept answers before training. Not done: the grading page was built, but training
+  went ahead with no grades in. A 40-answer sample graded on 8 Oct was 37% right, 45% partly right and 17% wrong.
+  That is no better than the plain 4B, so the teacher was not a stronger source of correct answers.
+- [x] LoRA on GPU 0 in the existing `c6/venv`: rank 16, best validation loss 0.693 at step 60, early stop at 68.
+- [x] Merged, converted to Q4_K_M and served on the Mac as `kenn-answer1`. Benched 8 Oct on main `86f69540` with index
+  `v-5f6964698b76` and fake Live, against main's 8 Oct runs:
+  - probe 40/39/40 vs 32/32/33;
+  - held-out 58/72 vs 44/72;
+  - held-out median 6.13 s vs 6.67 s.
+- [x] Keep it only if both sets rise, the median is no slower and the negative-advice guard holds. **Not kept.** It
+  meets the first two on paper, and the guard was not checked. Grading the 62 held-out rows where the two models
+  differ found that the extra deliveries are mostly wrong advice. Of the 16 rows it newly got through, 1 is right,
+  7 are partly right and 8 are wrong, e.g. de-ess at 500 Hz, a "Warp device" in Live, and high crest factor called
+  squashed. Overall it is 26% right / 28% wrong against main's 33% / 17%.
 
-  Otherwise record the result here and drop it.
+  The gate counts delivery, so it could not see this. `kenn-answer1` stays in Ollama on the Mac but is not wired
+  into KENN. Write-up and grades: `Nite-DSP/kenn-evaluation-data/2026-10-06-answer-tune/results.md`.
+
+8 Oct 2026, Jack: we move past the 15 s gate. It stays **open, not passed**. Probe runs pass on paper with the tune,
+but neither model is right often enough on the held-out set for the gate to mean the answers help. A held-out
+question set with owner-graded correctness, not delivery alone, is the measure to bring back before the gate is
+picked up again.
