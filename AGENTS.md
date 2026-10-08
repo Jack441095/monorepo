@@ -8,15 +8,49 @@ The goal of this repository is production-grade audio engineering software that 
 
 ## 1. Code & Comment Style: Human-Like, Clear, and Well-Commented
 
+Code here should read like a colleague left it, not like a machine emitted it. Hold yourself to one test: would you be willing to have your name on the diff?
+
+### Comment Generously, and Comment the Decision
+
+A comment earns its line when it answers a question the code alone raises:
+
+- Why this approach and not the obvious one.
+- What breaks if this number, tolerance, ordering, or unit changes.
+- Where the value came from — the measurement, the standard, the paper, the date, the machine.
+- What was tried and rejected, so the next person does not repeat it.
+- What this code deliberately does *not* do, and who does it instead.
+
+Density target: a reader who knows Python should never have to stop and ask "why?" more than once inside a single function. Comment the seams, not every line.
+
+```python
+# Before: correct, and a reader cannot tell why either constant is what it is.
+peaks_db = min(peaks_db, -1.0)
+gain = round(10.0 ** (delta_db / 20.0), 4)
+```
+
+```python
+# After: both constants now carry the constraint that produced them.
+# -1 dBTP is the ceiling: a summed master above it clips in the lossy
+# encode we hand to streaming, and we would rather give up 0.1 dB of peak
+# than ship a master that distorts on someone else's phone speaker.
+peaks_db = min(peaks_db, -1.0)
+
+# Four decimals, because Live quantises the raw fader to 1e-4, so a finer
+# gain silently rounds on write-back and the next read disagrees with the
+# value we measured here.
+gain = round(10.0 ** (delta_db / 20.0), 4)
+```
+
 ### Comments Explain *Why*, Never Just *What*
-- **Explain the reason, the trade-off, or the gotcha**: If the code is `if meter > 1.0:`, don't write `# check if meter is greater than 1.0`. Write `# Live's post-fader meter can report values slightly above 1.0 during transient overshoots, so clamp to avoid distortion`.
-- **First person plural is natural**: Phrases like *"we read the mixer here because..."* or *"we cache by SHA-256 to avoid re-analyzing multi-megabyte audio frames"* sound human and explain team intent.
-- **Record the edge cases that bit us**: Mention dates, Ableton OSC quirks, or platform bugs where relevant (`# Live ignores device view changes while the mixer view is folded, so select the track first`).
-- **No boilerplate comments**:
-  - No ASCII banners or divider lines (`# ---------------- Helpers ----------------`).
-  - No robot docstrings that merely echo function signatures (`def set_volume(track, vol): """Sets volume of track."""`).
-  - No meaningless opening prefixes like `"Note:"` or `"This function is responsible for..."`.
-  - No decorative emojis in comments or commit logs.
+- **Skip the restatement**: `if meter > 1.0:` needs no `# check if meter is greater than 1.0`. It needs `# Live's post-fader meter can report slightly above 1.0 during transient overshoots, so clamp here to avoid distortion`.
+- **First person plural is natural**: *"we read the mixer here because..."* or *"we cache by SHA-256 to avoid re-analyzing multi-megabyte audio frames"* sounds human and explains team intent.
+- **Write field notes**: record the edge cases that bit us, with dates, Ableton OSC quirks, and platform bugs where relevant (`# Live ignores device view changes while the mixer view is folded, so select the track first`).
+- **Every fallback branch gets a line**: on each `except`, each early `return None`, each degraded path, say what happens there and why returning is safe.
+- **Every literal gets a unit**: `-1.0` becomes `-1.0 dBTP`, `2048` becomes `2048 samples (46 ms at 44.1 kHz)`, `0.16` becomes `0.16 cosine overlap threshold`.
+- **Docstrings state the contract**: one line on what it returns or changes, plus any surprising side effect or caller obligation. Expand only when the reasoning genuinely needs the room.
+
+### No Boilerplate (the one hard guardrail)
+Plenty of comments still means every comment is load-bearing. Specifically out: ASCII banners (`# ---------------- Helpers ----------------`), docstrings that echo the signature (`"""Sets volume of track."""`), `"Note:"` / `"This function is responsible for..."` openers, and decorative emojis in comments or commit logs. Delete any comment you cannot make specific.
 
 ### Plain, Specific English (Zero AI Slop)
 - Speak directly in short, crisp sentences using concrete audio and programming terms.
@@ -25,7 +59,12 @@ The goal of this repository is production-grade audio engineering software that 
 
 ### Match the Surrounding File
 - When editing an existing file, adopt its naming conventions, indentation, docstring format, and import styles. Do not introduce a foreign style into an established module.
+- Match the file's comment *register* — terse measured notes or chatty explanation — while keeping the density target above. A new module or a new subsystem gets the fuller treatment even if its neighbours are bare.
 - Keep abstractions lean: solve the real problem directly. Avoid defensive layers for scenarios that can never occur.
+
+### Before You Report Done
+- Reread your own diff top to bottom as if you inherit it in six months with no memory of the ticket. Every branch, constant, and fallback carries a why, or the commenting is not finished.
+- Delete every comment that only restates its line.
 
 ---
 
