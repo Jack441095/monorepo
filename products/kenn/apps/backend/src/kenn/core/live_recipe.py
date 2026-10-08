@@ -395,13 +395,16 @@ class LiveRecipeService:
         except Exception as exc:
             write_ok = False
             write_error = f"{type(exc).__name__}: {exc}"
+        # Parsing sits inside the try with the read: the write may already have landed, and an exception
+        # escaping from here leaves no step receipt, so the rollback would skip this step and still call
+        # the recipe cleanly restored.
         try:
             post_info = self.client.get_device_parameters(int(step["track_index"]), device_index)
+            post_parameter = _find_parameter(post_info, int(step["parameter_index"]), str(step.get("parameter", ""))) if post_info.get("success") else None
             readback_error = ""
         except Exception as exc:
-            post_info = {"success": False}
+            post_parameter = None
             readback_error = f"{type(exc).__name__}: {exc}"
-        post_parameter = _find_parameter(post_info, int(step["parameter_index"]), str(step.get("parameter", ""))) if post_info.get("success") else None
         readback = post_parameter.get("value") if post_parameter else None
         readback_matches = _values_match(readback, requested)
         changed = not _values_match(parameter.get("value"), requested)

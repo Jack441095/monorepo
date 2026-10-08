@@ -3049,6 +3049,50 @@ def test_recipe_reports_partial_recovery_when_compensating_rollback_fails() -> N
     assert fake.state["tracks"][0]["volume"] == 0.4
 
 
+def test_a_malformed_device_readback_after_the_write_is_still_rolled_back() -> None:
+    # Regression (9 Oct 2026 review): parsing the post-write readback raised outside its try, the step left no
+    # receipt, so the rollback skipped the -3 dB write and the recipe still reported failed_rolled_back.
+    fake = FakeLive()
+    recipes = LiveRecipeService(_service(fake))
+    proposed = recipes.propose_recipe(
+        [{"action": "set_device_parameter", "track_index": 3, "track_name": "Synth", "device_index": 0, "device_name": "EQ Eight", "parameter_index": 12, "parameter": "1 Gain A", "value": -3.0, "unit": "dB"}],
+        reason="Malformed readback test",
+        session_id="recipe-malformed-readback",
+    )
+    recipe = proposed["proposal"]
+    original_set = fake.set_device_parameter
+    original_get = fake.get_device_parameters
+    malformed = {"next_read": False}
+
+    def write_then_garble(track_index: int, device_index: int, parameter_index: int, value: float) -> bool:
+        result = original_set(track_index, device_index, parameter_index, value)
+        if value == -3.0:
+            malformed["next_read"] = True
+        return result
+
+    def garbled_read(track_index: int, device_index: int) -> dict:
+        if malformed["next_read"]:
+            malformed["next_read"] = False
+            return {"success": True, "parameters": [{"index": "twelve", "name": "1 Gain A", "value": -3.0}]}
+        return original_get(track_index, device_index)
+
+    fake.set_device_parameter = write_then_garble
+    fake.get_device_parameters = garbled_read
+    result = recipes.execute_recipe(
+        recipe,
+        confirm_token=recipe["confirmation_token"],
+        session_id="recipe-malformed-readback",
+        idempotency_key=recipe["action_id"],
+    )
+
+    assert result["ok"] is False
+    assert len(result["receipt"]["step_receipts"]) == 1
+    assert "readback_error" in result["receipt"]["step_receipts"][0]
+    restored = next(p for p in original_get(3, 0)["parameters"] if p["name"] == "1 Gain A")
+    assert restored["value"] == pytest.approx(0.0)
+    assert result["status"] == "failed_rolled_back"
+
+
 def test_send_recipe_aborts_without_writes_when_return_identity_is_stale() -> None:
     fake = FakeLive()
     recipes = LiveRecipeService(_service(fake))
