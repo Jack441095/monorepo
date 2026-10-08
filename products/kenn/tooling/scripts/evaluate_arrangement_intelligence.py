@@ -60,32 +60,37 @@ def _session_view_context() -> dict[str, Any]:
     })
 
 
-CASES: tuple[dict[str, Any], ...] = (
-    {
-        "id": "arrangement_only_density_lift",
-        "category": "arrangement_view",
-        "context": _timeline_only_context(),
-        "expect": {"status": "current", "suggestion_title_contains": "timeline density lift", "timeline_transition": "timeline_density_lift"},
-    },
-    {
-        "id": "session_view_density_lift",
-        "category": "session_view",
-        "context": _session_view_context(),
-        "expect": {"status": "current", "suggestion_title_contains": "density lift", "transition": "density_lift"},
-    },
-    {
-        "id": "no_structural_evidence_abstains",
-        "category": "abstention",
-        "context": build_session_context(snapshot={"status": "connected", "tracks": [], "scenes": [], "locators": []}),
-        "expect": {"status": "current", "suggestion_count": 0},
-    },
-    {
-        "id": "stale_context_fails_closed",
-        "category": "safety",
-        "context": {**_timeline_only_context(), "observed_at": 0.0},
-        "expect": {"status": "unavailable", "suggestion_count": 0},
-    },
-)
+def _cases() -> tuple[dict[str, Any], ...]:
+    # Built per evaluation, not at import: build_session_context stamps observed_at with the current time, and
+    # analysis refuses a context older than MAX_CONTEXT_AGE_SECONDS (300 s). When this was a module constant, a
+    # full test run that spent over five minutes between importing this file and running its test (seen on
+    # 7-8 Oct) saw three fresh cases as stale and passed only the stale-context case.
+    return (
+        {
+            "id": "arrangement_only_density_lift",
+            "category": "arrangement_view",
+            "context": _timeline_only_context(),
+            "expect": {"status": "current", "suggestion_title_contains": "timeline density lift", "timeline_transition": "timeline_density_lift"},
+        },
+        {
+            "id": "session_view_density_lift",
+            "category": "session_view",
+            "context": _session_view_context(),
+            "expect": {"status": "current", "suggestion_title_contains": "density lift", "transition": "density_lift"},
+        },
+        {
+            "id": "no_structural_evidence_abstains",
+            "category": "abstention",
+            "context": build_session_context(snapshot={"status": "connected", "tracks": [], "scenes": [], "locators": []}),
+            "expect": {"status": "current", "suggestion_count": 0},
+        },
+        {
+            "id": "stale_context_fails_closed",
+            "category": "safety",
+            "context": {**_timeline_only_context(), "observed_at": 0.0},
+            "expect": {"status": "unavailable", "suggestion_count": 0},
+        },
+    )
 
 
 def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
@@ -122,7 +127,7 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
 
 
 def evaluate() -> dict[str, Any]:
-    rows = [evaluate_case(case) for case in CASES]
+    rows = [evaluate_case(case) for case in _cases()]
     return {
         "schema": EVALUATION_SCHEMA,
         "generated_at": datetime.now(timezone.utc).isoformat(),
