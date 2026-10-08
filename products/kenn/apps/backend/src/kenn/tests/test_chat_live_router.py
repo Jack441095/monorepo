@@ -237,3 +237,34 @@ def test_a_change_asked_after_the_question_is_the_request() -> None:
                                      "Should I compress the vocal? Can you tell me why people do that?"])
 def test_asking_for_an_explanation_afterwards_is_still_a_question(message) -> None:
     assert asks_how_to(message)
+
+
+# 4 Oct 2026 gap-finder q130: the "send" rule read this capability question as a command and answered "How much?".
+def test_a_can_i_question_about_drum_rack_returns_is_answered_not_executed(demo) -> None:
+    question = "Can I add individual return chains inside a single Drum Rack pad for reverb sends?"
+    assert not wants_live_change(question, demo)
+
+
+@pytest.mark.parametrize("request_text", [
+    "add a reverb send to the drums",
+    "Can I get the vocal 3 dB louder?",                  # first person, but the parser reads a volume action
+    "Can I mute the kick?",
+    "Can you lower the bass a bit?",                     # "you" asks KENN to do it
+    "can you add a reverb send to the drums",
+    "Send the synth to A-Reverb 30 percent",
+])
+def test_real_live_requests_still_reach_live_after_the_can_i_rule(demo, request_text) -> None:
+    assert wants_live_change(request_text, demo)
+
+
+def test_the_chat_hands_the_drum_rack_question_to_the_notes_and_keeps_the_send_command(monkeypatch) -> None:
+    import kenn.server as server
+    import kenn.mixing_doctor as mixing_doctor
+
+    live = FakeLiveBackend()
+    monkeypatch.setattr(mixing_doctor, "get_latest_session_state", lambda: live.query_session_state())
+    handler = server.Handler.__new__(server.Handler)
+    question = "Can I add individual return chains inside a single Drum Rack pad for reverb sends?"
+    # None means the pre-handler declined, so the message goes on to the knowledge answer.
+    assert handler._maybe_handle_live_command_from_chat(question, "drum-rack-return-question") is None
+    assert server._chat_wants_live("add a reverb send to the drums") is True

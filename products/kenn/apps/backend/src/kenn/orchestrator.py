@@ -40,7 +40,18 @@ _MIX_REVIEW_PATTERNS = [
     re.compile(r"\b(review|analyz[ei]|check|assess|evaluat[ei]|audit)\b.*\b(mix(es)?|masters?|tracks?|songs?)\b", re.I),
     re.compile(r"\b(mix(es)?|masters?)\b.*\b(review|analys[ei]s|feedback|checks?)\b", re.I),
     re.compile(r"\bwhat'?s?\s+wrong\s+with\b.*\b(mix(es)?|masters?|tracks?)\b", re.I),
-    re.compile(r"\b(clipping|headroom|dynamics|loudness|phase)\b.*\b(checks?|issues?|problems?)\b", re.I),
+    # "phase issues" is also how people describe a recording problem ("acoustic guitar with one mic vs two, phase
+    # issues when I pan them hard", 4 Oct 2026 gap-finder q227), and that got "Upload your mix". The symptom words
+    # only mean a mix review when the message also names a mix-level thing or asks for a check. A bare short ask
+    # ("any clipping problems?", six words or fewer) keeps its old route, because we would rather upload-prompt a
+    # terse request than lose it; a longer description with neither is a technique question for the notes.
+    # re.S so a multi-line message counts as one message for the word count and the lookahead.
+    re.compile(
+        r"(?=.*\b(?:mix(?:es)?|masters?|tracks?|songs?|sessions?|projects?"
+        r"|check|scan|review|analy[sz]e|assess|audit|diagnose|detect|test|measure|tell\s+me)\b|^(?:\W*\w+){1,6}\W*$)"
+        r".*\b(clipping|headroom|dynamics|loudness|phase)\b.*\b(checks?|issues?|problems?)\b",
+        re.I | re.S,
+    ),
 ]
 
 _LTAS_PATTERNS = [

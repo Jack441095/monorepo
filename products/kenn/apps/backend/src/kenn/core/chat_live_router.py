@@ -35,6 +35,10 @@ LIVE_WITHOUT_ACTION = frozenset({"current_volume", "send_amount", "negated", "de
                                  "return_track_action", "single_action"})
 
 
+# "Can I ..." / "Could we ..." asks whether something is possible. "Can you ..." is the polite way to ask KENN to do it
+# ("can you solo the hats"), so only the first person counts.
+_CAN_I_ASK = re.compile(r"^\s*(?:can|could)\s+(?:i|we)\b", re.I)
+
 _RETURN_HINT = re.compile(r"\b(?:sends?|returns?|reverb|verb|delay|echo|aux)\b|\b[a-h]-[a-z]+\b", re.I)
 _MIXER_VERB = re.compile(r"\b(?:mute|unmute|solo|pan|louder|quieter|volume|level|lower|raise|turn|bring|drop|boost|cut|set|up|down|db)\b",
                          re.I)
@@ -70,6 +74,12 @@ def wants_live_change(text: str, snapshot: dict[str, Any] | None) -> bool:
     intent = parse_request(str(text or ""), snapshot)
     missing = set(intent.get("missing_fields") or [])
     if "how_to" in missing:
+        return False
+    if _CAN_I_ASK.match(str(text or "")) and not intent.get("action"):
+        # "Can I add individual return chains inside a single Drum Rack pad for reverb sends?" (4 Oct 2026 gap-finder
+        # q130) hit the "send" rule and got "How much?". With no action read, only a missing field made it look like
+        # a command, so it is a capability question for the notes. "Can I get the vocal 3 dB louder?" reads as a
+        # volume action and stays a command.
         return False
     return bool(intent.get("action")) or bool(missing & LIVE_WITHOUT_ACTION)
 
