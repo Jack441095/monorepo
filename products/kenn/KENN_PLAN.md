@@ -1101,7 +1101,8 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
 - [x] Rejection reasons on every rejected upgrade, merged after review (see C1).
 - [x] Chat tests that need the local index skip on a clean checkout, so kenn-app CI fails only on real faults
   (`b7738223`, reviewed 5 Oct). Fresh-clone CI passed all nine steps.
-- [x] kenn-app synced to monorepo main `681dc674` (kenn-app `1c3ed858`, fast-forward, no force).
+- [x] kenn-app synced to monorepo main `681dc674` (kenn-app `1c3ed858`, fast-forward, no force). Synced again 8 Oct
+  to monorepo `eb5a21d0` (kenn-app `bb2ada6d`), fast-forward over SSH on port 443; Abrar's only commit was already in.
 - [ ] One probe run with reasons on merged main, index `v-5f6964698b76`, to `/tmp/kenn-reasons-run1.*`.
   Run 1 (5 Oct, 02:09) doesn't count for timing: the Mac dropped to battery at 02:11, and model answers took 26–30 s
   where the 30 Sept runs took about 10 s. It scored 8/44, with 34 of 44 delivered by the model. The reasons for the 10
@@ -1126,7 +1127,9 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
   `brain=True` log row now waits for the quality check, and a swap logs `generation:quality gate: <reason>` instead.
 - [x] Unsupported measurements: show the model which numbers the notes contain and have it describe others in words.
   Merged to main 5 Oct (`draft/allowed-figures` 314f1e78).
-- [ ] Answers that fit 128 tokens instead of being cut and rejected (`draft/answer-fits-128-tokens`).
+- [x] Answers that fit 128 tokens instead of being cut and rejected (`draft/answer-fits-128-tokens`). On main:
+  `a2b5f7b1` ends a cut answer on a whole sentence, and the branch's last two commits (prompt rules, learn requests)
+  landed under other hashes (`git cherry` shows both as already applied, checked 8 Oct).
 - [ ] ~~Stop the background upgrade repeating the template's retrieval and scoring.~~ Dropped 5 Oct: it costs
   70–120 ms of a 10 s answer.
 - [x] Advice questions that name a track ("advice on drum bus compression") go to the model, not Live inspection.
@@ -1244,9 +1247,32 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     3 sources on both sides, so those flips are the model, not the ranking. Of the 3 whose sources changed, 2 gained
     (q012, q208) and 1 was lost (q080).
   - **Merged to main 8 Oct** (bdec8fb5). The synonym inflation stays open as its own item, below.
+- [x] Find out why oversampling, precedence and pre/post sends still abstain after the ranking merge. Read-only
+  diagnosis 8 Oct, retrieval in memory, no model calls, held-out set not opened:
+  `kenn-evaluation-data/2026-10-08-ranking-diagnosis.md` (scripts beside it). Three different causes:
+  - **Pre/post sends: excerpt truncation, not ranking.** Both dedicated notes rank 1 and 2 and are shown, but each
+    excerpt is the first 400 characters of its chunk and the answer sits past that ("pre-fader" starts at character
+    364; the shown text ends at 359).
+  - **Oversampling: synonym inflation plus no stemming.** "clippers" pulls in the mastering synonym list; 17 of 22
+    search terms are words the user never typed, ranks 1–9 score only on those, and each gets a ×2.35 topic boost
+    against ×1.80 for the dedicated note (still at 10–12). "clippers", "saturators" and "alias" match nothing
+    unstemmed.
+  - **Precedence: a corpus gap.** No chunk defines the precedence effect; the query becomes "Haas effect" and the
+    model gets a mono-collapse warning and two generic delay chunks.
+  - **Fused-list cap (40, all from the embedding top 60):** a keyword-only match can never survive it, but removing
+    it made everything worse (questions.json top-1 0.7586 → 0.7414, probe concepts 112 → 108, precedence 0/4). It is
+    shielding answers from the synonym noise; leave it until the synonym fix lands.
+- [ ] Excerpt window: start each excerpt at the first sentence holding a query word instead of the chunk's first
+  400 characters. Simulated 8 Oct: pre/post sends 2/4 → 4/4 concepts, probe 112 → 115 of 163, questions.json
+  coverage unchanged (gains psy-equal-loudness, dyn-attack-release, eq-kick-bass-phase; losses psy-itd-ild,
+  space-haas-mono). First of the three because it is the largest predicted gain with no coverage cost.
 - [ ] Topic synonym inflation: the 49 routing and mixing terms and the 3.45 topic multiplier still lift the short
-  Sends And Returns note to 688 on routing-flavoured questions. Separately, find out why the oversampling (10–12)
-  and precedence (4) notes still rank too low to reach the model; that cause is not yet known. Measure on coverage, the held-out set and the probe together, like the ranking change.
+  Sends And Returns note to 688 on routing-flavoured questions, and the mastering synonyms bury the oversampling
+  note. Weight synonym terms at about ×0.35 and stem the user's own words, together: ×0.35 alone lifts oversampling
+  only to rank 4 and costs 2 probe concepts (112 → 110; MRR 0.8502 → 0.8464). Measure on coverage, the held-out set
+  and the probe together, like the ranking change. Sealed rows 066/068/069/114 are the sensitive ones.
+- [ ] A precedence-effect note for the corpus (needs Jack and an index rebuild); no ranking change can supply it.
+- [ ] Revisit the fused-list cap of 40 once the synonym fix has landed.
 - [x] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
   reaches the producer instead of a template that pretends to answer. Merged to main 7 Oct (`draft/honest-answers`
   243df63e, four adversary passes). Only a whole-reply decline counts: one line, 3–25 words naming what is missing,
