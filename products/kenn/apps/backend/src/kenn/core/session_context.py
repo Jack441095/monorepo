@@ -987,7 +987,7 @@ def note_pending_undo(session_id: str, undo_action_id: str, reverses_receipt_id:
 
 
 def undo_target(session_id: str, receipts: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """The newest change still standing, given receipts newest first: undos, and what they undid, are skipped.
+    """The newest change still standing, given receipts newest first: undos, what they undid, and clean rollbacks are skipped.
 
     Found 26 Sept: "undo that" twice undid the undo (a redo) instead of walking back to the change before.
     """
@@ -1001,6 +1001,12 @@ def undo_target(session_id: str, receipts: list[dict[str, Any]]) -> dict[str, An
             reversed_ids.add(links[receipt_id])
             continue
         if receipt_id in reversed_ids:
+            continue
+        # A recipe or device insert that failed and read back as fully restored left the set as it was, so it
+        # is not a change to undo; on 8 Oct one shadowed the producer's previous change and "Undo that" refused.
+        # Plain "failed" and "partial_recovery" still stop the walk: the set may hold a change we could not
+        # verify, and undoing something older underneath it would leave both wrong.
+        if receipt.get("status") == "failed_rolled_back":
             continue
         return receipt
     return None
