@@ -883,6 +883,9 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
     send and device cards show real before and after values. Stale-card and partial-failure paths are tested end to end.
     L3 stays open for the owner-scheduled real-Live rerun and producer usability.
     [Evidence](docs/evidence/KENN_L3_RECIPE_REQUAL_FAKE_2026-10-09.md).
+  - [x] Requal follow-ups, 9 Oct (merged at 757ae30f). A recipe undo refuses once a control it set was moved by hand.
+    "Undo that" walks past a card refused before it wrote. Undo cards no longer offer Undo. Button and device-parameter
+    undos are linked, so "Undo that" never redoes them. The mud card always reads the mixer first.
 - [ ] **L4 — Planner shadow qualification.** Keep deterministic authority. Promotion
   requires the existing comparison/time/schema/agreement gates and human review;
   include ambiguity, missing ranges, wrong units and stale identities. A large

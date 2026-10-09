@@ -62,13 +62,24 @@ The full KENN suite on merged main gives 4505 passed and 1 failed. The failure i
 
 - **Real-Live rerun** on a disposable set, on a night Jack schedules. It also qualifies `glue_drum_bus`, and checks that the mud
   recipe's new pan-to-centre write behaves on a real sub.
-- **A recipe undo can overwrite a later hand edit.** Recipe `propose_undo` does not compare the step readback with the current
-  value. This predates the requal.
-- **"Undo that" still refuses when the previous change failed before writing anything.** Those receipts are plain `failed`.
-  They need a "no write attempted" marker before the walk can skip them safely.
-- **"Undo the plan" redoes the change after an undo recipe is applied.** The button on that card calls `propose_undo` on the
-  undo's own receipt.
-- **Other phrasings may build the mud card without a mixer read.** Phrasings other than "Fix the low-end mud" may reach the
-  translator without a mixer snapshot, so the card could describe a pan it never read.
 - **Usability with producers.** The L3 producer questions (can they inspect and edit a suggestion, do they understand a
   partial-change receipt) need people, not fake Live.
+- **A gain-staging undo is not linked to the change it reversed.** Its receipt carries no action_id, so "Undo that" stops
+  on it rather than walking past. It only stops; it never redoes a change.
+
+## Closed after the requal (9 Oct, merged at 757ae30f)
+
+Each fix had its own branch and an adversary review. The full suite on merged main gives 4395 passed and 137 skipped in a
+clean worktree. The frontend gives 69 passed and `vue-tsc` is clean.
+
+- **A recipe undo could overwrite a later hand edit.** Recipe undo now compares each step's readback with Live, and
+  refuses by naming the moved control (`draft/recipe-undo-stale`).
+- **"Undo that" refused after a card that was refused before writing.** Those receipts now carry `write_attempted: False`,
+  and the walk skips them. A failure after the write went out still stops it (`draft/undo-skip-prewrite`).
+- **The Undo button on an undo card redid the change.** Undo cards no longer offer Undo (`draft/undo-card-no-redo`).
+- **"Undo that" after the card's Undo button redid the change.** This was found in review. The HTTP undo route now
+  records the undo link, and device-parameter undos are keyed by the id their receipt carries. Before, they were never
+  linked from chat either (`draft/button-undo-link`).
+- **The mud card could describe a pan it never read.** "Add a compressor to clear the mud" reached the translator
+  without a mixer read and called a sub panned 30% left "mono-centered". The mixer is now read before any mix metaphor is
+  translated. A sweep of 359 phrasings found none reaching the translator without fader values (`draft/mud-mixer-read`).
