@@ -972,6 +972,7 @@ def make_answer(
     # Every return below says why, and nothing from an earlier answer on this thread may stand in for it.
     _last_outcome.reason = ""
     _last_outcome.abstained = False
+    _last_outcome.rejected = None
     template = build_template_answer(
         query,
         results,
@@ -1102,6 +1103,13 @@ def make_answer(
         # reason attached cannot answer "why not" -- establishing that these are `unsupported measurements`
         # rejections meant reading this dict out of a monkeypatched harness. Same reason and no question text,
         # matching route_log's rule that the log holds timings and outcomes, never the producer's words.
+        # The text itself stays on the thread for answer_upgrades to hand to a bench (see last_rejected_generation).
+        # It is `enhanced` whichever ending was judged: when the sentence-cut ending fails, the gate's last word was
+        # on the full text.
+        _last_outcome.rejected = {
+            "answer": enhanced,
+            "refused_figures": list(validation["unsupported_measurements"]),
+        }
         _log_generation_outcome(False, validation, _time.perf_counter() - _ma_t2)
     else:
         # The model wrote nothing usable: timed out, unavailable, or failed the structure check in enhance().
@@ -1154,6 +1162,16 @@ def last_generation_outcome() -> str:
 def last_generation_abstained() -> bool:
     """Whether the model text the last make_answer() on this thread kept was an honest decline, not an answer."""
     return bool(getattr(_last_outcome, "abstained", False))
+
+
+def last_rejected_generation() -> dict | None:
+    """The model text the last answer on this thread threw away, as {"answer", "refused_figures"}, else None.
+
+    Set where the grounding gate refuses the text in make_answer() and where the quality check in answer_payload()
+    swaps it for the template. The 8 Oct 2026 refused-figures study could say a refused "3 dB" was in another note,
+    but not whether the answer used it sensibly, because nothing kept the text.
+    """
+    return getattr(_last_outcome, "rejected", None)
 
 
 def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) -> None:
@@ -1944,6 +1962,7 @@ def _answer_payload_stream_raw(
         stream_guard = StreamedAnswerGuard(
             evidence_measurements(
                 results,
+                query=relevance_query,
                 timeline_context=timeline_context,
                 additional_evidence_text=specialist_evidence,
             )
@@ -2754,6 +2773,7 @@ def _answer_payload_raw(
         # file does. Silently reverted an explicit voice-mode request back
         # to the full written template for any answer that fails this
         # after-the-fact quality check.
+        withheld = answer
         answer = weak_match_answer(query, answer_mode=answer_mode)
         weak_match = True
         confidence = "low"
@@ -2764,6 +2784,8 @@ def _answer_payload_raw(
             # the model (audit, 5 Oct 2026).
             llm_used = False
             _last_outcome.reason = f"quality gate: {gate_warning}"
+            # No figures here: the grounding gate passed this text, so the quality check is the only objection.
+            _last_outcome.rejected = {"answer": withheld, "refused_figures": []}
             _settle_held_generation_row(gate_warning)
         grounding = {
             **grounding,

@@ -17,6 +17,7 @@ from kenn.core.chat_constants import (
 
 from kenn.core.chat_retrieval import (
     detect_intent,
+    load_chunks,
     normalized_terms,
     query_intent_terms,
     source_label,
@@ -764,8 +765,9 @@ class StreamedAnswerGuard:
     why the streaming path used to discard every token and show the producer nothing until generation AND the gate
     had both finished. We cannot make that gate incremental, but two of its eight warnings are prefix-sound:
 
-    - unsupported measurements, because the evidence side of `_measurements(answer) - _measurements(evidence_text)`
-      is fixed before the first token while the answer side only grows;
+    - unsupported measurements, because the accepted side of `_measurements(answer) - accepted` (the shown
+      evidence, the question and the shown notes in full, see _accepted_measurements) is fixed before the first
+      token while the answer side only grows;
     - claims_live_change, because a regex match inside a prefix is still a match inside the finished answer.
 
     The other three are not: evidence_overlap divides by an answer_terms set that grows with every token, and
@@ -835,17 +837,77 @@ def _gate_evidence_text(
     return evidence_text
 
 
+def _shown_note_text(shown: list[tuple[float, dict, str]]) -> str:
+    """Every section of every note that a shown excerpt was cut from, as one string. Manual pages are left out."""
+    sources = {
+        str(chunk.get("source"))
+        for _score, chunk, _body in shown
+        if chunk.get("kind") == "note" and chunk.get("source")
+    }
+    if not sources:
+        # Only manual pages or nothing were shown, so there is no note to widen to and the excerpts stand alone.
+        return ""
+    # The shown chunks' own full text goes in as well as the index's copy. A result list built outside
+    # load_chunks() (a test, or an index reloaded after the search ran) would otherwise lose its own sections.
+    texts = [str(chunk.get("text") or "") for _score, chunk, _body in shown if chunk.get("kind") == "note"]
+    # A plain scan of the whole index, no cache. On v-5f6964698b76 (3974 chunks) the scan took 0.1 ms and the
+    # measurement pass over the four largest notes (22,664 chars) 0.85 ms, measured 10 Oct 2026 with a bench
+    # running. The gate runs at most three times per answer, and the answer takes seconds to generate.
+    texts += [
+        str(chunk.get("text") or "")
+        for chunk in load_chunks()
+        if chunk.get("source") in sources and chunk.get("kind") == "note"
+    ]
+    return " ".join(texts)
+
+
+# The gate used to accept only the figures in the shown excerpts. The 8 Oct 2026 bench refused 116 figures over 12
+# runs (kenn-evaluation-data/2026-10-08-refused-figures). Of those, 20 were in the producer's own question and 23
+# were in a shown note but past the 400-character excerpt. On main's held-out run, 6 of 15 rejected answers had
+# every refused figure in one of those two places.
+# Examples: eq-kick-bass-phase asks about a cancel "around 60 Hz", and all 8 answers that said 60 Hz back were
+# refused. loud-streaming-targets wrote the note's -1 dBTP and was refused 3 runs out of 3.
+#
+# This does not reopen the 2 Oct "wide" bug described above _evidence_chunks. There, a "3 dB" passed on chunk #9,
+# which the model was never shown. Here the extra figures come only from notes the model saw part of. Manual pages
+# are left out because every manual chunk shares one source, and "the whole manual" would accept almost any Hz.
+# Three costs we accept:
+# - The context is not checked. The note may give the same number for something else, for example -18 dBFS as a
+#   gain-staging target where the answer uses -18 dB as a threshold.
+# - A producer's proposed setting echoed back as advice ("should I boost 5 kHz by 3 dB?" "yes, 3 dB") now passes.
+# - The prompt's allowed-figures list in llm_rewrite does not grow to match. A bare number from a section the model
+#   never read has no sentence saying what it measures, so the gate stays wider than the list, never narrower.
+#
+# Only the measurement check widens. Overlap and product checks still read evidence_text alone, and the query is
+# still kept out of overlap (see the comment in generated_answer_validation). verify_claim_citations still reads the
+# excerpts only: a whole-note figure tagged with an excerpt id is still a misattribution, because the model cannot
+# have read it in that excerpt.
+def _accepted_measurements(
+    query: str, shown: list[tuple[float, dict, str]], evidence_text: str
+) -> set[str]:
+    """Every measurement an answer may carry: those in the evidence text, the producer's question, and the shown notes in full."""
+    return (
+        _measurements(evidence_text)
+        | _measurements(query)
+        | _measurements(_shown_note_text(shown))
+    )
+
+
 def evidence_measurements(
     results: list[tuple[float, dict]],
     *,
+    query: str,
     timeline_context: str | None = None,
     additional_evidence_text: str | None = None,
 ) -> set[str]:
-    """Every measurement the retrieved evidence actually contains, keyed the way the gate keys them."""
-    return _measurements(
-        _gate_evidence_text(
-            _evidence_chunks(results), timeline_context, additional_evidence_text
-        )
+    """Every measurement the gate will accept in an answer, keyed the way the gate keys them.
+
+    The streamed guard is built from this, so it has to take the same query the final gate is called with, or a
+    figure from the question would stop the stream that the final gate would have let through.
+    """
+    shown = _evidence_chunks(results)
+    return _accepted_measurements(
+        query, shown, _gate_evidence_text(shown, timeline_context, additional_evidence_text)
     )
 
 
@@ -1130,7 +1192,9 @@ def generated_answer_validation(
         if answer_terms
         else 0.0
     )
-    unsupported_measurements = sorted(_measurements(answer) - _measurements(evidence_text))
+    unsupported_measurements = sorted(
+        _measurements(answer) - _accepted_measurements(query, shown, evidence_text)
+    )
     # The labels the model was actually given, so a citation is only fabricated if the filename was not on
     # screen. Derived from the same shown list, not from what retrieval could have supplied.
     displayed_filenames = {

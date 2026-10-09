@@ -154,6 +154,7 @@ def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
     else:
         declined = bool(payload.get("answer_abstained")) or (bool(validation.get("accepted")) and bool(validation.get("abstained")))
     model_answered = (upgrade_accepted or inline_accepted) and not declined
+    refused = list(upgrade.get("refused_figures") or validation.get("unsupported_measurements") or [])
     attempted = (bool(validation.get("attempted")) or bool(upgrade_meta.get("id"))
                  or upgrade.get("status") in {"accepted", "rejected"})
     return {
@@ -165,7 +166,13 @@ def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
         "upgrade_status": upgrade.get("status", ""),
         "rejection_reason": rejection_reason(payload, upgrade, model_answered or declined),
         "warnings": list(validation.get("warnings") or [])[:4],
-        "unsupported_measurements": len(validation.get("unsupported_measurements") or []),
+        # On the background path the inline validation is empty, so this read 0 on every 8 Oct row while
+        # routes.jsonl showed the refusals. The upgrade carries the figures when the companion runs with
+        # KENN_EXPOSE_REJECTED_ANSWERS=1, and the rejected text with them, so a refused figure can be judged in its
+        # sentence.
+        "unsupported_measurements": len(refused),
+        "refused_figures": refused,
+        "rejected_answer": str(upgrade.get("rejected_answer") or ""),
         "fabricated_sources": len(validation.get("fabricated_sources") or []),
         "template_seconds": template_seconds,
         "final_seconds": upgrade.get("seconds_from_ask", template_seconds),
@@ -299,11 +306,17 @@ def review_sheet(rows: list[dict]) -> str:
                   f"Concepts missed: {', '.join(row.get('concepts_missed', [])) or 'none'}"]
         if row.get("rejection_reason"):
             lines.append(f"Model answer rejected: {row['rejection_reason']}")
+        if row.get("refused_figures"):
+            lines.append(f"Refused figures: {', '.join(row['refused_figures'])}")
         if row.get("repeats_answer_of"):
             lines.append(f"**Same answer as {row['repeats_answer_of']}.**")
         if row.get("forbidden_named"):
             lines.append(f"**Named what the user never mentioned: {', '.join(row['forbidden_named'])}.**")
-        lines += ["", row.get("answer") or "(no answer)", "", "Grade: ", "Notes: ", ""]
+        lines += ["", row.get("answer") or "(no answer)", ""]
+        if row.get("rejected_answer"):
+            # Quoted so it cannot be mistaken for what the producer saw.
+            lines += ["Rejected model text:", "", *(f"> {line}" for line in row["rejected_answer"].splitlines()), ""]
+        lines += ["Grade: ", "Notes: ", ""]
     return "\n".join(lines)
 
 

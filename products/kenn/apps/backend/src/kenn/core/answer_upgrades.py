@@ -28,6 +28,16 @@ def enabled() -> bool:
     return os.environ.get("KENN_LLM_BACKGROUND", "").strip().lower() in {"1", "true", "yes", "on"} and is_enabled()
 
 
+def _expose_rejected_answers() -> bool:
+    """Whether a rejected upgrade carries the text the gate refused. Off unless KENN_EXPOSE_REJECTED_ANSWERS is set.
+
+    The gate promises that failed text never reaches a caller, and a producer's client has no use for it. The
+    probe does: judging whether a refused "3 dB" was a sensible suggestion or an invention needs the sentence it
+    sat in. So bench runs switch this on and a normal companion never sends the text.
+    """
+    return os.environ.get("KENN_EXPOSE_REJECTED_ANSWERS", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _forget_old(now: float) -> None:
     for entries in (_RESULTS, _TURNS):
         for key in [k for k, v in entries.items() if now - v["at"] > KEEP_SECONDS]:
@@ -126,10 +136,14 @@ def start(write: Callable[[], dict[str, Any]], *, session_id: str = "", turn_id:
             if abstained:
                 entry["abstained"] = True
             if not accepted:
-                from kenn.core.chat_answer import last_generation_outcome
+                from kenn.core.chat_answer import last_generation_outcome, last_rejected_generation
 
                 # Empty when the answer never reached make_answer(): a cached, routed or conversational reply.
                 entry["reason"] = last_generation_outcome() or "model not asked on this path"
+                rejected = last_rejected_generation()
+                if rejected and _expose_rejected_answers():
+                    entry["rejected_answer"] = rejected["answer"]
+                    entry["refused_figures"] = rejected["refused_figures"]
         except Exception as exc:  # a model failure only means the template stands
             entry = {"status": "rejected", "error": type(exc).__name__}
         finally:
