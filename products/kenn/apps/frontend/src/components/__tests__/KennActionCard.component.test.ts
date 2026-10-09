@@ -23,3 +23,16 @@ describe('KennActionCard dismissal', () => {
     expect(wrapper.find('.kenn-action-card__btn--reject').exists()).toBe(true)
   })
 })
+
+describe('KennActionCard on an applied undo', () => {
+  const proposal = { action: 'set_volume', track_name: 'Synth', before: 0.6, after: 0.5 }
+
+  it('offers no Undo, because undoing an undo would redo the change', () => {
+    // Same bug as the recipe card (9 Oct 2026): the Undo button on an applied undo card reversed the undo.
+    const original = mount(KennActionCard, { props: { proposal, cardStatus: 'applied' } })
+    const undoCard = mount(KennActionCard, { props: { proposal, cardStatus: 'applied', undoable: false } })
+    expect(original.find('.kenn-action-card__btn--undo').exists()).toBe(true)
+    expect(undoCard.find('.kenn-action-card__btn--undo').exists()).toBe(false)
+    expect(undoCard.text()).toContain('Readback Verified')
+  })
+})
