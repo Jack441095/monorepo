@@ -304,7 +304,9 @@ class SubjectiveTranslator:
         if sub_track is not None:
             s_idx = int(sub_track.get("index", sub_track.get("track_index", 0)))
             s_name = str(sub_track.get("name", "Sub Bass"))
-            s_pan = float(sub_track.get("panning", 0.0))
+            # Track snapshots carry "pan"; only return-track mixers say "panning". Reading "panning" here
+            # always gave 0.0, so a panned sub was never centred (found 9 Oct 2026).
+            s_pan = float(sub_track.get("pan", 0.0) or 0.0)
             if abs(s_pan) > 0.05:
                 steps.append({
                     "action": "set_pan",
@@ -340,9 +342,16 @@ class SubjectiveTranslator:
                 "changed": False,
             }
 
+        # Say only what this card will do. The fixed line promised both moves even when one was found, so a
+        # card that only turned the synth down claimed to centre the sub as well (8 Oct requal).
+        moves = []
+        if sub_track is not None and any(step["action"] == "set_pan" for step in steps):
+            moves.append(f"centre '{s_name}'")
+        if any(step["action"] == "set_volume" for step in steps):
+            moves.append(f"turn '{m_name}' down 2 dB, it is above -6 dB and crowding the low mids")
         recipe_res = LiveRecipeService(service).propose_recipe(
             steps,
-            reason="Fix low-end mud by centering sub bass panning and trimming hot low-mid rumble.",
+            reason=f"To clear the low-end mud: {' and '.join(moves)}.",
             session_id=session_id,
         )
         if not recipe_res.get("ok"):
