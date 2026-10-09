@@ -3439,6 +3439,13 @@ def _handle_command_impl(
     # metaphor; "clarity" there once turned a rename into the vocal-unmasking recipe.
     if SubjectiveTranslator.can_translate(cleaned_command) and not (
             deterministic_intent.get("action") and not deterministic_intent.get("missing_fields")):
+        if not mixer_snapshot:
+            # The translator reads pan and faders. "Add a compressor to clear the mud" parses as an insert with no
+            # track and no mixer word, so neither re-read above ran, and the mud card said the panned sub was
+            # "mono-centered" off a snapshot with no pan in it (adversary review, 9 Oct 2026).
+            mixer_snapshot = True
+            snapshot = {**_command_snapshot(live, include_mixer=True),
+                        **({"return_tracks": snapshot["return_tracks"]} if "return_tracks" in snapshot else {})}
         subjective_res = SubjectiveTranslator.translate(cleaned_command, snapshot, response["session_id"], live)
         if subjective_res is not None:
             response["llm"] = {"status": "not_used", "reason": "subjective_translation"}
