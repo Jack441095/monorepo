@@ -113,3 +113,30 @@ def test_a_failure_after_the_write_was_sent_still_stops_the_walk(kenn) -> None:
     for marker in ({}, {"write_attempted": True}):
         failure = {"receipt_id": "receipt-failed", "status": "failed", "verified": False, **marker}
         assert undo_target(kenn.session, [failure, older]) is failure
+
+
+def test_a_device_write_whose_readback_failed_still_stops_the_walk(kenn, monkeypatch) -> None:
+    # The write went out and we could not read it back, so the threshold may have moved; undoing the older
+    # synth change underneath it would leave the set wrong in two places.
+    card = kenn.propose("set the Drum Bus compressor threshold to -20 dB")
+    kenn.do("Set the synth to -4 dB")
+    sent = []
+    real_write, real_read = kenn.fake.set_device_parameter, kenn.fake.get_device_parameters
+
+    def write(*args, **kwargs):
+        sent.append(args)
+        return real_write(*args, **kwargs)
+
+    def read(*args, **kwargs):
+        if sent:
+            raise TimeoutError("no reply from Live")
+        return real_read(*args, **kwargs)
+
+    monkeypatch.setattr(kenn.fake, "set_device_parameter", write)
+    monkeypatch.setattr(kenn.fake, "get_device_parameters", read)
+    failed = kenn.apply("set the Drum Bus compressor threshold to -20 dB", card)
+    monkeypatch.setattr(kenn.fake, "get_device_parameters", real_read)
+
+    assert sent and failed["receipt"]["status"] == "failed"
+    assert "write_attempted" not in failed["receipt"]
+    assert not (kenn.ask_undo().get("proposal") or {}).get("confirmation_token")

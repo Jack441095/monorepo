@@ -2070,6 +2070,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
         insertion_index = int(proposal.get("insertion_index", -1))
         expected_devices = proposal.get("after_devices")
         before_devices = proposal.get("before_devices")
+        # Set just before insert_device_with_result; until then a failure is a refusal that left the chain alone.
+        write_started = False
 
         def fail(
             error: str,
@@ -2106,6 +2108,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 "retry_safe": "requires_inspection" if rollback and not rollback.get("reverted") else "unsafe",
                 "correlation_id": resolve_correlation_id(correlation_id),
             }
+            if not write_started:
+                receipt["write_attempted"] = False
             _RECEIPTS[receipt["receipt_id"]] = receipt
             return {"ok": False, "status": status, "error": error, "receipt": receipt}
 
@@ -2122,6 +2126,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
         if insertion_index != len(current_devices):
             return fail("The insertion position is no longer the end of the target device chain.", readback_devices=current_devices)
 
+        write_started = True
         try:
             result = self.client.insert_device_with_result(track_index, str(proposal["device_name"]), insertion_index)
         except Exception as exc:
