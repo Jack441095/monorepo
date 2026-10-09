@@ -96,11 +96,13 @@ def test_a_panned_sub_bass_gets_centred_by_the_low_end_mud_recipe(kenn) -> None:
     assert "'Sub Bass' pan 30% left -> centre" in card["answer"]
 
 
-@pytest.mark.parametrize("phrasing", ["Clear the low end", "The mix is muddy", "Remove the boominess"])
+@pytest.mark.parametrize("phrasing", ["Clear the low end", "The mix is muddy", "Remove the boominess",
+                                      "Add a compressor to clear the mud"])
 def test_other_mud_phrasings_build_the_card_from_values_read_off_the_mixer(kenn, phrasing) -> None:
-    # None of these has a mixer word, so the first read is the fast one with no pan or fader values. The
-    # 9 Oct requal asked whether such a card could describe a pan it never read; it can't, because a request
-    # the rules don't place re-reads with the mixer before the translator runs. This pins that re-read down.
+    # None of these has a mixer word, so the first read is the fast one with no pan or fader values. The last
+    # one parses as a device insert missing its track, which slipped past the no-action re-read and answered
+    # that the sub panned 30% left was "mono-centered" (9 Oct 2026). Every one must reach the card with the
+    # mixer read.
     bass = kenn.index("Bass")
     kenn.fake.set_track_name(bass, "Sub Bass")
     kenn.fake.set_track_pan(bass, -0.3)
