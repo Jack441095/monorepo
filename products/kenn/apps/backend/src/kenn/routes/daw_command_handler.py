@@ -314,8 +314,7 @@ def handle_osc_undo(handler: Any, payload: dict) -> None:
         if result.get("ok") and isinstance(result.get("proposal"), dict):
             # The same bookkeeping chat "Undo that" does, so the undo this card applies is linked to the change it
             # reverses and a later "Undo that" walks past both instead of redoing the change.
-            note_pending_undo(session_id, str(result["proposal"].get("action_id") or ""),
-                              str(receipt.get("receipt_id") or ""))
+            note_pending_undo(session_id, result["proposal"], str(receipt.get("receipt_id") or ""))
         handler.send_json(200 if result.get("ok") else 409, result)
         return
     if not action_allowed("daw_control"):

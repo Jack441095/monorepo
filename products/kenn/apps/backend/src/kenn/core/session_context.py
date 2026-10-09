@@ -974,10 +974,18 @@ def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any
         })
 
 
-def note_pending_undo(session_id: str, undo_action_id: str, reverses_receipt_id: str) -> None:
+def note_pending_undo(session_id: str, undo_proposal: dict[str, Any], reverses_receipt_id: str) -> None:
+    """Remember which receipt an offered undo reverses, keyed by the action_id its receipt will carry."""
+    # Device-parameter proposals carry "id", not "action_id", and their receipt copies "id" into action_id. Keying
+    # on action_id alone filed them all under "", so those undos were never linked, and the "" entry then got
+    # popped by whichever unrelated receipt had no action_id (gain staging) and linked it instead (9 Oct 2026).
+    key = str(undo_proposal.get("action_id") or undo_proposal.get("id") or "")
+    if not key:
+        # Nothing the applied receipt could match; better unlinked, which only stops the walk, than linked wrongly.
+        return
     state = _live_conversation(session_id)
     with _LIVE_CONVERSATION_LOCK:
-        state["pending_undos"][str(undo_action_id)] = str(reverses_receipt_id)
+        state["pending_undos"][key] = str(reverses_receipt_id)
         while len(state["pending_undos"]) > 20:
             state["pending_undos"].pop(next(iter(state["pending_undos"])))
 
@@ -1000,7 +1008,11 @@ def note_undo_applied(session_id: str, receipt: dict[str, Any]) -> None:
 def _link_applied_undo(state: dict[str, Any], receipt: dict[str, Any]) -> None:
     # Caller holds _LIVE_CONVERSATION_LOCK. Only a verified undo is linked: an unverified one may not have put
     # the change back, so the walk has to stop on it rather than skip past both.
-    reversed_id = state["pending_undos"].pop(str(receipt.get("action_id") or ""), None)
+    action_id = str(receipt.get("action_id") or "")
+    if not action_id:
+        # Gain-staging receipts carry no action_id; with nothing to match they can never be an announced undo.
+        return
+    reversed_id = state["pending_undos"].pop(action_id, None)
     if reversed_id and receipt.get("verified") is True:
         state["undo_links"][str(receipt["receipt_id"])] = reversed_id
         while len(state["undo_links"]) > 100:

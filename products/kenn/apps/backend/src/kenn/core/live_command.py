@@ -3100,8 +3100,7 @@ def _handle_command_impl(
                 return _clarification(response, {"action": "undo"}, "I don't have a verified change to undo in this session yet.")
             undo = live.propose_undo(receipt, session_id=response["session_id"])
             if undo.get("ok") and isinstance(undo.get("proposal"), dict):
-                note_pending_undo(response["session_id"], str(undo["proposal"].get("action_id") or ""),
-                                  str(receipt.get("receipt_id") or ""))
+                note_pending_undo(response["session_id"], undo["proposal"], str(receipt.get("receipt_id") or ""))
                 response["undo_of_receipt_id"] = str(receipt.get("receipt_id") or "")
                 # A recipe undo is itself a recipe. The single-change card read it as one setting and said
                 # "I can set recipe on 'ableton_recipe' from None to None" for every recipe (8 Oct requal).

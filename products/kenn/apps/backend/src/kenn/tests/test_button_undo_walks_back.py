@@ -8,6 +8,7 @@ from kenn.core.fake_live import FakeLiveBackend
 from kenn.core.live_action_service import LiveActionService
 from kenn.core.live_command import handle_command
 from kenn.core.live_receipt_journal import record_receipt
+from kenn.core.session_context import note_pending_undo, note_undo_applied, undo_target
 from kenn.routes import daw_command_handler
 
 
@@ -45,7 +46,8 @@ def _press_undo(session, receipt):
     proposal = handler.sent[1]["proposal"]
     daw_command_handler.handle_osc_undo(handler, {
         "session_id": session, "receipt": receipt, "proposal": proposal,
-        "confirm_token": proposal["confirmation_token"], "idempotency_key": proposal["action_id"],
+        # Device proposals have no action_id; the frontend then falls back to a made-up key, as here.
+        "confirm_token": proposal["confirmation_token"], "idempotency_key": proposal.get("action_id") or "undo-button",
     })
     assert handler.sent[0] == 200
     return handler.sent[1]["receipt"]
@@ -75,3 +77,30 @@ def test_a_recipe_undone_with_the_button_leaves_nothing_for_undo_that(kenn) -> N
     _press_undo(session, _do(service, session, "Push the synth back"))
     answer = handle_command("Undo that", session_id=session, service=service)["answer"]
     assert "don't have a verified change" in answer
+
+
+@pytest.mark.parametrize("undo_with", ["button", "chat"])
+def test_a_device_parameter_undo_is_walked_past_too(kenn, undo_with) -> None:
+    # Device proposals carry "id", not "action_id", so before 9 Oct their undos were never linked from either
+    # path and the next "Undo that" offered the threshold change back.
+    service, session = kenn
+    start = _synth(service)
+    _do(service, session, "Set the synth to -4 dB")
+    threshold = _do(service, session, "set the Drum Bus compressor threshold to -20 dB")
+    if undo_with == "button":
+        _press_undo(session, threshold)
+    else:
+        _do(service, session, "Undo that")
+    _do(service, session, "Undo that")
+    assert _synth(service) == pytest.approx(start, abs=1e-4)
+
+
+def test_a_receipt_with_no_action_id_never_counts_as_an_undo(kenn) -> None:
+    # The old "" key let a gain-staging receipt (no action_id) consume a device undo's pending entry, so the
+    # walk skipped a gain staging nobody reversed and a device change that was still in place.
+    _, session = kenn
+    note_pending_undo(session, {"schema": "kenn.action_proposal.v1"}, "receipt-device-change")
+    gain_stage = {"receipt_id": "receipt-gain-stage", "status": "applied", "verified": True}
+    note_undo_applied(session, gain_stage)
+    device_change = {"receipt_id": "receipt-device-change", "status": "applied", "verified": True}
+    assert undo_target(session, [gain_stage, device_change]) is gain_stage
