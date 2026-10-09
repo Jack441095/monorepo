@@ -76,3 +76,41 @@ def test_a_stale_second_step_rolls_back_the_first_step_it_already_wrote(live) ->
     assert fake.get_track_send(vocal, 0) == pytest.approx(reverb_before, abs=1e-4)
     # The producer's own 40 % stays; rollback only reverses what the recipe wrote.
     assert fake.get_track_send(vocal, 1) == pytest.approx(0.4, abs=1e-4)
+
+
+def test_undo_refuses_a_recipe_whose_target_was_moved_by_hand_since(live) -> None:
+    # Until 9 Oct 2026 recipe undo restored every "before" without looking, so this put the reverb send back to 0 %
+    # and threw away the producer's 30 %. Single-action undo already refused it as stale.
+    from kenn.core.live_receipt_journal import record_receipt
+
+    fake, service, session = live
+    card = _propose(service, session, "Give the vocal some space")
+    applied = _apply(service, session, "Give the vocal some space", card)
+    assert applied["receipt"]["status"] == "applied"
+    record_receipt(applied["receipt"], session_id=session)
+    vocal = _track(service, "Lead Vocal")["index"]
+    fake.set_track_send(vocal, 0, 0.3)
+    delay_after_recipe = fake.get_track_send(vocal, 1)
+
+    answer = handle_command("Undo that", session_id=session, service=service)
+
+    assert not (answer.get("proposal") or {}).get("confirmation_token")
+    assert "The send from 'Lead Vocal' to 'A-Reverb' changed since the recipe was applied" in answer["answer"]
+    assert fake.get_track_send(vocal, 0) == pytest.approx(0.3, abs=1e-4)
+    assert fake.get_track_send(vocal, 1) == pytest.approx(delay_after_recipe, abs=1e-4)
+
+
+def test_undo_still_offers_a_recipe_nobody_has_touched_since(live) -> None:
+    # The other side of the stale check: an untouched recipe must still come back as an undo card.
+    from kenn.core.live_receipt_journal import record_receipt
+
+    fake, service, session = live
+    card = _propose(service, session, "Give the vocal some space")
+    applied = _apply(service, session, "Give the vocal some space", card)
+    record_receipt(applied["receipt"], session_id=session)
+
+    answer = handle_command("Undo that", session_id=session, service=service)
+
+    undo = answer.get("proposal") or {}
+    assert undo.get("confirmation_token")
+    assert [step.get("return_track_name") for step in undo["steps"]] == ["B-Delay", "A-Reverb"]

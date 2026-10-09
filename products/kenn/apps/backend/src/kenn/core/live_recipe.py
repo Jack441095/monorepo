@@ -630,12 +630,45 @@ class LiveRecipeService:
                 })
             else:
                 return {"ok": False, "error": f"Recipe step '{action}' is not undoable."}
-        return self.propose_recipe(
+        result = self.propose_recipe(
             inverse_steps,
             reason=f"Restore verified KENN recipe {receipt.get('receipt_id', '')}.",
             session_id=session_id,
             source_evidence=receipt.get("source_evidence"),
         )
+        if not result.get("ok"):
+            return result
+        # Each child's "before" is what Live holds right now, read while proposing. If that is no longer what the
+        # recipe verified it wrote, someone moved the control since, and restoring "before" would throw their
+        # change away. Single-action undo refuses this as stale; recipe undo skipped the check until 9 Oct 2026.
+        # The children come back in inverse_steps order, which is reversed(step_receipts), so they pair up. strict,
+        # so that if propose_recipe ever drops a no-op child the pairing fails loudly instead of skipping the check.
+        for child, item in zip(result["proposal"]["steps"], reversed(step_receipts), strict=True):
+            if not _values_match(child.get("before"), item.get("readback")):
+                # The recipe token was issued a moment ago; retire it so the refused undo cannot still be applied.
+                revoke_confirmation(str(result["proposal"].get("confirmation_token") or ""), session_id=session_id)
+                return {"ok": False, "error": f"{_moved_control(item.get('target') or {})} changed since the recipe "
+                                              f"was applied, so undoing it now would overwrite that change; undo is stale."}
+        return result
+
+
+def _moved_control(target: dict[str, Any]) -> str:
+    """Name the one control a stale recipe undo tripped on, the way the producer would look for it in Live."""
+    # A vocal-space recipe writes two sends on one track, so the track name alone does not say which one moved.
+    track = f"'{target.get('track_name', '')}'"
+    if target.get("parameter") == "is_playing":
+        return "Playback"
+    if target.get("action") == "set_send":
+        return f"The send from {track} to '{target.get('return_track_name', '')}'"
+    if target.get("device_name"):
+        return f"{target['device_name']} '{target.get('parameter', '')}' on {track}"
+    if target.get("action") == "rename_track":
+        # track_name is the name the recipe replaced, which is no longer on the track; say what kind of change it was.
+        return f"The track KENN renamed from {track}"
+    # Snapshot field names ("muted", "soloed") read oddly in a sentence; use the control's name in Live.
+    control = {"muted": "mute", "soloed": "solo", "armed": "arm"}.get(str(target.get("parameter", "")),
+                                                                      str(target.get("parameter", "")))
+    return f"{track} {control}".rstrip()
 
 
 __all__ = ["LiveRecipeService", "RECIPE_SCHEMA", "RECIPE_RECEIPT_SCHEMA", "MAX_RECIPE_STEPS"]
