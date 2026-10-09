@@ -878,6 +878,11 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   already exist; audit usability rather than schedule their creation again.
   Test whether producers can inspect current/proposed values, units and targets,
   edit the suggestion and understand partial-change receipts before expanding recipes.
+  - Fake half, 9 Oct: 14/15 recipes qualified on merged main (`glue_drum_bus` needs real Live's Glue Compressor). Three
+    fixes landed. "Undo that" now walks past a clean rollback. A garbled readback can no longer skip a rollback. Undo,
+    send and device cards show real before and after values. Stale-card and partial-failure paths are tested end to end.
+    L3 stays open for the owner-scheduled real-Live rerun and producer usability.
+    [Evidence](docs/evidence/KENN_L3_RECIPE_REQUAL_FAKE_2026-10-09.md).
 - [ ] **L4 — Planner shadow qualification.** Keep deterministic authority. Promotion
   requires the existing comparison/time/schema/agreement gates and human review;
   include ambiguity, missing ranges, wrong units and stale identities. A large
