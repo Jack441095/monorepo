@@ -956,11 +956,7 @@ def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any
             state["pending_question"] = None
         if receipt.get("receipt_id"):
             state["last_receipt_id"] = _text(receipt.get("receipt_id"), 128)
-            reversed_id = state["pending_undos"].pop(str(receipt.get("action_id") or ""), None)
-            if reversed_id and receipt.get("verified") is True:
-                state["undo_links"][str(receipt["receipt_id"])] = reversed_id
-                while len(state["undo_links"]) > 100:
-                    state["undo_links"].pop(next(iter(state["undo_links"])))
+            _link_applied_undo(state, receipt)
         state["confirmation_status"] = (
             "pending" if status in {"confirmation_required", "requires_confirmation"}
             else "confirmed" if status == "applied"
@@ -984,6 +980,31 @@ def note_pending_undo(session_id: str, undo_action_id: str, reverses_receipt_id:
         state["pending_undos"][str(undo_action_id)] = str(reverses_receipt_id)
         while len(state["pending_undos"]) > 20:
             state["pending_undos"].pop(next(iter(state["pending_undos"])))
+
+
+def note_undo_applied(session_id: str, receipt: dict[str, Any]) -> None:
+    """Link an applied undo's receipt to the change it reversed, for an undo applied outside the chat.
+
+    The card's Undo button goes through /api/ableton/osc/undo, not handle_command, so record_live_exchange never
+    saw its receipt. With no link, "Undo that" picked the button's undo as the newest change and offered to put
+    the original change straight back (adversary review, 9 Oct 2026).
+    """
+    if not isinstance(receipt, dict) or not receipt.get("receipt_id"):
+        # A refused or malformed apply has no receipt to link; the pending entry ages out of its 20-slot window.
+        return
+    state = _live_conversation(session_id)
+    with _LIVE_CONVERSATION_LOCK:
+        _link_applied_undo(state, receipt)
+
+
+def _link_applied_undo(state: dict[str, Any], receipt: dict[str, Any]) -> None:
+    # Caller holds _LIVE_CONVERSATION_LOCK. Only a verified undo is linked: an unverified one may not have put
+    # the change back, so the walk has to stop on it rather than skip past both.
+    reversed_id = state["pending_undos"].pop(str(receipt.get("action_id") or ""), None)
+    if reversed_id and receipt.get("verified") is True:
+        state["undo_links"][str(receipt["receipt_id"])] = reversed_id
+        while len(state["undo_links"]) > 100:
+            state["undo_links"].pop(next(iter(state["undo_links"])))
 
 
 def undo_target(session_id: str, receipts: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -1025,6 +1046,6 @@ def live_conversation_context(session_id: str) -> dict[str, Any]:
 
 __all__ = [
     "CONTEXT_BINDING_SCHEMA", "SCHEMA", "assistant_context_binding", "build_session_context",
-    "live_conversation_context", "note_pending_undo", "preprocess_live_command", "record_live_exchange", "undo_target",
+    "live_conversation_context", "note_pending_undo", "note_undo_applied", "preprocess_live_command", "record_live_exchange", "undo_target",
     "refresh_session_context_fingerprint", "safe_audio_job", "validate_session_context",
 ]

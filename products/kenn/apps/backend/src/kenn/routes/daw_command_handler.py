@@ -13,6 +13,7 @@ import kenn.core.live_action_service as live_action_service_module
 import kenn.core.live_command as live_command_module
 from kenn.core.action_policy import action_allowed, action_denied_message
 from kenn.core.live_receipt_journal import record_receipt
+from kenn.core.session_context import note_pending_undo, note_undo_applied
 from kenn.core.midi_clip_service import (
     CREATE_PROPOSAL_SCHEMA,
     MidiClipActionService,
@@ -310,6 +311,11 @@ def handle_osc_undo(handler: Any, payload: dict) -> None:
             result = SampleImportService().propose_undo(receipt, session_id=session_id)
         else:
             result = service.propose_undo(receipt, session_id=session_id)
+        if result.get("ok") and isinstance(result.get("proposal"), dict):
+            # The same bookkeeping chat "Undo that" does, so the undo this card applies is linked to the change it
+            # reverses and a later "Undo that" walks past both instead of redoing the change.
+            note_pending_undo(session_id, str(result["proposal"].get("action_id") or ""),
+                              str(receipt.get("receipt_id") or ""))
         handler.send_json(200 if result.get("ok") else 409, result)
         return
     if not action_allowed("daw_control"):
@@ -414,5 +420,6 @@ def handle_osc_undo(handler: Any, payload: dict) -> None:
         )
     if isinstance(result.get("receipt"), dict):
         record_receipt(result["receipt"], session_id=session_id)
+        note_undo_applied(session_id, result["receipt"])
     handler.send_json(200 if result.get("ok") else 409, result)
     return
