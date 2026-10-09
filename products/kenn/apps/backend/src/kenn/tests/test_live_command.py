@@ -2904,6 +2904,10 @@ def test_recipe_reconciles_an_applied_step_when_acknowledgement_is_lost() -> Non
 
 def test_shared_service_dispatches_recipe_receipt_to_fresh_recipe_undo() -> None:
     fake = FakeLive()
+    # Leave the set as the receipt says the recipe did; recipe undo refuses a stale target (9 Oct 2026).
+    fake.set_track_pan(3, 0.1)
+    fake.set_device_parameter(3, 0, 12, -3.0)
+    fake.writes.clear()
     result = LiveActionService(fake).propose_undo(
         {
             "schema": RECIPE_RECEIPT_SCHEMA,

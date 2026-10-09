@@ -630,12 +630,26 @@ class LiveRecipeService:
                 })
             else:
                 return {"ok": False, "error": f"Recipe step '{action}' is not undoable."}
-        return self.propose_recipe(
+        result = self.propose_recipe(
             inverse_steps,
             reason=f"Restore verified KENN recipe {receipt.get('receipt_id', '')}.",
             session_id=session_id,
             source_evidence=receipt.get("source_evidence"),
         )
+        if not result.get("ok"):
+            return result
+        # Each child's "before" is what Live holds right now, read while proposing. If that is no longer what the
+        # recipe verified it wrote, someone moved the control since, and restoring "before" would throw their
+        # change away. Single-action undo refuses this as stale; recipe undo skipped the check until 9 Oct 2026.
+        # The children come back in inverse_steps order, which is reversed(step_receipts), so they pair up.
+        for child, item in zip(result["proposal"]["steps"], reversed(step_receipts)):
+            if not _values_match(child.get("before"), item.get("readback")):
+                # The recipe token was issued a moment ago; retire it so the refused undo cannot still be applied.
+                revoke_confirmation(str(result["proposal"].get("confirmation_token") or ""), session_id=session_id)
+                target = (item.get("target") or {}).get("track_name") or "Live"
+                return {"ok": False, "error": f"'{target}' changed since the recipe was applied, so undoing it now "
+                                              f"would overwrite that change; undo is stale."}
+        return result
 
 
 __all__ = ["LiveRecipeService", "RECIPE_SCHEMA", "RECIPE_RECEIPT_SCHEMA", "MAX_RECIPE_STEPS"]
