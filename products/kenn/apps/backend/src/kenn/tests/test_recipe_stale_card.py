@@ -95,7 +95,7 @@ def test_undo_refuses_a_recipe_whose_target_was_moved_by_hand_since(live) -> Non
     answer = handle_command("Undo that", session_id=session, service=service)
 
     assert not (answer.get("proposal") or {}).get("confirmation_token")
-    assert "'Lead Vocal''s send to 'A-Reverb' changed since the recipe was applied" in answer["answer"]
+    assert "The send from 'Lead Vocal' to 'A-Reverb' changed since the recipe was applied" in answer["answer"]
     assert fake.get_track_send(vocal, 0) == pytest.approx(0.3, abs=1e-4)
     assert fake.get_track_send(vocal, 1) == pytest.approx(delay_after_recipe, abs=1e-4)
 

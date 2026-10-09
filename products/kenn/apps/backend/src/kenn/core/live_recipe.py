@@ -659,10 +659,16 @@ def _moved_control(target: dict[str, Any]) -> str:
     if target.get("parameter") == "is_playing":
         return "Playback"
     if target.get("action") == "set_send":
-        return f"{track}'s send to '{target.get('return_track_name', '')}'"
+        return f"The send from {track} to '{target.get('return_track_name', '')}'"
     if target.get("device_name"):
-        return f"'{target.get('parameter', '')}' on {track}'s {target['device_name']}"
-    return f"{track} {target.get('parameter', '')}".rstrip()
+        return f"{target['device_name']} '{target.get('parameter', '')}' on {track}"
+    if target.get("action") == "rename_track":
+        # track_name is the name the recipe replaced, which is no longer on the track; say what kind of change it was.
+        return f"The track KENN renamed from {track}"
+    # Snapshot field names ("muted", "soloed") read oddly in a sentence; use the control's name in Live.
+    control = {"muted": "mute", "soloed": "solo", "armed": "arm"}.get(str(target.get("parameter", "")),
+                                                                      str(target.get("parameter", "")))
+    return f"{track} {control}".rstrip()
 
 
 __all__ = ["LiveRecipeService", "RECIPE_SCHEMA", "RECIPE_RECEIPT_SCHEMA", "MAX_RECIPE_STEPS"]
