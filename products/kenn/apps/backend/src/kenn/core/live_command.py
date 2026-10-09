@@ -1767,7 +1767,9 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
             },
         })
         return response
-    if kind == "send":
+    # Undoing a send arrives as kind "undo" and used to fall through to the generic card, which read
+    # "I can set set_send on 'Lead Vocal' from 0.4 normalized to 0 normalized" (8 Oct requal).
+    if kind == "send" or proposal.get("action") == "set_send":
         return_name = str(proposal.get("return_track_name", "")) or "the return track"
         before_pct = round(float(proposal.get("before", 0.0)) * 100)
         after_pct = round(float(proposal.get("after", 0.0)) * 100)
@@ -1874,9 +1876,32 @@ def _recipe_step_text(step: dict[str, Any]) -> str:
     if action in verbs and isinstance(after, bool):
         return f"{verbs[action][0 if after else 1].capitalize()} {track}"
     if action == "set_device_parameter":
-        now = f" (now {step['before_display']})" if step.get("before_display") else ""
-        return f"{step.get('device_name') or 'Device'} {step.get('parameter') or 'setting'} on {track}{now}"
+        device, parameter = str(step.get("device_name") or "Device"), str(step.get("parameter") or "setting")
+        after_text = _device_step_value(device, parameter, step.get("unit"), after)
+        # Convert both sides the same way when we can. Live's own readback ("-3.00 dB") is two decimals and our
+        # table is one, so mixing them put "-3.00 dB -> 0.0 dB" on one line in the 9 Oct card check.
+        before_text = _device_step_value(device, parameter, step.get("unit"), before) or str(step.get("before_display") or "")
+        if before_text and after_text:
+            return f"{device} {parameter} on {track} {before_text} -> {after_text}"
+        # No measured mapping for this control, so we cannot say what the new raw value will read as in Live.
+        # Show what Live shows now rather than a raw 0..1 number the producer has never seen.
+        now = f" (now {before_text})" if before_text else ""
+        return f"{device} {parameter} on {track}{now}"
     return f"{action}: {track} {before} -> {after}"
+
+
+def _device_step_value(device: str, parameter: str, unit: Any, raw: Any) -> str:
+    """A recipe step's raw device value as Live would show it, or "" when no measured mapping covers it.
+
+    Undo steps carry unit "" (their values are raw readbacks, and a unit would make the service convert them
+    again), so for those we take the one measured profile for the control when there is exactly one.
+    """
+    # Only a measured profile counts. Without one, display_text guesses (an unprofiled dB control passes the
+    # raw 0..1 through as dB), and a guessed "before" would replace Live's own readback on the card.
+    if normalize_unit(unit):
+        return display_text(device, parameter, str(unit), raw) if find_profile(device, parameter, str(unit)) else ""
+    units = [candidate for candidate in ("db", "hz", "ms", "%", "ratio") if find_profile(device, parameter, candidate)]
+    return display_text(device, parameter, units[0], raw) if len(units) == 1 else ""
 
 
 def _recipe_parts_text(recipe: dict[str, Any]) -> str:
@@ -1907,25 +1932,36 @@ def _recipe_parts_text(recipe: dict[str, Any]) -> str:
     return " ".join(parts) + " Nothing changed."
 
 
-def _recipe_response(response: dict[str, Any], proposal: dict[str, Any]) -> dict[str, Any]:
-    """Render a bounded recipe as one exact confirmation card payload."""
+def _recipe_response(response: dict[str, Any], proposal: dict[str, Any], *, undo: bool = False) -> dict[str, Any]:
+    """Render a bounded recipe as one exact confirmation card payload; ``undo`` words it as putting a recipe back."""
     _update_lifecycle(response, "proposal_ready", target={"step_count": proposal.get("step_count", 0)})
     summaries = [f"{number}. {_recipe_step_text(step)}" for number, step in enumerate(proposal.get("steps", []), start=1)]
     count = proposal.get("step_count", len(summaries))
-    reason = str(proposal.get("reason") or "").strip()
-    lead = f"{reason}\n" if reason and not reason.lower().startswith(("llm-proposed", "explicit user request")) else ""
-    response.update({
-        "status": "confirmation_required",
-        "answer": (
-            f"{lead}The plan, {count} change{'s' if count != 1 else ''}:\n"
+    plural = count != 1
+    if undo:
+        # The undo recipe's own reason is "Restore verified KENN recipe receipt-…", which means nothing to a
+        # producer. And "one Undo puts them all back" would be wrong here: a second "Undo that" walks back to
+        # the change before, it does not redo this one.
+        answer = (
+            f"To undo that, put {'these' if plural else 'this'} back:\n" + "\n".join(summaries)
+            + f"\nNothing has changed yet. Apply puts {'them' if plural else 'it'} back."
+        )
+    else:
+        reason = str(proposal.get("reason") or "").strip()
+        lead = f"{reason}\n" if reason and not reason.lower().startswith(("llm-proposed", "explicit user request")) else ""
+        answer = (
+            f"{lead}The plan, {count} change{'s' if plural else ''}:\n"
             + "\n".join(summaries)
             + "\nNothing has changed yet. Apply makes "
-            + ("these changes; one Undo puts them all back." if count != 1 else "this change; Undo puts it back.")
-        ),
+            + ("these changes; one Undo puts them all back." if plural else "this change; Undo puts it back.")
+        )
+    response.update({
+        "status": "confirmation_required",
+        "answer": answer,
         "proposal": proposal,
         "confirmation_required": True,
         "confirmation_token": proposal.get("confirmation_token", ""),
-        "proposal_kind": "recipe",
+        "proposal_kind": "undo" if undo else "recipe",
         "intent": {"action": "recipe", "step_count": proposal.get("step_count", len(summaries))},
     })
     return response
@@ -3067,6 +3103,10 @@ def _handle_command_impl(
                 note_pending_undo(response["session_id"], str(undo["proposal"].get("action_id") or ""),
                                   str(receipt.get("receipt_id") or ""))
                 response["undo_of_receipt_id"] = str(receipt.get("receipt_id") or "")
+                # A recipe undo is itself a recipe. The single-change card read it as one setting and said
+                # "I can set recipe on 'ableton_recipe' from None to None" for every recipe (8 Oct requal).
+                if undo["proposal"].get("schema") == RECIPE_SCHEMA:
+                    return _recipe_response(response, undo["proposal"], undo=True)
                 return _proposal_response(response, undo["proposal"], kind="undo")
             return _clarification(response, {"action": "undo"}, undo.get("error", "The latest change cannot be undone safely."))
         if context_resolution.get("resolution") == "adjust_requires_amount":
