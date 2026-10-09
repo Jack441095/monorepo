@@ -89,3 +89,27 @@ def test_an_unverified_failure_still_stops_undo_from_reaching_past_it(kenn, stat
     older = {"receipt_id": "receipt-older", "status": "applied", "verified": True}
     failure = {"receipt_id": "receipt-failed", "status": status, "verified": False}
     assert undo_target(kenn.session, [failure, older]) is failure
+
+
+def test_undo_walks_past_a_card_refused_before_it_wrote_anything(kenn) -> None:
+    # Regression (9 Oct 2026, L3 requal follow-up): a stale device card refused at Apply wrote a plain "failed"
+    # receipt, and "Undo that" stopped on it even though Live was never touched.
+    stale_card = kenn.propose("set the Drum Bus compressor threshold to -20 dB")
+    start = kenn.volume("Synth")
+    kenn.do("Set the synth to -4 dB")
+    kenn.fake.set_device_parameter(stale_card["track_index"], stale_card["device_index"],
+                                   stale_card["parameter_index"], float(stale_card["before"]) + 0.1)
+    refused = kenn.apply("set the Drum Bus compressor threshold to -20 dB", stale_card)
+    assert refused["receipt"]["status"] == "failed"
+    assert refused["receipt"]["write_attempted"] is False
+    kenn.do("Undo that")
+    assert kenn.volume("Synth") == pytest.approx(start, abs=1e-4)
+
+
+def test_a_failure_after_the_write_was_sent_still_stops_the_walk(kenn) -> None:
+    # The marker has to be explicit False; a failed receipt from an older build, or one whose write went out,
+    # carries no marker or True and keeps blocking, as in the parametrised test above.
+    older = {"receipt_id": "receipt-older", "status": "applied", "verified": True}
+    for marker in ({}, {"write_attempted": True}):
+        failure = {"receipt_id": "receipt-failed", "status": "failed", "verified": False, **marker}
+        assert undo_target(kenn.session, [failure, older]) is failure

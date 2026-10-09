@@ -36,6 +36,8 @@ _RECEIPT_FIELDS = frozenset(
         "status",
         "verified",
         "write_acknowledgement",
+        # False only on a failure that stopped before any write; session_context.undo_target walks past those.
+        "write_attempted",
         "retry_safe",
         "timestamp",
         "target",

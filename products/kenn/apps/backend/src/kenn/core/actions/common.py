@@ -72,8 +72,14 @@ def _failed_receipt(
     retry_safe: str = "unsafe",
     correlation_id: str = "",
     stage_timings_ms: dict[str, float] | None = None,
+    before_write: bool = False,
 ) -> dict[str, Any]:
-    return {
+    """A plain "failed" receipt; before_write=True marks it as stopped before any write reached Live.
+
+    Only the marked ones let "Undo that" walk past them (session_context.undo_target). An unmarked failure may have
+    left a write we could not read back, so it keeps blocking the walk.
+    """
+    receipt = {
         "schema": RECEIPT_SCHEMA,
         "receipt_id": f"receipt-{uuid.uuid4().hex}",
         "action_id": proposal.get("action_id") or proposal.get("id"),
@@ -111,6 +117,9 @@ def _failed_receipt(
         "correlation_id": resolve_correlation_id(correlation_id or proposal.get("correlation_id")),
         "stage_timings_ms": stage_timings_ms or {},
     }
+    if before_write:
+        receipt["write_attempted"] = False
+    return receipt
 
 
 def _state_version(state: dict[str, Any], *, track: dict[str, Any] | None = None) -> str:
