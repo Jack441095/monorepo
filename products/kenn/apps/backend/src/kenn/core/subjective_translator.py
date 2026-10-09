@@ -304,9 +304,10 @@ class SubjectiveTranslator:
         if sub_track is not None:
             s_idx = int(sub_track.get("index", sub_track.get("track_index", 0)))
             s_name = str(sub_track.get("name", "Sub Bass"))
-            # Track snapshots carry "pan"; only return-track mixers say "panning". Reading "panning" here
-            # always gave 0.0, so a panned sub was never centred (found 9 Oct 2026).
-            s_pan = float(sub_track.get("pan", 0.0) or 0.0)
+            # Track snapshots carry "pan"; return-track and world-model mixers say "panning". Reading only
+            # "panning" here always gave 0.0, so a panned sub was never centred (found 9 Oct 2026). We read
+            # both, the way mix_recipes does, so neither snapshot shape can drop the step again.
+            s_pan = float(sub_track.get("pan", sub_track.get("panning", 0.0)) or 0.0)
             if abs(s_pan) > 0.05:
                 steps.append({
                     "action": "set_pan",

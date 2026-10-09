@@ -1896,8 +1896,10 @@ def _device_step_value(device: str, parameter: str, unit: Any, raw: Any) -> str:
     Undo steps carry unit "" (their values are raw readbacks, and a unit would make the service convert them
     again), so for those we take the one measured profile for the control when there is exactly one.
     """
+    # Only a measured profile counts. Without one, display_text guesses (an unprofiled dB control passes the
+    # raw 0..1 through as dB), and a guessed "before" would replace Live's own readback on the card.
     if normalize_unit(unit):
-        return display_text(device, parameter, str(unit), raw)
+        return display_text(device, parameter, str(unit), raw) if find_profile(device, parameter, str(unit)) else ""
     units = [candidate for candidate in ("db", "hz", "ms", "%", "ratio") if find_profile(device, parameter, candidate)]
     return display_text(device, parameter, units[0], raw) if len(units) == 1 else ""
 

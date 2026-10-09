@@ -94,3 +94,13 @@ def test_a_panned_sub_bass_gets_centred_by_the_low_end_mud_recipe(kenn) -> None:
     card = kenn.ask("Fix the low-end mud")
     assert "centre 'Sub Bass'" in card["answer"]
     assert "'Sub Bass' pan 30% left -> centre" in card["answer"]
+
+
+def test_a_control_with_no_measured_profile_keeps_lives_own_reading() -> None:
+    # Review of 9 Oct 2026: an unprofiled dB control would have shown its raw 0.5 as "0.5 dB" in place of Live's
+    # "-12.0 dB", because display_text passes unprofiled raw values straight through.
+    from kenn.core.live_command import _recipe_step_text
+
+    step = {"action": "set_device_parameter", "track_name": "Keys", "device_name": "Simpler", "parameter": "Volume",
+            "unit": "db", "before": 0.5, "after": 0.45, "before_display": "-12.0 dB"}
+    assert _recipe_step_text(step) == "Simpler Volume on 'Keys' (now -12.0 dB)"
