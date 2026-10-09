@@ -116,4 +116,14 @@ describe('KennRecipeCard', () => {
     const wrapper = mount(KennRecipeCard, { props: { proposal: recipe, cardStatus: 'error', errorMessage: 'boom' } })
     expect(wrapper.text()).toContain('boom')
   })
+
+  it('offers no Undo on a plan that was itself an undo, because undoing it would redo the change', () => {
+    // 9 Oct 2026: "Undo the plan" on an applied undo card called propose_undo on the undo's receipt and put the
+    // producer's change straight back.
+    const receipt = { receipt_id: 'receipt-undo', action: 'recipe', status: 'applied', verified: true }
+    const original = mount(KennRecipeCard, { props: { proposal: recipe, cardStatus: 'applied', receipt } })
+    const undoCard = mount(KennRecipeCard, { props: { proposal: recipe, cardStatus: 'applied', receipt, undoable: false } })
+    expect(original.find('.kenn-recipe-card__btn--undo').exists()).toBe(true)
+    expect(undoCard.find('.kenn-recipe-card__btn--undo').exists()).toBe(false)
+  })
 })

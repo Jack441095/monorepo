@@ -125,6 +125,7 @@
           Readback Verified
         </span>
         <button
+          v-if="undoable"
           type="button"
           class="kenn-action-card__btn kenn-action-card__btn--undo"
           @click="$emit('undo')"
@@ -163,11 +164,15 @@ const props = withDefaults(
     cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
     receipt?: KennActionReceipt
     errorMessage?: string
+    // False on a card that is itself an undo. Its receipt reverses the change before it, so "undoing" it would
+    // put that change straight back: a redo behind an Undo label (L3 requal, 9 Oct 2026).
+    undoable?: boolean
   }>(),
   {
     cardStatus: 'pending',
     receipt: undefined,
     errorMessage: '',
+    undoable: true,
   }
 )
 
