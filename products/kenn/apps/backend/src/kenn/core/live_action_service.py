@@ -2070,6 +2070,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
         insertion_index = int(proposal.get("insertion_index", -1))
         expected_devices = proposal.get("after_devices")
         before_devices = proposal.get("before_devices")
+        # Set just before insert_device_with_result; until then a failure is a refusal that left the chain alone.
+        write_started = False
 
         def fail(
             error: str,
@@ -2106,6 +2108,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 "retry_safe": "requires_inspection" if rollback and not rollback.get("reverted") else "unsafe",
                 "correlation_id": resolve_correlation_id(correlation_id),
             }
+            if not write_started:
+                receipt["write_attempted"] = False
             _RECEIPTS[receipt["receipt_id"]] = receipt
             return {"ok": False, "status": status, "error": error, "receipt": receipt}
 
@@ -2122,6 +2126,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
         if insertion_index != len(current_devices):
             return fail("The insertion position is no longer the end of the target device chain.", readback_devices=current_devices)
 
+        write_started = True
         try:
             result = self.client.insert_device_with_result(track_index, str(proposal["device_name"]), insertion_index)
         except Exception as exc:
@@ -2664,7 +2669,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
             return {"attempted": True, "reverted": False, "wrong_device_name": wrong_name, "error": "track did not return to its pre-insertion device order after removal"}
         return {"attempted": True, "reverted": True, "wrong_device_name": wrong_name, "after_devices": confirmed_devices}
 
-    def _insertion_failure(self, proposal: dict[str, Any], key: str, error: str, *, readback: Any = None) -> dict[str, Any]:
+    def _insertion_failure(self, proposal: dict[str, Any], key: str, error: str, *, readback: Any = None,
+                           before_write: bool = False) -> dict[str, Any]:
         _finish_idempotency_key(key)
         receipt = {
             "schema": RECEIPT_SCHEMA,
@@ -2687,6 +2693,9 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "readback_devices": readback,
             "error": error,
         }
+        if before_write:
+            # Same marker as _failed_receipt: "Undo that" may walk past this one, nothing reached Live.
+            receipt["write_attempted"] = False
         _RECEIPTS[receipt["receipt_id"]] = receipt
         return {"ok": False, "error": error, "receipt": receipt}
 
@@ -2719,16 +2728,16 @@ class LiveActionService(Tier2Tier3ControlMixin):
         try:
             state = self.snapshot(include_mixer=False)
         except Exception as exc:
-            return self._insertion_failure(proposal, key, f"Live snapshot failed before device insertion: {exc}")
+            return self._insertion_failure(proposal, key, f"Live snapshot failed before device insertion: {exc}", before_write=True)
         track, error = _find_track(state, int(proposal.get("track_index", -1)), str(proposal.get("track_name", "")))
         if error or track is None:
-            return self._insertion_failure(proposal, key, error or "Target Live track is unavailable.")
+            return self._insertion_failure(proposal, key, error or "Target Live track is unavailable.", before_write=True)
         before_devices = _ordered_device_identities(track)
         if not _device_identities_match(proposal.get("before_devices"), before_devices):
-            return self._insertion_failure(proposal, key, "Live device order changed since the proposal was created.", readback=before_devices)
+            return self._insertion_failure(proposal, key, "Live device order changed since the proposal was created.", readback=before_devices, before_write=True)
         insertion_index = int(proposal.get("insertion_index", -1))
         if insertion_index != len(before_devices):
-            return self._insertion_failure(proposal, key, "The insertion position is no longer the end of the target device chain.", readback=before_devices)
+            return self._insertion_failure(proposal, key, "The insertion position is no longer the end of the target device chain.", readback=before_devices, before_write=True)
         try:
             result = self.client.insert_device_with_result(
                 int(proposal["track_index"]), str(proposal["device_name"]), insertion_index
@@ -2934,13 +2943,13 @@ class LiveActionService(Tier2Tier3ControlMixin):
             state = self.snapshot(include_mixer=False)
             track, error = _find_track(state, int(proposal["track_index"]), str(proposal.get("track_name", "")))
             if error or track is None:
-                return self._insertion_failure(proposal, key, error or "Target Live track is unavailable.")
+                return self._insertion_failure(proposal, key, error or "Target Live track is unavailable.", before_write=True)
             current = _ordered_device_identities(track)
             if not _device_identities_match(proposal.get("before_devices"), current):
-                return self._insertion_failure(proposal, key, "Live device order changed before identity-bound undo.", readback=current)
+                return self._insertion_failure(proposal, key, "Live device order changed before identity-bound undo.", readback=current, before_write=True)
             index = int(proposal["device_index"])
             if index < 0 or index >= len(current) or current[index]["name"] != str(proposal["device_name"]):
-                return self._insertion_failure(proposal, key, "The identity-bound inserted device is no longer present.", readback=current)
+                return self._insertion_failure(proposal, key, "The identity-bound inserted device is no longer present.", readback=current, before_write=True)
             result = self.client.remove_device_with_result(int(proposal["track_index"]), index, str(proposal["device_name"]))
             write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
             if not result.get("success"):
@@ -3038,9 +3047,13 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 _IN_FLIGHT_IDEMPOTENCY_KEYS.discard(key)
             return {"ok": False, "error": "Invalid, expired, mismatched, or already-used device confirmation token."}
 
+        # Flipped just before set_device_parameter, so fail() can tell a refusal (nothing sent to Live, "Undo that"
+        # may walk past it) from a failed readback after a write that may have landed.
+        write_started = False
+
         def fail(error: str, *, readback: Any = None) -> dict[str, Any]:
             _finish_idempotency_key(key)
-            receipt = _failed_receipt(proposal, key, error)
+            receipt = _failed_receipt(proposal, key, error, before_write=not write_started)
             receipt.update({
                 "target": {
                     "target": proposal.get("target", "ableton_device"),
@@ -3095,6 +3108,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
         if not _values_match(parameter.get("value"), before):
             return fail("Live device parameter value changed since the proposal was created; make a new proposal.")
         write_error = None
+        write_started = True
         try:
             write_ok = bool(self.client.set_device_parameter(track_index, device_index, parameter_index, requested))
         except Exception as exc:
@@ -3250,9 +3264,13 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 _IN_FLIGHT_IDEMPOTENCY_KEYS.discard(key)
             return {"ok": False, "error": "Invalid, expired, mismatched, or already-used compound EQ confirmation token."}
 
+        # As in the single device write: set at the first set_device_parameter, so fail() only marks a receipt
+        # "nothing written" when the frequency write was never sent.
+        write_started = False
+
         def fail(error: str, *, readback: Any = None) -> dict[str, Any]:
             _finish_idempotency_key(key)
-            receipt = _failed_receipt(proposal, key, error)
+            receipt = _failed_receipt(proposal, key, error, before_write=not write_started)
             receipt.update({
                 "target": {
                     "target": "ableton_device", "track_index": track_index,
@@ -3289,6 +3307,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 return fail("Live EQ parameter identity changed since the proposal was created.")
             if not _values_match(frequency_parameter.get("value"), frequency_before) or not _values_match(gain_parameter.get("value"), gain_before):
                 return fail("Live EQ values changed since the proposal was created; make a new proposal.")
+            write_started = True
             frequency_write = bool(self.client.set_device_parameter(track_index, device_index, frequency_index, frequency_after))
             frequency_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
             if not frequency_write:
@@ -3838,7 +3857,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             state = self.snapshot(include_mixer=False if action in SUPPORTED_TRACK_CREATION_ACTIONS | SUPPORTED_RETURN_TRACK_CREATION_ACTIONS else True)
         except Exception as exc:
             _finish_idempotency_key(key)
-            receipt = _failed_receipt(proposal, key, f"Live snapshot failed before execution: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms())
+            receipt = _failed_receipt(proposal, key, f"Live snapshot failed before execution: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms(), before_write=True)
             _RECEIPTS[receipt["receipt_id"]] = receipt
             return {"ok": False, "error": receipt["error"], "receipt": receipt}
         timer.mark("snapshot")
@@ -3956,7 +3975,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 fresh_playback = self.client.get_clip_playback_state(int(proposal["track_index"]), int(proposal["clip_slot_index"]))
             except Exception as exc:
                 _finish_idempotency_key(key)
-                receipt = _failed_receipt(proposal, key, f"Could not read clip-slot state before write: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms())
+                receipt = _failed_receipt(proposal, key, f"Could not read clip-slot state before write: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms(), before_write=True)
                 _RECEIPTS[receipt["receipt_id"]] = receipt
                 return {"ok": False, "error": receipt["error"], "receipt": receipt}
             if not fresh_playback.get("success") or not (fresh_playback.get("is_playing") or fresh_playback.get("is_triggered")):
@@ -3978,7 +3997,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 fresh_return_tracks = self.client.get_return_tracks()
             except Exception as exc:
                 _finish_idempotency_key(key)
-                receipt = _failed_receipt(proposal, key, f"Could not read the exact return-track identity: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms())
+                receipt = _failed_receipt(proposal, key, f"Could not read the exact return-track identity: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms(), before_write=True)
                 _RECEIPTS[receipt["receipt_id"]] = receipt
                 return {"ok": False, "error": receipt["error"], "receipt": receipt}
             fresh_return, return_error = _find_return_track(fresh_return_tracks, int(proposal["return_track_index"]), str(proposal.get("return_track_name", "")))
@@ -3989,7 +4008,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 current_send = self.client.get_track_send(int(proposal["track_index"]), int(proposal["return_track_index"]))
             except Exception as exc:
                 _finish_idempotency_key(key)
-                receipt = _failed_receipt(proposal, key, f"Could not read the current send value: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms())
+                receipt = _failed_receipt(proposal, key, f"Could not read the current send value: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms(), before_write=True)
                 _RECEIPTS[receipt["receipt_id"]] = receipt
                 return {"ok": False, "error": receipt["error"], "receipt": receipt}
             if current_send is None or not _values_match(round(float(current_send), 6), proposal.get("before")):
@@ -4011,7 +4030,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 fresh_locators, locators_available = self._locator_observation()
             except Exception as exc:
                 _finish_idempotency_key(key)
-                receipt = _failed_receipt(proposal, key, f"Could not read locator state before write: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms())
+                receipt = _failed_receipt(proposal, key, f"Could not read locator state before write: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms(), before_write=True)
                 _RECEIPTS[receipt["receipt_id"]] = receipt
                 return {"ok": False, "error": receipt["error"], "receipt": receipt}
             if current_time is None or not locators_available:

@@ -1004,9 +1004,14 @@ def undo_target(session_id: str, receipts: list[dict[str, Any]]) -> dict[str, An
             continue
         # A recipe or device insert that failed and read back as fully restored left the set as it was, so it
         # is not a change to undo; on 8 Oct one shadowed the producer's previous change and "Undo that" refused.
-        # Plain "failed" and "partial_recovery" still stop the walk: the set may hold a change we could not
+        # Other "failed" receipts and "partial_recovery" still stop the walk: the set may hold a change we could not
         # verify, and undoing something older underneath it would leave both wrong.
         if receipt.get("status") == "failed_rolled_back":
+            continue
+        # Same for a plain "failed" that stopped before anything was sent: a stale card refused at Apply left the
+        # set untouched (9 Oct 2026, L3 requal). Only the explicit marker counts; older receipts and failures after
+        # a write lack it and still stop the walk.
+        if receipt.get("status") == "failed" and receipt.get("write_attempted") is False:
             continue
         return receipt
     return None
