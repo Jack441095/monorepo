@@ -169,7 +169,8 @@ choice.
   metadata only after release and legal approval; keep Para-phase free. The
   old £2 Submit and £9 SLO Payment Links are deactivated; their dashboard
   metadata maps to `nite-submit` and `smart-sample-manager`, respectively, but
-  the catalog products are archived. Their URLs have been removed from source;
+  the catalog products are archived. The live Stripe catalogue currently has
+  zero active products. Their URLs have been removed from source;
   production checkout now also requires replacement Stripe-hosted URLs in
   Vercel. The fail-closed website build deployed on 2026-10-10; both apex and
   `www` pricing pages return HTTP 200, show beta access, and contain neither
