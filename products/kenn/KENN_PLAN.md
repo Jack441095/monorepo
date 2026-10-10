@@ -1293,6 +1293,13 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   - **Held-out:** 49, 38, 46 of 72 within 15 s (mean 44.33; total model deliveries 52, 44, 49; median final seconds 7.15 s, 10.72 s, 9.18 s). Run 1 achieved 52 model deliveries (72.2%), but 3 delivered answers landed between 15.1–17.8 s due to host swap memory pressure.
   - **Rejections:** Unshown excerpt citations dropped from 4–5 to 0 in runs 1 and 3; weak match / intent guard misses dropped from 5 to 2.
   - **Blind grading:** Generated `heldout-grading.html` (55 differing questions, 54 with model answers) for Jack's blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench/`).
+- [x] Candidate qualification bench v2, 10 Oct 2026 (`draft/excerpt-id-format` `4e41a3b8`):
+  Adds precision grounding normalization: decimal equivalence (`-14.0 LUFS` to `-14 LUFS`), range interval containment (`5 dB` in `3–6 dB`), and colloquial question audio shorthand (`5k` -> `5 kHz`, `+0.8 true peak` -> `0.8 dBTP`). 138 scoped regression tests passing.
+  Local 4B model (`qwen3:4b-instruct-2507-q4_K_M`), fake Live, Live closed, mains power, pinned index `v-5f6964698b76`, `KENN_LLM_CACHE=0`.
+  - **Probe:** 35/44 (79.5%), 36/44 (81.8%), 23/44 (52.3%, clock-limited; 33 delivered by model, 10 took 15.2–21.3 s under 8.3 GB host swap pressure). Unsupported measurement rejections dropped from 16 to 1 (run 1, 2) and 5 (run 3).
+  - **Held-out:** 42, 46, 44 of 72 within 15 s (total model deliveries 44, 48, 49; median final seconds 6.63 s, 7.62 s, 8.61 s). Model acceptance rate when attempted rose to 68.7% (46 of 67).
+  - **Rejections:** Unsupported measurement rejections dropped monotonically across held-out runs: 15 (run 1) -> 12 (run 2) -> 10 (run 3), down from 16 on main.
+  - **Blind grading:** Generated `heldout-grading.html` (55 differing questions, 93 answers to grade) for Jack's blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench-v2/`).
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
