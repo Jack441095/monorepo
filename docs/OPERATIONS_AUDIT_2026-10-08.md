@@ -195,9 +195,9 @@ choice.
   also need review against the actual Plausible configuration.
   The deployed refund policy promises a full refund within 14 days and says a
   refund revokes the licence. The current source now revokes active entitlements
-  on a full-refund webhook and records the action; the production backend still
-  needs a reviewed deployment and live validation before this mismatch is
-  resolved. Para-phase
+  on a full-refund webhook and records the action. Production now runs that
+  change, and a signed synthetic webhook smoke check passed; a real Stripe event
+  delivery and refund still need operational validation. Para-phase
   is an online text service: when enabled, the website sends text to the backend,
   which streams it to a separately configured engine. Verify that engine's
   provider, location, logging, and retention before enabling it. Confirm the
@@ -325,8 +325,10 @@ choice.
   Stripe sandbox has its own account context; rotate the live destination shown
   above, not a sandbox endpoint. The dashboard's Event deliveries view showed
   no deliveries under its current filters on 2026-10-10, so a real Stripe-to-
-  backend delivery remains unproved even though the production verifier
-  accepted the replacement signature.
+  backend delivery remains unproved. After the 2026-10-10 backend deployment,
+  a fresh synthetic `account.updated` signature returned HTTP 200 with status
+  `ignored`, confirming the production verifier still accepts the replacement
+  signer without creating a purchase or charge.
   The saved test key returns HTTP 403 when asked to list sandbox webhook
   endpoints, so test-mode routing cannot be read back with that key. Checkout
   remains disabled pending the separate complete test purchase, legal review,
@@ -450,6 +452,7 @@ choice.
 | Current Stripe API and dashboard read | Three live Checkout Sessions remain: one paid and two expired; no open sessions. The three catalog products are archived, and the restricted key cannot list Payment Links or the account object |
 | Backend Fly deployment | Release migration and rolling update passed; both machines use image `deployment-01M4E632FPNQ7R4D23ZCTEEGF2`; current snapshot shows one started with a passing service check and one stopped by the configured auto-stop policy |
 | Production API readiness | Current `/health` and `/ready` return HTTP 200; database, storage, and email checks true; checkout, legal approval, and release readiness false |
+| Full-refund webhook deployment | Image `deployment-01M4JQCJZF070TEDFFH54RKE9E` rolled out; both machines report passing checks; signed synthetic webhook returned HTTP 200 `ignored`; checkout remains closed |
 | Public email DNS records | SPF/MX, DKIM selector, and DMARC records resolve; `p=none`; message alignment and bounce handling remain unverified |
 | Controlled sign-in email | Resend reports delivered at 14:18 BST; the 14:10 BST screenshot predates the probe, while inbox placement and dashboard/API workspace match remain unverified |
 | Complete customer purchase and inbox delivery | Incomplete; no new paid test purchase made during this audit |
