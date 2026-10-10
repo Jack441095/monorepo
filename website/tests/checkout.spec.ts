@@ -20,6 +20,20 @@ test("pricing opens Stripe links only after the public checkout gates pass", asy
   }
 });
 
+test("pricing explains that a returned Stripe test session did not charge real money", async ({ page }) => {
+  await page.goto("/pricing?checkout=success&session_id=cs_test_example");
+  await expect(page.getByRole("status")).toContainText("No real money was charged");
+  await expect(page.getByRole("status")).toContainText("does not create a production licence");
+  await expect(page.getByRole("status").getByRole("link")).toHaveCount(0);
+});
+
+test("pricing sends live checkout returns to server-confirmed account status", async ({ page }) => {
+  await page.goto("/pricing?checkout=success&session_id=cs_live_example");
+  await expect(page.getByRole("status")).toContainText("confirm payments on the server");
+  await expect(page.getByRole("status").getByRole("link", { name: "Check your account" }))
+    .toHaveAttribute("href", "/account?purchase=pending");
+});
+
 for (const path of ["/products/submit", "/products/smart-sample-manager"]) {
   test(`product page respects the public checkout gate: ${path}`, async ({ page }) => {
     await page.goto(path);

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { WaitlistCounter } from "@/components/WaitlistForm";
+import { CheckoutReturnNotice } from "@/components/CheckoutReturnNotice";
 import { PUBLIC_CHECKOUT_LIVE, STRIPE_SUBMIT_LINK, STRIPE_SLO_LINK } from "@/lib/commerce-config";
 
 export const metadata: Metadata = pageMetadata({
@@ -25,6 +26,8 @@ export default function PricingPage() {
           </p>
         </div>
       </section>
+
+      <CheckoutReturnNotice />
 
       {/* Product Comparison */}
       <section className="section-rule">
