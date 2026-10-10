@@ -48,6 +48,22 @@ if (process.env.NEXT_PUBLIC_CHECKOUT_LIVE === "1") {
   if (process.env.NEXT_PUBLIC_RELEASE_READY !== "1") {
     problems.push("live checkout requires NEXT_PUBLIC_RELEASE_READY=1");
   }
+  for (const name of ["NEXT_PUBLIC_STRIPE_SUBMIT_LINK", "NEXT_PUBLIC_STRIPE_SLO_LINK"]) {
+    const value = process.env[name] ?? "";
+    let isHostedStripeUrl = false;
+    try {
+      const url = new URL(value);
+      isHostedStripeUrl =
+        url.protocol === "https:" &&
+        url.pathname !== "/" &&
+        (url.hostname === "buy.stripe.com" || url.hostname === "checkout.stripe.com");
+    } catch {
+      // An absent or malformed public link keeps checkout closed.
+    }
+    if (!isHostedStripeUrl) {
+      problems.push(`${name} must be an HTTPS Stripe-hosted checkout URL`);
+    }
+  }
 }
 
 // proxy.ts fails closed: with no password configured, /portfolio serves 403

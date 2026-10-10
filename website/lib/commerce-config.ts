@@ -1,16 +1,22 @@
-// Stripe direct payment links (created 2026-09-18 via API with product_id metadata)
-// TODO: paste the Stripe pre-order Payment Link for Submit here as
-// STRIPE_SUBMIT_PREORDER_LINK (a buy.stripe.com URL) and point the pre-live
-// pre-order CTAs at it. Until then they route to the existing waitlist
-// anchors so no surface shows a dead button.
-// TODO: paste the Stripe deposit Payment Links for studio services here (each
-// a buy.stripe.com URL from the Stripe dashboard). Until a link is pasted the
-// matching deposit CTA on /services falls back to a prefilled mailto so no
-// surface ever shows a dead button.
+// Public Payment Links change state independently of the website deploy. Keep
+// their URLs in Vercel so deactivated dashboard links cannot ship in the bundle.
 export const STRIPE_MIXING_DEPOSIT_LINK = "";
 export const STRIPE_MASTERING_DEPOSIT_LINK = "";
-export const STRIPE_SLO_LINK = "https://buy.stripe.com/7sY3cwgGFdAk6kN6X75sA04";
-export const STRIPE_SUBMIT_LINK = "https://buy.stripe.com/cNiaEYdutbsc38B3KV5sA05";
+export const STRIPE_SLO_LINK = process.env.NEXT_PUBLIC_STRIPE_SLO_LINK ?? "";
+export const STRIPE_SUBMIT_LINK = process.env.NEXT_PUBLIC_STRIPE_SUBMIT_LINK ?? "";
+
+export function isHostedStripeCheckoutUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === "https:" &&
+      url.pathname !== "/" &&
+      (url.hostname === "buy.stripe.com" || url.hostname === "checkout.stripe.com")
+    );
+  } catch {
+    return false;
+  }
+}
 
 // Checkout approvals follow docs/STRIPE_COMMERCE.md. Website flags and the
 // backend gate must agree before launch; Payment Links have a separate state.
@@ -31,4 +37,7 @@ export const CHECKOUT_LIVE =
     (STRIPE_MODE === "live" && LEGAL_REVIEW_APPROVED && RELEASE_READY));
 
 export const PUBLIC_CHECKOUT_LIVE =
-  CHECKOUT_LIVE && STRIPE_MODE === "live";
+  CHECKOUT_LIVE &&
+  STRIPE_MODE === "live" &&
+  isHostedStripeCheckoutUrl(STRIPE_SUBMIT_LINK) &&
+  isHostedStripeCheckoutUrl(STRIPE_SLO_LINK);

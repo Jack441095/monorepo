@@ -51,8 +51,25 @@ test("live checkout accepts the full production approval contract", () => {
     NEXT_PUBLIC_STRIPE_MODE: "live",
     NEXT_PUBLIC_LEGAL_REVIEW_APPROVED: "1",
     NEXT_PUBLIC_RELEASE_READY: "1",
+    NEXT_PUBLIC_STRIPE_SUBMIT_LINK: "https://buy.stripe.com/submit-live-link",
+    NEXT_PUBLIC_STRIPE_SLO_LINK: "https://buy.stripe.com/slo-live-link",
   });
   expect(result.status).toBe(0);
+});
+
+test("live checkout rejects missing or non-Stripe payment links", () => {
+  const result = checkBuild({
+    VERCEL_ENV: "production",
+    NEXT_PUBLIC_NITE_DSP_API_URL: "https://api.example.test",
+    NEXT_PUBLIC_CHECKOUT_LIVE: "1",
+    NEXT_PUBLIC_STRIPE_MODE: "live",
+    NEXT_PUBLIC_LEGAL_REVIEW_APPROVED: "1",
+    NEXT_PUBLIC_RELEASE_READY: "1",
+    NEXT_PUBLIC_STRIPE_SUBMIT_LINK: "https://buy.stripe.com",
+  });
+  expect(result.status).toBe(1);
+  expect(result.stderr).toContain("NEXT_PUBLIC_STRIPE_SUBMIT_LINK must be an HTTPS Stripe-hosted checkout URL");
+  expect(result.stderr).toContain("NEXT_PUBLIC_STRIPE_SLO_LINK must be an HTTPS Stripe-hosted checkout URL");
 });
 
 for (const vercelEnv of ["", "preview"]) {

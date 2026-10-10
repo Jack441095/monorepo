@@ -166,7 +166,12 @@ choice.
   archived Submit row is £3, while the earlier successful live purchase and
   current public copy use £2; no current SLO product is ready to sell. Create
   and verify the intended Submit and SLO products/prices and their Payment Link
-  metadata only after release and legal approval; keep Para-phase free. A live
+  metadata only after release and legal approval; keep Para-phase free. The
+  old £2 Submit and £9 SLO Payment Links are deactivated; their dashboard
+  metadata maps to `nite-submit` and `smart-sample-manager`, respectively, but
+  the catalog products are archived. Their URLs have been removed from source;
+  production checkout now also requires replacement Stripe-hosted URLs in
+  Vercel. A live
   Checkout Session read returned three records: one paid and two expired, with
   no open sessions. The restricted key cannot read prices, Payment Links, or
   the Stripe account object (HTTP 403). Sandbox cleanup deactivated seven old
