@@ -88,11 +88,12 @@ so this is a requirement for whoever sets up the hosting, not a verified current
 
 ## Secrets handling
 
-Every secret this phase's design introduces (production Ed25519 private key, Paddle API
-credentials, database credentials, transactional email API key) is designed to live only in a
-production secrets manager, never in the repository, client, or CI logs — consistent with the
-existing dev-key discipline already correctly followed in `licensing_server/` (gitignored dev
-key, ephemeral per-CI-run keypair for tests).
+Every secret this phase's design introduces (production Ed25519 private key, restricted Stripe
+API key and webhook signing secret, database credentials, transactional email API key, and
+release-storage credentials) is designed to live only in a production secrets manager, never in
+the repository, client, or CI logs — consistent with the existing dev-key discipline already
+correctly followed in `licensing_server/` (gitignored dev key, ephemeral per-CI-run keypair for
+tests).
 
 ## What this review does NOT cover
 

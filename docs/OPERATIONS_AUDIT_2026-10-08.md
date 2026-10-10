@@ -127,6 +127,9 @@ choice.
   synthetic customer data, an isolated database, the verified product metadata,
   and the approved test inbox. Confirm webhook fulfilment, one licence, inbox
   delivery, sign-in, entitlement, download, and duplicate-event behavior.
+  On 2026-10-10, a Stripe CLI-created £2 GBP sandbox Checkout Session is open
+  and unpaid in Safari; the owner must submit the test card before fulfilment
+  can be checked.
   The local `backend/tests/test_e2e.py` integration suite passes all 10 tests,
   including purchase-to-activation, duplicate webhook idempotency, download
   authorization, and refund revocation. Its Stripe webhook is signed locally
@@ -306,9 +309,13 @@ choice.
   the revoke attempt. The production replacement key works; local rehearsal
   copies now use it. During a later ignored-file inventory, a command
   accidentally emitted fragments of ignored rehearsal JSON into tool output,
-  including local signing/session material. The stale rehearsal files were
-  removed and no rehearsal API or listener process is running. The exposed
-  signing value could not be compared with Fly's stored production signer;
+  including local signing/session material. The Oct 8 rehearsal files were
+  removed after that incident. A new temporary rehearsal started on Oct 10:
+  the API listens on localhost port 8765, a redirect helper on port 8766, and
+  Stripe CLI is running. Local `/ready` reports local storage, console email,
+  and `checkout_enabled=false`; this does not prove production readiness. Stop
+  those processes after the sandbox checkout is resolved. The exposed signing
+  value could not be compared with Fly's stored production signer;
   verify its provenance through the secret manager before issuing more
   production licences. Do not rotate the production signer until the client
   trust-key lifecycle is ready, because an immediate change can invalidate
@@ -331,10 +338,11 @@ choice.
   a fresh synthetic `account.updated` signature returned HTTP 200 with status
   `ignored`, confirming the production verifier still accepts the replacement
   signer without creating a purchase or charge.
-  The saved test key returns HTTP 403 when asked to list sandbox webhook
-  endpoints, so test-mode routing cannot be read back with that key. Checkout
-  remains disabled pending the separate complete test purchase, legal review,
-  and release checks.
+  Stripe's sandbox dashboard shows the restricted `NITE DSP checkout rehearsal`
+  key has only `Checkout Sessions: Write` and was used on 2026-10-10. It cannot
+  list sandbox webhook endpoints (HTTP 403), so test-mode routing remains
+  unverified. Checkout remains disabled pending the complete test purchase,
+  legal review, and release checks.
 - [ ] **Licensing key provenance:** the lifecycle design says no production key
   was generated, while the deployed backend requires a signing key. Reconcile
   that document with the live secret's origin and check whether the removed
@@ -451,7 +459,7 @@ choice.
 | Five old live Payment Links | Deactivated with owner approval; saved statuses verified after reload |
 | Current Stripe API and dashboard read | Three live Checkout Sessions remain: one paid and two expired; no open sessions. The three catalog products are archived, and the restricted key cannot list Payment Links or the account object |
 | Scoped R2 replacement | Bucket-only token passed a ranged release read, was imported into Fly, and production `/ready` reports durable S3 storage; older tokens remain active pending usage identification |
-| Backend Fly deployment | Release migration and rolling update passed; both machines use image `deployment-01M4E632FPNQ7R4D23ZCTEEGF2`; current snapshot shows one started with a passing service check and one stopped by the configured auto-stop policy |
+| Backend Fly deployment | Image `deployment-01M4JQCJZF070TEDFFH54RKE9E`; current snapshot shows one started machine with a passing service check and one stopped by the configured auto-stop policy (warning: machine hasn't started) |
 | Production API readiness | Current `/health` and `/ready` return HTTP 200; database, storage, and email checks true; checkout, legal approval, and release readiness false |
 | Full-refund webhook deployment | Image `deployment-01M4JQCJZF070TEDFFH54RKE9E` rolled out; both machines report passing checks; signed synthetic webhook returned HTTP 200 `ignored`; checkout remains closed |
 | Public email DNS records | SPF/MX, DKIM selector, and DMARC records resolve; `p=none`; message alignment and bounce handling remain unverified |

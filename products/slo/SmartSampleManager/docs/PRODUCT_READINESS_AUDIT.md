@@ -115,6 +115,9 @@ without you. See
 
 # SAMPLE MANAGER COMMERCIAL READINESS: 80 / 100 (Phase 1: 56; Phase 2: 68; Phase 3: 70)
 
+Historical phase scorecard. For current hosting, payment, legal, and release gates, see
+[`docs/OPERATIONS_AUDIT_2026-10-08.md`](../../../../docs/OPERATIONS_AUDIT_2026-10-08.md).
+
 **Commercial infrastructure (5→8/10).** Phase 3's designs are now real, running code, verified
 against a real local database rather than described on paper: auth, licensing (real Ed25519
 signing, cryptographically re-verified independent of the server), commerce webhook handling

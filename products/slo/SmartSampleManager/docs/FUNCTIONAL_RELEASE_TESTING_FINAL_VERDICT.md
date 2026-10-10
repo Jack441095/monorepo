@@ -54,9 +54,9 @@ P1                      ZERO open — no new P1s found this phase. One P2-level 
                         isolated temp dir) — neither blocks beta
 EXTERNAL BLOCKERS       Unchanged from docs/PRIVATE_BETA_RC.md: Apple Developer Program
                         membership (blocks signing + notarization), a genuinely clean test
-                        Mac, and hosted backend infrastructure (Railway project + DNS
-                        execution). None of these were addressable this phase and none were
-                        worked around or faked.
+                        Mac, and an approved hosted staging environment with public durable
+                        release delivery and staging DNS. None of these were addressable this
+                        phase and none were worked around or faked.
 FINAL STATUS            FUNCTIONALLY READY FOR PRIVATE BETA
 ```
 

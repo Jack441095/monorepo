@@ -10,9 +10,10 @@ becomes available. This document does NOT claim the test has been passed -- see
   license via `POST /admin/entitlements/issue` before step 1 -- without this, you have nothing
   to sign in with or download. Ask whoever is running this test to confirm your email has been
   issued one.
-- **Know the URLs**: sign-in / account / downloads all happen at `https://nitedsp.co.uk/account`
-  (once hosted -- `docs/RAILWAY_DEPLOYMENT.md`). Until then, substitute the local staging URL
-  you were given.
+- **Know the URLs**: sign-in / account / downloads use `https://nitedsp.co.uk/account`. The
+  old deployment guide is retired; check `docs/OPERATIONS_AUDIT_2026-10-08.md` for current
+  staging and release-delivery status. Use the approved staging URL for acceptance when it is
+  available.
 - **The identity codes "NDSP" and "AtSm"** referenced below are Smart Sample Manager's
   plugin-manufacturer and plugin codes (`docs/FINAL_PRODUCT_IDENTITY.md`) -- they're how your
   DAW identifies this specific plugin. You don't need to understand them, just recognize them
