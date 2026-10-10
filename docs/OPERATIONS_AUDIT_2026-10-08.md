@@ -348,12 +348,12 @@ choice.
   not inbox placement.
 - [ ] **Email operations:** confirm the probe is visible in the inbox or junk
   folder, then verify the installed API key against the Resend workspace.
-  The 2026-10-10 dashboard check showed both sign-in probes as delivered and
-  the replacement `NiteDSP Fly sending 2026-10-08` sending-only key as used two
-  days earlier. The workspace has five active keys, including a full-access
-  `API_01`, also used two days earlier. A masked comparison now confirms the
-  ignored local replacement credential matches the dashboard's current
-  `NiteDSP Fly sending 2026-10-08` key; the old exposed key is still unmatched.
+  The latest 2026-10-10 dashboard check shows the replacement
+  `NiteDSP Fly sending 2026-10-08` sending-only key was used 37 minutes earlier.
+  A masked comparison confirms the ignored local replacement credential matches
+  that dashboard key. The workspace has five active keys, including a
+  full-access `API_01` last used two days earlier. The old exposed key is still
+  unmatched.
   `/ready` reports `email_deliverable=true` from key presence alone, not from a
   send probe.
   Public DNS answers show root SPF, `send` SPF/MX, the Resend DKIM selector,
