@@ -17,7 +17,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.nitedsp.co.uk https://backend-submit-staging.nitedsp.co.uk",
+      "connect-src 'self' https://api.nitedsp.co.uk",
       "frame-src 'self'",
       "form-action 'self'",
     ].join("; "),
