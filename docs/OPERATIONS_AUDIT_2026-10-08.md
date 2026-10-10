@@ -123,22 +123,19 @@ choice.
   Para-phase support links (£1, £3, £10). All five saved statuses read
   “Deactivated” after a dashboard reload. The earlier Submit £3 link was already
   deactivated. These links can be reactivated when their launch checks pass.
-- [ ] **Operations: prove the complete test purchase.** Use Stripe test mode,
-  synthetic customer data, an isolated database, the verified product metadata,
-  and the approved test inbox. Confirm webhook fulfilment, one licence, inbox
-  delivery, sign-in, entitlement, download, and duplicate-event behavior.
-  On 2026-10-10, the owner completed a £2 GBP Stripe Sandbox checkout for NITE
-  Submit (`livemode=false`). Stripe reported the session paid; its matching
+- [ ] **Operations: complete the isolated Sandbox customer journey.** The
+  owner completed a £2 GBP Stripe Sandbox checkout for NITE Submit on
+  2026-10-10 (`livemode=false`). Stripe reported the session paid; its matching
   signed `checkout.session.completed` event reached the local listener with
   HTTP 200. The isolated checkout-rehearsal database contains one completed
-  purchase and one active entitlement. This proves local Sandbox payment and
-  webhook fulfilment. The local mailer is console-only, so inbox delivery,
-  sign-in, download, and duplicate-event behavior remain unverified.
-  The local `backend/tests/test_e2e.py` integration suite passes all 10 tests,
+  purchase and one active entitlement. The local mailer is console-only, so
+  inbox delivery, sign-in, release download, and duplicate-event delivery still
+  need proof. The local `backend/tests/test_e2e.py` suite passes all 10 tests,
   including purchase-to-activation, duplicate webhook idempotency, download
-  authorization, and refund revocation. Its Stripe webhook is signed locally
-  and its mail delivery is not sent through Resend. On 2026-10-08 the saved
-  Submit Checkout session was open and unpaid for £2 GBP; a read-only retrieval
+  authorization, and refund revocation. This proves local Sandbox payment and
+  fulfilment, not a hosted customer journey. Its webhook is signed locally, and
+  its mail delivery is not sent through Resend. On 2026-10-08 the saved Submit
+  Checkout session was open and unpaid for £2 GBP; a read-only retrieval
   on 2026-10-10 shows it expired without payment. The saved test key can read
   that session and its line item, but Stripe returns HTTP 403 when it lists
   active prices or hosted webhook endpoints. The successful checkout used a
@@ -188,12 +185,12 @@ choice.
   Payments and Payouts as active with no open verification tasks; the app's
   closed legal, release, and checkout gates still prevent storefront sales.
 - [ ] **Owner/legal reviewer: approve accurate terms, privacy, and refund copy.**
-  The owner confirmed the product brand is NiteDSP and the operator is a UK
-  limited company, but the registered name, company number, and registered
-  office are still outstanding. An [official Companies House search for
-  NiteDSP](https://find-and-update.company-information.service.gov.uk/search/companies?q=NiteDSP)
-  returned no exact match, so the brand must not be assumed to be the legal
-  entity. The 2026-10-10 production privacy page check confirms the old
+  The owner supplied `Nite-DSP` as the registered name and confirmed the
+  operator is a UK limited company. An [official Companies House search for
+  Nite-DSP](https://find-and-update.company-information.service.gov.uk/search/companies?q=Nite-DSP)
+  returned no results; the company number and registered office are also still
+  missing, so the legal entity needs independent confirmation before approval.
+  The 2026-10-10 production privacy page check confirms the old
   sole-trader, nurture-sequence, and fixed-retention claims are gone. It now
   names the website, waitlist, backend, release-storage, payment, and email
   providers; describes Submit and SLO as local products; and identifies
@@ -336,11 +333,17 @@ choice.
   A live-dashboard check on 2026-10-10 confirms the active destination is
   `https://api.nitedsp.co.uk/webhooks/stripe` with four events. The separate
   Stripe sandbox has its own account context; rotate the live destination shown
-  above, not a sandbox endpoint. The dashboard's Event deliveries view showed
-  no deliveries under its current filters on 2026-10-10, so a real Stripe-to-
-  backend delivery remains unproved. After the 2026-10-10 backend deployment,
-  a fresh synthetic `account.updated` signature returned HTTP 200 with status
-  `ignored`, confirming the production verifier still accepts the replacement
+  above, not a sandbox endpoint. The live Stripe event list confirms the 18 Sep
+  £2 Submit Checkout Session completed with `livemode=true` and
+  `payment_status=paid`.
+  Its detail says Stripe sent it to the active endpoint, but the full delivery
+  attempt record has aged out. The endpoint overview currently shows zero
+  deliveries this week, and its Event deliveries view is empty. Stripe still
+  offers a replay of that event during its 30-day window. Replaying it would
+  send the original checkout payload, including buyer contact details, to the
+  production API; it has not been replayed. After the 2026-10-10 backend
+  deployment, a fresh signed `account.updated` event returned HTTP 200 with
+  status `ignored`, confirming production accepts the replacement
   signer without creating a purchase or charge.
   Stripe's sandbox dashboard shows the restricted `NITE DSP checkout rehearsal`
   key has only `Checkout Sessions: Write` and was used on 2026-10-10. It cannot
@@ -464,6 +467,7 @@ choice.
 | Live website browser/HTTPS checks | Product names/status and closed checkout verified; Paddle removed from CSP |
 | 2026-10-10 public storefront/policy check | `/pricing`, `/privacy`, and `/terms` return HTTP 200; pricing HTML has no Stripe Checkout URL or checkout API path; the deployed privacy page no longer contains the old sole-trader claim; registered company particulars and legal review remain outstanding |
 | Earlier £2 Submit purchase | Exact paid Stripe session matches one completed purchase, one active licence, and a sent confirmation; Resend reported delivered on 2026-09-18, but inbox placement was not verified |
+| Live Stripe webhook after rotation | Destination is active for four commerce events; current-week delivery count is zero. The 18 Sep paid session was sent to it, but its detailed attempt record aged out; a replay remains available and awaits owner approval because it resends checkout contact data |
 | Five old live Payment Links | Deactivated with owner approval; saved statuses verified after reload |
 | Current Stripe API and dashboard read | Three live Checkout Sessions remain: one paid and two expired; no open sessions. The three catalog products are archived, and the restricted key cannot list Payment Links or the account object |
 | Scoped R2 replacement | Bucket-only token passed a ranged release read, was imported into Fly, and production `/ready` reports durable S3 storage; older tokens remain active pending usage identification |
@@ -472,8 +476,8 @@ choice.
 | Full-refund webhook deployment | Image `deployment-01M4JQCJZF070TEDFFH54RKE9E` rolled out; both machines report passing checks; signed synthetic webhook returned HTTP 200 `ignored`; checkout remains closed |
 | Public email DNS records | SPF/MX, DKIM selector, and DMARC records resolve; `p=none`; message alignment and bounce handling remain unverified |
 | Controlled sign-in email | Resend reports delivered at 14:18 BST; the 14:10 BST screenshot predates the probe, while inbox placement and dashboard/API workspace match remain unverified |
-| Complete customer purchase and inbox delivery | Incomplete; no new paid test purchase made during this audit |
-| Full-refund handling source | Focused commerce, end-to-end, and webhook suites pass (58 tests); production behavior still needs deployment and validation |
+| Complete customer purchase and inbox delivery | The isolated £2 Sandbox payment and local webhook fulfilment passed; inbox, sign-in, release download, duplicate hosted delivery, and public staging remain unverified; no new live charge was made |
+| Full-refund handling | Production code is deployed; focused commerce, end-to-end, and webhook suites pass (58 tests), and a signed synthetic event was accepted; a real refund delivery still needs operational validation |
 | Para-phase free-only checkout guard | Focused paraphrase and commerce catalog suites pass (51 tests); new paid checkout route is absent, and historical paid-order redemption remains covered |
 
 Audio_Too's initial test collection failed because the shell could not import
@@ -483,12 +487,11 @@ a pre-existing stale truth-sheet path in both copies; correcting it to the
 existing product document made both checks pass. No audio, live Ableton session,
 or GPU job was used.
 
-As of 2026-10-10, the Stripe CLI listener, local API, and redirect proxy remain
-running for the unpaid sandbox Checkout Session. The API listens on port 8765
-and its local `/ready` check reports local storage, console email, and
-`checkout_enabled=false`; this rehearsal is not production readiness evidence.
-The local website server is stopped. Stop the remaining rehearsal processes
-after the owner completes or abandons the checkout.
+On 2026-10-10, a process check found no Stripe CLI listener and no service
+listening on local ports 8765 or 8766. The local API, redirect helper, and
+Stripe CLI had been stopped after the paid Sandbox checkout. Production
+`/ready` remains healthy with checkout disabled; the local Sandbox rehearsal
+does not establish production readiness.
 
 The dependency patch addresses published Next.js/sharp/source-map-js advisories:
 [Next.js ImageResponse](https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j),
