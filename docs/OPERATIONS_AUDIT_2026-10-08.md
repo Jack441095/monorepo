@@ -208,6 +208,9 @@ choice.
   Nite-DSP](https://find-and-update.company-information.service.gov.uk/search/companies?q=Nite-DSP)
   returned no results; the company number and registered office are also still
   missing, so the legal entity needs independent confirmation before approval.
+  A fresh 2026-10-10 register search for `Nite DSP` and `NiteDSP` also found no
+  exact company match. A search by an officer name does not establish which
+  company operates this brand, so no similarly named entity has been assumed.
   The 2026-10-10 production privacy page check confirms the old
   sole-trader, nurture-sequence, and fixed-retention claims are gone. It now
   names the website, waitlist, backend, release-storage, payment, and email
@@ -321,9 +324,11 @@ choice.
   The 2026-10-10 dashboard check showed both sign-in probes as delivered and
   the replacement `NiteDSP Fly sending 2026-10-08` sending-only key as used two
   days earlier. The workspace has five active keys, including a full-access
-  `API_01`; the deployed key and the old exposed key have not been matched to
-  their dashboard entries. `/ready` reports `email_deliverable=true` from key
-  presence alone, not from a send probe.
+  `API_01`, also used two days earlier. A masked comparison now confirms the
+  ignored local replacement credential matches the dashboard's current
+  `NiteDSP Fly sending 2026-10-08` key; the old exposed key is still unmatched.
+  `/ready` reports `email_deliverable=true` from key presence alone, not from a
+  send probe.
   Public DNS answers show root SPF, `send` SPF/MX, the Resend DKIM selector,
   and DMARC `p=none`; actual message alignment, provider verification, and
   bounce handling remain unverified. Keep the current DMARC policy. Revocation
