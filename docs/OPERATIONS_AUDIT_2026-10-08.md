@@ -171,7 +171,9 @@ choice.
   metadata maps to `nite-submit` and `smart-sample-manager`, respectively, but
   the catalog products are archived. Their URLs have been removed from source;
   production checkout now also requires replacement Stripe-hosted URLs in
-  Vercel. A live
+  Vercel. The fail-closed website build deployed on 2026-10-10; both apex and
+  `www` pricing pages return HTTP 200, show beta access, and contain neither
+  deactivated Payment Link. A live
   Checkout Session read returned three records: one paid and two expired, with
   no open sessions. The restricted key cannot read prices, Payment Links, or
   the Stripe account object (HTTP 403). Sandbox cleanup deactivated seven old
