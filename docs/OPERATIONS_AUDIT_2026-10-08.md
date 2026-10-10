@@ -310,27 +310,26 @@ choice.
   production licences. Do not rotate the production signer until the client
   trust-key lifecycle is ready, because an immediate change can invalidate
   existing licence signatures.
-- [ ] **Stripe webhook secret rotation:** the live signing secret was pasted in
-  the conversation and must be replaced. The prepared
-  `/tmp/nitedsp-operations-credentials.sh` wizard captures the new value hidden,
-  stores it only in an ignored mode-600 admin file, updates Fly, and verifies the
-  production verifier with a signed synthetic `account.updated` event. The
-  backend records one ignored webhook receipt, with no purchase or charge. It
-  then prompts the owner to expire the exposed secret.
+- [x] **Stripe webhook secret rotation:** the live signing secret was exposed
+  in the conversation and replaced on 2026-10-10 using the hidden-input
+  credential wizard. The replacement is stored only in the ignored,
+  mode-600 `backend/admin/.env.operations-stripe-webhook-replacement` file and
+  was installed in Fly. The wizard's signed synthetic `account.updated` check
+  passed against production, where the event is ignored without creating a
+  purchase or charge; its final completion also followed the owner's
+  confirmation that the previous secret was expired. The secret value is not
+  recorded here.
   A live-dashboard check on 2026-10-10 confirms the active destination is
   `https://api.nitedsp.co.uk/webhooks/stripe` with four events. The separate
   Stripe sandbox has its own account context; rotate the live destination shown
-  above, not a sandbox endpoint.
-  The destination's Event deliveries view showed no deliveries under its
-  current filters on 2026-10-10, so Stripe-to-backend delivery remains unproved.
-  Fly confirms `STRIPE_WEBHOOK_SECRET` is deployed, but its secret listing does
-  not expose a rotation timestamp or the value. The ignored replacement file is
-  absent, so the new signer and synthetic-event check remain unverified; treat
-  the exposed signer as active until the wizard verifies its replacement.
+  above, not a sandbox endpoint. The dashboard's Event deliveries view showed
+  no deliveries under its current filters on 2026-10-10, so a real Stripe-to-
+  backend delivery remains unproved even though the production verifier
+  accepted the replacement signature.
   The saved test key returns HTTP 403 when asked to list sandbox webhook
-  endpoints, so test-mode routing cannot be read back with that key.
-  The wizard has not run; do not enable checkout until the replacement is
-  verified.
+  endpoints, so test-mode routing cannot be read back with that key. Checkout
+  remains disabled pending the separate complete test purchase, legal review,
+  and release checks.
 - [ ] **Licensing key provenance:** the lifecycle design says no production key
   was generated, while the deployed backend requires a signing key. Reconcile
   that document with the live secret's origin and check whether the removed
