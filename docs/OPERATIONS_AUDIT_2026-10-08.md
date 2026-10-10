@@ -14,6 +14,13 @@ stopped after the readiness request. The exact registered company name, number,
 and office address are still outstanding, so this deployment does not approve
 sales.
 
+A config-only Fly release (version 37) reused that image and set
+`min_machines_running=1` while keeping autostart and autostop enabled. Fly now
+reports one AMS machine started with a passing check and one stopped; `/ready`
+still returns HTTP 200 with database, storage, and email healthy and all sales
+gates false. One warm machine should avoid the observed cold start while it is
+healthy. Sustained memory headroom is still unmeasured.
+
 The platform responds in production, but public payment readiness has not been
 proved. Website and backend checkout are disabled. The five old live Stripe
 Payment Links were deactivated on 2026-10-08 after explicit owner approval;
@@ -446,6 +453,10 @@ choice.
   The 2026-10-08 deployment completed its migration command and rolling update;
   both machines now use image
   `registry.fly.io/nite-dsp-backend:deployment-01M4E632FPNQ7R4D23ZCTEEGF2`.
+  On 2026-10-10, a config-only version 37 deployment reused the current image
+  and set `min_machines_running=1`. `flyctl config validate` passed, the
+  production smoke check passed, and a follow-up status showed one started
+  machine with a passing check and one stopped.
   The image replaced for this rollout was
   `registry.fly.io/nite-dsp-backend:deployment-01M4E2NXH9S0E5AHHB3FFMJ2Z6`;
   redeploy that image with `flyctl deploy --image registry.fly.io/nite-dsp-backend:deployment-01M4E2NXH9S0E5AHHB3FFMJ2Z6 --config fly.toml --dockerfile Dockerfile --yes` to restore the prior code. Rollback preserves current secrets and app config. Immediately after deployment, both machines were started with passing health checks; `/health` and `/ready` returned HTTP 200. The older image before the replaced rollout was `registry.fly.io/nite-dsp-backend:deployment-01M488Y13N9CV9M68EA7XA20WW`.
@@ -453,8 +464,9 @@ choice.
   auto-stop enabled. On 2026-10-10, Fly listed both AMS machines stopped before a
   public `/ready` request; the request returned HTTP 200 in 5.32 seconds, and a
   follow-up list showed one started machine with a passing check and one stopped.
-  This proves one readiness cold start, but not sustained memory headroom or a
-  staging rollback. Review both before increasing production workload.
+  The latest config keeps one machine running while the other may stop, and
+  Fly reports one started/passing and one stopped. Sustained memory headroom and
+  a staging rollback remain unproved; review both before increasing workload.
 - [x] **Rate-limit client identity:** production DNS and HTTPS resolve directly
   to Fly, so the backend now keys requests on Fly's `Fly-Client-IP` header and
   ignores `X-Forwarded-For` there. Focused tests cover spoofed and missing
