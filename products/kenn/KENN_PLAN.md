@@ -1270,10 +1270,9 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   - **Fused-list cap (40, all from the embedding top 60):** a keyword-only match can never survive it, but removing
     it made everything worse (questions.json top-1 0.7586 → 0.7414, probe concepts 112 → 108, precedence 0/4). It is
     shielding answers from the synonym noise; leave it until the synonym fix lands.
-- [ ] Excerpt window: start each excerpt at the first sentence holding a query word instead of the chunk's first
-  400 characters. Simulated 8 Oct: pre/post sends 2/4 → 4/4 concepts, probe 112 → 115 of 163, questions.json
-  coverage unchanged (gains psy-equal-loudness, dyn-attack-release, eq-kick-bass-phase; losses psy-itd-ild,
-  space-haas-mono). First of the three because it is the largest predicted gain with no coverage cost.
+- [x] Excerpt window: start each excerpt at the first sentence holding a query word instead of the chunk's first
+  400 characters. Benched 9–10 Oct (`draft/excerpt-window` `0db3006f`): gained 2.7 on probe (32.0 → 34.7) but lost 3
+  on held-out (45.0 → 42.0). Shelved: not merged (`kenn-evaluation-data/2026-10-09-excerpt-window-bench/results.md`).
 - [ ] Topic synonym inflation: the 49 routing and mixing terms and the 3.45 topic multiplier still lift the short
   Sends And Returns note to 688 on routing-flavoured questions, and the mastering synonyms bury the oversampling
   note. Weight synonym terms at about ×0.35 and stem the user's own words, together: ×0.35 alone lifts oversampling
@@ -1287,6 +1286,13 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   with no figure, unit, file name, instruction or product. Anything else goes through the full gate as before. Probe
   and held-out reports count declines apart from model answers. Known leftovers, harmless: "a dozen"/"a few" still
   pass, and "silent on"/"cannot say" declines fall to the template.
+- [x] Candidate qualification bench 10 Oct 2026 (`draft/excerpt-id-format` `9b8f6c9f`):
+  Combines knowledge misroutes (`a4de7e65`), excerpt ID prefix resolution and alias tolerance (`7f687f2b`), typo query recovery (`8d96ee79`), figure-evidence (`e44a0f1e`, `29bcf89f`, `d2ddca03`), and cleaned background upgrade dispatch (`9b8f6c9f`).
+  Local 4B model (`qwen3:4b-instruct-2507-q4_K_M`), fake Live, Live closed, mains power, pinned index `v-5f6964698b76`, `KENN_LLM_CACHE=0`.
+  - **Probe:** 36, 33, 35 of 44 within 15 s (mean 34.67 / 44, 78.8%). **Passed** probe bar (>= 31) across three consecutive runs.
+  - **Held-out:** 49, 38, 46 of 72 within 15 s (mean 44.33; total model deliveries 52, 44, 49; median final seconds 7.15 s, 10.72 s, 9.18 s). Run 1 achieved 52 model deliveries (72.2%), but 3 delivered answers landed between 15.1–17.8 s due to host swap memory pressure.
+  - **Rejections:** Unshown excerpt citations dropped from 4–5 to 0 in runs 1 and 3; weak match / intent guard misses dropped from 5 to 2.
+  - **Blind grading:** Generated `heldout-grading.html` (55 differing questions, 54 with model answers) for Jack's blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench/`).
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
