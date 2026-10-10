@@ -6,7 +6,10 @@
                                 [--allow-template] [--note TEXT]
 
 Needs the companion already running with the model on (KENN_LLM_ENABLED=1, and KENN_LLM_BACKGROUND=1 for the
-browser path). Run it with KENN_LLM_CACHE=0 on the server so a cached reply cannot pass as a model answer.
+browser path). Run it with KENN_LLM_CACHE=0 on the server so a cached reply cannot pass as a model answer. Add
+KENN_EXPOSE_REJECTED_ANSWERS=1 to get the refused figures and the refused text into each row and the review sheet.
+Without it the background path reports no refused figures at all, so `rejected_text_exposed` is false on every row
+and an `unsupported_measurements` of 0 there means "not told", not "none refused".
 
 **Why it records who wrote the answer.** On 3 Oct the companion was answering from the grounded template with the
 model off, and a template reply looks like a real one. Every row says whether the model was attempted and whether its
@@ -173,6 +176,9 @@ def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
         "unsupported_measurements": len(refused),
         "refused_figures": refused,
         "rejected_answer": str(upgrade.get("rejected_answer") or ""),
+        # The key is only there when the server ran with the flag and the gate kept the text, so a run can be
+        # told apart from an 8 Oct one where every row read 0 because nothing was sent.
+        "rejected_text_exposed": "refused_figures" in upgrade,
         "fabricated_sources": len(validation.get("fabricated_sources") or []),
         "template_seconds": template_seconds,
         "final_seconds": upgrade.get("seconds_from_ask", template_seconds),

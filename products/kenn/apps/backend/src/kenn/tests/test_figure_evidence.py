@@ -74,10 +74,11 @@ def index(monkeypatch):
     return use
 
 
-def _refused(answer: str, results: list[dict], query: str = QUERY) -> list[str]:
+def _refused(answer: str, results: list[dict], query: str = QUERY, question: str = "") -> list[str]:
+    """`query` is the history-expanded search string the gate is called with, `question` what the producer typed."""
     return generated_answer_validation(
         query, [(SCORE, chunk) for chunk in results], answer,
-        route="production", confidence="high", answer_mode="quick_fix",
+        route="production", confidence="high", answer_mode="quick_fix", question=question,
     )["unsupported_measurements"]
 
 
@@ -105,9 +106,24 @@ def test_a_figure_only_an_unshown_note_states_is_still_refused(index):
 
 def test_a_figure_the_producer_typed_is_not_one_the_model_invented(index):
     # eq-kick-bass-phase, 8 Oct: all 8 answers that said the producer's "60 Hz" back were refused.
-    query = "Why do my kick and bass cancel around 60 Hz?"
-    assert _refused("The cancel around 60 Hz is the two waves out of phase.", [OTHER_NOTE], query) == []
-    assert _refused("The cancel around 80 Hz is the two waves out of phase.", [OTHER_NOTE], query) == ["80hz"]
+    question = "Why do my kick and bass cancel around 60 Hz?"
+    answer = "The cancel around {} is the two waves out of phase."
+    assert _refused(answer.format("60 Hz"), [OTHER_NOTE], question, question) == []
+    assert _refused(answer.format("80 Hz"), [OTHER_NOTE], question, question) == ["80hz"]
+
+
+def test_a_figure_from_an_earlier_turn_is_not_accepted_on_the_follow_ups_say_so(index):
+    # On a follow-up the gate's query is search_query_with_history(), which carries the earlier turn's words. Read
+    # as "the producer's question", it let the 300 Hz from the last turn through on a turn that never mentioned it
+    # (read-only review of this branch, 10 Oct 2026).
+    expanded = "cut 300 Hz on the bass by 4 dB? and the guitars?"
+    assert _refused("Cut 300 Hz on the guitars too.", [OTHER_NOTE], expanded, "and the guitars?") == ["300hz"]
+
+
+def test_without_the_producers_question_no_figure_passes_on_the_query_alone(index):
+    # A caller that does not pass `question` gets the stricter gate, never the history-expanded one.
+    question = "Why do my kick and bass cancel around 60 Hz?"
+    assert _refused("The cancel around 60 Hz is the two waves out of phase.", [OTHER_NOTE], question) == ["60hz"]
 
 
 def test_a_shown_manual_page_does_not_open_the_rest_of_the_manual(index):
@@ -119,6 +135,37 @@ def test_a_shown_manual_page_does_not_open_the_rest_of_the_manual(index):
 def test_the_stream_guard_allows_the_figures_the_final_gate_allows(index):
     # The guard stops a stream for good, so a figure it refuses and the final gate would accept costs the answer.
     index(SHOWN, SIBLING, OTHER_NOTE)
-    allowed = evidence_measurements([(SCORE, SHOWN)], query="Is 60 Hz too low for the sub?")
+    allowed = evidence_measurements([(SCORE, SHOWN)], question="Is 60 Hz too low for the sub?")
     assert {"60hz", "-1dbtp", "-14lufs"} <= allowed
     assert "3db" not in allowed
+
+
+def test_a_follow_up_reaches_make_answer_as_typed_beside_the_expanded_search_string(tmp_path, monkeypatch):
+    # make_answer() searches and writes with the history-expanded string, but the gate inside it takes figures from
+    # `question`. Wired to the expanded string, the 300 Hz from the turn before rides in on "and the guitars?".
+    from kenn.core import chat_answer, chat_retrieval, route_log, session_memory
+    from kenn.tests.test_streamed_generation_prefix_guard import CHUNKS
+
+    monkeypatch.setattr(session_memory, "DB_PATH", tmp_path / "memory.db")
+    monkeypatch.setattr(route_log, "record", lambda *a, **k: None)
+    monkeypatch.setattr(chat_answer, "_critique_and_save_trace", lambda **kwargs: None)
+    terms = {"total_docs": 0, "avg_len": 1.0, "lengths": [], "idf": {}, "postings": {}}
+    for module in (chat_retrieval, chat_answer):
+        monkeypatch.setattr(module, "load_chunks", lambda: [c for _, c in CHUNKS])
+        monkeypatch.setattr(module, "load_terms", lambda: terms)
+        monkeypatch.setattr(module, "search", lambda *args, **kwargs: list(CHUNKS))
+    called: dict = {}
+
+    def make_answer(query, *args, **kwargs):
+        called.update(query=query, question=kwargs.get("question"))
+        return "Short answer: a model answer.", True
+
+    monkeypatch.setattr(chat_answer, "make_answer", make_answer)
+    history = [
+        {"role": "user", "content": "Should I cut 300 Hz on the bass by 4 dB?"},
+        {"role": "assistant", "content": "Try a narrow cut there and listen in the mix."},
+    ]
+    chat_answer.answer_payload("and the guitars?", history=history, session_id="follow-up", record_session=False)
+
+    assert "300 Hz" in called["query"], "the follow-up has to be history-expanded or this proves nothing"
+    assert called["question"] == "and the guitars?"

@@ -1947,9 +1947,9 @@ def _build_synthesis_messages(
     # same text the gate checks, specialist observations included, so nothing on it can be rejected. Only
     # unit-bearing values are listed because those are all the gate checks; a 4:1 ratio or "step 3" is left
     # alone. Imported here because chat_grounding imports this module at load time.
-    # Since 10 Oct 2026 the gate also accepts figures from the question and from the unshown sections of each shown
-    # note (_accepted_measurements). Those are left off this list on purpose: a number from a section the model
-    # never read comes with no sentence saying what it measures.
+    # Since 10 Oct 2026 the gate also accepts figures from the producer's question and from the rest of each shown
+    # note: its other sections and the tail past the excerpt cut (_accepted_measurements). Those are left off this
+    # list on purpose: a number from text the model never read comes with no sentence saying what it measures.
     from kenn.core.chat_grounding import _gate_evidence_text, measurements_in_order
 
     # Specialist figures go first. The cap below keeps the head of the list, and a stem-scan or classifier reading

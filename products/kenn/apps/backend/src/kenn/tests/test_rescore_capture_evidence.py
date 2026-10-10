@@ -120,6 +120,11 @@ def _replay_to(monkeypatch, results: list[tuple[float, dict]]) -> None:
     would stall a shared machine.
     """
     monkeypatch.setattr(module, "_replay_results", lambda query, chunks, terms: results)
+    # Since 10 Oct 2026 the gate also reads a shown note's other sections from the index, so that copy has to be
+    # the replayed chunks too, or the real sidechain note's figures land in evidence_measurements.
+    from kenn.core import chat_grounding
+
+    monkeypatch.setattr(chat_grounding, "load_chunks", lambda: [chunk for _score, chunk in results])
 
 
 def test_a_stale_capture_field_does_not_make_a_grounded_answer_look_like_a_leak(monkeypatch) -> None:

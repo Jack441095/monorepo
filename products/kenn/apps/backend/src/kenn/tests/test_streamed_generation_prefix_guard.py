@@ -21,7 +21,7 @@ from __future__ import annotations
 import re
 import time
 
-from kenn.core import chat_answer
+from kenn.core import chat_answer, chat_grounding
 from kenn.core.chat_grounding import (
     _STREAM_GUARD_CONTEXT_CHARS,
     StreamedAnswerGuard,
@@ -142,11 +142,14 @@ def _model_tokens(text: str) -> list[str]:
 
 def _fake_retrieval(monkeypatch) -> None:
     monkeypatch.setattr(chat_answer, "load_chunks", lambda: list(CHUNKS))
+    # The gate reads a shown note's other sections from the index (10 Oct 2026). Point it at the fixture too, or a
+    # checkout with the real corpus accepts whatever figures the real sidechain note happens to hold.
+    monkeypatch.setattr(chat_grounding, "load_chunks", lambda: [chunk for _score, chunk in CHUNKS])
     monkeypatch.setattr(chat_answer, "load_terms", lambda: TERMS)
     monkeypatch.setattr(chat_answer, "search", lambda *a, **k: list(CHUNKS))
 
 
-def _stream(monkeypatch, fake_stream):
+def _stream(monkeypatch, fake_stream, query: str = QUERY, history: list | None = None):
     """The answer stream with retrieval, the model and the on-disk writers faked."""
     monkeypatch.setattr(chat_answer, "llm_enabled", lambda: True)
     monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *a, **k: True)
@@ -155,7 +158,7 @@ def _stream(monkeypatch, fake_stream):
     # Traces, citation trust and session memory are written to the repo's data dir; a test must not.
     monkeypatch.setattr(chat_answer, "_critique_and_save_trace", lambda **kw: kw.get("confidence", ""))
     monkeypatch.setattr(chat_answer, "_update_session", lambda *a, **k: None)
-    return chat_answer._answer_payload_stream_raw(QUERY, allow_llm=True)
+    return chat_answer._answer_payload_stream_raw(query, history=history, allow_llm=True)
 
 
 def _template(monkeypatch) -> str:
@@ -322,6 +325,56 @@ def test_a_mid_stream_claim_that_the_live_set_changed_never_reaches_the_producer
     assert claims_live_change(candidate) is True, "the fixture has to trip the regex or the test proves nothing"
     assert metadata["answer"] == template
     assert any("claims it changed the Live set" in warning for warning in validation["warnings"]), validation
+
+
+def test_a_figure_the_producer_typed_gets_past_the_guard_and_the_final_gate(monkeypatch) -> None:
+    """Both halves take the producer's question, so the "200 ms" they asked about can be said back to them.
+
+    The guard and the final gate have to be built from the same question. A guard that never saw it stops the
+    stream on the producer's own number for good, and a final gate that never saw it throws away an answer the
+    guard already let out (read-only review of the figure-evidence branch, 10 Oct 2026).
+    """
+    question = "Is a 200 ms release too slow for sidechain compression on bass?"
+    candidate = ACCEPTED_ANSWER.replace("150 ms", "200 ms")
+    assert "200ms" not in _measurements(" ".join(chunk["text"] for _score, chunk in CHUNKS)), "the note must not say it"
+
+    def fake_stream(*args, **kwargs):
+        for token in _model_tokens(candidate):
+            yield {"event": "token", "token": token}
+
+    text, metadata = _text_and_metadata(list(_stream(monkeypatch, fake_stream, query=question)))
+    validation = metadata["generation_validation"]
+
+    assert text == candidate, text
+    assert validation["accepted"] is True, validation
+    assert metadata["answer"] == candidate.strip()
+
+
+def test_a_figure_from_the_turn_before_still_stops_a_follow_up_stream(monkeypatch) -> None:
+    """The history-expanded search string is not the producer's question, so its "200 ms" is not accepted.
+
+    On "and on the drums?" the stream's relevance query carries the earlier turn's words. Handing that to the guard
+    would let the model repeat a figure the producer floated last turn as if this turn's sources backed it.
+    """
+    history = [
+        {"role": "user", "content": "Is a 200 ms release too slow for sidechain compression on bass?"},
+        {"role": "assistant", "content": "Start the release at 150 ms and set the ratio to 4:1."},
+    ]
+    candidate = ACCEPTED_ANSWER.replace("release to 150 ms so", "release to 200 ms so")
+
+    def fake_stream(*args, **kwargs):
+        for token in _model_tokens(candidate):
+            yield {"event": "token", "token": token}
+
+    text, metadata = _text_and_metadata(
+        list(_stream(monkeypatch, fake_stream, query="and on the drums?", history=history))
+    )
+    validation = metadata["generation_validation"]
+
+    assert metadata["used_history"] is True, "the follow-up has to be history-expanded or this proves nothing"
+    assert "200" not in text, text
+    assert validation["accepted"] is False
+    assert validation["unsupported_measurements"] == ["200ms"]
 
 
 def test_the_full_gate_still_rejects_at_completion_when_evidence_overlap_falls_late(monkeypatch) -> None:

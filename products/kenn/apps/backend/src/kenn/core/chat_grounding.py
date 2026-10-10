@@ -423,10 +423,11 @@ def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) ->
     `unattributed` here while still passing the aggregate unsupported-measurement check, which sees the wider set.
 
     Uncited claims are counted and returned but do not warn. The aggregate measurement check already rejects any
-    number found nowhere in the evidence, so a second warning on the same numbers would reject nothing new while
-    dropping every currently-accepted answer until an 8B model has learned the rule. The count is what keeps that
-    reversible: promote `uncited` to a warning on the day the citation rate justifies it. Same reasoning keeps
-    `ambiguously_attributed` silent -- the number is in the evidence, so no existing warning could fire on it.
+    number found nowhere in the evidence, the producer's question or the shown notes, so a second warning on the
+    same numbers would reject nothing new while dropping every currently-accepted answer until an 8B model has
+    learned the rule. The count is what keeps that reversible: promote `uncited` to a warning on the day the
+    citation rate justifies it. Same reasoning keeps `ambiguously_attributed` silent -- the number is in the
+    evidence, so no existing warning could fire on it.
     """
     bodies: dict[str, str] = {}
     for _score, chunk, body in shown:
@@ -766,8 +767,8 @@ class StreamedAnswerGuard:
     had both finished. We cannot make that gate incremental, but two of its eight warnings are prefix-sound:
 
     - unsupported measurements, because the accepted side of `_measurements(answer) - accepted` (the shown
-      evidence, the question and the shown notes in full, see _accepted_measurements) is fixed before the first
-      token while the answer side only grows;
+      evidence, the producer's question and the shown notes in full, see _accepted_measurements) is fixed before
+      the first token while the answer side only grows;
     - claims_live_change, because a regex match inside a prefix is still a match inside the finished answer.
 
     The other three are not: evidence_overlap divides by an answer_terms set that grows with every token, and
@@ -850,9 +851,10 @@ def _shown_note_text(shown: list[tuple[float, dict, str]]) -> str:
     # The shown chunks' own full text goes in as well as the index's copy. A result list built outside
     # load_chunks() (a test, or an index reloaded after the search ran) would otherwise lose its own sections.
     texts = [str(chunk.get("text") or "") for _score, chunk, _body in shown if chunk.get("kind") == "note"]
-    # A plain scan of the whole index, no cache. On v-5f6964698b76 (3974 chunks) the scan took 0.1 ms and the
-    # measurement pass over the four largest notes (22,664 chars) 0.85 ms, measured 10 Oct 2026 with a bench
-    # running. The gate runs at most three times per answer, and the answer takes seconds to generate.
+    # load_chunks() is cached, but picking out the sections by source is a fresh pass over all of them every call.
+    # On v-5f6964698b76 (3974 chunks) that pass took 0.1 ms and the measurement pass over the four largest notes
+    # (22,664 chars) 0.85 ms, measured 10 Oct 2026 with a bench running. The gate runs at most three times per
+    # answer, and the answer takes seconds to generate, so an index by source would be a cache nobody needs.
     texts += [
         str(chunk.get("text") or "")
         for chunk in load_chunks()
@@ -871,24 +873,33 @@ def _shown_note_text(shown: list[tuple[float, dict, str]]) -> str:
 # This does not reopen the 2 Oct "wide" bug described above _evidence_chunks. There, a "3 dB" passed on chunk #9,
 # which the model was never shown. Here the extra figures come only from notes the model saw part of. Manual pages
 # are left out because every manual chunk shares one source, and "the whole manual" would accept almost any Hz.
-# Three costs we accept:
+#
+# The question is the producer's words this turn, passed in separately, and not the `query` every other check
+# reads. On a follow-up that query is search_query_with_history(): earlier turns, a Mix Review context turn, the
+# turn being corrected, all kept whole. Taking figures from it would let "and the guitars?" after "cut 300 Hz on the
+# bass by 4 dB?" pass 300 Hz and 4 dB for the guitars, and a Mix Review turn would pass -7.9 LUFS the producer
+# never typed (read-only review of this branch, 10 Oct 2026).
+#
+# Four costs we accept:
 # - The context is not checked. The note may give the same number for something else, for example -18 dBFS as a
 #   gain-staging target where the answer uses -18 dB as a threshold.
 # - A producer's proposed setting echoed back as advice ("should I boost 5 kHz by 3 dB?" "yes, 3 dB") now passes.
+# - So does a figure the producer rules out ("no, not 300 Hz, I meant 2 kHz"). An answer that says 300 Hz there
+#   is most often saying "not 300 Hz", and the gate cannot tell either way without reading the sentence.
 # - The prompt's allowed-figures list in llm_rewrite does not grow to match. A bare number from a section the model
 #   never read has no sentence saying what it measures, so the gate stays wider than the list, never narrower.
 #
 # Only the measurement check widens. Overlap and product checks still read evidence_text alone, and the query is
 # still kept out of overlap (see the comment in generated_answer_validation). verify_claim_citations still reads the
 # excerpts only: a whole-note figure tagged with an excerpt id is still a misattribution, because the model cannot
-# have read it in that excerpt.
+# have read it in that excerpt. So is a question figure tagged that way, so the widening helps untagged claims only.
 def _accepted_measurements(
-    query: str, shown: list[tuple[float, dict, str]], evidence_text: str
+    question: str, shown: list[tuple[float, dict, str]], evidence_text: str
 ) -> set[str]:
     """Every measurement an answer may carry: those in the evidence text, the producer's question, and the shown notes in full."""
     return (
         _measurements(evidence_text)
-        | _measurements(query)
+        | _measurements(question)
         | _measurements(_shown_note_text(shown))
     )
 
@@ -896,18 +907,18 @@ def _accepted_measurements(
 def evidence_measurements(
     results: list[tuple[float, dict]],
     *,
-    query: str,
+    question: str,
     timeline_context: str | None = None,
     additional_evidence_text: str | None = None,
 ) -> set[str]:
     """Every measurement the gate will accept in an answer, keyed the way the gate keys them.
 
-    The streamed guard is built from this, so it has to take the same query the final gate is called with, or a
-    figure from the question would stop the stream that the final gate would have let through.
+    The streamed guard is built from this, so it has to take the same question the final gate is called with, or a
+    figure the producer typed would stop the stream that the final gate would have let through.
     """
     shown = _evidence_chunks(results)
     return _accepted_measurements(
-        query, shown, _gate_evidence_text(shown, timeline_context, additional_evidence_text)
+        question, shown, _gate_evidence_text(shown, timeline_context, additional_evidence_text)
     )
 
 
@@ -1152,12 +1163,17 @@ def generated_answer_validation(
     answer_mode: str,
     timeline_context: str | None = None,
     additional_evidence_text: str | None = None,
+    question: str = "",
 ) -> dict:
     """Gate generated prose against the same evidence used for retrieval.
 
     This is deliberately deterministic and provider-independent, so local,
     remote, sync, streaming, and voice generation cannot select different
     standards. Failed generated text is discarded before it reaches a caller.
+
+    `question` is the producer's words this turn, as typed; its figures are accepted in the answer. It is not
+    `query`, which is history-expanded on a follow-up (see _accepted_measurements). Left empty, no figure is
+    accepted on the question's say-so, which is the stricter gate.
     """
     grounding = grounding_report(
         query,
@@ -1193,7 +1209,7 @@ def generated_answer_validation(
         else 0.0
     )
     unsupported_measurements = sorted(
-        _measurements(answer) - _accepted_measurements(query, shown, evidence_text)
+        _measurements(answer) - _accepted_measurements(question, shown, evidence_text)
     )
     # The labels the model was actually given, so a citation is only fabricated if the filename was not on
     # screen. Derived from the same shown list, not from what retrieval could have supplied.

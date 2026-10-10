@@ -34,8 +34,9 @@ ones -- or that predates the fields entirely -- produces a warning above the num
 figures that were untrustworthy on 2 Oct were untrustworthy for precisely this reason.
 
 The per-item numeric column is not the gate's. The gate answers "is every measurement in the answer in the shown
-evidence"; this additionally answers "is it in the *gold* chunk", which is the stricter question the eval set exists
-to ask, and it is the one that separates a note-quoting answer from a training-prior number.
+evidence, the producer's question or the rest of a shown note"; this additionally answers "is it in the *gold*
+chunk", which is the stricter question the eval set exists to ask, and it is the one that separates a note-quoting
+answer from a training-prior number.
 """
 
 from __future__ import annotations
@@ -122,6 +123,7 @@ def _gate_inputs(query: str, results: list[tuple[float, dict]], timeline_context
 
 def score_item(row: dict, chunks: list[dict], terms: dict) -> dict:
     """One capture row, re-judged by today's gate."""
+    from kenn.core.chat_grounding import evidence_measurements as gate_evidence_measurements
     from kenn.core.chat_grounding import generated_answer_validation
     from kenn.core.chat_retrieval import source_label
     from kenn.llm.llm_rewrite import model_evidence
@@ -147,6 +149,8 @@ def score_item(row: dict, chunks: list[dict], terms: dict) -> dict:
         answer_mode=answer_mode,
         timeline_context=timeline_context or None,
         additional_evidence_text=additional or None,
+        # A capture's question is what the producer typed, which is what the live gate takes figures from.
+        question=query,
     )
 
     _block, shown = model_evidence(results, source_label, max_chars=_gate_budget_chars())
@@ -167,7 +171,17 @@ def score_item(row: dict, chunks: list[dict], terms: dict) -> dict:
     else:
         evidence_source = "none"
         evidence_text = ""
-    evidence_measurements = _measurement_keys(f"{evidence_text} {timeline_context} {additional}")
+    if evidence_source == "recomputed":
+        # The gate's own accepted set, so this column cannot disagree with its unsupported_measurements. Since
+        # 10 Oct 2026 that set takes in the question and the rest of each shown note, which the excerpts alone
+        # do not hold.
+        evidence_measurements = gate_evidence_measurements(
+            results, question=query, timeline_context=timeline_context or None,
+            additional_evidence_text=additional or None,
+        )
+    else:
+        # No replay to widen from: the captured text, or nothing, is all there is to read figures out of.
+        evidence_measurements = _measurement_keys(f"{evidence_text} {timeline_context} {additional}")
 
     answer_measurements = sorted(_measurement_keys(answer))
     gold_id = str(row.get("gold_chunk_id") or "")

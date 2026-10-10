@@ -966,6 +966,7 @@ def make_answer(
     timeline_context: str | None = None,
     answer_mode: str = "",
     session_id: str = "",
+    question: str = "",
 ) -> tuple[str, bool]:
     import time as _time, sys as _sys
     _ma_t0 = _time.perf_counter()
@@ -1068,6 +1069,9 @@ def make_answer(
                 answer_mode=mode,
                 timeline_context=timeline_context,
                 additional_evidence_text=specialist_evidence,
+                # The producer's own words, not `query`: on a follow-up that is the history-expanded search
+                # string, and the gate must not accept a figure from an earlier turn on the question's say-so.
+                question=question,
             )
 
         # The 128-token cap leaves most answers stopped mid-sentence. Judge and show the cleaner ending, but
@@ -1962,7 +1966,7 @@ def _answer_payload_stream_raw(
         stream_guard = StreamedAnswerGuard(
             evidence_measurements(
                 results,
-                query=relevance_query,
+                question=query,
                 timeline_context=timeline_context,
                 additional_evidence_text=specialist_evidence,
             )
@@ -2019,6 +2023,8 @@ def _answer_payload_stream_raw(
                 answer_mode=answer_mode,
                 timeline_context=timeline_context,
                 additional_evidence_text=specialist_evidence,
+                # Same question the guard above was built with, or the two disagree about a figure the producer typed.
+                question=query,
             )
             generation_validation = {
                 "attempted": True,
@@ -2723,6 +2729,7 @@ def _answer_payload_raw(
             timeline_context=timeline_context,
             answer_mode=answer_mode,
             session_id=session_id,
+            question=query,
         )
     finally:
         _last_outcome.hold = False
