@@ -17,12 +17,6 @@ class ParaphraseRequest(BaseModel):
     text: str = Field(min_length=1, max_length=8000)
 
 
-class ParaphraseCheckoutRequest(BaseModel):
-    """Start an anonymous pay-what-you-like purchase."""
-
-    tier: Literal["gbp-1", "gbp-3", "gbp-10"]
-
-
 class ParaphraseRedemptionRequest(BaseModel):
     """Exchange a completed transaction hint for a session unlock token."""
 

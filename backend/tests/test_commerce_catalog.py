@@ -894,7 +894,7 @@ def test_delayed_payment_fulfils_once_when_two_events_share_a_session(client, db
     assert db_session.query(models.Entitlement).count() == 1
 
 
-def test_paraphrase_paid_session_records_minor_units_and_can_be_redeemed(client, db_session):
+def test_legacy_paraphrase_paid_session_remains_redeemable(client, db_session):
     from app import paraphrase_orders
 
     payload = _completed_payload("evt_paraphrase", "cs_paraphrase", product_id="nite-paraphrase")
@@ -910,26 +910,6 @@ def test_paraphrase_paid_session_records_minor_units_and_can_be_redeemed(client,
     assert paraphrase_orders.redeem(db_session, "other-browser-hint") is None
     assert db_session.query(models.User).count() == 0
     assert db_session.query(models.Entitlement).count() == 0
-
-
-def test_paraphrase_checkout_uses_stripe_metadata_and_success_hint(monkeypatch):
-    from app import paraphrase_orders
-
-    monkeypatch.setattr(app_settings, "paraphrase_price_gbp_3", "price_paraphrase_3")
-    calls = []
-
-    class Provider:
-        def create_checkout_url(self, price_id, **kwargs):
-            calls.append((price_id, kwargs))
-            return "https://checkout.stripe.com/paraphrase"
-
-    url, hint = paraphrase_orders.create_checkout(Provider(), "gbp-3")
-    assert url == "https://checkout.stripe.com/paraphrase"
-    assert calls[0][0] == "price_paraphrase_3"
-    assert calls[0][1]["metadata"] == {"product_id": "nite-paraphrase", "paraphrase_hint": hint}
-    assert calls[0][1]["success_url"].endswith("?paraphrase_hint=" + hint)
-
-
 def test_failed_flush_rolls_back_purchase_before_retry(client, db_session, monkeypatch):
     # A SQL failure aborts the transaction; recording an error needs a fresh one.
     import app.stripe_commerce as module

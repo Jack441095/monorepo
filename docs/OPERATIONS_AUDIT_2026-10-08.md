@@ -42,9 +42,11 @@ Checkboxes distinguish finished source work from outstanding deployed behavior.
 | KENN | Research and development; no sale or price promised | `kenn` |
 
 The owner confirmed these names on 2026-10-08. Current website copy follows them.
-Para-phase payment prompts and the unused donation component were removed. Old
-orders and previously issued unlock tokens remain readable; catalog IDs and
-routes remain stable so existing licences and purchase metadata still work.
+Para-phase payment prompts and the unused donation component were removed. Its
+new paid Checkout route and £1/£3/£10 price settings are now removed as well.
+The historical webhook and redemption path remain so old paid orders and
+previously issued unlock tokens keep working during their normal lifetimes.
+The internal catalog ID remains stable for those historical payments.
 Thursday is internal infrastructure. Audio_Too remains a studio workspace.
 
 ## Verified infrastructure
@@ -456,6 +458,7 @@ choice.
 | Controlled sign-in email | Resend reports delivered at 14:18 BST; the 14:10 BST screenshot predates the probe, while inbox placement and dashboard/API workspace match remain unverified |
 | Complete customer purchase and inbox delivery | Incomplete; no new paid test purchase made during this audit |
 | Full-refund handling source | Focused commerce, end-to-end, and webhook suites pass (58 tests); production behavior still needs deployment and validation |
+| Para-phase free-only checkout guard | Focused paraphrase and commerce catalog suites pass (51 tests); new paid checkout route is absent, and historical paid-order redemption remains covered |
 
 Audio_Too's initial test collection failed because the shell could not import
 the repository's `nite_core` package. Running with `PYTHONPATH=../shared` passed

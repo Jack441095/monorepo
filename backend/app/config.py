@@ -115,11 +115,9 @@ class Settings(BaseSettings):
     # free tier.
     paraphrase_unlock_token: str = ""
 
-    # These are Stripe price IDs; product_id metadata uses our internal slug.
+    # Keep the internal slug so old Stripe payments can still redeem during
+    # their token lifetime; Para-phase no longer creates paid Checkout sessions.
     paraphrase_product_id: str = "nite-paraphrase"
-    paraphrase_price_gbp_1: str = ""
-    paraphrase_price_gbp_3: str = ""
-    paraphrase_price_gbp_10: str = ""
 
     # How long a redeemed paraphrase unlock stays valid (an anonymous
     # session token, deliberately not a perpetual licence).

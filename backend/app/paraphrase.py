@@ -1,4 +1,4 @@
-"""Paraphrase router -- products/nite-paraphrase, Phase 2 + Phase 4.
+"""Free Para-phase router for the hosted rewrite engine.
 
 The browser talks to this backend (POST /v1/paraphrase) which proxies a
 Server-Sent-Events stream from the engine service
@@ -7,21 +7,10 @@ Ollama directly and never stores the pasted text: events are streamed
 through and dropped, matching the "rewrites are not stored" privacy
 promise of the product.
 
-Free tier = `paraphrase_free_daily_limit` rewrites/day per client IP,
-reusing the in-process limiter from rate_limit.py. An unlock token
-(issued by the Phase 4 redemption path after a completed Stripe payment)
-skips the free-tier limit.
-
-Phase 4 adds two anonymous endpoints on the same router -- no sign-in
-required, intentionally separate from the main product's
-users/purchases/entitlements tables:
-  POST /v1/paraphrase/checkout  -> { checkout_url }
-  POST /v1/paraphrase/redemption -> { unlock_token, expires }
-
-The checkout endpoint creates a Stripe transaction with the browser's
-own random `hint` in custom_data + a success_url so the browser can
-return, poll redemption, and receive a signed session token without ever
-touching its email address.
+The free tier allows `paraphrase_free_daily_limit` rewrites per client IP,
+using the in-process limiter from rate_limit.py. Existing paid unlocks remain
+redeemable while their records and short-lived tokens are still valid; this
+router no longer creates new Para-phase charges.
 """
 from __future__ import annotations
 
@@ -38,7 +27,7 @@ from . import paraphrase_orders
 from .config import settings
 from .database import get_db
 from .rate_limit import rate_limit
-from .schemas import ParaphraseCheckoutRequest, ParaphraseRedemptionRequest, ParaphraseRequest
+from .schemas import ParaphraseRedemptionRequest, ParaphraseRequest
 
 router = APIRouter(prefix="/v1/paraphrase", tags=["paraphrase"])
 
@@ -135,42 +124,6 @@ async def paraphrase(
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache"},
     )
-
-
-# ---------------------------------------------------------------------------
-# Phase 4: anonymous pay-what-you-like checkout + redemption
-# ---------------------------------------------------------------------------
-
-@router.post("/checkout")
-async def paraphrase_checkout(
-    body: ParaphraseCheckoutRequest,
-    _: None = Depends(_gate),
-) -> dict:
-    """Create an anonymous Stripe checkout for the chosen tier.
-
-    No authentication. Returns a checkout_url the browser must navigate
-    to. Stripe redirects back to /paraphrase?paraphrase_hint=HINT so
-    the client can poll redemption afterwards.
-
-    Fails loudly:
-      - 503 when stripe_checkout_enabled is False or provider is not
-        configured (estate norm: gate must be explicit).
-      - 400 when the tier is unknown or unconfigured.
-    """
-    from .commerce import get_provider
-
-    if not settings.stripe_checkout_enabled:
-        raise HTTPException(status_code=503, detail="Checkout is not available yet")
-    provider = get_provider()
-    if not provider.configured:
-        raise HTTPException(status_code=503, detail="Checkout is not available yet")
-    try:
-        checkout_url, _hint = paraphrase_orders.create_checkout(provider, body.tier)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except RuntimeError as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
-    return {"checkout_url": checkout_url}
 
 
 @router.post("/redemption")

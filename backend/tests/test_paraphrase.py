@@ -74,6 +74,15 @@ def test_free_tier_allows_three_then_429(client, monkeypatch):
     assert _post(client).status_code == 429
 
 
+def test_free_product_has_no_checkout_route_even_when_stripe_is_enabled(client, monkeypatch):
+    _enable(monkeypatch)
+    import app.config
+
+    monkeypatch.setattr(app.config.settings, "stripe_checkout_enabled", True)
+    response = client.post("/v1/paraphrase/checkout", json={"tier": "gbp-3"})
+    assert response.status_code == 404
+
+
 def test_unlock_header_removes_limit(client, monkeypatch):
     _enable(monkeypatch)
     _stub_engine(monkeypatch)
