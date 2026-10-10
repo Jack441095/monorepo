@@ -2,15 +2,17 @@
 
 ## 2026-10-10 deployment update
 
-Vercel production deployment `dpl_DG5SaW3RHy1Kf5xw8CsLN46Anc4L` serves commit
-`d333e9f`. Its production build guard passed; `/pricing` and `/account` return
-HTTP 200. The account page keeps polling for a new licence after checkout even
-when the customer already has an older licence. The privacy page no longer
-describes NiteDSP as a sole trader, and pricing still has no checkout link.
-Production API readiness remains healthy while checkout, legal approval,
-release readiness, and commercial gates remain false. The exact registered
-company name, number, and office address are still outstanding, so this
-deployment does not approve sales.
+Vercel production deployment `dpl_8V43GpwAvN9rBqR33AbT2JJwFuJa` is READY and
+serves the `nitedsp.co.uk` and `www.nitedsp.co.uk` aliases (created 2026-10-10
+19:16 UTC). After a clean reload, the public Stripe test-success URL displayed
+the warning that no real money was charged and a test session cannot create a
+production licence. The production API `/ready` endpoint returned HTTP 200 with
+database, durable S3 storage, and email delivery configured; checkout, legal
+approval, release readiness, and commercial gates remain false. Fly's current
+image is `deployment-01M4KJR2NQX8MMVEXVDXBB7ZBS`; one machine was started and one
+stopped after the readiness request. The exact registered company name, number,
+and office address are still outstanding, so this deployment does not approve
+sales.
 
 The platform responds in production, but public payment readiness has not been
 proved. Website and backend checkout are disabled. The five old live Stripe
@@ -158,7 +160,8 @@ choice.
   Public tunnel attempts failed to connect and were stopped. Current DNS checks
   also return no A or AAAA answers for `staging.nitedsp.co.uk` or
   `api-staging.nitedsp.co.uk`. Use a maintained staging API and website with
-  separate test keys and database.
+  separate test keys and database. The current Fly app inventory contains only
+  the production backend and database; no hosted staging app exists.
 - [ ] **Operations: bring the free Para-phase engine online.** Production
   `PARAPHRASE_ENABLED` is false. Verify the engine's hosting, service authentication,
   streaming, cancellation, privacy behavior, and daily quota before enabling it.
