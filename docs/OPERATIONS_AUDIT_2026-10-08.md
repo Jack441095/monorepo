@@ -307,15 +307,10 @@ choice.
   bounce handling remain unverified. Keep the current DMARC policy. Revocation
   of the old exposed Resend key remains unconfirmed: its API returned 403 for
   the revoke attempt. The production replacement key works; local rehearsal
-  copies now use it. During a later ignored-file inventory, a command
-  accidentally emitted fragments of ignored rehearsal JSON into tool output,
-  including local signing/session material. The Oct 8 rehearsal files were
-  removed after that incident. A new temporary rehearsal started on Oct 10:
-  the API listens on localhost port 8765, a redirect helper on port 8766, and
-  Stripe CLI is running. Local `/ready` reports local storage, console email,
-  and `checkout_enabled=false`; this does not prove production readiness.
-  After the paid sandbox checkout was verified, the API, redirect helper, and
-  Stripe CLI listener were stopped; ports 8765 and 8766 are clear. The exposed
+  copies use it. The October 8 rehearsal files were removed after a command
+  accidentally printed fragments of ignored JSON, including local signing and
+  session material. A process check after the paid Sandbox checkout found no
+  Stripe CLI listener and no service on ports 8765 or 8766. The exposed local
   signing value could not be compared with Fly's stored production signer;
   verify its provenance through the secret manager before issuing more
   production licences. Do not rotate the production signer until the client
