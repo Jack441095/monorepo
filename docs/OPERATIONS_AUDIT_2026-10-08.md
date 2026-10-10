@@ -176,7 +176,9 @@ choice.
   still uses it.
   The Stripe dashboard confirms Starling Bank Ltd is the default GBP payout
   destination; account digits are intentionally omitted. Receipt/support
-  information still needs review.
+  information still needs review. The 2026-10-10 account-status view lists
+  Payments and Payouts as active with no open verification tasks; the app's
+  closed legal, release, and checkout gates still prevent storefront sales.
 - [ ] **Owner/legal reviewer: approve accurate terms, privacy, and refund copy.**
   The owner confirmed the product brand is NiteDSP and the operator is a UK
   limited company, but the registered name, company number, and registered
