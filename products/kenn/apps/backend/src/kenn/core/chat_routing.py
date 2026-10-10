@@ -1597,6 +1597,14 @@ def route_query(query: str, history: list | None = None, allow_llm: bool = True)
     if conversational_intent(query):
         return "conversation"
     topics = set(query_topics(query))
+    if not topics:
+        try:
+            from kenn.core.chat_retrieval import canonical_audio_query, correct_query_typos, load_terms
+            corrected = correct_query_typos(canonical_audio_query(query), load_terms())
+            if corrected != query:
+                topics = set(query_topics(corrected))
+        except Exception:
+            pass
     if topics & GAME_ROUTE_TOPICS:
         return "game_audio"
     if latest_mix_review_context(history) and (
@@ -1626,12 +1634,15 @@ def route_query(query: str, history: list | None = None, allow_llm: bool = True)
 
     # Fast-path: Audio engineering & studio dialogue patterns (sub-1ms dispatch)
     lowered = query.lower().strip()
-    if any(re.search(p, lowered) for p in (
-        r"\b(?:what is|how do i|how to|can you explain|why is|tell me about|tips for|best way to|difference between)\b",
+    fast_patterns = (
+        r"\b(?:what is|how do i|how to|can you explain|why is|tell me about|tips (?:for|on)|advice (?:on|for)|best way to|difference between)\b",
         r"\b(?:eq|compression|reverb|delay|saturation|mastering|sidechain|mix|kick|snare|vocal|synth|limiter|headroom|clipping|stereo)\b",
         # The fallback model marked these audio fundamentals out of scope; route the complete terms directly.
-        r"\b(?:precedence\s+effect|phantom\s+power|balanced\s+(?:audio\s+)?(?:cabling|cables?|connections?))\b",
-    )):
+        r"\b(?:precedence\s+effect|phantom\s+power|white\s+noise|pink\s+noise|balanced\s+(?:audio\s+)?(?:cabling|cables?|connections?))\b",
+    )
+    if any(re.search(p, lowered) for p in fast_patterns):
+        return "production"
+    if "corrected" in locals() and corrected != query and any(re.search(p, corrected.lower().strip()) for p in fast_patterns):
         return "production"
 
     # LLM routing fallback: when keyword routing fails, ask the model. The model-free foreground answer passes

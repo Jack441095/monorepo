@@ -405,9 +405,22 @@ def results_are_weak(query: str, results: list[tuple[float, dict]]) -> bool:
         return True
     topics = query_topics(query)
     if not topics:
+        # A query with mistyped words ("paralel compresion on drms") produces no raw topics.
+        # Check against typo-corrected text before declaring the match weak and dropping sources.
+        terms = load_terms()
+        corrected = correct_query_typos(canonical_audio_query(query), terms)
+        if corrected != query:
+            topics = query_topics(corrected)
+    if not topics:
         _score, primary = displayed[0]
         if primary.get("kind") == "note":
-            return note_query_affinity(query, primary) == 0
+            affinity = note_query_affinity(query, primary)
+            if affinity == 0:
+                terms = load_terms()
+                corrected = correct_query_typos(canonical_audio_query(query), terms)
+                if corrected != query:
+                    affinity = note_query_affinity(corrected, primary)
+            return affinity == 0
         return False
     if chunk_topics(top_chunk) & set(topics):
         return False
