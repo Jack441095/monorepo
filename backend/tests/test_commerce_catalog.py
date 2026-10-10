@@ -106,6 +106,38 @@ def test_purchase_confirmation_uses_catalog_product_name(client, db_session, mon
     assert resp.json()["status"] == "processed"
     assert sent[0]["subject"] == "Your NITE Submit purchase is complete"
     assert "Thanks for purchasing NITE Submit!" in sent[0]["body"]
+    entitlement = db_session.query(models.Entitlement).one()
+    assert entitlement.license_key.startswith("NTSUB1-")
+    assert entitlement.license_key in sent[0]["body"]
+
+
+def test_submit_purchase_key_matches_the_client_wire_format(client, db_session):
+    import base64
+    import struct
+    import time
+
+    from nacl.signing import VerifyKey
+
+    from app.submit_licensing import SUBMIT_LICENSE_PUBLIC_KEY_BASE64
+
+    db_session.add(models.Product(
+        id="nite-submit", name="NITE Submit", status="active", public=False,
+        purchasable=True, platforms=["macos"],
+    ))
+    db_session.commit()
+
+    response = _post_webhook(client, _completed_payload(
+        "evt_submit_signed_key", "cs_submit_signed_key", product_id="nite-submit",
+        email="submit-signed-key@example.com",
+    ))
+
+    assert response.status_code == 200
+    key = db_session.query(models.Entitlement).one().license_key
+    encoded = key.removeprefix("NTSUB1-")
+    raw = base64.urlsafe_b64decode(encoded + "=" * (-len(encoded) % 4))
+    assert len(raw) == 68
+    VerifyKey(base64.b64decode(SUBMIT_LICENSE_PUBLIC_KEY_BASE64)).verify(raw[:4], raw[4:])
+    assert time.time() - 86400 <= struct.unpack("<I", raw[:4])[0] <= time.time() + 86400
 
 
 def _refund_payload(event_id, transaction_id, full_refund=True):

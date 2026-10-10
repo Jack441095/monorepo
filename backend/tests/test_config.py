@@ -1,3 +1,7 @@
+import base64
+
+from nacl.signing import SigningKey
+
 from app.config import Settings, _validate_production_config, _validate_staging_config
 
 
@@ -56,6 +60,29 @@ def test_staging_configuration_rejects_missing_catalog_or_https_values():
         assert "nite_dsp_public_url" in message
     else:
         raise AssertionError("incomplete staging configuration was accepted")
+
+
+def test_staging_checkout_rejects_a_submit_signer_that_cannot_unlock_the_app():
+    wrong_signer = base64.b64encode(bytes(SigningKey.generate())).decode("ascii")
+    settings = _staging_settings(submit_license_private_key_base64=wrong_signer)
+
+    try:
+        _validate_staging_config(settings)
+    except RuntimeError as exc:
+        assert "does not match the NITE Submit app public key" in str(exc)
+    else:
+        raise AssertionError("staging accepted a Submit signer its app cannot verify")
+
+
+def test_staging_checkout_rejects_a_missing_submit_signer():
+    settings = _staging_settings(submit_license_private_key_base64="")
+
+    try:
+        _validate_staging_config(settings)
+    except RuntimeError as exc:
+        assert "submit_license_private_key_base64 is required" in str(exc)
+    else:
+        raise AssertionError("staging accepted checkout without a Submit signer")
 
 
 def test_staging_configuration_rejects_placeholder_support_email():

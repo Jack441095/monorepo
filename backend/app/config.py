@@ -15,6 +15,8 @@ from urllib.parse import urlparse
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from .submit_licensing import load_submit_signing_key
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
@@ -58,6 +60,9 @@ class Settings(BaseSettings):
     licensing_private_key_path: str = "./staging_keys/licensing_signing_key.private"
     licensing_public_key_path: str = "./staging_keys/licensing_signing_key.public"
     licensing_private_key_base64: str = ""
+    # Submit's offline key uses a separate public key from the backend's
+    # online licensing service, so it must have its own production secret.
+    submit_license_private_key_base64: str = ""
     offline_grace_period_seconds: int = 14 * 24 * 60 * 60  # unchanged from the dev server -- Section 22
     default_max_activations: int = 3  # unchanged from the dev server -- Phase 3 Section 23
 
@@ -175,6 +180,11 @@ def _checkout_configuration_problems(s: Settings) -> list[str]:
         problems.append("at least one of stripe_intro_price_id or stripe_regular_price_id is required")
     elif s.stripe_active_price_id and s.stripe_active_price_id not in prices:
         problems.append("stripe_active_price_id must match an intro or regular configured price ID")
+    if s.stripe_product_id == "nite-submit":
+        try:
+            load_submit_signing_key(s.submit_license_private_key_base64)
+        except ValueError as exc:
+            problems.append(str(exc))
     return problems
 
 

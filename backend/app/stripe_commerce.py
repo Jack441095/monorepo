@@ -18,6 +18,7 @@ from . import email_templates, models, paraphrase_orders
 from .config import settings
 from .database import get_db
 from .email import send_email
+from .submit_licensing import generate_submit_license_key
 
 router = APIRouter(prefix="/webhooks", tags=["stripe"])
 logger = logging.getLogger("nitedsp.stripe_commerce")
@@ -120,7 +121,13 @@ def _handle_checkout_session_completed(db: Session, payload: dict) -> str:
     )
     db.add(purchase)
     db.flush()
-    license_key = _generate_license_key()
+    # Submit validates licences offline against its embedded Ed25519 key. Keep
+    # the random legacy format for catalogue items that use another entitlement.
+    license_key = (
+        generate_submit_license_key(settings.submit_license_private_key_base64)
+        if product.id == "nite-submit"
+        else _generate_license_key()
+    )
     db.add(models.Entitlement(
         user_id=user.id, product_id=product.id, purchase_id=purchase.id,
         license_key=license_key, license_type="perpetual",

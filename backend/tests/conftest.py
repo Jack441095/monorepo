@@ -44,6 +44,20 @@ from fastapi.testclient import TestClient  # noqa: E402
 from sqlalchemy import text  # noqa: E402
 
 BACKEND_DIR = Path(__file__).parent.parent
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
+
+# Stripe tests use a temporary Submit signer and its matching public key. This
+# keeps the checked-in client key and the real customer key out of test runs.
+from app import submit_licensing  # noqa: E402
+
+test_submit_signing_key = SigningKey.generate()
+submit_licensing.SUBMIT_LICENSE_PUBLIC_KEY_BASE64 = base64.b64encode(
+    bytes(test_submit_signing_key.verify_key)
+).decode("ascii")
+os.environ["SUBMIT_LICENSE_PRIVATE_KEY_BASE64"] = base64.b64encode(
+    bytes(test_submit_signing_key)
+).decode("ascii")
 
 
 @pytest.fixture(scope="session", autouse=True)
