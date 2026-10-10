@@ -210,6 +210,66 @@ _MEASUREMENT_RE = re.compile(
 )
 
 
+def _measurement_is_supported(measurement: str, allowed: set[str]) -> bool:
+    """Whether measurement is allowed, treating integer and .0 forms as equivalent.
+
+    Audio engineers write -14 LUFS or -14.0 LUFS interchangeably, and Live meters display decimal true peaks
+    like -1.0 dBTP alongside integer bounds like -1 dBTP. Treating -14.0 LUFS as unsupported when the note
+    writes -14 LUFS is a formatting mismatch, not an invention.
+    """
+    if measurement in allowed:
+        return True
+    m_int = re.sub(r"^(-?\d+)\.0([a-z%]+)$", r"\1\2", measurement)
+    if m_int in allowed:
+        return True
+    m_dec = re.sub(r"^(-?\d+)([a-z%]+)$", r"\1.0\2", measurement)
+    if m_dec in allowed:
+        return True
+    return False
+
+
+def _unsupported_measurements(found: set[str], allowed: set[str]) -> set[str]:
+    """Measurements in found that are not permitted by allowed."""
+    return {m for m in found if not _measurement_is_supported(m, allowed)}
+
+
+def _range_interval_measurements(text: str) -> set[str]:
+    """Every integer measurement within a small recommended range (e.g. 3-6 dB -> 3, 4, 5, 6 dB).
+
+    When a note recommends setting backing vocals '3-6 dB below the lead', an answer recommending
+    '3-5 dB' or '5 dB' is mathematically within the note's guidance. Large spans (> 10) are skipped to avoid
+    broad sweeps.
+    """
+    added: set[str] = set()
+    for m in _RANGE_RE.finditer(text):
+        low_str, high_str, unit = m.group(1), m.group(2), m.group(3)
+        unit_clean = "".join(unit.lower().split())
+        try:
+            low, high = float(low_str), float(high_str)
+            if low.is_integer() and high.is_integer() and 1 <= (high - low) <= 10:
+                for val in range(int(low), int(high) + 1):
+                    added.add(f"{val}{unit_clean}")
+                    added.add(f"{val}.0{unit_clean}")
+        except ValueError:
+            pass
+    return added
+
+
+def _question_measurements(question: str) -> set[str]:
+    """Measurements typed by the producer this turn, handling colloquial audio shorthand.
+
+    Producers routinely type shorthand like 'boosted around 5k', '+0.8 true peak', or '0.0 peak'.
+    When the model echoes these exact figures back (e.g. 5 kHz or +0.8 dBTP), it is addressing the
+    producer's stated values, not inventing them.
+    """
+    q = question
+    q = re.sub(r"\b(\d+(?:\.\d+)?)\s*k\b", r"\1 kHz", q, flags=re.IGNORECASE)
+    q = re.sub(r"\+(\d+(?:\.\d+)?)", r"\1", q)
+    q = re.sub(r"\b(\d+(?:\.\d+)?)\s*true\s*peak\b", r"\1 dBTP \1 dB", q, flags=re.IGNORECASE)
+    q = re.sub(r"\b(\d+(?:\.\d+)?)\s*peak\b", r"\1 dB", q, flags=re.IGNORECASE)
+    return _measurements(q)
+
+
 def _measurements(text: str) -> set[str]:
     """Each measurement in `text`, keyed so spacing never decides a match.
 
@@ -791,7 +851,7 @@ class StreamedAnswerGuard:
         # after the dB. Judging the window there cut two good answers on 2 Oct 2026 (the sources had -6 dBFS and
         # -0.3 dBTP). The carry keeps the text, so the next token's window sees the whole unit.
         judged = window[:-2] if window.lower().endswith("db") else window
-        leaked = _measurements(judged) - self._allowed
+        leaked = _unsupported_measurements(_measurements(judged), self._allowed)
         if leaked:
             return {
                 "warning": (
@@ -897,10 +957,13 @@ def _accepted_measurements(
     question: str, shown: list[tuple[float, dict, str]], evidence_text: str
 ) -> set[str]:
     """Every measurement an answer may carry: those in the evidence text, the producer's question, and the shown notes in full."""
+    shown_note_text = _shown_note_text(shown)
     return (
         _measurements(evidence_text)
-        | _measurements(question)
-        | _measurements(_shown_note_text(shown))
+        | _range_interval_measurements(evidence_text)
+        | _question_measurements(question)
+        | _measurements(shown_note_text)
+        | _range_interval_measurements(shown_note_text)
     )
 
 
@@ -1209,7 +1272,10 @@ def generated_answer_validation(
         else 0.0
     )
     unsupported_measurements = sorted(
-        _measurements(answer) - _accepted_measurements(question, shown, evidence_text)
+        _unsupported_measurements(
+            _measurements(answer),
+            _accepted_measurements(question, shown, evidence_text),
+        )
     )
     # The labels the model was actually given, so a citation is only fabricated if the filename was not on
     # screen. Derived from the same shown list, not from what retrieval could have supplied.

@@ -97,6 +97,34 @@ def test_a_figure_from_another_section_of_a_shown_note_is_accepted(index):
     assert _refused("Aim for -14 LUFS integrated.", [SHOWN]) == []
 
 
+def test_decimal_equivalent_figure_matches_integer_source(index):
+    # SIBLING has -14 LUFS; an answer writing -14.0 LUFS is equivalent and accepted.
+    index(SHOWN, SIBLING)
+    assert _refused("Aim for -14.0 LUFS integrated.", [SHOWN]) == []
+
+
+def test_integer_within_recommended_range_is_accepted():
+    # Note has 3–6 dB; an answer recommending 4 dB or 5 dB is within the note's guidance.
+    range_chunk = {
+        "id": "bv-levels", "kind": "note", "title": "Background Vocals", "source": "bvs.md",
+        "page": 0, "section": "Try this", "text": "Set BV levels 3–6 dB below the lead vocal.",
+    }
+    assert _refused("Set the backing vocals 5 dB below the lead.", [range_chunk]) == []
+    assert _refused("Set the backing vocals 4 dB below the lead.", [range_chunk]) == []
+    # 7 dB is outside the 3–6 dB range and must be refused.
+    assert _refused("Set the backing vocals 7 dB below the lead.", [range_chunk]) == ["7db"]
+
+
+def test_colloquial_question_figures_are_accepted():
+    # User types 'boosted around 5k', model responds with '5 kHz'.
+    q = "why do my vocals sound harsh after I boosted around 5k?"
+    assert _refused("Harshness at 5 kHz is common with high boosts.", [OTHER_NOTE], q, q) == []
+
+    # User types '+0.8 true peak', model responds with '0.8 dBTP'.
+    q_tp = "my limiter says +0.8 true peak but 0.0 peak help"
+    assert _refused("True peak at 0.8 dBTP indicates overshoot.", [OTHER_NOTE], q_tp, q_tp) == []
+
+
 def test_a_figure_only_an_unshown_note_states_is_still_refused(index):
     # The 2 Oct "wide" bug: a 3 dB waved through on a chunk the model never saw. Widening to the shown note's other
     # sections must not reopen that.
