@@ -40,7 +40,7 @@ You are a **release engineer + security reviewer** performing the final ship gat
 ### Phase 3 — Privacy, security & the local-only promise
 8. Grep `Sources/` for network APIs (`URLSession`, `NWConnection`, `Socket`, `http`, `upload`) and third-party SDKs in `Package.swift` / `.build/checkouts`. Any outbound call = P0 unless documented and customer-visible.
 9. Inspect the shipped binary: `strings` / `otool -L` / `codesign -d --entitlements` on the actual `.app`. Check linked frameworks, embedded URLs, entitlements (no `com.apple.security.network.client` unless justified), and no analytics beacons.
-10. Scan repo history and tree for committed secrets (Paddle keys, API tokens, `.p8`/`.p12`, SSH keys, `.env`). Report exposure path, never the value.
+10. Scan repo history and tree for committed secrets (payment-provider keys, API tokens, `.p8`/`.p12`, SSH keys, `.env`). Report exposure path, never the value.
 11. Verify `PRIVACY.md` and `THIRD_PARTY_NOTICES.md` are accurate against the code: every dependency listed with correct license; privacy claims match observed behavior. Any mismatch = blocker (legal exposure).
 
 ### Phase 4 — Distribution, signing & notarization
@@ -51,7 +51,7 @@ You are a **release engineer + security reviewer** performing the final ship gat
 
 ### Phase 5 — Licensing, payments & fulfillment
 16. Verify licensing/activation end-to-end: key generation → validation → grace/undo path; confirm validation is tamper-resistant (not a trivially-patched equality check) or that you explicitly accept that risk.
-17. Verify Paddle (or chosen processor) integration: prices, product ID, tax handling, receipt/license delivery, and that a test purchase + refund works. Confirm provider keys are NOT embedded in the client.
+17. Verify the active Stripe integration: live product and price mapping, tax handling, receipt and licence delivery, and a test purchase plus refund. Confirm provider keys are NOT embedded in the client.
 18. Verify delivery pipeline: download URL on hosting/CDN, integrity checksum published, link not guessable, expiry behavior understood.
 
 ### Phase 6 — Storefront & customer-facing surface
@@ -95,5 +95,4 @@ Write (as new files only, outside `Sources/`):
 2. `SHIP_BLOCKERS.md` — the prioritized P0/P1 blocker list with exact fix steps.
 3. The completed §5 sign-off checklist.
 4. A per-phase receipt of commands run and files read.
-
 

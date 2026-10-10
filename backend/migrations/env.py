@@ -73,8 +73,8 @@ def run_migrations_online() -> None:
         )
 
         with context.begin_transaction():
-            # Railway can briefly run two containers for the same commit while
-            # replacing a service. Serialise migrations at the database level
+            # Overlapping deployments can migrate the same database together.
+            # Serialise migrations at the database level
             # so both containers cannot race while Alembic creates or updates
             # its version table. The transaction-scoped lock is released when
             # this migration transaction commits or rolls back.

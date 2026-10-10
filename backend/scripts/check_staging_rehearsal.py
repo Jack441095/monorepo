@@ -159,7 +159,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--allow-http-local",
         action="store_true",
-        help="allow an http:// URL for a local fixture or tunnel; never use for Railway",
+        help="allow an http:// URL for a local fixture; hosted staging requires HTTPS",
     )
     return parser
 

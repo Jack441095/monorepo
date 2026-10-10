@@ -1,0 +1,17 @@
+# Backend builds also run with this directory as their context.
+.env
+.env.*
+admin/
+staging_keys/
+*.private
+*.key
+*.pem
+.venv/
+venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+mock_storage/
+tests/
+*.log

@@ -369,7 +369,7 @@ Category C integrations and Kokoro TTS):
 ```
 $ THURSDAY_SERVER_TOKEN=... .venv/bin/python3 -m thursday.server --host 127.0.0.1 --port 8099
 $ curl -X POST http://127.0.0.1:8099/ask -d '{"question": "what is the beta readiness status"}'
-# -> real answer, live-read from docs/NITE_DSP_SUBMIT_BETA_LAUNCH_CHECKLIST_V1.md
+# -> real answer, live-read from products/nite-submit/docs/NITE_SUBMIT_PRIVATE_TECHNICAL_PREVIEW_CHECKLIST_V1.md
 $ curl -X POST http://127.0.0.1:8099/speak -d '{"text": "...", "voice": "thursday"}' -o out.wav
 # -> 170028-byte real WAV, RIFF/WAVE, 16-bit mono 24kHz (Kokoro)
 ```

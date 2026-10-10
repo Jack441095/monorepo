@@ -7,7 +7,7 @@ import { WaitlistForm, WaitlistCounter } from "@/components/WaitlistForm";
 import { PUBLIC_CHECKOUT_LIVE, STRIPE_SUBMIT_LINK } from "@/lib/commerce-config";
 
 export const metadata: Metadata = pageMetadata({
-  title: "NITE Submit: Document Prep Intelligence",
+  title: "Submit: Document Prep Intelligence",
   description: "The safest way to verify and prepare files before submission. Fully local document validation for macOS.",
   path: "/products/submit",
 });
@@ -39,7 +39,7 @@ export default function SubmitProductPage() {
         <LightField />
         <div className="site-container relative">
           <span className="eyebrow text-brand-blue-bright">Workflow Intelligence Family</span>
-          <h1 className="section-title mt-4 text-foreground">NITE Submit</h1>
+          <h1 className="section-title mt-4 text-foreground">Submit</h1>
           <p className="text-sm font-mono text-brand-blue-bright mt-1">Submission Preparation Intelligence</p>
           <p className="body-large mt-6 font-sans">
             The safest way to prepare important files before submission. Drop in a document, review structural metadata, correct errors, and save a clean copy. Fully offline, local-first, and optimized for macOS.
@@ -153,7 +153,7 @@ export default function SubmitProductPage() {
           <span className="eyebrow block text-center">Operational Boundary</span>
           <h2 className="mt-4 text-xl sm:text-2xl font-semibold tracking-tight text-center text-foreground">Important Disclaimer</h2>
           <p className="mt-4 text-xs leading-relaxed text-muted text-center">
-            NITE Submit checks file details and naming formats. It does not submit work on your behalf, nor can it guarantee department-specific criteria match generic presets. Always run a final manual check on your files.
+            Submit checks file details and naming formats. It does not submit work on your behalf, nor can it guarantee department-specific criteria match generic presets. Always run a final manual check on your files.
           </p>
         </div>
       </section>

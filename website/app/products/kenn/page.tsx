@@ -10,7 +10,7 @@ import { WaitlistForm, WaitlistCounter } from "@/components/WaitlistForm";
 
 export const metadata: Metadata = pageMetadata({
   title: "KENN: AI Audio Assistant for Ableton Live",
-  description: "KENN is an AI-powered audio assistant that lives inside Ableton Live. It listens, explains, and helps you make better mixing decisions. In development at NITE DSP.",
+  description: "KENN is an AI-powered audio assistant that lives inside Ableton Live. It listens, explains, and helps you make better mixing decisions. In research and development at NITE DSP.",
   path: "/products/kenn",
 });
 
@@ -58,7 +58,7 @@ export default function KennPage() {
           </p>
           <div className="mt-4">
             <span className="status-chip text-[9px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border border-brand-violet/40 text-brand-violet-text">
-              Closed Beta &mdash; not for sale yet
+              Research &amp; Development
             </span>
           </div>
           <div className="mt-8 flex flex-wrap gap-4">
@@ -159,10 +159,10 @@ export default function KennPage() {
           <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-start">
             <div>
               <span className="eyebrow text-brand-violet-text">Early Access</span>
-              <h2 className="section-title mt-4 text-foreground">Join the first 50.</h2>
+              <h2 className="section-title mt-4 text-foreground">Follow KENN&apos;s development.</h2>
               <p className="mt-4 text-sm leading-relaxed text-muted">
-                KENN is in active development. We&apos;re opening early access to a small group
-                of producers and engineers who want to help shape the product.
+                KENN is in research and development. Join the interest list to hear when
+                supervised testing becomes available.
               </p>
               <ul className="mt-6 space-y-3 text-sm text-muted">
                 <li className="flex gap-3 items-start">
@@ -171,11 +171,11 @@ export default function KennPage() {
                 </li>
                 <li className="flex gap-3 items-start">
                   <span className="text-brand-violet-text font-bold">02</span>
-                  <span>We&apos;ll email you when your beta access is ready</span>
+                  <span>We&apos;ll email you when testing becomes available</span>
                 </li>
                 <li className="flex gap-3 items-start">
                   <span className="text-brand-violet-text font-bold">03</span>
-                  <span>Test KENN inside Ableton Live and shape what ships</span>
+                  <span>Hear about future Ableton Live testing when it is ready</span>
                 </li>
               </ul>
             </div>

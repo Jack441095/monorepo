@@ -1,10 +1,10 @@
 # SLO Infrastructure Requirements V1
 
-**Purpose:** what SLO will eventually need from the NITE DSP platform — documented now, **not implemented now**. Per explicit instruction: do not touch Submit, platform payment rails, Railway staging, Paddle, or licensing. This is a forward-looking requirements list, gated behind private beta success, not a build task.
+**Purpose:** what SLO will eventually need from the NITE DSP platform — documented now, **not implemented now**. Per explicit instruction: do not touch Submit's payment, release-delivery, or licensing systems. This is a forward-looking requirements list, gated behind private beta success, not a build task.
 
 ## Later (post-beta, paid-launch adjacent) — do not build yet
 
-- **Account entitlement** — SLO has no user-account/entitlement system today (unlike Submit, which has magic-link auth + Paddle entitlement already proven on staging). Would need its own design, likely reusing Submit's proven pattern rather than inventing a new one — but that's a platform-level decision, not SLO's alone.
+- **Account entitlement** — SLO has no user-account/entitlement system today. Submit's magic-link and Stripe fulfilment flow passed a £2 purchase test, but public checkout remains gated. Any SLO entitlement design should be a platform decision, not an assumption that Submit's current setup is ready to reuse.
 - **Signed downloads** — depends on B-001 (Apple Developer ID) landing first. No distribution signing infrastructure exists for SLO specifically; Submit's existing release-artifact registry pattern (`releases/nite-submit/...`) is a reasonable template to reuse rather than reinvent, once B-001 unblocks.
 - **Update channel** — no auto-update mechanism exists for SLO. Not needed for a beta with a handful of manually-distributed builds; needed before any wider release.
 - **Crash/error reporting** — SLO has no telemetry or crash reporting today. For a *local-first, read-only* private beta with a small, owner-approved cohort, manual tester feedback (see `SLO_PRIVATE_BETA_TEST_PLAN_V1.md`) is sufficient; don't build telemetry infrastructure just for this beta.
@@ -23,4 +23,4 @@
 
 ## Explicit non-goals for this document
 
-Paid launch, Railway/Paddle integration, account systems, and update infrastructure are all **out of scope for private beta** and were not designed, prototyped, or touched while producing this document — consistent with "SLO is parked but important" and "do not disturb Submit."
+Paid launch, payment integration, account systems, and update infrastructure are all **out of scope for private beta** and were not designed, prototyped, or touched while producing this document — consistent with "SLO is parked but important" and "do not disturb Submit."

@@ -138,7 +138,7 @@ const PROJECTS: ProjectEntry[] = [
   },
   {
     name: "SLO",
-    family: "Sample Library Optimiser",
+    family: "Sample Library Optimizer",
     statusLabel: "R&D prototype",
     description:
       "A native macOS plugin (AU/VST3/Standalone) that browses a sample library by acoustic similarity, a 2D map of how sounds actually sound, not how they're named.",
@@ -212,7 +212,7 @@ const STACK_GROUPS: Array<{ area: string; items: string }> = [
   { area: "KENN core / AudioGen engine", items: "Python" },
   {
     area: "Commercial platform",
-    items: "Next.js · Tailwind CSS · Railway (hosting) · Stripe (payments) · Ed25519 (device-bound licensing)",
+    items: "Next.js · Tailwind CSS · Vercel and Fly.io (hosting) · Stripe (payments) · Ed25519 (device-bound licensing)",
   },
 ];
 
@@ -379,7 +379,7 @@ export default function PortfolioPage() {
                 <div className="mt-8 grid gap-5 sm:grid-cols-2">
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm text-foreground">Railway, DNS/TLS verified</span>
+                      <span className="text-sm text-foreground">Vercel and Fly.io, DNS/TLS verified</span>
                       <EvidenceTag kind="MEASURED" />
                     </div>
                     <p className="mt-1 text-xs" style={{ color: "var(--muted-dim)" }}>

@@ -9,6 +9,8 @@ delivery (Stripe retry or admin resend) must complete the email exactly once.
 """
 from __future__ import annotations
 
+import pytest
+
 from app import models
 from tests.test_commerce_catalog import _completed_payload, _post_webhook
 from tests.test_e2e import _seed_product
@@ -136,6 +138,44 @@ def test_admin_resend_unknown_purchase_is_404(client):
         headers={"X-Admin-Key": "test-admin-key"},
     )
     assert resp.status_code == 404
+
+
+@pytest.mark.parametrize("status", ["refunded", "disputed"])
+def test_unsent_confirmation_is_not_retried_after_refund_or_dispute(
+    client, db_session, monkeypatch, status
+):
+    import app.stripe_commerce as commerce_module
+
+    _seed_product(db_session)
+    _buy_with_broken_mail(
+        client, db_session, monkeypatch, f"evt_mail_{status}", f"txn_mail_{status}"
+    )
+    purchase = db_session.query(models.Purchase).filter(
+        models.Purchase.provider_order_id == f"txn_mail_{status}"
+    ).one()
+    purchase.status = status
+    db_session.commit()
+
+    sent = []
+    monkeypatch.setattr(commerce_module, "send_email", lambda **kwargs: sent.append(kwargs))
+
+    pending = client.get(
+        "/admin/purchases/unsent-confirmations",
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+    assert pending.status_code == 200
+    assert pending.json() == []
+    assert commerce_module.sweep_unsent_confirmations(db_session) == {
+        "checked": 0, "sent": 0, "still_pending": 0
+    }
+
+    resend = client.post(
+        f"/admin/purchases/{purchase.id}/resend-confirmation",
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+    assert resend.status_code == 409
+    assert resend.json()["detail"] == "Purchase is not eligible for confirmation email"
+    assert sent == []
 
 
 def test_admin_issue_reports_email_failure_without_losing_entitlement(client, db_session, monkeypatch):

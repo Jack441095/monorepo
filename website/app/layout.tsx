@@ -23,10 +23,7 @@ const geistMono = Geist_Mono({
 // site's real-world identity, safe to state directly regardless of which
 // environment is currently serving the page.
 //
-// Uses the "www" host, not the bare apex: Railway's real custom domain (and
-// this deployment's actual HTTPS target) is www.nitedsp.co.uk, the apex
-// only redirects to it at the DNS/registrar level and doesn't itself serve
-// HTTPS yet (docs/IONOS_DNS_SETUP.md). Update if/when that changes.
+// Keep canonical URLs on www so apex and preview visits share one identity.
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.nitedsp.co.uk"),
   title: {
@@ -123,7 +120,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 All products
               </Link>
               <Link href="/products/smart-sample-manager" className="hover:text-[color:var(--foreground)] transition-colors">
-                SLO (Sample Library Optimiser)
+                SLO (Sample Library Optimizer)
               </Link>
               <Link href="/products/submit" className="hover:text-[color:var(--foreground)] transition-colors">
                 Submit (Document Prep)

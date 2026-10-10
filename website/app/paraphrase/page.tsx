@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/seo";
 import { ParaphraseBox } from "@/components/ParaphraseBox";
-import { ParaphraseDonate } from "@/components/ParaphraseDonate";
 import { Reveal } from "@/components/motion/Reveal";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Paraphrase: Make AI text read natural",
+  title: "Para-phase: Free writing aid",
   description:
-    "A free writing aid that rewrites pasted text so it reads like a person wrote it. Four voices, pay what you like, no account needed.",
+    "A free writing aid that rewrites pasted text so it reads like a person wrote it. Four voices, free daily rewrites, no account needed.",
   path: "/paraphrase",
 });
 
@@ -39,17 +38,25 @@ export default function ParaphrasePage() {
       <section className="section product-hero relative overflow-hidden">
         <div className="site-container relative">
           <span className="eyebrow text-muted-dim">University Writing Aids</span>
-          <h1 className="section-title mt-4 text-foreground">Make AI text read like you wrote it.</h1>
+          <h1 className="section-title mt-4 text-foreground">Para-phase</h1>
           <p className="text-sm font-mono text-muted-dim mt-1">
             Essay &middot; Email &middot; Report &middot; Casual
           </p>
           <p className="body-large mt-6 font-sans">
             Paste the draft, pick a voice, and get a version that sounds natural instead of
             generated. Meaning and citations are preserved by design, free rewrites reset every
-            day, and payments are pay-what-you-like, from nothing up.
+            day. Para-phase is free to use.
           </p>
           <div className="mt-8 max-w-3xl">
-            <ParaphraseBox />
+            {/* The backend gate is separate from free pricing. Publish the form
+                only after the production engine has passed a streaming check. */}
+            {process.env.NEXT_PUBLIC_PARAPHRASE_ENABLED === "1" ? (
+              <ParaphraseBox />
+            ) : (
+              <p className="surface-card rounded-lg border border-border/50 p-5 text-sm text-muted">
+                Para-phase is free. Public rewriting is being prepared and is not available yet.
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -95,31 +102,13 @@ export default function ParaphrasePage() {
       </section>
 
       <section className="section section-rule">
-        <div className="site-container">
-          <Reveal>
-            <div className="max-w-2xl">
-              <span className="eyebrow">Support the tool</span>
-              <h2 className="section-title mt-4">Pay what you like.</h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
-                Free rewrites reset every day. If you use it regularly, throwing something
-                in keeps it running. Any amount, no account, one-time charge.
-              </p>
-            </div>
-          </Reveal>
-          <div className="mt-8">
-            <ParaphraseDonate />
-          </div>
-        </div>
-      </section>
-
-      <section className="section section-rule">
         <div className="site-container cta-panel depth-hover">
           <div>
             <span className="eyebrow">Privacy &amp; Pricing</span>
-            <h2 className="section-title mt-4 text-foreground">Nothing stored. Pay what you like.</h2>
+            <h2 className="section-title mt-4 text-foreground">Free daily rewrites. No account needed.</h2>
             <p className="mt-2 text-sm text-muted max-w-xl">
-              Pasted text is streamed through and not stored. The soft paywall keeps the tool
-              free for everyone; supporting it buys the hours that keep it running.
+              Pasted text is streamed through and not stored. Daily limits help keep the
+              free service available. You can try again when the limit resets.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 relative z-10">

@@ -25,7 +25,7 @@ a customer.
 
 1. **Hosting.** This runs on `localhost:8420` with no TLS. Production needs
    a real domain + HTTPS (e.g. behind Caddy/nginx or a managed platform like
-   Fly.io/Render/Railway/AWS). `LicenseManager::serverBaseURL()` must be
+   Fly.io/Render/AWS). `LicenseManager::serverBaseURL()` must be
    updated to an `https://` URL — the client only ever sends license keys
    and device info in POST bodies, which absolutely must not travel over
    plain HTTP.

@@ -31,3 +31,10 @@ shared/
 **/.mypy_cache/
 **/node_modules/
 **/.env
+# Local credential captures and signing keys must stay outside the image.
+**/.env.*
+**/admin/
+**/staging_keys/
+**/*.private
+**/*.key
+**/*.pem

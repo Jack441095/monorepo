@@ -12,10 +12,10 @@
 - Version: 0.2.0 · Channel: PRIVATE BETA INTEGRATION CANDIDATE
 - Source revision and working-tree state: recorded in the machine-readable
   release manifest.
-- This candidate is registered in isolated Railway staging and the exact
-  checksum-bound remote download was independently reverified on deployment
-  `4f14ba49-5cd0-48b4-86f0-b9bad3f6855a`. It has not been sent to testers or
-  enabled in production; the owner send gate still requires explicit approval.
+- A prior isolated staging deployment independently reverified the exact
+  checksum-bound remote download. That environment is no longer part of current
+  release operations. The candidate has not been sent to testers or enabled in
+  production; the owner send gate still requires explicit approval.
 - Machine-readable provenance: `artifacts/Submit-0.2.0-release-manifest.json`
 
 ## Signing

@@ -46,12 +46,12 @@ curl -s -X POST http://127.0.0.1:8091/kenn/chat \
 Runtime state defaults to this wrapper's `.runtime/`; set
 `KENN_CHAT_RUNTIME_DIR` for external storage.
 
-## Railway deployment shape
+## Container deployment shape
 
-The included Dockerfile (build it from the monorepo root; see its header) copies
-the backend source and this wrapper, builds the approved index into `/app/runtime-index`, and serves only the
-wrapper route. It does not include an audio upload path or the wider KENN
-assistant surface.
+Build the included Dockerfile from the monorepo root; it copies the backend
+source and this wrapper, builds the approved index into `/app/runtime-index`,
+and serves only the wrapper route. It does not include an audio upload path or
+the wider KENN assistant surface.
 
 Run the service from `packages/chat/` with:
 
@@ -59,8 +59,7 @@ Run the service from `packages/chat/` with:
 uvicorn app:app --host 0.0.0.0 --port "$PORT"
 ```
 
-Set these Railway variables (values containing hostnames are supplied by the
-owner after the services exist):
+Set these runtime variables in the chosen container host:
 
 ```text
 AUDIO_TOO_LLM_ENABLED=0

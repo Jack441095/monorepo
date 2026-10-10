@@ -25,7 +25,7 @@ Stripe remains the payment provider. Cloudflare hosting does not replace Stripe 
 | Releases | Existing `S3CompatibleStorage` uses boto3, immutable keys, SHA-256, and signed download URLs | R2 is already an intended adapter target; prove a real R2 round trip before cutover. |
 | Email | Backend supports `console` and Resend | Retaining Resend is compatible with Cloudflare hosting. Cloudflare Email Service needs another adapter if service consolidation is desired. |
 | Paraphrase | Feature-gated API streams from a separate engine URL | Hosting the public API does not migrate the model engine. Inventory that service before declaring all enabled services migrated. |
-| Deployment | Railway configurations, backend pre-deploy Alembic migration, and website Vercel configuration | Add a reviewed Cloudflare deployment path first; remove old deployment files after cutover succeeds. |
+| Deployment | Backend Docker image with separate Alembic migrations, and website Vercel configuration; obsolete Railway files removed | Add a reviewed Cloudflare deployment path and verify migrations before changing hosts. |
 | Rate limits | Backend keeps counters in process memory and trusts the first forwarded IP | Multiple Workers/Containers need a shared policy and a trusted ingress boundary. |
 
 These observations come from `website/package.json`, `website/app/api/waitlist`, `website/proxy.ts`, `backend/app/database.py`, `backend/app/models.py`, `backend/app/licensing.py`, `backend/app/storage.py`, `backend/app/rate_limit.py`, and the existing deployment files.

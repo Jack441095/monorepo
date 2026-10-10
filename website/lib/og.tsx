@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 /* Shared Open Graph card.
  *
  * Every page used to inherit the single root card, which read "SLO / Sample
- * Library Optimiser" — so sharing the homepage, Submit, KENN or a legal page
+ * Library Optimizer" — so sharing the homepage, Submit, KENN or a legal page
  * all produced an SLO advert. Each product segment now owns its own card and
  * the root one carries brand-level messaging.
  *

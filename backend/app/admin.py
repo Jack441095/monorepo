@@ -335,7 +335,7 @@ def upload_release_artifact(
 ) -> dict:
     """Upload one release artifact into staging storage.
 
-    This is deliberately a staging-only bridge for the private Railway proof
+    This is deliberately a staging-only bridge for the private proof
     environment, where local storage is inside the running service and cannot
     be populated from the operator's workstation. Production release uploads
     remain an out-of-band S3/R2 operation followed by the authenticated
@@ -567,7 +567,10 @@ def unsent_confirmations(db: Session = Depends(get_db), actor: str = Depends(req
     duplicate delivery) can retry delivery without touching fulfilment."""
     purchases = (
         db.query(models.Purchase)
-        .filter(models.Purchase.confirmation_email_sent_at.is_(None))
+        .filter(
+            models.Purchase.confirmation_email_sent_at.is_(None),
+            models.Purchase.status == "completed",
+        )
         .order_by(models.Purchase.purchased_at.asc())
         .all()
     )

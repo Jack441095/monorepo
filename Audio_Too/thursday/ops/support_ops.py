@@ -4,7 +4,7 @@ Two real, live sources, neither paraphrased into code:
 - `business/app/business_knowledge.json`'s `faqs` list — the real,
   current FAQ content already shown to real enquirers, read fresh every
   call (shares finance_ops.py's `_business_knowledge_path()` resolution).
-- `qa_ops.beta_readiness_check()`'s live-parsed checklist state — Gate 0's
+- `qa_ops.beta_readiness_check()`'s live-parsed checklist state — private-preview handoff gate's
   unchecked items reframed as "known issues" for support triage, not a
   separately maintained list. Reuses the existing parse rather than
   re-reading the checklist file a second, differently-scoped way.
@@ -92,15 +92,14 @@ def faq_lookup(query: str = "") -> str:
 def known_issues() -> str:
     from thursday.ops import qa_ops
 
-    sections = None
     path = qa_ops.checklist_path()
     if not path.exists():
-        return "KNOWN ISSUES\n\nEvidence missing — beta checklist not found; nothing to report."
+        return "KNOWN ISSUES\n\nEvidence missing — private-preview checklist not found; nothing to report."
 
     try:
         text = path.read_text(encoding="utf-8")
     except OSError as exc:
-        return f"KNOWN ISSUES\n\nEvidence missing — could not read checklist: {exc}"
+        return f"KNOWN ISSUES\n\nEvidence missing — could not read private-preview checklist: {exc}"
 
     sections = qa_ops.parse_checklist(text)
     gate = next((s for s in sections if qa_ops._BLOCKING_GATE_MARKER in s["heading"].lower()), None)
@@ -108,15 +107,18 @@ def known_issues() -> str:
 
     lines = ["KNOWN ISSUES", ""]
     if not open_items:
-        lines.append("  None — the beta launch checklist's Gate 0 is fully cleared.")
+        lines.append(
+            "  No unchecked private-preview handoff items are recorded. "
+            "The owner-send gate and paid launch remain separate."
+        )
     else:
-        lines.append(f"  {len(open_items)} open item(s) blocking beta launch (from {path}):")
+        lines.append(f"  {len(open_items)} open private-preview handoff item(s) (from {path}):")
         for item in open_items:
             lines.append(f"  - {item}")
     lines.append("")
     lines.append(
-        "These are the real, currently-unchecked Gate 0 items from the "
-        "beta launch checklist, not a separately maintained issue list — "
-        "see 'beta readiness' for the full checklist state."
+        "These are the unchecked items in the private-preview handoff gate, not "
+        "a separately maintained issue list. Checked boxes do not approve "
+        "tester distribution or commercial release."
     )
     return "\n".join(lines)

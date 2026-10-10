@@ -1,44 +1,48 @@
-"""Documentation / launch tracker (Thursday Ops upgrade, phase 11).
+"""Report the current paid-launch blockers from the operations audit.
 
-Live-parses `docs/NITE_SUBMIT_LAUNCH_TRACKER.md`'s real markdown tables
-off disk on every call -- same discipline as qa_ops.py, never cached or
-paraphrased. Genuinely distinct from qa_ops.beta_readiness_check(): that
-module tracks the tactical, checkbox-shaped beta-launch checklist (Gate 0
-onward, day-by-day send steps); this tracks the strategic, table-shaped
-launch-gate tracker (a different real document, a different status
-vocabulary: DONE / IN PROGRESS / OWNER ACTION / BLOCKED / NOT STARTED /
-DEFERRED, not checkboxes). Neither replaces the other.
-
-Most of the spec's Documentation Agent bullets are deliberately NOT
-implemented here because something else already covers them, and
-building a second version would duplicate real, working functionality:
-- "risk registers" -- thursday.ops.weekly_report.py already aggregates real
-  risks from task_ledger/funding_ops.
-- "handoffs" -- thursday.ops.agent_briefing.py already composes a real
-  evidence-cited handoff document.
-- "internal reports" -- thursday.ops.weekly_report.py's weekly company report
-  and this module's launch-tracker status together cover this.
-- "product docs" -- no live-generatable scope here; writing product
-  documentation is an authoring task, not a data-aggregation one, and
-  isn't something Thursday can safely originate without fabricating
-  content the same way marketing_ops.py's docstring already argues
-  against for marketing copy.
-
-"launch trackers" was the one genuinely unclaimed piece.
+The audit is the source of truth for launch blockers. This helper reads only
+its named paid-sales section and reports the checkbox state as written; it
+does not independently verify completed work or approve a release.
 """
 
 from __future__ import annotations
 
-import logging
 import re
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
+OPERATIONS_AUDIT_RELATIVE_PATH = "docs/OPERATIONS_AUDIT_2026-10-08.md"
 
-LAUNCH_TRACKER_RELATIVE_PATH = "docs/NITE_SUBMIT_LAUNCH_TRACKER.md"
+_CHECKBOX_RE = re.compile(r"^- \[([ xX])\]\s*(.+)$")
+_HEADING_RE = re.compile(r"^##\s+(.+)$")
+_LABEL_RE = re.compile(r"^\*\*(.+?)\*\*")
+_LAUNCH_BLOCKERS_HEADING = "launch blockers — complete before paid sales"
 
-_TABLE_ROW_RE = re.compile(r"^\|(.+)\|\s*$")
-_SEPARATOR_ROW_RE = re.compile(r"^\|[\s:|-]+\|\s*$")
+
+def parse_launch_blockers(text: str) -> list[dict]:
+    """Read checkbox labels only from the paid-sales section of the audit."""
+    items: list[dict] = []
+    in_launch_section = False
+    for line in text.splitlines():
+        heading = _HEADING_RE.match(line)
+        if heading:
+            if in_launch_section:
+                break
+            in_launch_section = (
+                heading.group(1).strip().casefold() == _LAUNCH_BLOCKERS_HEADING
+            )
+            continue
+        if not in_launch_section:
+            continue
+        checkbox = _CHECKBOX_RE.match(line)
+        if not checkbox:
+            continue
+        raw_label = checkbox.group(2).strip()
+        bold_label = _LABEL_RE.match(raw_label)
+        items.append({
+            "label": bold_label.group(1) if bold_label else raw_label,
+            "checked": checkbox.group(1).lower() == "x",
+        })
+    return items
 
 
 def _nite_dsp_root() -> Path:
@@ -50,7 +54,7 @@ def _nite_dsp_root() -> Path:
     from thursday.repo_root import search_upward
 
     here = Path(__file__).resolve()
-    found = search_upward(here, (LAUNCH_TRACKER_RELATIVE_PATH,), depth=6)
+    found = search_upward(here, (OPERATIONS_AUDIT_RELATIVE_PATH,), depth=6)
     if found is not None:
         return found
     # Fallback depth for this copy's location: autonomous-systems/thursday/
@@ -59,96 +63,48 @@ def _nite_dsp_root() -> Path:
     return here.parents[4]
 
 
-def launch_tracker_path() -> Path:
-    return _nite_dsp_root() / LAUNCH_TRACKER_RELATIVE_PATH
+def operations_audit_path() -> Path:
+    return _nite_dsp_root() / OPERATIONS_AUDIT_RELATIVE_PATH
 
 
-def _split_row(line: str) -> list[str]:
-    inner = line.strip()[1:-1] if line.strip().startswith("|") else line.strip()
-    return [cell.strip() for cell in inner.split("|")]
-
-
-def parse_gate_statuses(text: str) -> list[dict]:
-    """Parse every markdown table row that has a "Status" column into
-    [{"label": <first column>, "status": <value>}]. Tables with no
-    "Status" column are skipped entirely -- this only extracts what it
-    can verify the meaning of, never guesses which column holds status
-    from position alone.
-    """
-    lines = text.splitlines()
-    rows: list[dict] = []
-    i = 0
-    while i < len(lines):
-        line = lines[i]
-        header_match = _TABLE_ROW_RE.match(line)
-        if header_match and i + 1 < len(lines) and _SEPARATOR_ROW_RE.match(lines[i + 1]):
-            headers = _split_row(line)
-            try:
-                status_idx = next(j for j, h in enumerate(headers) if h.strip().lower() == "status")
-            except StopIteration:
-                i += 2
-                continue
-
-            i += 2
-            while i < len(lines) and _TABLE_ROW_RE.match(lines[i]):
-                cells = _split_row(lines[i])
-                if len(cells) > status_idx and cells[0] and cells[0] not in ("---",):
-                    rows.append({"label": cells[0], "status": cells[status_idx]})
-                i += 1
-            continue
-        i += 1
-    return rows
-
-
-_BLOCKING_STATUSES = {"blocked", "not started", "owner action"}
 
 
 def launch_tracker_status() -> str:
-    path = launch_tracker_path()
+    path = operations_audit_path()
     if not path.exists():
-        return f"LAUNCH TRACKER STATUS\n\nEvidence missing — tracker not found at {path}."
+        return f"PAID LAUNCH BLOCKERS\n\nEvidence missing — operations audit not found at {path}."
 
     try:
         text = path.read_text(encoding="utf-8")
     except OSError as exc:
-        return f"LAUNCH TRACKER STATUS\n\nEvidence missing — could not read {path}: {exc}"
+        return f"PAID LAUNCH BLOCKERS\n\nEvidence missing — could not read {path}: {exc}"
 
-    rows = parse_gate_statuses(text)
-    if not rows:
-        return f"LAUNCH TRACKER STATUS\n\nEvidence missing — {path} has no parseable Status-column tables."
-
-    tally: dict[str, int] = {}
-    for r in rows:
-        key = r["status"].strip().lower()
-        # Handle compound statuses like "DONE for reviewed fields; policy
-        # IN PROGRESS" honestly: tally under the first plain status word
-        # this recognizes, else "other" -- never silently drop a row.
-        matched = next(
-            (s for s in ("done", "in progress", "owner action", "blocked", "not started", "deferred") if s in key),
-            "other",
+    items = parse_launch_blockers(text)
+    if not items:
+        return (
+            f"PAID LAUNCH BLOCKERS\n\nEvidence missing — {path} has no checkbox items "
+            "in its paid-sales section."
         )
-        tally[matched] = tally.get(matched, 0) + 1
 
-    blocking = [r for r in rows if r["status"].strip().lower() in _BLOCKING_STATUSES]
-
-    lines = ["LAUNCH TRACKER STATUS", f"Source (read live): {path}", ""]
-    lines.append(f"{len(rows)} gates tracked.")
-    for status, count in sorted(tally.items(), key=lambda kv: -kv[1]):
-        lines.append(f"  {status}: {count}")
-    lines.append("")
-
-    if blocking:
-        lines.append(f"BLOCKING ({len(blocking)}):")
-        for r in blocking:
-            lines.append(f"  - {r['label']}: {r['status']}")
+    completed = sum(item["checked"] for item in items)
+    open_items = [item["label"] for item in items if not item["checked"]]
+    lines = [
+        "PAID LAUNCH BLOCKERS",
+        f"Source (read live): {path}",
+        "",
+        f"{len(items)} blockers tracked: {completed} checked, {len(open_items)} open.",
+        "",
+    ]
+    if open_items:
+        lines.append(f"OPEN ({len(open_items)}):")
+        lines.extend(f"  - {label}" for label in open_items)
     else:
-        lines.append("No gates currently in a blocking status (BLOCKED / NOT STARTED / OWNER ACTION).")
-
-    lines.append("")
-    lines.append(
-        "This reflects exactly what's in the tracker table, read just "
-        "now -- a compound status (e.g. \"DONE for X; Y IN PROGRESS\") is "
-        "tallied under its first recognized keyword, not resolved to a "
-        "single verdict. Read the full row text for nuance."
+        lines.append("No unchecked items remain in the paid-sales section.")
+    lines.extend(
+        [
+            "",
+            "This reports the audit's checkbox state; it is not an independent "
+            "verification of checked work or a release approval.",
+        ]
     )
     return "\n".join(lines)

@@ -12,7 +12,7 @@ import { TiltSurface } from "@/components/motion/TiltSurface";
 import { PUBLIC_CHECKOUT_LIVE, STRIPE_SLO_LINK } from "@/lib/commerce-config";
 
 export const metadata: Metadata = pageMetadata({
-  title: "SLO: Sample Library Optimiser",
+  title: "SLO: Sample Library Optimizer",
   description: "An acoustic-similarity sample browser and organizer for macOS. Fully offline, private, and built for professional music production workflows.",
   path: "/products/smart-sample-manager",
 });
@@ -58,7 +58,7 @@ const FAQ = [
 const SOFTWARE_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "SLO (Sample Library Optimiser)",
+  name: "SLO (Sample Library Optimizer)",
   applicationCategory: "MultimediaApplication",
   operatingSystem: "macOS",
   description:
@@ -79,7 +79,7 @@ export default function SmartSampleManagerPage() {
         <div className="site-container relative">
           <span className="eyebrow text-brand-violet-text">Audio Intelligence Family</span>
           <h1 className="section-title mt-4 text-foreground">SLO</h1>
-          <p className="text-sm font-mono text-amber-400 mt-1">Sample Library Optimiser</p>
+          <p className="text-sm font-mono text-amber-400 mt-1">Sample Library Optimizer</p>
           <p className="body-large mt-6 font-sans">
             A professional, acoustic-similarity sample browser and organizer for macOS.
             By analysing raw audio signals rather than depending on folder structures or filenames, SLO provides absolute clarity over your sample library.

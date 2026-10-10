@@ -8,32 +8,21 @@
  * config.py._validate_production_config — same "fail loudly, collect
  * every problem before exiting" shape.
  *
- * Engagement rule. Originally this keyed solely off an explicit
- * NITEDSP_BUILD_ENV=production flag, deliberately NOT off Next.js's own
- * NODE_ENV (which `next build` sets to "production" even for a local
- * build). That left one hole: if a real deploy simply never set the flag,
- * the guard exited 0 and the deploy shipped whatever was configured --
- * including a site pointing at localhost. So a detected Railway build now
- * engages the guard too. A correctly configured deploy is unaffected; only
- * a deploy that is already broken starts failing, which is the point of a
- * fail-closed check.
+ * Vercel production builds must engage the guard even when the explicit
+ * flag is missing. NODE_ENV cannot distinguish a local Next.js build from
+ * a deployed one, and Vercel previews need their own isolated API settings.
  */
 const isExplicitProductionBuild = process.env.NITEDSP_BUILD_ENV === "production";
-// Railway injects these into every build; presence means "this is a real
-// deploy", not someone's laptop.
-const isRailwayBuild = Boolean(
-  process.env.RAILWAY_ENVIRONMENT ||
-    process.env.RAILWAY_SERVICE_ID ||
-    process.env.RAILWAY_PROJECT_ID,
-);
+const isVercelProductionBuild = process.env.VERCEL_ENV === "production";
 
-if (!isExplicitProductionBuild && !isRailwayBuild) {
+if (!isExplicitProductionBuild && !isVercelProductionBuild) {
+  // Local builds and previews do not carry the production launch contract.
   process.exit(0);
 }
 
 const reason = isExplicitProductionBuild
   ? "NITEDSP_BUILD_ENV=production"
-  : "a Railway deploy build was detected";
+  : "VERCEL_ENV=production";
 console.log(`Checking deploy configuration (${reason}).`);
 
 // Fatal: these break core functionality if wrong.

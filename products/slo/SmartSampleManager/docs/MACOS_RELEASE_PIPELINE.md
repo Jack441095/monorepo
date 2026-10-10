@@ -1,5 +1,9 @@
 # macOS Release Pipeline
 
+> This product-release procedure does not approve a release. Current hosting,
+> storage, and commercial gates are in the
+> [operations audit](../../../../docs/OPERATIONS_AUDIT_2026-10-08.md).
+
 Phase 6, Section 59. Consolidates the release pipeline as it actually exists today across
 Phase 2's design (`docs/MACOS_RELEASE_PROCESS.md`, `docs/INSTALLER_ARCHITECTURE.md`) and Phase
 5-5.6's tooling. This is the authoritative step list; the two docs above remain the deeper design
@@ -50,11 +54,12 @@ STANDALONE VALIDATE           same as above
        ↓
 CHECKSUM                      Ready -- sha256sum against the final signed artifact once it exists
        ↓
-UPLOAD                        BLOCKED EXTERNAL -- no hosted release storage exists yet
-                               (docs/RAILWAY_DEPLOYMENT.md's known object-storage gap)
+UPLOAD                        R2 release storage and the backend upload path exist; the exact
+                               signed artifact still needs checksum, clean-machine acceptance,
+                               and owner release approval before upload
        ↓
-RELEASE RECORD                Ready -- releases table + admin release-management endpoints
-                               already exist (docs/NITE_DSP_BACKEND_IMPLEMENTATION.md)
+RELEASE RECORD                Backend release records exist; production release readiness
+                               remains disabled until the owner accepts the artifact
 ```
 
 ## What's genuinely READY today (verified this phase)

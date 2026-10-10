@@ -364,8 +364,8 @@ class ChatRequest(BaseModel):
 class FixedWindowLimiter:
     """Small single-process limiter suitable for the local service.
 
-    Railway deployment must keep this service single-process or replace this
-    with a shared limiter before scaling horizontally.
+    Keep this service single-process or replace this with a shared limiter
+    before scaling horizontally.
     """
 
     def __init__(self, max_requests: int, window_seconds: float) -> None:

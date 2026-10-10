@@ -1,5 +1,9 @@
 # Release Candidate Validation
 
+> This is a historical product validation matrix. Current hosting, Stripe,
+> email, backups, and launch status are in the
+> [operations audit](../../../../docs/OPERATIONS_AUDIT_2026-10-08.md).
+
 Phase 6, Sections 89-90. Template for the exact evidence a real Release Candidate must produce
 -- **no RC has been cut.** Per Section 89, the exact artifact tested must be the exact artifact
 published; nothing here claims that's happened.
@@ -34,11 +38,13 @@ published; nothing here claims that's happened.
                                      (docs/PHASE_5_PLAN.md's Section 60 scope), no client-side
                                      update-check implementation has been built or verified
 [ ] project recall                  BLOCKED, needs a real DAW + signed build
-[ ] hosted backend                  BLOCKED EXTERNAL -- no Railway deployment exists
-[x] backup/restore                  PASS -- real pg_dump/restore rehearsal, Phase 5, evidence
-                                     stands (no schema changes since to invalidate it)
-[ ] Paddle sandbox                  BLOCKED EXTERNAL -- no Paddle account
-[ ] refund sandbox                  BLOCKED, chained on Paddle sandbox
+[x] hosted production backend       Fly.io production API is deployed and passes health/readiness
+[ ] customer staging                no separate public staging API, website, and database
+[~] backup/restore                  local synthetic pg_dump/restore rehearsal passed;
+                                     production snapshot restore remains unverified
+[ ] Stripe test purchase            webhook fulfilment, email, sign-in, entitlement, and download
+                                     have not been verified together in test mode
+[ ] refund rehearsal                Stripe test-mode refund/dispute handling remains unverified
 ```
 
 ## Score: 10 ready / 14 blocked or not-applicable-yet

@@ -4,10 +4,10 @@
 **Platform:** macOS 13+, Apple Silicon
 **Purpose:** Validate real university PDFs locally before wider distribution.
 
-This candidate is registered in isolated Railway staging, and the exact
-checksum-bound remote download has been independently reverified. It has not
-been sent to testers or enabled in production; the owner send gate still
-requires explicit approval.
+An isolated staging deployment previously verified the exact checksum-bound
+remote download. That environment is no longer part of current release
+operations. This candidate has not been sent to testers or enabled in
+production; the owner send gate still requires explicit approval.
 
 ## Tester artifact
 
@@ -100,8 +100,8 @@ metrics only; it does not copy, rename, upload, or log document text.
 ## Current evidence and limitations
 
 - 252/252 deterministic checks pass.
-- Railway staging deployment `4f14ba49-5cd0-48b4-86f0-b9bad3f6855a` passed
-  health/readiness checks and the authenticated magic-link → entitlement →
+- A prior isolated staging deployment passed health/readiness checks and the
+  authenticated magic-link → entitlement →
   licence → signed-download journey. The downloaded ZIP matched the release
   SHA-256 `64c503ebbbc975a8c839cb731ec158b9e0ef14029e84df23ff2e91dc5f0096a9`.
 - 43 public university PDFs pass the controlled batch safety gate.

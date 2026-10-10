@@ -1,4 +1,9 @@
-# NITE DSP Security Model (Design Review)
+# NITE DSP Security Model (Historical Design Review)
+
+Recorded before the current Stripe/Vercel/Fly.io platform. Provider choices, hosting status,
+and referenced phase plans below are historical. Current operations and launch gates live in
+[the operations audit](../../../../docs/OPERATIONS_AUDIT_2026-10-08.md) and
+[Stripe commerce](../../../../docs/STRIPE_COMMERCE.md); retired plans are recoverable in Git history.
 
 Phase 3, Section 82. **Reviews the design of the commercial infrastructure specified this phase
 — nothing described here is deployed, so this is a design-time security review, not an audit of

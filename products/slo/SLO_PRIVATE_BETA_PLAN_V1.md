@@ -2,7 +2,7 @@
 
 **SLO** (formerly Smart Sample Manager — treated as the current name throughout this and future SLO docs). Local-first sample organisation, classification, search, and discovery for producers and audio engineers.
 
-**Strategic position, unchanged**: Submit remains the active commercial launch lane. This document does not touch Submit, platform payment rails, Railway staging, Paddle, or licensing, and does not propose a public or paid launch for SLO. SLO stays parked behind Submit — this plan prepares it for a **future** private beta, it does not schedule one.
+**Strategic position, unchanged**: Submit remains the active commercial launch lane. This document does not touch Submit's payment, licensing, or release-delivery systems, and does not propose a public or paid launch for SLO. SLO stays parked behind Submit — this plan prepares it for a **future** private beta, it does not schedule one.
 
 ## 1. Current state (audit)
 
@@ -64,7 +64,7 @@ Real, existing evidence from `NITE_DSP_SLO_MASTER_PLAN_V1.md` Phase 3 (B-009) an
 - Exact build SHA: capture at freeze time (not frozen yet — no beta candidate has been cut).
 - Version number: needs a decision (SLO has no version scheme yet, unlike Submit's `0.2.0`).
 - Artifact checksum: the same `juce::SHA256` pattern already proven in this session's read-only safety test can produce this trivially once a candidate build exists.
-- Release receipt, install instructions, known issues, rollback instructions, tester feedback form: **not yet written** — templates exist for Submit (`NITE_DSP_SUBMIT_BETA_LAUNCH_CHECKLIST_V1.md`'s tester-pack step) that SLO's version should follow rather than reinvent.
+- Release receipt, install instructions, known issues, rollback instructions, tester feedback form: **not yet written** — templates exist for Submit (`products/nite-submit/docs/NITE_SUBMIT_PRIVATE_TECHNICAL_PREVIEW_CHECKLIST_V1.md`'s tester-pack step) that SLO's version should follow rather than reinvent.
 - Explicitly: no public release, no paid claims, matching every instruction this plan was written under.
 
 ## 9. Infrastructure plan

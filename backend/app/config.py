@@ -48,8 +48,7 @@ class Settings(BaseSettings):
     # never committed, and is cryptographically unrelated to any future
     # production key.
     #
-    # Two ways to supply the signing key, chosen at Jack's direction
-    # (Railway deploy, 2026-08-13): a hosted environment like Railway has no
+    # Two ways to supply the signing key: a hosted container has no
     # guaranteed-persistent filesystem across redeploys unless a Volume is
     # attached, so production reads the key straight from an env var
     # (licensing_private_key_base64) instead -- same pattern already used

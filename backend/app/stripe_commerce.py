@@ -143,11 +143,21 @@ def send_purchase_confirmation(db: Session, purchase_id: str) -> bool:
     duplicate delivery replay or the admin resend endpoint can retry with the
     stored key.
     """
-    purchase = db.get(models.Purchase, purchase_id)
+    # Refund/dispute handlers take the same row lock. Holding it through the
+    # send prevents a concurrent status change from racing a licence email.
+    purchase = (
+        db.query(models.Purchase)
+        .filter(models.Purchase.id == purchase_id)
+        .with_for_update()
+        .populate_existing()
+        .one_or_none()
+    )
     if purchase is None:
         raise ValueError("Purchase not found")
     if purchase.confirmation_email_sent_at is not None:
         return False
+    if purchase.status != "completed":
+        raise ValueError("Purchase is not eligible for confirmation email")
     user = db.get(models.User, purchase.user_id)
     product = db.get(models.Product, purchase.product_id)
     entitlement = (
@@ -204,7 +214,10 @@ def sweep_unsent_confirmations(db: Session, limit: int = 100) -> dict:
     """
     pending = (
         db.query(models.Purchase)
-        .filter(models.Purchase.confirmation_email_sent_at.is_(None))
+        .filter(
+            models.Purchase.confirmation_email_sent_at.is_(None),
+            models.Purchase.status == "completed",
+        )
         .order_by(models.Purchase.purchased_at.asc())
         .limit(limit)
         .all()

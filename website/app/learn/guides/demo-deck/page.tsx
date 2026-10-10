@@ -36,7 +36,7 @@ const SLIDES = [
   {
     eyebrow: "KENN",
     title: "Your AI audio assistant for Ableton",
-    body: "KENN listens to your mix and explains what it hears.\n\nIt shows measurements, not opinions. It helps you decide, never processes your audio.\n\nLocal analysis. Transparent reasoning. £19 perpetual licence.",
+    body: "KENN listens to your mix and explains what it hears.\n\nIt shows measurements, not opinions. It helps you decide, never processes your audio.\n\nLocal analysis. Transparent reasoning. Research and development. Pricing is not announced.",
     accent: "var(--brand-violet, #9277F2)",
   },
   {

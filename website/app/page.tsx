@@ -19,12 +19,12 @@ import { WaitlistCounter } from "@/components/WaitlistForm";
 export const metadata: Metadata = {
   title: { absolute: "NITE DSP | Intelligent tools for creative workflows" },
   description:
-    "NITE DSP builds local-first macOS tools for producers and students: Submit for document preparation, SLO for acoustic sample search, and KENN for mix review.",
+    "NITE DSP builds local-first macOS tools for producers and students: Submit for document preparation, SLO for acoustic sample search, Para-phase for free writing help, and KENN in research and development.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "NITE DSP | Intelligent tools for creative workflows",
     description:
-      "Local-first macOS tools for producers and students: Submit, SLO, and KENN.",
+      "Local-first macOS tools for producers and students: Submit, SLO, Para-phase, and KENN in research and development.",
     url: "/",
     siteName: "NITE DSP",
     type: "website",
@@ -53,12 +53,21 @@ const ECOSYSTEM = [
     waitlistId: "smart-sample-manager",
   },
   {
+    name: "Para-phase",
+    family: "Family 1 - General",
+    line: "Free writing help.",
+    body: "Rewrite a draft in four voices, with free daily use and no account required. Review the result before using it.",
+    href: "/paraphrase",
+    status: "Free · Coming soon",
+    tone: "warning" as const,
+  },
+  {
     name: "KENN",
     family: "Family 2 - Audio",
     line: "Your AI audio assistant for Ableton.",
-    body: "Lives inside Ableton Live. Listens to your mix, explains what it hears, and helps you make better decisions. Closed beta, not for sale yet.",
+    body: "Lives inside Ableton Live. Listens to your mix, explains what it hears, and helps you make better decisions. In research and development; access and pricing are not announced.",
     href: "/products/kenn",
-    status: "Closed Beta",
+    status: "Research & Development",
     tone: "warning" as const,
     waitlistId: "kenn",
   },
@@ -116,8 +125,8 @@ export default function HomePage() {
             Tools built for the way you actually work.
           </h1>
           <p className="hero-copy mt-6 mx-auto">
-            Document prep, sample discovery, mix feedback. Local-first macOS software
-            that runs on your machine and stays out of your way.
+            Submit for document prep, SLO for sample discovery, and free Para-phase for
+            writing help. KENN is in research and development.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
             <Link href="/products" className="btn-primary">
@@ -126,7 +135,7 @@ export default function HomePage() {
             <CtaButton state="BETA_REQUEST" label="Request beta access" secondary />
           </div>
           <p className="mt-6 text-xs" style={{ color: "var(--muted-dim)" }}>
-            macOS 13+ &middot; Apple Silicon &middot; Local processing &middot; No uploads
+            Submit and SLO: local macOS tools &middot; Para-phase: free online writing aid
           </p>
         </div>
       </section>
@@ -137,9 +146,9 @@ export default function HomePage() {
           <Reveal>
             <div className="max-w-2xl">
               <span className="eyebrow">The Products</span>
-              <h2 className="section-title mt-4">Three tools, one direction.</h2>
+              <h2 className="section-title mt-4">Tools for documents, samples, and writing.</h2>
               <p className="mt-4 text-sm text-muted leading-relaxed font-sans">
-                Document preparation, sample search, and mix feedback. Each one solves a real problem, runs offline, and doesn&apos;t phone home.
+                Submit prepares documents locally. SLO searches your sample library. Para-phase offers free writing help online. KENN is in research and development.
               </p>
             </div>
           </Reveal>

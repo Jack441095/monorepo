@@ -1,5 +1,10 @@
 # Private Beta Release Candidate
 
+> Historical Phase 5.6 snapshot. Its hosting, payment, and email status is
+> superseded by the [current operations audit](../../../../docs/OPERATIONS_AUDIT_2026-10-08.md).
+> Production now runs on Fly.io/Vercel with Stripe and Resend; this does not
+> mean public staging, paid sales, or a product release is approved.
+
 ## Gate status: **NOT READY** (narrower gap again, Phase 5.6)
 
 Phase 5.6 re-evaluation, Section 26's instruction (domain → PASS once configured in code,
@@ -48,12 +53,10 @@ distinct):
                    (strengthened this phase for standalone executability by someone unfamiliar
                    with the codebase) -- no clean machine available.
 
-[BLOCKED EXTERNAL] hosted staging operational
-                   Evidence: docs/RAILWAY_DEPLOYMENT.md -- deployment fully prepared
-                   (railway.json for both services, healthchecks, env reference,
-                   docs/IONOS_DNS_SETUP.md) but no Railway project/credentials exist to
-                   actually deploy to. A materially more concrete BLOCKED than Phase 5.5's --
-                   the target platform is chosen and configured, not just undecided.
+[BLOCKED EXTERNAL] separate public customer staging
+                   Evidence: production hosting now exists, but there is no separate
+                   staging API, website, database, and test-key set for a customer
+                   rehearsal. See the current operations audit.
 
 [PASS]             beta entitlement works
                    Evidence: docs/BETA_ENTITLEMENT_FLOW.md, verified live -- issuance, 90-day
@@ -92,27 +95,23 @@ distinct):
                    zero sibling-plugin or dev-tooling references found.
 ```
 
-## Score: 12 PASS / 3 BLOCKED EXTERNAL / 0 FAIL
+## Historical Phase 5.6 score: 12 PASS / 3 BLOCKED EXTERNAL / 0 FAIL
 
-Up from Phase 5.5's 10/15. The three remaining external blockers: Apple Developer credentials
-(blocks both signing and notarization, counted as one root cause across two gate rows), a real
-clean Mac, and real hosted infrastructure (Railway project + IONOS DNS execution).
+Up from Phase 5.5's 10/15 at the time. The external blockers then were Apple
+Developer credentials, a clean Mac, and hosted infrastructure. Production
+hosting has since been deployed; separate customer staging remains open. The
+current platform status and launch gates are in the operations audit.
 
-## Distinct from the gates above: transactional email still blocked
+## Historical transactional email status
 
-Not one of the 15 gates directly, but referenced by several: `EMAIL_PROVIDER` remains
-`"console"` -- magic-link/purchase/beta-invite emails do not actually send to a real inbox yet.
-This requires a real transactional email provider account and SPF/DKIM/DMARC DNS records for
-`nitedsp.co.uk`, neither of which exist. Explicitly not conflated with the "support route
-exists" gate above, per Section 26/2's instruction.
+At Phase 5.6, `EMAIL_PROVIDER` was `"console"`. Resend is now configured and a
+controlled sign-in message was reported delivered, but inbox receipt, link use,
+and the complete purchase-email journey remain unverified. See the operations
+audit for current evidence.
 
-## Section 74 (Phase 5.5's question, reconfirmed): is the codebase ready to produce the RC if
-credentials/hosting/clean-machine were provided today?
+## Historical Section 74 (Phase 5.5 question): was the codebase ready to produce the RC if
+credentials/hosting/clean-machine were provided at that checkpoint?
 
-**YES**, more concretely than Phase 5.5's answer. Deployment isn't just "the code doesn't block
-it" anymore -- there's an actual prepared target (Railway service configs, health checks, DNS
-documentation) waiting only for an account to exist. `scripts/signing_preflight.py` still
-confirms "Build/manifest/identity preflight: READY." If Apple credentials, a Railway account,
-and a clean Mac were provided today, the remaining path is a sequence of operations (create the
-Railway project, point IONOS DNS at it, sign, notarize, test on the clean machine, fill in the
-DAW matrix) -- not further engineering.
+The answer recorded then was **YES**. That phase report is not a current release
+decision. Use the operations audit for live hosting and checkout gates, and the
+current product checklist for signing, notarization, and clean-machine acceptance.

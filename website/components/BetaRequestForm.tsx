@@ -12,7 +12,7 @@ export function BetaRequestForm({ intent }: { intent?: string }) {
   const [useCase, setUseCase] = useState(intent === "notify" ? "Notify me when SLO or KENN opens up." : "");
   const [opened, setOpened] = useState(false);
 
-  const subject = intent === "notify" ? "NITE DSP beta notify request" : "NITE Submit beta access request";
+  const subject = intent === "notify" ? "NITE DSP beta notify request" : "Submit beta access request";
   const body = encodeURIComponent(
     `Name: ${name}\n\nWhat I'd like to do with NITE software:\n${useCase}\n\nmacOS version:\n`,
   );

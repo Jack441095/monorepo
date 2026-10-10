@@ -8,8 +8,6 @@ implemented (zero live testers/tickets exist to draft a response to).
 
 from __future__ import annotations
 
-import json
-
 import thursday.ops.support_ops as support
 import thursday.ops.qa_ops as qa
 
@@ -60,28 +58,28 @@ def test_known_issues_evidence_missing_when_checklist_absent(monkeypatch, tmp_pa
     assert "Evidence missing" in out
 
 
-def test_known_issues_reflects_real_gate_0_state(monkeypatch, tmp_path):
+def test_known_issues_reflects_real_handoff_gate_state(monkeypatch, tmp_path):
     monkeypatch.setenv("NITE_DSP_ROOT", str(tmp_path))
     checklist = tmp_path / qa.CHECKLIST_RELATIVE_PATH
     checklist.parent.mkdir(parents=True, exist_ok=True)
     checklist.write_text(
-        "## Gate 0 — Owner decisions (nothing below moves without these)\n\n"
+        "## Handoff gate\n\n"
         "- [ ] Do the important thing.\n"
         "- [x] Already done thing.\n"
     )
     out = support.known_issues()
-    assert "1 open item(s)" in out
+    assert "1 open private-preview handoff item(s)" in out
     assert "Do the important thing." in out
     assert "Already done thing." not in out
 
 
-def test_known_issues_none_when_gate_0_fully_cleared(monkeypatch, tmp_path):
+def test_known_issues_none_when_handoff_gate_fully_cleared(monkeypatch, tmp_path):
     monkeypatch.setenv("NITE_DSP_ROOT", str(tmp_path))
     checklist = tmp_path / qa.CHECKLIST_RELATIVE_PATH
     checklist.parent.mkdir(parents=True, exist_ok=True)
     checklist.write_text(
-        "## Gate 0 — Owner decisions (nothing below moves without these)\n\n"
+        "## Handoff gate\n\n"
         "- [x] Done.\n"
     )
     out = support.known_issues()
-    assert "None — the beta launch checklist's Gate 0 is fully cleared." in out
+    assert "No unchecked private-preview handoff items are recorded." in out

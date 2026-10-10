@@ -33,7 +33,7 @@ def test_redacts_known_env_secret_names():
     for line in [
         "STRIPE_SECRET_KEY=sk_test_fake000111222",
         "STRIPE_WEBHOOK_SECRET=whsec_fake_000",
-        "PADDLE_API_KEY=fake-legacy-secret",
+        "RESEND_API_KEY=re_fake-resend-key",
         "SESSION_SECRET: super-secret-fake-value",
         "ADMIN_API_KEY = 'fake-admin-key-000'",
         "THURSDAY_CONFIRMATION_SECRET=fake-confirmation-secret",

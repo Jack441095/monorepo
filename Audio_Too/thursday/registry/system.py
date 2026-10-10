@@ -264,8 +264,8 @@ def _register_system_services(services: dict, api: Any) -> None:
     )
 
     services["beta_readiness"] = ServiceDef(
-        name="Beta Readiness Check",
-        description="Live-parsed Submit beta launch checklist status",
+        name="Private Preview Handoff Check",
+        description="Live-parsed local Submit artifact handoff checklist; not a paid-launch approval",
         examples=["beta readiness", "is submit ready for beta",
                    "what's blocking the beta"],
         triggers=["beta readiness", "submit beta status",
@@ -326,7 +326,7 @@ def _register_system_services(services: dict, api: Any) -> None:
 
     services["known_issues"] = ServiceDef(
         name="Known Issues",
-        description="Real, currently-open Gate 0 blockers from the beta checklist",
+        description="Unchecked private-preview handoff items from the current checklist",
         examples=["known issues", "what's blocking support", "current known issues"],
         triggers=["known issues", "current known issues", "known bugs"],
         intents=["business_ops"],
@@ -335,7 +335,7 @@ def _register_system_services(services: dict, api: Any) -> None:
 
     services["launch_tracker"] = ServiceDef(
         name="Launch Tracker Status",
-        description="Live-parsed launch-gate status from the real tracker doc",
+        description="Paid-launch blockers read from the current operations audit",
         examples=["launch tracker", "launch tracker status", "launch gates"],
         triggers=["launch tracker", "launch gates", "launch status"],
         intents=["business_ops"],

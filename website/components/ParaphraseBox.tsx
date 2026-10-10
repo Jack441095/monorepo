@@ -8,7 +8,6 @@ import {
   readUsage,
   recordUsage,
   requestParaphrase,
-  unlockParaphrase,
   type Voice,
 } from "@/lib/paraphrase";
 
@@ -21,12 +20,6 @@ const VOICE_LABELS: Record<Voice, string> = {
   casual: "Casual",
 };
 
-const TIER_BUTTONS = [
-  { id: "gbp-1" as const, label: "£1", subtitle: "Just because" },
-  { id: "gbp-3" as const, label: "£3", subtitle: "Fair trade" },
-  { id: "gbp-10" as const, label: "£10", subtitle: "Thanks a lot" },
-];
-
 export function ParaphraseBox() {
   const [voice, setVoice] = useState<Voice>("essay");
   const [input, setInput] = useState("");
@@ -35,8 +28,6 @@ export function ParaphraseBox() {
   const [stats, setStats] = useState<{ tokens?: number; seconds?: number }>({});
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
-  const [showPaywall, setShowPaywall] = useState(false);
-  const [unlockMessage, setUnlockMessage] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => () => abortRef.current?.abort(), []);
@@ -87,14 +78,14 @@ export function ParaphraseBox() {
       if (controller.signal.aborted) return;
       if (caught instanceof ParaphraseError) {
         if (caught.status === 429) {
-          setError("");
+          // A daily cap keeps the free service available; it no longer offers a paid bypass.
+          setError("Para-phase is free. The daily limit has been reached; please try again tomorrow.");
           setStatus("rate-limited");
-          setShowPaywall(true);
           return;
         }
         setError(caught.message);
       } else {
-        setError("Could not reach the paraphrase service.");
+        setError("Could not reach Para-phase.");
       }
       setStatus("error");
     }
@@ -103,16 +94,6 @@ export function ParaphraseBox() {
   function handleStop() {
     abortRef.current?.abort();
     setStatus("idle");
-  }
-
-  async function onSelectTier(id: "gbp-1" | "gbp-3" | "gbp-10") {
-    const result = await unlockParaphrase(id);
-    if (result.ok) {
-      setUnlockMessage("Unlimited rewrites unlocked for today.");
-      setShowPaywall(false);
-    } else {
-      setUnlockMessage(result.error);
-    }
   }
 
   return (
@@ -160,7 +141,6 @@ export function ParaphraseBox() {
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-muted-dim">
           <span>
             {remaining} of {FREE_DAILY_LIMIT} free rewrites today
-            {unlockMessage ? ` — ${unlockMessage}` : null}
           </span>
           <span>{charCount.toLocaleString()}/8 000</span>
         </div>
@@ -182,13 +162,6 @@ export function ParaphraseBox() {
               Stop
             </button>
           ) : null}
-          <button
-            type="button"
-            onClick={() => setShowPaywall(true)}
-            className="text-xs font-mono text-muted-dim underline decoration-border/50 underline-offset-2 hover:text-foreground"
-          >
-            Support / Get unlimited
-          </button>
         </div>
       </form>
 
@@ -220,7 +193,7 @@ export function ParaphraseBox() {
           </div>
         ) : null}
 
-        {status === "error" && error ? (
+        {(status === "error" || status === "rate-limited") && error ? (
           <p className="mt-2 text-sm text-[color:var(--state-warning)]">{error}</p>
         ) : null}
 
@@ -231,48 +204,6 @@ export function ParaphraseBox() {
         ) : null}
       </div>
 
-      {/* Paywall modal */}
-      {showPaywall ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="paywall-title"
-        >
-          <div className="surface-card w-full max-w-sm rounded-lg border border-border/60 p-6 shadow-lg">
-            <h3 id="paywall-title" className="text-base font-semibold text-foreground">
-              Pay what you like
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
-              Free rewrites reset each day. Pay once to remove the limit for this
-              session — any amount feels right.
-            </p>
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              {TIER_BUTTONS.map((tier) => (
-                <button
-                  key={tier.id}
-                  onClick={() => void onSelectTier(tier.id)}
-                  className="flex flex-col items-center gap-1 rounded-md border border-border-strong/60 px-3 py-3 text-center transition hover:border-brand-violet hover:bg-brand-violet/5"
-                >
-                  <span className="text-lg font-semibold text-foreground">{tier.label}</span>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-dim">
-                    {tier.subtitle}
-                  </span>
-                </button>
-              ))}
-            </div>
-            {unlockMessage ? (
-              <p className="mt-4 text-center text-xs text-muted-dim">{unlockMessage}</p>
-            ) : null}
-            <button
-              onClick={() => setShowPaywall(false)}
-              className="mt-5 w-full rounded-md border border-border/50 px-3 py-2 text-center text-xs text-muted transition hover:text-foreground"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

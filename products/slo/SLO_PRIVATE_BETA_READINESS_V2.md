@@ -65,4 +65,4 @@ Real infrastructure exists (`bundle_apple_deps.py`, `codesign_and_package.py`, `
 
 ## Confirmation
 
-Nothing in this program touched Submit's launch lane, platform payment/download/licensing/Railway systems, or any real user sample library — all test execution used disposable fixture data or the already-existing `real_corpus_v2` licensed benchmark corpus, never a real user's files. No public launch claims were made. No readiness claim in this document is unbacked by a specific test run or code citation above.
+Nothing in this program touched Submit's launch lane, platform payment/download/licensing systems, or any real user sample library — all test execution used disposable fixture data or the already-existing `real_corpus_v2` licensed benchmark corpus, never a real user's files. No public launch claims were made. No readiness claim in this document is unbacked by a specific test run or code citation above.

@@ -9,7 +9,7 @@ import { KennMixDemo } from "@/components/demo/KennMixDemo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Product Families",
-  description: "Focused tools for creative workflows by NITE DSP: document preparation intelligence, audio intelligence, and internal orchestration.",
+  description: "Submit, SLO (Sample Library Optimizer), and free Para-phase. KENN is in research and development.",
   path: "/products",
 });
 
@@ -47,11 +47,11 @@ export default function ProductsPage() {
                     <StatusDot tone="live" live />
                     Private Beta RC1
                   </span>
-                  <h2 className="mt-5 text-4xl font-bold text-foreground tracking-tight">NITE Submit</h2>
+                  <h2 className="mt-5 text-4xl font-bold text-foreground tracking-tight">Submit</h2>
                   <p className="text-sm font-mono text-muted-dim mt-1.5">Submission Preparation Intelligence</p>
                 </div>
                 <Link href="/products/submit" className="btn-primary">
-                  Explore NITE Submit &rarr;
+                  Explore Submit &rarr;
                 </Link>
               </div>
 
@@ -76,23 +76,22 @@ export default function ProductsPage() {
             </div>
           </TiltSurface>
 
-          {/* NITE Files Product Card */}
           <div className="mt-8 surface-card p-8 rounded-lg border border-brand-emerald/30 bg-surface-raised/40">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <span className="status-chip text-[9px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border border-brand-emerald/40 text-brand-emerald">
-                  <StatusDot tone="live" live />
-                  C++17 Engine v0.1.0
+                  Free &middot; Coming soon
                 </span>
-                <h3 className="mt-4 text-2xl font-bold text-foreground">NITE Files</h3>
-                <p className="text-xs font-mono text-muted-dim mt-1">General-Purpose Library Folder Cleaner & Metadata Organizer</p>
+                <h3 className="mt-4 text-2xl font-bold text-foreground">Para-phase</h3>
+                <p className="text-xs font-mono text-muted-dim mt-1">Free online writing aid</p>
               </div>
-              <Link href="/products/files" className="btn-secondary text-xs">
-                Explore NITE Files &rarr;
+              <Link href="/paraphrase" className="btn-secondary text-xs">
+                Explore Para-phase &rarr;
               </Link>
             </div>
             <p className="mt-4 text-sm text-muted leading-relaxed max-w-2xl font-sans">
-              A general-purpose library organizer powered by a local C++17 engine. Sort photos by EXIF date, music by ID3 tag, and documents by category with non-destructive dry-run previews and transactional undo history.
+              Rewrite a draft in an essay, email, report, or casual voice. Free daily use,
+              no account needed. Review the result before using it.
             </p>
           </div>
         </div>
@@ -120,7 +119,7 @@ export default function ProductsPage() {
                   <span className="text-[10px] font-mono text-muted-dim">AUDIO DSP</span>
                 </div>
                 <h3 className="mt-5 text-2xl font-bold text-foreground">SLO</h3>
-                <p className="text-xs font-mono text-muted-dim mt-1">Sample Library Optimiser</p>
+                <p className="text-xs font-mono text-muted-dim mt-1">Sample Library Optimizer</p>
                 <p className="mt-4 text-sm leading-relaxed text-muted font-sans">
                   An acoustic-similarity sample browser for macOS. Find sounds by how they sound, not just how they are named. Audition timbral matches and drag directly into Ableton Live or any DAW timeline.
                 </p>
@@ -139,7 +138,7 @@ export default function ProductsPage() {
                 <div className="flex items-center justify-between gap-3">
                   <span className="status-chip text-[9px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border border-brand-violet/40 text-brand-violet-text">
                     <StatusDot tone="warning" />
-                    Closed Beta
+                    Research &amp; Development
                   </span>
                   <span className="text-[10px] font-mono text-muted-dim">AI AUDIO ASSISTANT</span>
                 </div>

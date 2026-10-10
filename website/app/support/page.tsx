@@ -5,7 +5,7 @@ import { LEGACY_SUPPORT_EMAIL, SUPPORT_EMAIL } from "@/lib/contact";
 
 export const metadata: Metadata = pageMetadata({
   title: "Support",
-  description: "Support for NITE Submit, SLO, and NITE DSP products.",
+  description: "Support for Submit, SLO, and NITE DSP products.",
   path: "/support",
 });
 
@@ -41,7 +41,7 @@ export default function SupportPage() {
           <span className="eyebrow">Support Center</span>
           <h1 className="section-title mt-4 text-foreground">Get back to making music.</h1>
           <p className="body-large mt-6">
-            Explore product guides or contact us directly. NITE Submit beta users should include their macOS version, app version, and a redacted description of the PDF workflow.
+            Explore product guides or contact us directly. Submit beta users should include their macOS version, app version, and a redacted description of the PDF workflow.
           </p>
 
           <div className="support-grid mt-12">

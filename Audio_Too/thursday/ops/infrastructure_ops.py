@@ -13,7 +13,7 @@ retries -- a single failed check is reported honestly, not retried into a
 false positive.
 
 Endpoints and their contracts are documented in
-docs/NITE_DSP_SOURCE_OF_TRUTH_AND_RAILWAY_RUNBOOK_V1.md (cited, not
+docs/OPERATIONS_AUDIT_2026-10-08.md (cited, not
 duplicated -- same discipline as funding_ops.py). This module answers
 exactly one question per endpoint: did it respond, and with what status
 code, right now. It does NOT replace

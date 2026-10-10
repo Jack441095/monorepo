@@ -15,7 +15,7 @@ than marketing_ops/advertising_ops:
 2. No qualitative company/product narrative is duplicated or paraphrased
    into this code. Doing that would create a second, stale copy of facts
    that live in docs/NITE_DSP_BUSINESS_PLAN_V1.md,
-   docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md, and
+   products/nite-submit/docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md, and
    docs/NITE_DSP_PORTFOLIO_READINESS_AUDIT_V1.md -- this module cites
    those paths as the source of truth instead, exactly the failure mode
    the whole reorg has held itself to avoiding elsewhere.
@@ -46,7 +46,7 @@ _UNAVAILABLE = "unavailable (could not query app.db)"
 
 _SOURCE_DOCS = {
     "company_strategy": "docs/NITE_DSP_BUSINESS_PLAN_V1.md",
-    "submit_status": "docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md",
+    "submit_status": "products/nite-submit/docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md",
     "portfolio_evidence": "docs/NITE_DSP_PORTFOLIO_READINESS_AUDIT_V1.md",
 }
 

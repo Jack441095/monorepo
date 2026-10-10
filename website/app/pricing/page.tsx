@@ -6,7 +6,7 @@ import { PUBLIC_CHECKOUT_LIVE, STRIPE_SUBMIT_LINK, STRIPE_SLO_LINK } from "@/lib
 
 export const metadata: Metadata = pageMetadata({
   title: "Pricing",
-  description: "NITE Submit and SLO perpetual pricing.",
+  description: "Submit and SLO planned pricing, free Para-phase, and KENN research status.",
   path: "/pricing",
 });
 
@@ -20,8 +20,8 @@ export default function PricingPage() {
           <h1 className="section-title mt-4 text-foreground">One price. Yours to keep.</h1>
           <p className="body-large mt-6">
             {PUBLIC_CHECKOUT_LIVE
-              ? "NITE Submit is available as a £2 perpetual licence with no subscription."
-              : "NITE Submit is currently in a free closed beta. It will be available as a simple £2 perpetual licence with no subscription."}
+              ? "Submit is available as a £2 perpetual licence with no subscription."
+              : "Submit is currently in a free closed beta. It will be available as a simple £2 perpetual licence with no subscription."}
           </p>
         </div>
       </section>
@@ -31,7 +31,7 @@ export default function PricingPage() {
         <div className="site-container py-12 sm:py-20">
           <span className="eyebrow">Compare</span>
           <h2 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">
-            Three tools. One honest price model.
+            Product pricing and development status.
           </h2>
           <div className="mt-8 overflow-x-auto">
             <table className="w-full text-sm" style={{ minWidth: "40rem", borderCollapse: "collapse" }}>
@@ -40,16 +40,17 @@ export default function PricingPage() {
                   <th scope="col" className="py-3 pr-4 font-semibold">&nbsp;</th>
                   <th scope="col" className="py-3 pr-4 font-semibold text-foreground">Submit</th>
                   <th scope="col" className="py-3 pr-4 font-semibold text-foreground">SLO</th>
+                  <th scope="col" className="py-3 pr-4 font-semibold text-foreground">Para-phase</th>
                   <th scope="col" className="py-3 pr-4 font-semibold text-foreground">KENN</th>
                 </tr>
               </thead>
               <tbody style={{ color: "var(--muted)" }}>
                 {[
-                  ["Purpose", "Prepare the right submission", "Find the right sound", "Understand the mix"],
-                  ["Status", PUBLIC_CHECKOUT_LIVE ? "Available for macOS" : "Closed Beta, free", "Private Beta / Research", "In development"],
-                  ["Local processing", "Documents never leave your Mac", "Audio analysis runs on your machine", "Planned: local analysis"],
-                  ["Account required", "No", "Activation check-in only", "—"],
-                  ["Price model", PUBLIC_CHECKOUT_LIVE ? "£2 perpetual · no subscription" : "£2 perpetual planned · no subscription", PUBLIC_CHECKOUT_LIVE ? "£9 perpetual · no subscription" : "£9 perpetual planned · no subscription", "Pricing announced at launch"],
+                  ["Purpose", "Prepare the right submission", "Find the right sound", "Rewrite a draft", "Understand the mix"],
+                  ["Status", PUBLIC_CHECKOUT_LIVE ? "Available for macOS" : "Closed Beta, free", "Private Beta / Research", "Public service being prepared", "Research and development"],
+                  ["Local processing", "Documents never leave your Mac", "Audio analysis runs on your machine", "Online service", "Planned: local analysis"],
+                  ["Account required", "No", "Activation check-in only", "No", "—"],
+                  ["Price model", PUBLIC_CHECKOUT_LIVE ? "£2 perpetual · no subscription" : "£2 perpetual planned · no subscription", PUBLIC_CHECKOUT_LIVE ? "£9 perpetual · no subscription" : "£9 perpetual planned · no subscription", "Free daily use", "Not announced"],
                 ].map(([label, ...cells]) => (
                   <tr key={label} style={{ borderTop: "1px solid var(--border)" }}>
                     <th scope="row" className="py-4 pr-4 text-left text-xs font-semibold text-foreground">{label}</th>
@@ -65,7 +66,8 @@ export default function PricingPage() {
             Thursday is internal infrastructure and is not sold. Full product details:{" "}
             <Link href="/products/submit" className="text-link">Submit</Link>,{" "}
             <Link href="/products/smart-sample-manager" className="text-link">SLO</Link>,{" "}
-            <Link href="/products/kenn" className="text-link">KENN</Link>.
+            <Link href="/paraphrase" className="text-link">Para-phase (free)</Link>, and{" "}
+            <Link href="/products/kenn" className="text-link">KENN (research and development)</Link>.
           </p>
         </div>
       </section>
@@ -90,7 +92,7 @@ export default function PricingPage() {
 
           <div className="purchase-panel border border-brand-blue/30">
             <span className="eyebrow text-brand-blue-bright">Single-User Licences</span>
-            <h2 className="mt-5 text-xl font-bold text-foreground">NITE Submit</h2>
+            <h2 className="mt-5 text-xl font-bold text-foreground">Submit</h2>
             <p className="text-xs text-muted-dim font-mono mt-0.5">Submission Preparation Intelligence</p>
             
             <div className="mt-8 space-y-6">
@@ -120,7 +122,7 @@ export default function PricingPage() {
             
             <div className="mt-8 flex flex-col gap-4">
               <div>
-                <p className="text-xs font-semibold text-foreground mb-2">{PUBLIC_CHECKOUT_LIVE ? "NITE Submit — £2" : "NITE Submit — closed beta"}</p>
+                <p className="text-xs font-semibold text-foreground mb-2">{PUBLIC_CHECKOUT_LIVE ? "Submit — £2" : "Submit — closed beta"}</p>
                 <div className="flex flex-wrap gap-3">
                   {PUBLIC_CHECKOUT_LIVE ? (
                     <a href={STRIPE_SUBMIT_LINK} className="btn-primary">Buy now — £2</a>
@@ -160,7 +162,7 @@ export default function PricingPage() {
             </div>
 
             <p className="mt-4 text-xs leading-relaxed text-muted-dim">
-              NITE Submit is a local macOS app. It does not submit work for the user and cannot guarantee that generic presets match a department&apos;s rules.
+              Submit is a local macOS app. It does not submit work for the user and cannot guarantee that generic presets match a department&apos;s rules.
             </p>
 
             <p className="mt-6 text-xs text-muted-dim">

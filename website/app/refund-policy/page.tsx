@@ -13,7 +13,7 @@ export default function RefundPolicyPage() {
   return (
     <LegalPage title="Refund Policy">
       <p>
-        If you buy NITE Submit or SLO, contact support
+        If you buy Submit or SLO, contact support
         within 14 days of purchase for a full refund, no questions asked.
       </p>
       <p>

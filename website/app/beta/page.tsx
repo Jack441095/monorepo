@@ -5,7 +5,7 @@ import { BetaRequestForm } from "@/components/BetaRequestForm";
 
 export const metadata: Metadata = pageMetadata({
   title: "Beta Access",
-  description: "Request access to the NITE Submit closed beta, or ask to be notified when SLO and KENN open up.",
+  description: "Request access to the Submit closed beta, or ask to be notified when SLO and KENN open up.",
   path: "/beta",
 });
 
@@ -24,8 +24,8 @@ export default function BetaPage() {
           <span className="eyebrow">Closed Beta</span>
           <h1 className="section-title mt-4 text-foreground">Try NITE software early.</h1>
           <p className="body-large mt-6">
-            NITE Submit is in a free invitation-only closed beta. SLO remains separately gated, and
-            KENN is in development. Request access, or ask us to notify you as products mature.
+            Submit is in a free invitation-only closed beta. SLO remains separately gated, and
+            KENN is in research and development. Request access, or ask us to notify you as products mature.
           </p>
         </div>
       </section>

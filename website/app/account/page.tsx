@@ -38,7 +38,7 @@ const PLATFORM_OPTIONS: PlatformOption[] = [
 ];
 
 // Release rows carry the authoritative architecture. SLO currently uses the
-// existing universal macOS contract; the staged NITE Submit candidate is an
+// existing universal macOS contract; the staged Submit candidate is an
 // Apple-Silicon arm64 build, so its account request must match that row rather
 // than pretending the archive is universal.
 function platformOptionsFor(productId: string): PlatformOption[] {
@@ -63,8 +63,8 @@ const noPlatformSubscription = () => () => {};
 const noServerPlatform = (): PlatformId | null => null;
 
 const PRODUCT_NAMES: Record<string, string> = {
-  "smart-sample-manager": "SLO (Sample Library Optimiser)",
-  "nite-submit": "NITE Submit",
+  "smart-sample-manager": "SLO (Sample Library Optimizer)",
+  "nite-submit": "Submit",
 };
 
 function EntitlementCard({ entitlement }: { entitlement: Entitlement }) {

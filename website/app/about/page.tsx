@@ -56,7 +56,7 @@ export default function AboutPage() {
 
               <h2>Where this is going</h2>
               <p>
-                Right now I&apos;m focused on getting SLO, Submit, and KENN into the hands of the first 50 beta testers each. KENN is an AI audio assistant that lives inside Ableton Live. It listens to your mix, explains what it hears, and helps you make better decisions. All three waitlists are open and the feedback will shape what ships.
+                I&apos;m developing Submit for document preparation, SLO (Sample Library Optimizer) for sample discovery, and Para-phase as a free writing aid. KENN is an AI audio assistant in research and development. Feedback from early users will shape what ships.
               </p>
               <p>
                 If any of this sounds useful to you, I&apos;d genuinely love to hear from you. Join a waitlist, drop me a line through the support page, or just have a look around.

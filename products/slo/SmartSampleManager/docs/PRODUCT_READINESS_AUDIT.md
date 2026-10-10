@@ -1,5 +1,9 @@
 # SmartSampleManager — Product Readiness Audit
 
+> Historical phased assessment. Its payment, hosting, and production-key
+> statements describe earlier checkpoints and are superseded by the
+> [current operations audit](../../../../docs/OPERATIONS_AUDIT_2026-10-08.md).
+
 Phase 1, Section 2, rescored Phase 2. Scores are based on the actual audits in this `docs/`
 directory — build verification, the full 9-test regression suite (run repeatedly across this
 session, not just once), direct source-code review, real memory/performance profiling runs — not

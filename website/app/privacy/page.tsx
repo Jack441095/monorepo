@@ -12,20 +12,23 @@ export const metadata: Metadata = pageMetadata({
 export default function PrivacyPage() {
   return (
     <LegalPage title="Privacy Policy">
-      <p><strong>Last updated:</strong> September 2026</p>
+      <p><strong>Last updated:</strong> October 2026</p>
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Who we are</h2>
       <p>
-        NITE DSP is operated by Jack Knowlton as a sole trader based in the United Kingdom.
+        NITE DSP is a product brand operated by a UK limited company. The
+        company&apos;s registered name, number, and registered office address are
+        being confirmed before purchases reopen.
         For privacy questions, contact{" "}
         <a href="mailto:nitedsp@outlook.com" className="underline">nitedsp@outlook.com</a>.
       </p>
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">What our products do locally</h2>
       <p>
-        NITE Submit, SLO, and KENN all process your files entirely on your Mac.
-        Documents, audio samples, and mix sessions never leave your machine.
-        No file content is uploaded, transmitted, or stored on our servers.
+        Submit and SLO process documents and audio locally on your Mac; those apps
+        do not upload the files you process to NITE DSP services. Para-phase is an
+        online writing service and is not currently enabled. KENN remains in
+        research and development and is not offered for sale.
       </p>
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Data we collect</h2>
@@ -48,7 +51,6 @@ export default function PrivacyPage() {
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">How we use your data</h2>
       <ul className="list-disc pl-5 space-y-1 mt-2">
         <li>To notify you when your waitlist spot opens or beta access is ready</li>
-        <li>To send a nurture email sequence after you join a waitlist (you can unsubscribe from any email)</li>
         <li>To deliver licence keys and account services</li>
         <li>To respond to support requests</li>
       </ul>
@@ -56,16 +58,20 @@ export default function PrivacyPage() {
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Data storage and security</h2>
       <p>
-        Waitlist and account data is stored in a Neon PostgreSQL database hosted in the EU (Frankfurt).
-        The website is hosted on Vercel. All connections use TLS encryption.
+        Waitlist sign-ups are stored separately in Neon. Account, licence, and
+        commerce records use the backend database hosted on Fly.io. The website
+        runs on Vercel, release downloads use Cloudflare R2, payment processing
+        uses Stripe, and transactional email uses Resend. Provider regions and
+        data-transfer details are being verified before purchases reopen.
       </p>
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Data retention</h2>
-      <ul className="list-disc pl-5 space-y-1 mt-2">
-        <li><strong>Waitlist data:</strong> kept until the product launches and you either convert to a customer or ask to be removed.</li>
-        <li><strong>Account data:</strong> kept for as long as you have an active licence. Deleted on request.</li>
-        <li><strong>Support emails:</strong> kept for 12 months after the last message, then deleted.</li>
-      </ul>
+      <p>
+        We are reviewing retention periods and deletion procedures for each data
+        type. Contact{" "}
+        <a href="mailto:nitedsp@outlook.com" className="underline">nitedsp@outlook.com</a>
+        {" "}to request access to or deletion of your data.
+      </p>
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Your rights</h2>
       <p>
@@ -79,13 +85,16 @@ export default function PrivacyPage() {
         <li><strong>Stripe:</strong> payment processing (<a href="https://stripe.com/privacy" className="underline" target="_blank" rel="noopener">their privacy policy</a>)</li>
         <li><strong>Plausible:</strong> analytics (<a href="https://plausible.io/data-policy" className="underline" target="_blank" rel="noopener">their data policy</a>)</li>
         <li><strong>Vercel:</strong> website hosting</li>
-        <li><strong>Neon:</strong> database hosting (EU)</li>
+        <li><strong>Neon:</strong> waitlist database hosting</li>
+        <li><strong>Fly.io:</strong> backend and account database hosting</li>
+        <li><strong>Cloudflare R2:</strong> release file storage</li>
+        <li><strong>Resend:</strong> transactional email delivery</li>
       </ul>
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Changes to this policy</h2>
       <p>
         We will update the &ldquo;last updated&rdquo; date at the top of this page when changes are made.
-        Material changes will be communicated by email to account holders and waitlist members.
+        Material changes will be posted on this page.
       </p>
     </LegalPage>
   );

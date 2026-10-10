@@ -172,9 +172,9 @@ Known couplings to break, from real inspection:
 - Audio-engineering domain vocabulary baked into `intent.py` triggers,
   `brain.py`'s prompts, and the whole KENN/AudioGen/Ableton service surface.
   For a general product these must be **pluggable domain packs**, not core.
-- Document paths (`docs/NITE_SUBMIT_LAUNCH_TRACKER.md`,
-  `NITE_DSP_SUBMIT_BETA_LAUNCH_CHECKLIST_V1.md`) hardcoded in
-  `ops/documentation_ops.py` / `ops/qa_ops.py`.
+- Thursday's operational document sources now point to the existing paid-launch
+  section in `docs/OPERATIONS_AUDIT_2026-10-08.md` and Submit's private-preview
+  handoff checklist. The helpers still assume NITE DSP's product and audit.
 - Single-tenant state: one `THURSDAY_STATE_DIR`, one SQLite, one session store.
 - `docs/EXTRACTION_COUPLING.md`'s Category B/C couplings to the `Audio_Too`
   process — a customer will not have Audio_Too.

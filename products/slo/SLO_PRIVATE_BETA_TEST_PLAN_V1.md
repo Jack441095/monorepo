@@ -20,7 +20,7 @@
 
 ## During beta (tester-facing)
 
-- **Cohort**: owner-approved only, per the beta definition. Naming testers is an owner decision (same pattern as `NITE_DSP_SUBMIT_BETA_LAUNCH_CHECKLIST_V1.md`).
+- **Cohort**: owner-approved only, per the beta definition. Naming testers is an owner decision (same pattern as `products/nite-submit/docs/NITE_SUBMIT_PRIVATE_TECHNICAL_PREVIEW_CHECKLIST_V1.md`).
 - **Feedback focus, in priority order**: (1) any file-safety concern at all — this should be impossible per §Read-Only Safety, but tester reports are the real-world check on that claim; (2) classification usefulness — does the taxonomy actually help find sounds, independent of raw accuracy percentages; (3) Unknown/uncertain handling — does "I don't know" read as honest or as broken; (4) performance on the tester's own (likely much larger and messier than this session's test corpus) real library; (5) crashes/hangs.
 - **What NOT to collect**: no requirement to upload audio anywhere (local-first, see infrastructure doc) — feedback should be structured text/screenshots, not sample files, unless a tester explicitly opts to share a specific problem file for debugging.
 

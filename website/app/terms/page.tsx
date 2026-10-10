@@ -13,7 +13,7 @@ export const metadata: Metadata = pageMetadata({
 export default function TermsPage() {
   return (
     <LegalPage title="Terms of Service">
-      <p><strong>Last updated:</strong> September 2026</p>
+      <p><strong>Last updated:</strong> October 2026</p>
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Agreement</h2>
       <p>
@@ -23,8 +23,9 @@ export default function TermsPage() {
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Products and licences</h2>
       <p>
-        NITE DSP products (Submit, SLO, KENN) are macOS desktop applications sold as
-        perpetual single-user licences. &ldquo;Perpetual&rdquo; means you own the version you purchased
+        Submit and SLO are macOS desktop products with planned perpetual single-user
+        licences. Para-phase is a free online writing aid. KENN is in research and development.
+        For a paid desktop licence, &ldquo;Perpetual&rdquo; means you own the version you purchased
         for as long as your Mac runs it. It does not guarantee future updates or new versions.
       </p>
       <p>
@@ -58,17 +59,18 @@ export default function TermsPage() {
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Local processing</h2>
       <p>
-        NITE DSP products process your files locally on your Mac. We do not access, view,
-        or store the content of your documents, audio files, or mix sessions. You are
-        solely responsible for the files you process with our tools.
+        Submit and SLO process files locally on your Mac. Para-phase is an online
+        writing service and is not currently enabled. KENN remains in research and
+        development. You are responsible for the files and text you choose to use
+        with our services.
       </p>
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Limitation of liability</h2>
       <p>
         NITE DSP products are tools, not guarantees. Submit checks file structure but does
         not guarantee that a submission portal will accept your file. SLO classifies audio
-        but does not guarantee accuracy. KENN provides mix observations but does not
-        replace professional audio engineering judgement.
+        but does not guarantee accuracy. KENN is a research and development project
+        and is not currently offered for sale.
       </p>
       <p>
         To the maximum extent permitted by law, NITE DSP is not liable for indirect,

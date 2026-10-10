@@ -976,10 +976,9 @@ def _handle_weekly_report() -> str:
 
 
 def _handle_beta_readiness() -> str:
-    """QA / beta readiness -- live-parses the real Submit beta checklist
-    off disk. See thursday/qa_ops.py's module docstring: this never
-    checks a box on the founder's behalf, only reports what's currently
-    checked in the actual file.
+    """Report the live private-preview handoff checklist state only.
+
+    This does not approve tester distribution or paid release.
     """
     import thursday.ops.qa_ops as qa_ops
     return qa_ops.beta_readiness_check()
@@ -1043,18 +1042,16 @@ def _handle_faq(text: str) -> str:
 
 
 def _handle_known_issues() -> str:
-    """Real, currently-unchecked Gate 0 items from the beta checklist,
-    reframed for support triage. See thursday/support_ops.py.
+    """Unchecked private-preview handoff items, reframed for support triage.
+    See thursday/support_ops.py.
     """
     import thursday.ops.support_ops as support_ops
     return support_ops.known_issues()
 
 
 def _handle_launch_tracker() -> str:
-    """Live-parsed launch-gate status from the real tracker doc. See
-    thursday/documentation_ops.py's module docstring for why this is
-    distinct from qa_ops.beta_readiness_check() (different document,
-    different status vocabulary, different granularity).
+    """Read paid-launch blockers from the operations audit. See
+    thursday/documentation_ops.py for the source section and limits.
     """
     import thursday.ops.documentation_ops as documentation_ops
     return documentation_ops.launch_tracker_status()

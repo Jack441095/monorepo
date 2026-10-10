@@ -35,8 +35,8 @@ router = APIRouter(prefix="/v1", tags=["licensing"])
 
 @functools.lru_cache(maxsize=1)
 def _get_signing_key() -> SigningKey:
-    # Production (Railway or any host without a guaranteed-persistent
-    # filesystem) supplies the key via env var; local/staging keeps reading
+    # Production hosts with an ephemeral filesystem supply the key via
+    # env var; local/staging keeps reading
     # the generated keypair file. See config.py's licensing key comment.
     #
     # Deliberately lazy (not at import time): a missing/malformed key used to

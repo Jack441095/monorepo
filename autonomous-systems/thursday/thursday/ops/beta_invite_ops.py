@@ -9,7 +9,7 @@ spec and the beta checklist hold ("hand the exact frozen ZIP directly,"
 not automated distribution) and the founder's own explicit choice when
 asked how Thursday should send these ("draft-only, you send manually").
 
-Live-reads two real facts from `docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md`'s
+Live-reads two real facts from `products/nite-submit/docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md`'s
 Field/Truth tables (Version, Support channel) rather than hardcoding them
 -- the exact release SHA is deliberately NOT embedded (it can change
 between beta waves and this module has no way to verify which build is
@@ -26,7 +26,7 @@ from pathlib import Path
 
 from thursday.ops.ops_intake import parse_structured_command
 
-TRUTH_SHEET_RELATIVE_PATH = "docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md"
+TRUTH_SHEET_RELATIVE_PATH = "products/nite-submit/docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md"
 FEEDBACK_TEMPLATE_RELATIVE_PATH = "products/nite-submit/docs/BETA_FEEDBACK_TEMPLATE.md"
 
 _TABLE_ROW_RE = re.compile(r"^\|(.+)\|\s*$")
@@ -113,11 +113,11 @@ def draft_beta_invite(recipient_email: str, recipient_name: str = "") -> str:
     body = f"""DRAFT — NOT SENT. Review and send manually.
 
 To: {recipient_email}
-Subject: NITE Submit private beta — a quick favour
+Subject: Submit private beta — a quick favour
 
 {greeting}
 
-I'd like you to try NITE Submit — a small Mac app I've been building
+I'd like you to try Submit — a small Mac app I've been building
 that reads a PDF assignment, spots the student name/ID/module details,
 and helps create a correctly named file without uploading anything
 anywhere. Everything stays on your Mac.

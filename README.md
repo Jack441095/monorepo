@@ -1,15 +1,18 @@
-# NITE DSP Platform
+# NITE DSP
 
-This repository owns the NITE DSP public platform: the website, the backend
-API, and the deployment configuration that serves them. It is **not** a home
-for NITE DSP products (Smart Sample Manager, KENN, NITE Submit) or research —
-those live in their own repositories.
+This monorepo contains the NITE DSP public platform, products, audio research,
+and internal studio tools. Website payment operations belong to `website/`
+and `backend/`.
 
 ## Layout
 
 - `website/` — Next.js 16 / React 19 / Tailwind 4 / TypeScript public site.
 - `backend/` — FastAPI backend: licensing, entitlements, Stripe commerce
   integration, Alembic migrations.
+- `products/` — Product source, including Submit, SLO (Sample Library Optimizer), Para-phase, and KENN research.
+- `audio-technology/` — Shared audio analysis and research tools.
+- `autonomous-systems/` — Thursday and internal platform support.
+- `Audio_Too/` — Existing studio/server workspace; it does not host the public checkout.
 
 ## History
 
@@ -21,36 +24,34 @@ were filtered out.
 
 See [Stripe commerce](docs/STRIPE_COMMERCE.md) for checkout settings, webhook events, and migration details.
 
-## Railway deployment (current)
+## Deployment and operations
 
-- Website service root: `/website`
-- Backend service root: `/backend`
+The production website runs on Vercel; the FastAPI backend runs on Fly.io.
+Release artifacts use S3-compatible Cloudflare R2 storage. PostgreSQL account
+and commerce data is attached to the backend; the website waitlist has a
+separate Neon integration. These providers were checked on 2026-10-08.
 
-Railway Production Website and Backend are deployed from this repository's
-`main` branch. The Submit-staging Backend is also connected to `/backend` and
-uses the same source branch. The root workspace's launch and recovery runbooks
-hold the current verified platform pin, dated deployment receipts, and live
-readiness evidence.
+Stripe is the current payment provider. Production website/backend checkout,
+legal review, and release readiness are disabled. Existing Stripe Payment Links
+have their own activation state and must be checked separately before launch.
 
-Production checkout remains explicitly disabled until the owner completes the
-live Stripe catalog/key gate. Submit staging uses Stripe test mode, uses an isolated
-database, and currently uses local release storage; it is not a durable paid-
-launch environment. A separate staging Website service has not been
-provisioned because of the current Railway project capacity limit.
+See [the operations audit and checklist](docs/OPERATIONS_AUDIT_2026-10-08.md)
+for evidence, outstanding launch gates, and completed maintenance. Older
+website reports and database migrations describe the platform at their recorded
+date; use the Stripe commerce guide and this audit for current operations.
 
-To run the read-only durable-staging gate after owner-approved S3/Resend
-configuration is installed, use:
+A durable staging deployment still needs a public customer rehearsal. The
+local test uses an isolated PostgreSQL database, Stripe test mode, R2 artifact
+reads, and Resend. It does not establish public staging or live purchase readiness.
+
+The read-only staging gate checks health, storage/email configuration, and
+unauthenticated download rejection without creating purchases:
 
 ```
 cd backend
 python scripts/check_staging_rehearsal.py \
-  --base-url https://<submit-staging-api> --require-checkout
+  --base-url https://<staging-api> --require-checkout
 ```
-
-The command checks `/health`, the durable `/ready` contract, and that the
-unauthenticated download route returns `401`. It does not upload artifacts,
-send email, call Stripe, or mutate provider state. It intentionally fails
-against the current local-storage/console-email staging posture.
 
 ## Local dev
 
@@ -62,6 +63,6 @@ cd backend && python -m venv .venv && source .venv/bin/activate \
 
 ## Ownership boundaries
 
-- Products (Smart Sample Manager, KENN, NITE Submit): separate repos.
-- Autonomous systems (Thursday): separate repo (`thursday`).
-- Research / SLO / audio technology: separate repos, not migrated here.
+- Product release approval is separate from website deployment.
+- KENN planning remains in `products/kenn/KENN_PLAN.md`.
+- Studio tools use deterministic fixtures for engineering; running Ableton sessions belong to the producer.

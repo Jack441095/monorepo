@@ -1,19 +1,16 @@
 """
 Rate limiting -- Phase 5, Section 56.
 
-In-process fixed-window limiter, keyed by (bucket, client_key). Sufficient
-for a single-process staging deployment; a real multi-worker/multi-instance
-production deployment would need a shared store (Redis) instead of an
-in-memory dict -- documented here rather than built speculatively, since no
-production hosting exists yet to actually run more than one worker
-(docs/HUMAN_COMMERCIAL_REQUIREMENTS.md).
+In-process fixed-window limiter, keyed by (bucket, client_key). Counters are
+local to each process: multiple production instances do not share a quota.
+An edge limit or shared store is required for a deployment-wide quota.
 
-Client key derivation: behind Railway/Render the socket peer is the proxy,
-so every client would collapse onto one shared bucket (turning a 5/min
-per-IP limit into a global lockout lever). We therefore take the first
-X-Forwarded-For entry, which the trusted edge proxy sets to the real client
-and overwrites on the way in. Direct (non-proxied) access falls back to the
-socket peer.
+Client key derivation: Fly's edge provides Fly-Client-IP, which identifies
+the connection it accepted. The production API resolves directly to Fly, so
+we use that platform header instead of the caller-controlled X-Forwarded-For
+chain. If the header is missing on Fly, use the socket peer rather than
+trusting a spoofable forwarded value. Outside Fly, X-Forwarded-For remains a
+local development fallback; direct access falls back to the socket peer.
 
 Memory: buckets are evicted lazily. A hard cap on tracked buckets bounds
 memory against attacker-controllable key space (spoofed IPs); eviction only
@@ -24,6 +21,7 @@ or degrades other behavior.
 """
 from __future__ import annotations
 
+import os
 import time
 from collections import deque
 
@@ -41,9 +39,18 @@ _WINDOW_MAXLEN_HINT = 128
 
 
 def _client_key(request: Request) -> str:
+    fly_client_ip = request.headers.get("fly-client-ip", "").strip()
+    if fly_client_ip:
+        return fly_client_ip
+
+    # Fly terminates public connections and supplies Fly-Client-IP. If it is
+    # absent, a shared proxy bucket is safer than letting callers spoof XFF.
+    if os.getenv("FLY_APP_NAME"):
+        return request.client.host if request.client else "unknown"
+
     forwarded = request.headers.get("x-forwarded-for")
     if forwarded:
-        # First entry = the client as seen by the trusted edge proxy.
+        # Local reverse-proxy runs may not have Fly's trusted client header.
         first = forwarded.split(",")[0].strip()
         if first:
             return first

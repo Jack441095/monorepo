@@ -13,7 +13,9 @@ COPY . .
 
 EXPOSE 8000
 
-# Railway runs migrations through deploy.preDeployCommand. Keep the web
+# Run migrations as a separate deployment step. Keep the web
 # container focused on serving the already-migrated application so an ordinary
 # restart cannot implicitly execute schema changes.
-CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# app.main already logs status and latency without query strings. Uvicorn access
+# logs would copy magic-link and download tokens from URLs into provider logs.
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --no-access-log"]

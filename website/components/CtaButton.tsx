@@ -9,7 +9,7 @@ import { setBuyIntent, startCheckout } from "@/lib/checkout";
 
 /**
  * Single CTA state machine for every commercial surface (see
- * docs/NITE_DSP_CONVERSION_COMMERCIAL_UX_V1.md §1).
+ * docs/STRIPE_COMMERCE.md).
  *
  * States map 1:1 to commercial maturity, the label always states what
  * happens next, so a closed checkout never presents a dead Buy button:

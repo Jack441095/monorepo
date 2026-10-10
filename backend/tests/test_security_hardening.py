@@ -205,9 +205,10 @@ class _FakeRequest:
         self.client = type("C", (), {"host": host})() if host else None
 
 
-def test_rate_limit_keys_on_forwarded_for_not_shared_bucket():
+def test_rate_limit_keys_on_forwarded_for_not_shared_bucket(monkeypatch):
     from app import rate_limit as rl
 
+    monkeypatch.delenv("FLY_APP_NAME", raising=False)
     rl.reset_all()
     dep = rl.rate_limit("sec-test-bucket", max_requests=2, window_seconds=60)
 
@@ -224,6 +225,27 @@ def test_rate_limit_keys_on_forwarded_for_not_shared_bucket():
     # No header at all -> falls back to socket peer.
     dep(_FakeRequest({}, host="9.9.9.9"))
     rl.reset_all()
+
+
+def test_rate_limit_prefers_fly_client_ip_over_spoofed_forwarded_for(monkeypatch):
+    from app import rate_limit as rl
+
+    monkeypatch.setenv("FLY_APP_NAME", "nite-dsp-backend")
+    request = _FakeRequest({
+        "fly-client-ip": "203.0.113.8",
+        "x-forwarded-for": "198.51.100.99, 10.0.0.1",
+    })
+
+    assert rl._client_key(request) == "203.0.113.8"
+
+
+def test_fly_rate_limit_ignores_forwarded_for_when_platform_ip_is_missing(monkeypatch):
+    from app import rate_limit as rl
+
+    monkeypatch.setenv("FLY_APP_NAME", "nite-dsp-backend")
+    request = _FakeRequest({"x-forwarded-for": "198.51.100.99"}, host="10.0.0.1")
+
+    assert rl._client_key(request) == "10.0.0.1"
 
 
 def test_rate_limit_buckets_are_bounded_and_stale_ones_swept(monkeypatch):
@@ -245,4 +267,3 @@ def test_rate_limit_buckets_are_bounded_and_stale_ones_swept(monkeypatch):
     monkeypatch.setattr(rl.time, "monotonic", real_monotonic)
     assert ("sec-flood", "after-sweep") in rl._windows
     rl.reset_all()
-

@@ -1,34 +1,9 @@
-"""QA / Beta Readiness (Thursday Ops upgrade, phase 5).
+"""Read the current Submit private-preview handoff checklist on demand.
 
-Reads `docs/NITE_DSP_SUBMIT_BETA_LAUNCH_CHECKLIST_V1.md` LIVE from disk on
-every call and parses its real `- [ ]` / `- [x]` checkboxes, grouped by
-section -- it never paraphrases or snapshots that content into code, so
-this module cannot drift stale against the checklist the way a hardcoded
-summary would. The checklist's own header says exactly this discipline
-applies to humans reading it too: "if a gate turns out to already be
-satisfied, verify against current staging state before checking it off
-rather than trusting a prior doc's claim." This module holds the same
-line — it reports whatever is *currently* checked, nothing more, and
-never infers or guesses at an item's real-world status beyond what the
-checkbox says.
-
-That checklist lives at the NITE_DSP monorepo root, not inside Audio_Too
-(where this Thursday process actually runs) -- resolved via NITE_DSP_ROOT
-env var with a computed fallback, the same convention established
-tonight in autonomous-systems/thursday's shadow_adapters.py/lease_policy.py
-for the same kind of cross-repo path.
-
-Scoped to this one checklist deliberately, not every checkbox-shaped doc
-in the repo (several exist, for SLO/website/other tracks) -- the Submit
-beta checklist is the one that matches "QA / beta readiness" and is
-explicitly the founder's own current single bottleneck (see
-funding_ops.py's recommended next actions). Aggregating unrelated
-checklists of different products/freshness would conflate things that
-shouldn't be conflated.
-
-Only ever reads this file. Never writes to it, never checks a box on the
-founder's behalf -- that's a real-world decision this module has no
-authority to make.
+The checklist records local artifact handoff evidence only. Its owner-send
+gate and the separate operations audit control tester distribution and paid
+launch; checked handoff boxes do not approve either. This module reports the
+written checkbox state and never edits the owner's checklist.
 """
 
 from __future__ import annotations
@@ -37,17 +12,13 @@ import os
 import re
 from pathlib import Path
 
-CHECKLIST_RELATIVE_PATH = "docs/NITE_DSP_SUBMIT_BETA_LAUNCH_CHECKLIST_V1.md"
+CHECKLIST_RELATIVE_PATH = "products/nite-submit/docs/NITE_SUBMIT_PRIVATE_TECHNICAL_PREVIEW_CHECKLIST_V1.md"
 
 _CHECKBOX_RE = re.compile(r"^- \[([ xX])\]\s*(.+)$")
 _HEADING_RE = re.compile(r"^##\s+(.+)$")
 
-# Section heading substring that identifies the checklist's own declared
-# "nothing below moves without these" gate -- read from the doc's own
-# section title, not a separately-maintained list of item texts, so a
-# reworded item still gets classified correctly as long as the section
-# heading itself still says "Gate 0".
-_BLOCKING_GATE_MARKER = "gate 0"
+# Read the section title so reworded checklist items remain correctly scoped.
+_BLOCKING_GATE_MARKER = "handoff gate"
 
 
 def nite_dsp_root() -> Path:
@@ -115,7 +86,7 @@ def beta_readiness_check() -> str:
     if not path.exists():
         return (
             f"Evidence missing — checklist not found at {path}. "
-            "Can't assess beta readiness without it."
+            "Can't assess the private-preview handoff without it."
         )
 
     try:
@@ -142,7 +113,7 @@ def beta_readiness_check() -> str:
     )
 
     lines = [
-        "BETA READINESS CHECK",
+        "SUBMIT PRIVATE PREVIEW HANDOFF CHECK",
         f"Source (read live): {path}",
         "",
         f"Overall: {checked_items}/{total_items} items checked "
@@ -152,15 +123,17 @@ def beta_readiness_check() -> str:
 
     if gate_section and gate_unchecked:
         lines.append(
-            f"BLOCKED on \"{gate_section['heading']}\" — the checklist's own "
-            "declared prerequisite gate. Nothing else on this checklist "
-            "is meaningful progress until these clear:"
+            f"BLOCKED on \"{gate_section['heading']}\" — unchecked private-preview "
+            "handoff items remain:"
         )
         for item in gate_unchecked:
             lines.append(f"  - [ ] {item}")
         lines.append("")
     elif gate_section:
-        lines.append(f"\"{gate_section['heading']}\" is fully checked off — not blocking.")
+        lines.append(
+            f"\"{gate_section['heading']}\" is fully checked off. "
+            "The owner-send gate and commercial release remain separate."
+        )
         lines.append("")
 
     lines.append("BY SECTION:")

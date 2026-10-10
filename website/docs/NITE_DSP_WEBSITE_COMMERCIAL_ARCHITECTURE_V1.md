@@ -1,6 +1,6 @@
 # NITE DSP COMMERCIAL WEBSITE ARCHITECTURE V1
 
-Companion to `NITE_DSP_WEBSITE_AUDIT_V1.md`. Defines information architecture, page designs and component requirements. All copy below is approved-safe language.
+Recorded website design requirements. Current commerce and launch approvals are tracked in [Stripe commerce](../../docs/STRIPE_COMMERCE.md) and the [operations audit](../../docs/OPERATIONS_AUDIT_2026-10-08.md). This design record does not approve legal copy or payments.
 
 ---
 

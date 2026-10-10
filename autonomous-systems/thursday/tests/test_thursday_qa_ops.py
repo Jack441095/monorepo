@@ -3,13 +3,11 @@
 Live-parses a real markdown checklist off disk rather than caching or
 paraphrasing its content -- these tests write a fixture checklist to a
 temp path and confirm the parser and renderer reflect it exactly,
-including the "BLOCKED on Gate 0" logic, which comes entirely from the
+including the "BLOCKED on Handoff gate" wording, which comes entirely from the
 checklist's own section heading, not a separately-maintained item list.
 """
 
 from __future__ import annotations
-
-import pytest
 
 import thursday.ops.qa_ops as qa
 
@@ -19,7 +17,7 @@ FIXTURE_CHECKLIST = """\
 
 Some preamble text with no checkbox.
 
-## Gate 0 — Owner decisions (nothing below moves without these)
+## Handoff gate
 
 - [ ] Name the private-beta tester cohort.
 - [x] Confirm the support mailbox works.
@@ -34,8 +32,8 @@ Some preamble text with no checkbox.
 - [ ] Sign off pricing
 """
 
-FIXTURE_ALL_GATE_0_DONE = """\
-## Gate 0 — Owner decisions (nothing below moves without these)
+FIXTURE_ALL_HANDOFF_DONE = """\
+## Handoff gate
 
 - [x] Name the private-beta tester cohort.
 - [X] Confirm the support mailbox works.
@@ -62,20 +60,20 @@ def test_checklist_path_joins_root_and_relative_path(monkeypatch):
 def test_parse_groups_items_under_headings():
     sections = qa.parse_checklist(FIXTURE_CHECKLIST)
     headings = [s["heading"] for s in sections]
-    assert "Gate 0 — Owner decisions (nothing below moves without these)" in headings
+    assert "Handoff gate" in headings
     assert "Days 1-2 — Freeze the artifact" in headings
 
 
 def test_parse_reads_checked_state_case_insensitively():
-    sections = qa.parse_checklist(FIXTURE_ALL_GATE_0_DONE)
-    gate_0 = next(s for s in sections if "gate 0" in s["heading"].lower())
-    assert all(i["checked"] for i in gate_0["items"])
+    sections = qa.parse_checklist(FIXTURE_ALL_HANDOFF_DONE)
+    handoff_gate = next(s for s in sections if "handoff gate" in s["heading"].lower())
+    assert all(i["checked"] for i in handoff_gate["items"])
 
 
 def test_parse_correctly_reads_unchecked_items():
     sections = qa.parse_checklist(FIXTURE_CHECKLIST)
-    gate_0 = next(s for s in sections if "gate 0" in s["heading"].lower())
-    unchecked = [i["text"] for i in gate_0["items"] if not i["checked"]]
+    handoff_gate = next(s for s in sections if "handoff gate" in s["heading"].lower())
+    unchecked = [i["text"] for i in handoff_gate["items"] if not i["checked"]]
     assert unchecked == ["Name the private-beta tester cohort."]
 
 
@@ -96,22 +94,22 @@ def test_missing_checklist_reports_evidence_missing(monkeypatch, tmp_path):
     assert "not found" in out
 
 
-def test_readiness_blocked_when_gate_0_has_unchecked_items(monkeypatch, tmp_path):
+def test_readiness_blocked_when_handoff_gate_has_unchecked_items(monkeypatch, tmp_path):
     monkeypatch.setenv("NITE_DSP_ROOT", str(tmp_path))
     checklist = tmp_path / qa.CHECKLIST_RELATIVE_PATH
     checklist.parent.mkdir(parents=True, exist_ok=True)
     checklist.write_text(FIXTURE_CHECKLIST)
 
     out = qa.beta_readiness_check()
-    assert "BLOCKED on \"Gate 0" in out
+    assert "BLOCKED on \"Handoff gate" in out
     assert "Name the private-beta tester cohort." in out
 
 
-def test_readiness_not_blocked_when_gate_0_fully_checked(monkeypatch, tmp_path):
+def test_readiness_not_blocked_when_handoff_gate_fully_checked(monkeypatch, tmp_path):
     monkeypatch.setenv("NITE_DSP_ROOT", str(tmp_path))
     checklist = tmp_path / qa.CHECKLIST_RELATIVE_PATH
     checklist.parent.mkdir(parents=True, exist_ok=True)
-    checklist.write_text(FIXTURE_ALL_GATE_0_DONE)
+    checklist.write_text(FIXTURE_ALL_HANDOFF_DONE)
 
     out = qa.beta_readiness_check()
     assert "BLOCKED on" not in out
@@ -125,7 +123,7 @@ def test_readiness_reports_real_overall_fraction(monkeypatch, tmp_path):
     checklist.write_text(FIXTURE_CHECKLIST)
 
     out = qa.beta_readiness_check()
-    # Fixture: Gate 0 has 1/2 checked, Days 1-2 has 2/2, Days 3-4 has 0/1
+    # Fixture: Handoff gate has 1/2 checked, Days 1-2 has 2/2, Days 3-4 has 0/1
     # -- 3 checked out of 5 total items.
     assert "3/5" in out
     assert "60%" in out
@@ -148,7 +146,7 @@ def test_readiness_never_claims_independent_verification(monkeypatch, tmp_path):
     monkeypatch.setenv("NITE_DSP_ROOT", str(tmp_path))
     checklist = tmp_path / qa.CHECKLIST_RELATIVE_PATH
     checklist.parent.mkdir(parents=True, exist_ok=True)
-    checklist.write_text(FIXTURE_ALL_GATE_0_DONE)
+    checklist.write_text(FIXTURE_ALL_HANDOFF_DONE)
 
     out = qa.beta_readiness_check()
     assert "not an independent verification" in out

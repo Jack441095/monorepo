@@ -11,7 +11,7 @@ export const metadata: Metadata = pageMetadata({
 const PILLARS = [
   {
     title: "Local by default",
-    body: "NITE Submit reads and prepares documents entirely in memory on your Mac. SLO indexes and analyses audio on your machine. Our website demos run in your browser with illustrative data.",
+    body: "Submit reads and prepares documents entirely in memory on your Mac. SLO indexes and analyses audio on your machine. Our website demos run in your browser with illustrative data.",
   },
   {
     title: "What is not uploaded",
@@ -25,7 +25,7 @@ const PILLARS = [
 
 const FAQ = [
   [
-    "Does NITE Submit upload my files?",
+    "Does Submit upload my files?",
     "No. Documents are processed locally on your Mac. Nothing is sent to a server as part of document review or naming.",
   ],
   [

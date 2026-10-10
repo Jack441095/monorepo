@@ -12,8 +12,8 @@ import type { NextRequest } from "next/server";
 // Fails CLOSED by design, matching this codebase's existing security
 // posture elsewhere (Stripe webhook verification, licensing signing key) —
 // if PORTFOLIO_PASSWORD isn't configured in the environment, /portfolio is
-// blocked entirely rather than left open. Set it in Railway's website
-// service variables (not committed anywhere) to unlock the page.
+// blocked entirely rather than left open. Set it in the website host's
+// secret environment variables to unlock the page.
 const REALM = "NITE DSP Portfolio";
 
 function timingSafeEqual(a: string, b: string): boolean {
@@ -78,4 +78,3 @@ export const middleware = proxy;
 export const config = {
   matcher: ["/portfolio", "/portfolio/:path*"],
 };
-

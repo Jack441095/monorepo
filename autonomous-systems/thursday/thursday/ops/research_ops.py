@@ -25,7 +25,7 @@ two genuinely different, both-real things:
      competitor research as much as prospecting.
   2. `find_potential_customers()` — the same real search, pre-seeded with
      NITE Submit's actual documented target audience
-     (`docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md`: "students who need to
+     (`products/nite-submit/docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md`: "students who need to
      prepare university assignment files") when no specific query is
      given, so a bare "find customers" produces a real, on-topic search
      rather than a generic one or a refusal.
@@ -188,7 +188,7 @@ def find_potential_customers(query: str = "") -> str:
     if not query.strip() and result["ok"]:
         rendered += (
             "\n\nDefault query used NITE Submit's documented target audience "
-            "(docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md) — give a more specific "
+            "(products/nite-submit/docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md) — give a more specific "
             "query (e.g. 'find customers: music production forums UK') to "
             "narrow this."
         )

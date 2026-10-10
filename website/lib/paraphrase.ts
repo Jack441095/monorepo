@@ -1,8 +1,8 @@
-// Client-side access to the paraphrase product (products/nite-paraphrase).
+// Client-side access to Para-phase; existing API routes retain their original slug.
 //
 // Browser -> backend /v1/paraphrase (StreamingResponse), which proxies the
 // engine service. This module owns the SSE read pattern, the anonymous
-// free-tier counter, the unlock token, and the Phase 4 payment seam.
+// daily usage counter, and previously issued unlock tokens.
 //
 // The free tier is authoritative on the backend (3/day per client); the
 // local counter is UX only and resets when the day changes.
@@ -59,32 +59,13 @@ export function recordUsage(): void {
   window.localStorage.setItem(USAGE_KEY, JSON.stringify(next));
 }
 
-// --- Unlock token (set by the Phase 4 payment path) ---
+// Keep previously issued tokens readable so existing grants still work.
 
 const UNLOCK_KEY = "nite_paraphrase_unlock_v1";
 
 export function readUnlockToken(): string | null {
   if (typeof window === "undefined") return null;
   return window.localStorage.getItem(UNLOCK_KEY);
-}
-
-function storeUnlockToken(token: string): void {
-  window.localStorage.setItem(UNLOCK_KEY, token);
-}
-
-// Phase 4 seam: replaces this stub with a real Stripe checkout flow that
-// returns an issued token (webhook delivered, then the client polls
-// /v1/paraphrase/entitlement). Keep this function's signature.
-export async function unlockParaphrase(
-  _tier: "gbp-1" | "gbp-3" | "gbp-10",
-): Promise<{ ok: true; token: string } | { ok: false; error: string }> {
-  void _tier; // used by the Phase 4 Stripe catalog mapping
-  const devToken = process.env.NEXT_PUBLIC_PARAPHRASE_UNLOCK_TOKEN;
-  if (devToken) {
-    storeUnlockToken(devToken);
-    return { ok: true, token: devToken };
-  }
-  return { ok: false, error: "Payments open with the beta. Free rewriting stays available daily." };
 }
 
 // --- Streaming request ---
