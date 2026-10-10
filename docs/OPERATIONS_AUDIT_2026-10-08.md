@@ -318,6 +318,8 @@ choice.
   `https://api.nitedsp.co.uk/webhooks/stripe` with four events. The separate
   Stripe sandbox has its own account context; rotate the live destination shown
   above, not a sandbox endpoint.
+  The destination's Event deliveries view showed no deliveries under its
+  current filters on 2026-10-10, so Stripe-to-backend delivery remains unproved.
   Fly confirms `STRIPE_WEBHOOK_SECRET` is deployed, but its secret listing does
   not expose a rotation timestamp or the value. The ignored replacement file is
   absent, so the new signer and synthetic-event check remain unverified; treat
@@ -337,9 +339,16 @@ choice.
   file. The same credential wizard saves a replacement in the ignored admin
   file with mode 600, tests a ranged read of a current Submit object, updates
   Fly, and waits for live `/ready`. It leaves the old R2 tokens active until the
-  production token is positively identified; the broad website token and tokens
-  for other buckets must remain untouched. The wizard has not been run; the old
-  credentials still serve production storage.
+  production token is positively identified. A Cloudflare dashboard inventory
+  on 2026-10-10 shows three active Account API tokens with Object Read & Write
+  on `nite-dsp-releases`, including the owner-created token named NiteDSP
+  releases 2026-10-08. One more token has the same permission on
+  `nite-dsp-release01`.
+  The User API token `client-websites build token` has Admin Read & Write across
+  all buckets. Keep that broad token and the other-bucket token untouched until
+  their use is identified. The one-time secret for the Oct 8 token is not in the
+  ignored admin file, so it cannot be installed as-is. The wizard has not run;
+  existing credentials still serve production storage.
 - [ ] **Email recovery:** assign a monitored caller for
   `sweep_unsent_confirmations`. Its implementation exists, but no recurring
   production job was verified. Stripe's successful webhook acknowledgement does
