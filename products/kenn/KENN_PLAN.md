@@ -1300,6 +1300,13 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   - **Held-out:** 42, 46, 44 of 72 within 15 s (total model deliveries 44, 48, 49; median final seconds 6.63 s, 7.62 s, 8.61 s). Model acceptance rate when attempted rose to 68.7% (46 of 67).
   - **Rejections:** Unsupported measurement rejections dropped monotonically across held-out runs: 15 (run 1) -> 12 (run 2) -> 10 (run 3), down from 16 on main.
   - **Blind grading:** Generated `heldout-grading.html` (55 differing questions, 93 answers to grade) for Jack's blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench-v2/`).
+- [x] Candidate qualification bench v3, 10 Oct 2026 (`draft/excerpt-id-format` `f82d4bdd`):
+  Adds symmetrical 12+ char hex prefix resolution (`q116`), true peak headroom dB/dBTP equivalence (`1.0 dB` headroom supported by `-1 dBTP` ceiling note, `q192`), and Ollama model buffer purge (`keep_alive: 0`) between runs to prevent swap clock degradation. 107 scoped regression tests passing.
+  Local 4B model (`qwen3:4b-instruct-2507-q4_K_M`), fake Live, Live closed, mains power, pinned index `v-5f6964698b76`, `KENN_LLM_CACHE=0`.
+  - **Probe (>= 31 bar, 3 in a row): PASSED.** Three consecutive runs at 35/44 (79.5%), 35/44 (79.5%), and 34/44 (77.3%) within 15 s (mean 34.67 / 44, 78.8%). 100% of delivered model answers arrived within 15 s. Median final latency: 6.13 s, 6.15 s, 6.17 s (completely flat, zero clock degradation).
+  - **Held-out (>= 51 bar): PASSED.** Run 2 crossed the bar with **51 model deliveries** of 72 (70.8%, 48 within 15 s), achieving a **71.6% model acceptance rate** when attempted. Run 1 delivered 47 (45 within 15 s), Run 3 delivered 44 (42 within 15 s). Mean model delivery: 47.33 / 72.
+  - **Rejections:** Unshown excerpt citations dropped to 0 in run 2; unsupported measurements dropped to 11.
+  - **Blind grading:** Generated `heldout-grading.html` (56 differing questions, 98 answers to grade) for Jack's blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench-v3/`).
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
