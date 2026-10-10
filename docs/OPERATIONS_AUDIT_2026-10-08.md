@@ -189,13 +189,13 @@ choice.
   still uses it.
   The Stripe dashboard confirms Starling Bank Ltd is the default GBP payout
   destination; account digits are intentionally omitted. Receipt/support
-  information still needs review. A 2026-10-10 Stripe dashboard check found
-  successful-payment and refund emails disabled, and support replies routed to
-  the account owner's personal mailbox. The public-details editor prefilled the
-  support address from the account address; replace it only after confirming
-  the registered office, so a private address is not exposed on receipts. The
-  2026-10-10 account-status view lists
-  Payments and Payouts as active with no open verification tasks; the app's
+  information still needs review. On 2026-10-10, successful-payment and refund
+  emails were enabled, and public support replies were changed to the business
+  support inbox. The public-details editor had prefilled the support address
+  from the account address; that address was cleared before saving, so the
+  private address is not exposed on receipts. Add a customer-facing address only
+  after confirming the registered office. The 2026-10-10 account-status view
+  lists Payments and Payouts as active with no open verification tasks; the app's
   closed legal, release, and checkout gates still prevent storefront sales.
 - [ ] **Owner/legal reviewer: approve accurate terms, privacy, and refund copy.**
   The owner supplied `Nite-DSP` as the registered name and confirmed the
