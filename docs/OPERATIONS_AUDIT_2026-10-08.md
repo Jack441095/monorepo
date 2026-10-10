@@ -316,6 +316,10 @@ choice.
   `https://api.nitedsp.co.uk/webhooks/stripe` with four events. The separate
   Stripe sandbox has its own account context; rotate the live destination shown
   above, not a sandbox endpoint.
+  Fly confirms `STRIPE_WEBHOOK_SECRET` is deployed, but its secret listing does
+  not expose a rotation timestamp or the value. The ignored replacement file is
+  absent, so the new signer and synthetic-event check remain unverified; treat
+  the exposed signer as active until the wizard verifies its replacement.
   The saved test key returns HTTP 403 when asked to list sandbox webhook
   endpoints, so test-mode routing cannot be read back with that key.
   The wizard has not run; do not enable checkout until the replacement is
