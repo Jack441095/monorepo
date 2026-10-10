@@ -305,8 +305,11 @@ choice.
   headroom. On 2026-10-10, retained Fly logs showed two configured autostops
   with clean SIGINT shutdowns; both restarts passed health checks about two
   seconds after a transient startup failure. No OOM line appeared in that
-  retained log buffer. Inspect platform metrics or schedule a supervised memory
-  review before increasing workloads.
+  retained log buffer. A direct one-minute sample of the started machine's
+  `/proc/meminfo` on 2026-10-10 showed `MemAvailable` between 63,260 and 63,304
+  kB out of 212,228 kB total (about 30% available); this was an idle sample,
+  not a workload test or historical peak. Inspect platform metrics or schedule
+  a supervised memory review before increasing workloads.
 - [x] **Source: retire duplicated commerce plans.** Removed the old website
   commerce reports and SLO-hosted platform phase/deployment/launch plans. Kept
   migration history and product engineering evidence. The SLO documentation
