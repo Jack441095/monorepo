@@ -141,7 +141,12 @@ choice.
   active prices or hosted webhook endpoints. The successful checkout used a
   local Stripe CLI listener; it does not verify a hosted Sandbox endpoint or
   customer inbox delivery. The focused commerce/catalog, production-config,
-  and webhook-robustness suites also pass (66 tests).
+  and webhook-robustness suites also pass (66 tests). A hosted Sandbox Checkout
+  completed on 2026-10-10 at 17:38 UTC for £2 GBP (`livemode=false`), but Stripe
+  currently lists no Sandbox webhook endpoints. It redirected to the public
+  pricing page, which showed no purchase confirmation. This verifies hosted
+  payment collection and redirect only; no hosted fulfilment, email, or download
+  was demonstrated.
 - [ ] **Operations: establish durable public staging.** The local rehearsal is
   isolated, but does not prove an external browser can complete the full journey.
   Public tunnel attempts failed to connect and were stopped. Current DNS checks
@@ -312,9 +317,13 @@ choice.
   so its empty view predates the probe. This verifies provider-reported delivery,
   not inbox placement.
 - [ ] **Email operations:** confirm the probe is visible in the inbox or junk
-  folder, then verify the dashboard and installed API key use the same Resend
-  workspace. `/ready` reports
-  `email_deliverable=true` from key presence alone, not from a send probe.
+  folder, then verify the installed API key against the Resend workspace.
+  The 2026-10-10 dashboard check showed both sign-in probes as delivered and
+  the replacement `NiteDSP Fly sending 2026-10-08` sending-only key as used two
+  days earlier. The workspace has five active keys, including a full-access
+  `API_01`; the deployed key and the old exposed key have not been matched to
+  their dashboard entries. `/ready` reports `email_deliverable=true` from key
+  presence alone, not from a send probe.
   Public DNS answers show root SPF, `send` SPF/MX, the Resend DKIM selector,
   and DMARC `p=none`; actual message alignment, provider verification, and
   bounce handling remain unverified. Keep the current DMARC policy. Revocation
