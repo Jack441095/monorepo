@@ -141,7 +141,7 @@ def test_the_stream_guard_allows_the_figures_the_final_gate_allows(index):
 
 
 def test_a_follow_up_reaches_make_answer_as_typed_beside_the_expanded_search_string(tmp_path, monkeypatch):
-    # make_answer() searches and writes with the history-expanded string, but the gate inside it takes figures from
+    # make_answer() writes with the history-expanded string retrieval ran on, but the gate inside it takes figures from
     # `question`. Wired to the expanded string, the 300 Hz from the turn before rides in on "and the guitars?".
     from kenn.core import chat_answer, chat_retrieval, route_log, session_memory
     from kenn.tests.test_streamed_generation_prefix_guard import CHUNKS
@@ -169,3 +169,42 @@ def test_a_follow_up_reaches_make_answer_as_typed_beside_the_expanded_search_str
 
     assert "300 Hz" in called["query"], "the follow-up has to be history-expanded or this proves nothing"
     assert called["question"] == "and the guitars?"
+
+
+def test_make_answer_inner_check_takes_figures_from_typed_question_not_expanded_query(monkeypatch):
+    """The gate inside make_answer() takes figures from the turn as typed, not the history-expanded query.
+
+    The test above stubs make_answer() to verify what answer_payload() passes it, but that cannot catch a
+    mutation inside make_answer() from question=question to question=query. This exercises the real make_answer()
+    pipeline, confirming that a figure from the earlier turn is accepted on that turn and refused on a follow-up.
+    """
+    from kenn.core import chat_answer, chat_grounding
+    from kenn.tests.test_streamed_generation_prefix_guard import ACCEPTED_ANSWER, CHUNKS
+
+    # 200 ms is absent from CHUNKS, so only the question's say-so can justify it to the grounding gate.
+    ans_200 = ACCEPTED_ANSWER.replace("150 ms", "200 ms")
+    chunks = [chunk for _score, chunk in CHUNKS]
+
+    monkeypatch.setattr(chat_answer, "load_chunks", lambda: list(chunks))
+    monkeypatch.setattr(chat_grounding, "load_chunks", lambda: list(chunks))
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *args, **kwargs: True)
+    monkeypatch.setattr(chat_answer, "llm_enhance_answer", lambda *args, **kwargs: ans_200)
+    monkeypatch.setattr("kenn.llm.linter.lint_response", lambda text, mode: text)
+    monkeypatch.setattr(chat_answer, "_log_generation_outcome", lambda *args, **kwargs: None)
+
+    earlier = "Should I set the compressor release to 200 ms?"
+    results = list(CHUNKS)
+
+    # When query and question are both the earlier turn, the producer typed 200 ms and the answer keeps it.
+    ans_kept, used_kept = chat_answer.make_answer(earlier, results, question=earlier, route="production")
+    assert used_kept is True
+    assert "release to 200 ms" in ans_kept.lower()
+
+    # On a follow-up, the search query is expanded with history and carries 200 ms, but the typed question is
+    # "and on the drums?". make_answer()'s inner _check must refuse "release to 200 ms" because the producer
+    # did not type it this turn.
+    expanded = earlier + " and on the drums?"
+    ans_refused, _ = chat_answer.make_answer(
+        expanded, results, question="and on the drums?", route="production"
+    )
+    assert "200 ms" not in ans_refused

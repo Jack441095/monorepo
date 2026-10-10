@@ -133,6 +133,9 @@ def score_item(row: dict, chunks: list[dict], terms: dict) -> dict:
     # disagree with production on exactly the numbers it exists to audit.
 
     query = str(row.get("question") or "")
+    # Prefer typed_question when present: row["question"] carries the history-expanded search string, while
+    # the live gate takes accepted figures from the producer's typed question.
+    question = str(row.get("typed_question") or query)
     answer = str(row.get("answer") or "")
     timeline_context = str(row.get("timeline_context") or "")
     additional = str(row.get("additional_evidence_text") or "")
@@ -150,7 +153,7 @@ def score_item(row: dict, chunks: list[dict], terms: dict) -> dict:
         timeline_context=timeline_context or None,
         additional_evidence_text=additional or None,
         # A capture's question is what the producer typed, which is what the live gate takes figures from.
-        question=query,
+        question=question,
     )
 
     _block, shown = model_evidence(results, source_label, max_chars=_gate_budget_chars())
@@ -176,12 +179,15 @@ def score_item(row: dict, chunks: list[dict], terms: dict) -> dict:
         # 10 Oct 2026 that set takes in the question and the rest of each shown note, which the excerpts alone
         # do not hold.
         evidence_measurements = gate_evidence_measurements(
-            results, question=query, timeline_context=timeline_context or None,
+            results, question=question, timeline_context=timeline_context or None,
             additional_evidence_text=additional or None,
         )
     else:
-        # No replay to widen from: the captured text, or nothing, is all there is to read figures out of.
-        evidence_measurements = _measurement_keys(f"{evidence_text} {timeline_context} {additional}")
+        # No replay to widen from to recover the rest of the note, but the question is available here too, so
+        # its figures still pass.
+        evidence_measurements = _measurement_keys(
+            f"{evidence_text} {timeline_context} {additional} {question}"
+        )
 
     answer_measurements = sorted(_measurement_keys(answer))
     gold_id = str(row.get("gold_chunk_id") or "")

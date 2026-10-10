@@ -176,8 +176,9 @@ def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
         "unsupported_measurements": len(refused),
         "refused_figures": refused,
         "rejected_answer": str(upgrade.get("rejected_answer") or ""),
-        # The key is only there when the server ran with the flag and the gate kept the text, so a run can be
-        # told apart from an 8 Oct one where every row read 0 because nothing was sent.
+        # The field is per row; whether a run had the flag on belongs in that run's --note.
+        # "refused_figures" is present on the upgrade payload when the server ran with KENN_EXPOSE_REJECTED_ANSWERS=1
+        # and the gate kept the text, so a run can be told apart from an 8 Oct one where every row read 0 because nothing was sent.
         "rejected_text_exposed": "refused_figures" in upgrade,
         "fabricated_sources": len(validation.get("fabricated_sources") or []),
         "template_seconds": template_seconds,

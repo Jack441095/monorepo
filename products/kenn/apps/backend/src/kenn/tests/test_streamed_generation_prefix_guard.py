@@ -371,7 +371,7 @@ def test_a_figure_from_the_turn_before_still_stops_a_follow_up_stream(monkeypatc
     )
     validation = metadata["generation_validation"]
 
-    assert metadata["used_history"] is True, "the follow-up has to be history-expanded or this proves nothing"
+    assert "200 ms" in metadata["search_query"], "the follow-up has to be history-expanded or this proves nothing"
     assert "200" not in text, text
     assert validation["accepted"] is False
     assert validation["unsupported_measurements"] == ["200ms"]

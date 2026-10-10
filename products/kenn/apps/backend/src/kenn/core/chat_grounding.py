@@ -876,7 +876,7 @@ def _shown_note_text(shown: list[tuple[float, dict, str]]) -> str:
 #
 # The question is the producer's words this turn, passed in separately, and not the `query` every other check
 # reads. On a follow-up that query is search_query_with_history(): earlier turns, a Mix Review context turn, the
-# turn being corrected, all kept whole. Taking figures from it would let "and the guitars?" after "cut 300 Hz on the
+# turn being corrected, trimmed of a subject or a 'not' but with their figures intact. Taking figures from it would let "and the guitars?" after "cut 300 Hz on the
 # bass by 4 dB?" pass 300 Hz and 4 dB for the guitars, and a Mix Review turn would pass -7.9 LUFS the producer
 # never typed (read-only review of this branch, 10 Oct 2026).
 #
