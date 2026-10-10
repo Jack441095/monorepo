@@ -9,7 +9,8 @@ primary_region = "ams"
   force_https = true
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 0
+  # Keep one API machine warm so payment webhooks do not wait on a cold start.
+  min_machines_running = 1
 
 [[http_service.checks]]
   # Liveness stays independent of database/storage readiness during deploys.
