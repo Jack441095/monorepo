@@ -185,22 +185,25 @@ choice.
   office are still outstanding. An [official Companies House search for
   NiteDSP](https://find-and-update.company-information.service.gov.uk/search/companies?q=NiteDSP)
   returned no exact match, so the brand must not be assumed to be the legal
-  entity. A live
-  check on 2026-10-08 confirms the privacy page still incorrectly calls NITE DSP
-  a sole trader and promises a nurture sequence. It also combines the
-  separate Neon waitlist database with account/commerce data held by the Fly.io
-  backend, omits Fly.io, Resend, and Cloudflare R2 from the listed providers, and
-  describes KENN as a local-processing product although it remains in research
-  and development. Para-phase is an online text service: when enabled, the
-  website sends text to the backend, which streams it to a separately configured
-  engine. Verify that engine's provider, location, logging, and retention before
-  enabling it. The policy also promises a nurture sequence and fixed retention
-  periods that are not supported by the current implementation.
-  Confirm the actual regions, transfers, lawful bases, retention/deletion
-  practice, analytics behavior, and email workflow before replacing the copy.
-  Draft corrections are now in the working tree for product processing, storage
-  providers, and unsupported retention/email claims. They have not been deployed;
-  the public policy still needs the exact registered particulars and legal review.
+  entity. The 2026-10-10 production privacy page check confirms the old
+  sole-trader, nurture-sequence, and fixed-retention claims are gone. It now
+  names the website, waitlist, backend, release-storage, payment, and email
+  providers; describes Submit and SLO as local products; and identifies
+  Para-phase as an online service that is disabled and KENN as research and
+  development. The page still leaves company particulars, provider regions and
+  data transfers, and retention procedures unresolved. Its analytics claims
+  also need review against the actual Plausible configuration.
+  The deployed refund policy promises a full refund within 14 days and says a
+  refund revokes the licence. The webhook marks a full refund but leaves the
+  entitlement active for an admin decision, so the published policy and current
+  operation do not match. Resolve that mismatch before sales reopen. Para-phase
+  is an online text service: when enabled, the website sends text to the backend,
+  which streams it to a separately configured engine. Verify that engine's
+  provider, location, logging, and retention before enabling it. Confirm the
+  actual regions, transfers, lawful bases, retention/deletion practice,
+  analytics behavior, and email workflow with the reviewer.
+  The privacy corrections are deployed, but exact registered particulars and
+  legal review remain outstanding.
   Keep legal approval disabled until the registered company particulars and
   reviewed policy are complete.
 - [ ] **Owner: approve go-live only after evidence is attached.** Backend and
