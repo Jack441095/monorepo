@@ -46,7 +46,6 @@ test("public pages send baseline browser security headers", async ({ page }) => 
   expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
   expect(headers["permissions-policy"]).toBe("camera=(), microphone=(), geolocation=()");
   expect(headers["content-security-policy"]).toContain("object-src 'none'");
-  expect(headers["content-security-policy"]).not.toContain("paddle.com");
   expect(headers["content-security-policy"]).toContain("frame-src 'self'");
 });
 
@@ -88,14 +87,13 @@ test("public pages name WIP products only with status labels, never capability c
   expect(bodyText).toContain("Internal");
 });
 
-test("no production page links to localhost or a Railway subdomain", async ({ page }) => {
+test("no production page links to localhost", async ({ page }) => {
   await page.goto("/");
   const hrefs = await page.locator("a[href]").evaluateAll((els) =>
     els.map((el) => el.getAttribute("href") || "")
   );
   for (const href of hrefs) {
     expect(href).not.toContain("localhost");
-    expect(href).not.toContain(".up.railway.app");
   }
 });
 

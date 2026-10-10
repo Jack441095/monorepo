@@ -473,8 +473,14 @@ the repository's `nite_core` package. Running with `PYTHONPATH=../shared` passed
 without installing dependencies. Expanded beta-drafting checks initially found
 a pre-existing stale truth-sheet path in both copies; correcting it to the
 existing product document made both checks pass. No audio, live Ableton session,
-or GPU job was used. Test-mode listener, proxy, API, and website rehearsal
-processes were stopped.
+or GPU job was used.
+
+As of 2026-10-10, the Stripe CLI listener, local API, and redirect proxy remain
+running for the unpaid sandbox Checkout Session. The API listens on port 8765
+and its local `/ready` check reports local storage, console email, and
+`checkout_enabled=false`; this rehearsal is not production readiness evidence.
+The local website server is stopped. Stop the remaining rehearsal processes
+after the owner completes or abandons the checkout.
 
 The dependency patch addresses published Next.js/sharp/source-map-js advisories:
 [Next.js ImageResponse](https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j),
