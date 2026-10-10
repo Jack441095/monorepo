@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState, useSyncExternalStore } from "react";
+import { Suspense, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { consumeBuyIntent, startCheckout } from "@/lib/checkout";
@@ -217,6 +217,8 @@ function AccountPageInner() {
 
   const [user, setUser] = useState<User | null>(null);
   const [entitlements, setEntitlements] = useState<Entitlement[]>([]);
+  const [entitlementsLoaded, setEntitlementsLoaded] = useState(false);
+  const initialEntitlementIds = useRef<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [linkSent, setLinkSent] = useState(false);
@@ -242,7 +244,11 @@ function AccountPageInner() {
     apiFetch("/auth/entitlements")
       .then((res) => (res.ok ? res.json() : []))
       .catch(() => [])
-      .then(setEntitlements);
+      .then((data) => {
+        initialEntitlementIds.current = new Set(data.map((item: Entitlement) => item.id));
+        setEntitlements(data);
+        setEntitlementsLoaded(true);
+      });
   }, [user]);
 
   useEffect(() => {
@@ -253,7 +259,7 @@ function AccountPageInner() {
   }, [user]);
 
   useEffect(() => {
-    if (!user || !purchasePending || entitlements.length > 0) return;
+    if (!user || !purchasePending || !entitlementsLoaded) return;
     let cancelled = false;
     let attempts = 0;
     const poll = setInterval(async () => {
@@ -261,7 +267,9 @@ function AccountPageInner() {
       const res = await apiFetch("/auth/entitlements");
       const data = res.ok ? await res.json() : [];
       if (cancelled) return;
-      if (data.length > 0) {
+      // A returning buyer may already have older licences, so wait for a new
+      // entitlement ID instead of treating any nonempty account as fulfilment.
+      if (data.some((item: Entitlement) => !initialEntitlementIds.current.has(item.id))) {
         setEntitlements(data);
         clearInterval(poll);
       } else if (attempts >= 10) {
@@ -273,7 +281,7 @@ function AccountPageInner() {
       cancelled = true;
       clearInterval(poll);
     };
-  }, [user, purchasePending, entitlements.length]);
+  }, [user, purchasePending, entitlementsLoaded]);
 
   async function requestLink(e: React.FormEvent) {
     e.preventDefault();

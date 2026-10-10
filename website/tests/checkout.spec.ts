@@ -25,7 +25,7 @@ for (const path of ["/products/submit", "/products/smart-sample-manager"]) {
     await page.goto(path);
     const links = page.locator('a[href^="https://buy.stripe.com/"]');
     await expect(links).toHaveCount(PUBLIC_CHECKOUT_LIVE ? 1 : 0);
-    if (!PUBLIC_CHECKOUT_LIVE) await expect(page.locator('a[href="#join-waitlist"]')).toBeVisible();
+    if (!PUBLIC_CHECKOUT_LIVE) await expect(page.locator('a[href="#join-waitlist"]').first()).toBeVisible();
   });
 }
 
@@ -35,6 +35,38 @@ test("account page handles a purchase=pending param while signed out gracefully"
   // Signed out takes priority -- shows the sign-in form, not a broken
   // "confirming your purchase" state with no user to confirm it for.
   await expect(page.getByRole("heading", { name: /sign in/i })).toBeVisible();
+});
+
+test("account refreshes licences while a returning customer's purchase is pending", async ({ page }) => {
+  const previousLicence = {
+    id: "entitlement_previous",
+    product_id: "nite-submit",
+    license_key: "PREVIOUS-LICENCE-KEY",
+    license_type: "perpetual",
+    status: "active",
+    expires_at: null,
+  };
+  const newLicence = {
+    ...previousLicence,
+    id: "entitlement_new",
+    license_key: "NEW-LICENCE-KEY",
+  };
+  let entitlementReads = 0;
+
+  await page.route("**/api/auth/me", (route) => route.fulfill({ json: {
+    id: "user_existing_customer",
+    email: "buyer@example.com",
+    created_at: "2026-10-01T00:00:00Z",
+  } }));
+  await page.route("**/api/auth/entitlements", (route) => {
+    entitlementReads += 1;
+    return route.fulfill({ json: entitlementReads < 3 ? [previousLicence] : [previousLicence, newLicence] });
+  });
+
+  await page.goto("/account?purchase=pending");
+  await expect(page.getByText("PREVIOUS-LICENCE-KEY")).toBeVisible();
+  await expect(page.getByText("NEW-LICENCE-KEY")).toBeVisible({ timeout: 10_000 });
+  expect(entitlementReads).toBeGreaterThanOrEqual(3);
 });
 
 test("account page with a malformed purchase param does not crash", async ({ page }) => {
