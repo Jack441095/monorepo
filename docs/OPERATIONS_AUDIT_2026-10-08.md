@@ -220,6 +220,13 @@ choice.
   A fresh 2026-10-10 register search for `Nite DSP` and `NiteDSP` also found no
   exact company match. A search by an officer name does not establish which
   company operates this brand, so no similarly named entity has been assumed.
+  The live Stripe account's `account.updated` event at 19:05 BST on 2026-10-10
+  still reports `business_type=individual`, which conflicts with the owner's
+  statement that Nite-DSP is a UK limited company. The event has no fields
+  currently due, but lists `company.registration_number` as an alternative and
+  `company.vat_id` as eventually due. Confirm the exact legal entity, then
+  correct Stripe's business classification and required company details before
+  reopening sales; do not infer these fields from the trading name.
   The 2026-10-10 production privacy page check confirms the old
   sole-trader, nurture-sequence, and fixed-retention claims are gone. It now
   names the website, waitlist, backend, release-storage, payment, and email
