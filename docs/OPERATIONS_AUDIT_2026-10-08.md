@@ -189,7 +189,12 @@ choice.
   still uses it.
   The Stripe dashboard confirms Starling Bank Ltd is the default GBP payout
   destination; account digits are intentionally omitted. Receipt/support
-  information still needs review. The 2026-10-10 account-status view lists
+  information still needs review. A 2026-10-10 Stripe dashboard check found
+  successful-payment and refund emails disabled, and support replies routed to
+  the account owner's personal mailbox. The public-details editor prefilled the
+  support address from the account address; replace it only after confirming
+  the registered office, so a private address is not exposed on receipts. The
+  2026-10-10 account-status view lists
   Payments and Payouts as active with no open verification tasks; the app's
   closed legal, release, and checkout gates still prevent storefront sales.
 - [ ] **Owner/legal reviewer: approve accurate terms, privacy, and refund copy.**
