@@ -3023,7 +3023,11 @@ class Handler(BaseHTTPRequestHandler):
                         plugin_session_id=plugin_session_id, correlation_id=correlation_id,
                         request_turn_id=upgrade_turn,
                     )
-                    if result.get("llm_available") and not result.get("proposal"):
+                    if (
+                        result.get("llm_available")
+                        and not result.get("proposal")
+                        and result.get("intent") not in {"clarify", "out_of_scope", "conversation"}
+                    ):
                         upgrade_id = answer_upgrades.start(
                             lambda: answer_payload(
                                 question, limit=limit, history=history, session_id=session_id,
