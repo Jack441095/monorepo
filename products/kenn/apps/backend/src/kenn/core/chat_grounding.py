@@ -348,6 +348,63 @@ def _attribution_class(holders: list[str]) -> str:
     return _AMBIGUOUSLY_ATTRIBUTED
 
 
+def _resolve_chunk_id(
+    cited_id: str,
+    bodies: dict[str, str],
+    shown: list[tuple[float, dict, str]],
+) -> str | None:
+    """Resolve a model's cited excerpt identifier to a shown chunk ID.
+
+    The 4B model frequently truncates 12-char hexadecimal hashes to 11 characters (e.g. [#efac7b4076d]
+    instead of [#efac7b4076db]) or makes a single-character typo due to BPE subword tokenization.
+    This caused 14 rejections across 9 probe runs for 'cites an excerpt id that was never shown'.
+    We resolve:
+    1. Exact match against shown chunk IDs.
+    2. 1-based ordinal indices (e.g. '1', '2', '3' or 'source1', 'excerpt1').
+    3. Unambiguous prefix of at least 6 hex characters matching exactly one shown chunk.
+    4. Single-character substitution slip in a 12-char hex string matching exactly one shown chunk.
+    """
+    if not cited_id:
+        return None
+    if cited_id in bodies:
+        return cited_id
+
+    # 1-based ordinal index or 'source1' / 'excerpt1' alias
+    raw_digits = ""
+    lower = cited_id.lower()
+    if lower.isdigit():
+        raw_digits = lower
+    elif lower.startswith(("source", "excerpt", "chunk")) and lower[len("source"):].isdigit():
+        raw_digits = lower[len("source"):]
+    elif lower.startswith("ex") and lower[2:].isdigit():
+        raw_digits = lower[2:]
+
+    if raw_digits:
+        try:
+            idx = int(raw_digits) - 1
+            if 0 <= idx < len(shown):
+                return get_chunk_id(shown[idx][1])
+        except ValueError:
+            pass
+
+    # Unambiguous hex prefix (at least 6 characters)
+    if len(cited_id) >= 6 and all(c in "0123456789abcdefABCDEF" for c in cited_id):
+        prefixes = [cid for cid in bodies if cid.lower().startswith(lower)]
+        if len(prefixes) == 1:
+            return prefixes[0]
+
+        # Single-character slip on 12-character hex ID
+        if len(cited_id) == 12:
+            slips = [
+                cid for cid in bodies
+                if len(cid) == 12 and sum(1 for a, b in zip(cid.lower(), lower) if a != b) == 1
+            ]
+            if len(slips) == 1:
+                return slips[0]
+
+    return None
+
+
 def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) -> dict:
     """Place every number in `answer` on the shown excerpt that holds it, then cross-check the model's own citation.
 
@@ -384,17 +441,20 @@ def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) ->
         holders = [cid for cid in bodies if value in body_measurements[cid]]
         claim["attribution"] = _attribution_class(holders)
         claim["attributed_chunks"] = holders
+        resolved_id = _resolve_chunk_id(cited_id, bodies, shown)
+        if resolved_id:
+            claim["cited_chunk"] = resolved_id
         if not cited_id:
             claim.update(
                 verified=False, reason="uncited", citation_relation=_CITATION_ABSENT
             )
-        elif cited_id not in bodies:
+        elif not resolved_id:
             claim.update(
                 verified=False,
                 reason=_UNSHOWN_CITATION,
                 citation_relation=_CITATION_CITES_UNSHOWN_ID,
             )
-        elif value in body_measurements[cited_id]:
+        elif value in body_measurements[resolved_id]:
             claim.update(
                 verified=True, reason="", citation_relation=_CITATION_AGREES
             )
