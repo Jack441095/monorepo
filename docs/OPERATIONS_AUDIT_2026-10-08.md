@@ -316,9 +316,10 @@ choice.
   removed after that incident. A new temporary rehearsal started on Oct 10:
   the API listens on localhost port 8765, a redirect helper on port 8766, and
   Stripe CLI is running. Local `/ready` reports local storage, console email,
-  and `checkout_enabled=false`; this does not prove production readiness. Stop
-  those processes after the sandbox checkout is resolved. The exposed signing
-  value could not be compared with Fly's stored production signer;
+  and `checkout_enabled=false`; this does not prove production readiness.
+  After the paid sandbox checkout was verified, the API, redirect helper, and
+  Stripe CLI listener were stopped; ports 8765 and 8766 are clear. The exposed
+  signing value could not be compared with Fly's stored production signer;
   verify its provenance through the secret manager before issuing more
   production licences. Do not rotate the production signer until the client
   trust-key lifecycle is ready, because an immediate change can invalidate
