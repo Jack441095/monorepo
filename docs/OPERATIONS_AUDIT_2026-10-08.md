@@ -215,8 +215,12 @@ choice.
   `key_01`, has 138 permissions (46 read and 92 write), including broad account,
   catalog, payment, and payout permissions. Its visible activity includes two
   successful Payment Link creation calls on 2026-09-18; the legacy links are
-  deactivated. Owner action: expire `key_01` after confirming no other service
-  still uses it.
+  deactivated. On 2026-10-10, a fingerprint-only comparison confirmed Fly's
+  running production `STRIPE_SECRET_KEY` matches the ignored local operations
+  credential and does not match `key_01` (suffix `A9KW`). The production key is
+  the restricted Checkout Sessions write key. The Stripe dashboard has the
+  `key_01` expiration confirmation open; the owner must click **Expire** to
+  retire this broad key, which the checked production service no longer uses.
   The Stripe dashboard confirms Starling Bank Ltd is the default GBP payout
   destination; account digits are intentionally omitted. Receipt/support
   information still needs review. On 2026-10-10, successful-payment and refund
