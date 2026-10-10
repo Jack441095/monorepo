@@ -2,13 +2,15 @@
 
 ## 2026-10-10 deployment update
 
-Vercel production deployment `dpl_AwWdrveciMEwXAGZKQPXtU7f7e1A` now serves the
-current website source. Its production build guard passed; `/pricing`,
-`/privacy`, and `/terms` return HTTP 200. The privacy page no longer describes
-NiteDSP as a sole trader, and pricing still has no checkout link. Production API
-readiness remains healthy while checkout, legal approval, release readiness, and
-commercial gates remain false. The registered company name, number, and office
-address are still outstanding, so this deployment does not approve sales.
+Vercel production deployment `dpl_DG5SaW3RHy1Kf5xw8CsLN46Anc4L` serves commit
+`d333e9f`. Its production build guard passed; `/pricing` and `/account` return
+HTTP 200. The account page keeps polling for a new licence after checkout even
+when the customer already has an older licence. The privacy page no longer
+describes NiteDSP as a sole trader, and pricing still has no checkout link.
+Production API readiness remains healthy while checkout, legal approval,
+release readiness, and commercial gates remain false. The exact registered
+company name, number, and office address are still outstanding, so this
+deployment does not approve sales.
 
 The platform responds in production, but public payment readiness has not been
 proved. Website and backend checkout are disabled. The five old live Stripe
