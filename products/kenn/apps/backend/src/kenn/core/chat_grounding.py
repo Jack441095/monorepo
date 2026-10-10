@@ -17,6 +17,7 @@ from kenn.core.chat_constants import (
 
 from kenn.core.chat_retrieval import (
     detect_intent,
+    load_chunks,
     normalized_terms,
     query_intent_terms,
     source_label,
@@ -209,6 +210,84 @@ _MEASUREMENT_RE = re.compile(
 )
 
 
+def _measurement_is_supported(measurement: str, allowed: set[str]) -> bool:
+    """Whether measurement is allowed, treating integer and .0 forms as equivalent.
+
+    Audio engineers write -14 LUFS or -14.0 LUFS interchangeably, and Live meters display decimal true peaks
+    like -1.0 dBTP alongside integer bounds like -1 dBTP. Treating -14.0 LUFS as unsupported when the note
+    writes -14 LUFS is a formatting mismatch, not an invention. Similarly, true peak ceilings (-1 dBTP)
+    are routinely cited in mixing advice as 1 dB or 1.0 dB true peak headroom.
+    """
+    if measurement in allowed:
+        return True
+    m_int = re.sub(r"^(-?\d+)\.0([a-z%]+)$", r"\1\2", measurement)
+    if m_int in allowed:
+        return True
+    m_dec = re.sub(r"^(-?\d+)([a-z%]+)$", r"\1.0\2", measurement)
+    if m_dec in allowed:
+        return True
+    # True peak headroom / ceiling equivalence: answers citing 1 dB or 1.0 dB true peak margin against a -1 dBTP ceiling note
+    m_db = re.match(r"^(-?\d+(?:\.0)?)db$", measurement)
+    if m_db:
+        val = m_db.group(1).removesuffix(".0")
+        val_pos = val.lstrip("-")
+        if any(
+            target in allowed
+            for target in (
+                f"{val}dbtp",
+                f"{val}.0dbtp",
+                f"-{val_pos}dbtp",
+                f"-{val_pos}.0dbtp",
+                f"{val_pos}dbtp",
+                f"{val_pos}.0dbtp",
+            )
+        ):
+            return True
+    return False
+
+
+def _unsupported_measurements(found: set[str], allowed: set[str]) -> set[str]:
+    """Measurements in found that are not permitted by allowed."""
+    return {m for m in found if not _measurement_is_supported(m, allowed)}
+
+
+def _range_interval_measurements(text: str) -> set[str]:
+    """Every integer measurement within a small recommended range (e.g. 3-6 dB -> 3, 4, 5, 6 dB).
+
+    When a note recommends setting backing vocals '3-6 dB below the lead', an answer recommending
+    '3-5 dB' or '5 dB' is mathematically within the note's guidance. Large spans (> 10) are skipped to avoid
+    broad sweeps.
+    """
+    added: set[str] = set()
+    for m in _RANGE_RE.finditer(text):
+        low_str, high_str, unit = m.group(1), m.group(2), m.group(3)
+        unit_clean = "".join(unit.lower().split())
+        try:
+            low, high = float(low_str), float(high_str)
+            if low.is_integer() and high.is_integer() and 1 <= (high - low) <= 10:
+                for val in range(int(low), int(high) + 1):
+                    added.add(f"{val}{unit_clean}")
+                    added.add(f"{val}.0{unit_clean}")
+        except ValueError:
+            pass
+    return added
+
+
+def _question_measurements(question: str) -> set[str]:
+    """Measurements typed by the producer this turn, handling colloquial audio shorthand.
+
+    Producers routinely type shorthand like 'boosted around 5k', '+0.8 true peak', or '0.0 peak'.
+    When the model echoes these exact figures back (e.g. 5 kHz or +0.8 dBTP), it is addressing the
+    producer's stated values, not inventing them.
+    """
+    q = question
+    q = re.sub(r"\b(\d+(?:\.\d+)?)\s*k\b", r"\1 kHz", q, flags=re.IGNORECASE)
+    q = re.sub(r"\+(\d+(?:\.\d+)?)", r"\1", q)
+    q = re.sub(r"\b(\d+(?:\.\d+)?)\s*true\s*peak\b", r"\1 dBTP \1 dB", q, flags=re.IGNORECASE)
+    q = re.sub(r"\b(\d+(?:\.\d+)?)\s*peak\b", r"\1 dB", q, flags=re.IGNORECASE)
+    return _measurements(q)
+
+
 def _measurements(text: str) -> set[str]:
     """Each measurement in `text`, keyed so spacing never decides a match.
 
@@ -348,6 +427,67 @@ def _attribution_class(holders: list[str]) -> str:
     return _AMBIGUOUSLY_ATTRIBUTED
 
 
+def _resolve_chunk_id(
+    cited_id: str,
+    bodies: dict[str, str],
+    shown: list[tuple[float, dict, str]],
+) -> str | None:
+    """Resolve a model's cited excerpt identifier to a shown chunk ID.
+
+    The 4B model frequently truncates 12-char hexadecimal hashes to 11 characters (e.g. [#efac7b4076d]
+    instead of [#efac7b4076db]) or makes a single-character typo due to BPE subword tokenization.
+    This caused 14 rejections across 9 probe runs for 'cites an excerpt id that was never shown'.
+    We resolve:
+    1. Exact match against shown chunk IDs.
+    2. 1-based ordinal indices (e.g. '1', '2', '3' or 'source1', 'excerpt1').
+    3. Unambiguous prefix of at least 6 hex characters matching exactly one shown chunk.
+    4. Single-character substitution slip in a 12-char hex string matching exactly one shown chunk.
+    """
+    if not cited_id:
+        return None
+    if cited_id in bodies:
+        return cited_id
+
+    # 1-based ordinal index or 'source1' / 'excerpt1' alias
+    raw_digits = ""
+    lower = cited_id.lower()
+    if lower.isdigit():
+        raw_digits = lower
+    elif lower.startswith(("source", "excerpt", "chunk")) and lower[len("source"):].isdigit():
+        raw_digits = lower[len("source"):]
+    elif lower.startswith("ex") and lower[2:].isdigit():
+        raw_digits = lower[2:]
+
+    if raw_digits:
+        try:
+            idx = int(raw_digits) - 1
+            if 0 <= idx < len(shown):
+                return get_chunk_id(shown[idx][1])
+        except ValueError:
+            pass
+
+    # Unambiguous hex prefix (at least 6 characters) or 12+ char string starting with a 12-char ID
+    if len(cited_id) >= 6 and all(c in "0123456789abcdefABCDEF" for c in cited_id):
+        prefixes = [
+            cid for cid in bodies
+            if cid.lower().startswith(lower)
+            or (len(lower) >= 12 and lower.startswith(cid.lower()))
+        ]
+        if len(prefixes) == 1:
+            return prefixes[0]
+
+        # Single-character slip on 12-character hex ID
+        if len(cited_id) == 12:
+            slips = [
+                cid for cid in bodies
+                if len(cid) == 12 and sum(1 for a, b in zip(cid.lower(), lower) if a != b) == 1
+            ]
+            if len(slips) == 1:
+                return slips[0]
+
+    return None
+
+
 def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) -> dict:
     """Place every number in `answer` on the shown excerpt that holds it, then cross-check the model's own citation.
 
@@ -365,10 +505,11 @@ def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) ->
     `unattributed` here while still passing the aggregate unsupported-measurement check, which sees the wider set.
 
     Uncited claims are counted and returned but do not warn. The aggregate measurement check already rejects any
-    number found nowhere in the evidence, so a second warning on the same numbers would reject nothing new while
-    dropping every currently-accepted answer until an 8B model has learned the rule. The count is what keeps that
-    reversible: promote `uncited` to a warning on the day the citation rate justifies it. Same reasoning keeps
-    `ambiguously_attributed` silent -- the number is in the evidence, so no existing warning could fire on it.
+    number found nowhere in the evidence, the producer's question or the shown notes, so a second warning on the
+    same numbers would reject nothing new while dropping every currently-accepted answer until an 8B model has
+    learned the rule. The count is what keeps that reversible: promote `uncited` to a warning on the day the
+    citation rate justifies it. Same reasoning keeps `ambiguously_attributed` silent -- the number is in the
+    evidence, so no existing warning could fire on it.
     """
     bodies: dict[str, str] = {}
     for _score, chunk, body in shown:
@@ -384,17 +525,20 @@ def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) ->
         holders = [cid for cid in bodies if value in body_measurements[cid]]
         claim["attribution"] = _attribution_class(holders)
         claim["attributed_chunks"] = holders
+        resolved_id = _resolve_chunk_id(cited_id, bodies, shown)
+        if resolved_id:
+            claim["cited_chunk"] = resolved_id
         if not cited_id:
             claim.update(
                 verified=False, reason="uncited", citation_relation=_CITATION_ABSENT
             )
-        elif cited_id not in bodies:
+        elif not resolved_id:
             claim.update(
                 verified=False,
                 reason=_UNSHOWN_CITATION,
                 citation_relation=_CITATION_CITES_UNSHOWN_ID,
             )
-        elif value in body_measurements[cited_id]:
+        elif value in body_measurements[resolved_id]:
             claim.update(
                 verified=True, reason="", citation_relation=_CITATION_AGREES
             )
@@ -704,8 +848,9 @@ class StreamedAnswerGuard:
     why the streaming path used to discard every token and show the producer nothing until generation AND the gate
     had both finished. We cannot make that gate incremental, but two of its eight warnings are prefix-sound:
 
-    - unsupported measurements, because the evidence side of `_measurements(answer) - _measurements(evidence_text)`
-      is fixed before the first token while the answer side only grows;
+    - unsupported measurements, because the accepted side of `_measurements(answer) - accepted` (the shown
+      evidence, the producer's question and the shown notes in full, see _accepted_measurements) is fixed before
+      the first token while the answer side only grows;
     - claims_live_change, because a regex match inside a prefix is still a match inside the finished answer.
 
     The other three are not: evidence_overlap divides by an answer_terms set that grows with every token, and
@@ -728,7 +873,7 @@ class StreamedAnswerGuard:
         # after the dB. Judging the window there cut two good answers on 2 Oct 2026 (the sources had -6 dBFS and
         # -0.3 dBTP). The carry keeps the text, so the next token's window sees the whole unit.
         judged = window[:-2] if window.lower().endswith("db") else window
-        leaked = _measurements(judged) - self._allowed
+        leaked = _unsupported_measurements(_measurements(judged), self._allowed)
         if leaked:
             return {
                 "warning": (
@@ -775,17 +920,90 @@ def _gate_evidence_text(
     return evidence_text
 
 
+def _shown_note_text(shown: list[tuple[float, dict, str]]) -> str:
+    """Every section of every note that a shown excerpt was cut from, as one string. Manual pages are left out."""
+    sources = {
+        str(chunk.get("source"))
+        for _score, chunk, _body in shown
+        if chunk.get("kind") == "note" and chunk.get("source")
+    }
+    if not sources:
+        # Only manual pages or nothing were shown, so there is no note to widen to and the excerpts stand alone.
+        return ""
+    # The shown chunks' own full text goes in as well as the index's copy. A result list built outside
+    # load_chunks() (a test, or an index reloaded after the search ran) would otherwise lose its own sections.
+    texts = [str(chunk.get("text") or "") for _score, chunk, _body in shown if chunk.get("kind") == "note"]
+    # load_chunks() is cached, but picking out the sections by source is a fresh pass over all of them every call.
+    # On v-5f6964698b76 (3974 chunks) that pass took 0.1 ms and the measurement pass over the four largest notes
+    # (22,664 chars) 0.85 ms, measured 10 Oct 2026 with a bench running. The gate runs at most three times per
+    # answer, and the answer takes seconds to generate, so an index by source would be a cache nobody needs.
+    texts += [
+        str(chunk.get("text") or "")
+        for chunk in load_chunks()
+        if chunk.get("source") in sources and chunk.get("kind") == "note"
+    ]
+    return " ".join(texts)
+
+
+# The gate used to accept only the figures in the shown excerpts. The 8 Oct 2026 bench refused 116 figures over 12
+# runs (kenn-evaluation-data/2026-10-08-refused-figures). Of those, 20 were in the producer's own question and 23
+# were in a shown note but past the 400-character excerpt. On main's held-out run, 6 of 15 rejected answers had
+# every refused figure in one of those two places.
+# Examples: eq-kick-bass-phase asks about a cancel "around 60 Hz", and all 8 answers that said 60 Hz back were
+# refused. loud-streaming-targets wrote the note's -1 dBTP and was refused 3 runs out of 3.
+#
+# This does not reopen the 2 Oct "wide" bug described above _evidence_chunks. There, a "3 dB" passed on chunk #9,
+# which the model was never shown. Here the extra figures come only from notes the model saw part of. Manual pages
+# are left out because every manual chunk shares one source, and "the whole manual" would accept almost any Hz.
+#
+# The question is the producer's words this turn, passed in separately, and not the `query` every other check
+# reads. On a follow-up that query is search_query_with_history(): earlier turns, a Mix Review context turn, the
+# turn being corrected, trimmed of a subject or a 'not' but with their figures intact. Taking figures from it would let "and the guitars?" after "cut 300 Hz on the
+# bass by 4 dB?" pass 300 Hz and 4 dB for the guitars, and a Mix Review turn would pass -7.9 LUFS the producer
+# never typed (read-only review of this branch, 10 Oct 2026).
+#
+# Four costs we accept:
+# - The context is not checked. The note may give the same number for something else, for example -18 dBFS as a
+#   gain-staging target where the answer uses -18 dB as a threshold.
+# - A producer's proposed setting echoed back as advice ("should I boost 5 kHz by 3 dB?" "yes, 3 dB") now passes.
+# - So does a figure the producer rules out ("no, not 300 Hz, I meant 2 kHz"). An answer that says 300 Hz there
+#   is most often saying "not 300 Hz", and the gate cannot tell either way without reading the sentence.
+# - The prompt's allowed-figures list in llm_rewrite does not grow to match. A bare number from a section the model
+#   never read has no sentence saying what it measures, so the gate stays wider than the list, never narrower.
+#
+# Only the measurement check widens. Overlap and product checks still read evidence_text alone, and the query is
+# still kept out of overlap (see the comment in generated_answer_validation). verify_claim_citations still reads the
+# excerpts only: a whole-note figure tagged with an excerpt id is still a misattribution, because the model cannot
+# have read it in that excerpt. So is a question figure tagged that way, so the widening helps untagged claims only.
+def _accepted_measurements(
+    question: str, shown: list[tuple[float, dict, str]], evidence_text: str
+) -> set[str]:
+    """Every measurement an answer may carry: those in the evidence text, the producer's question, and the shown notes in full."""
+    shown_note_text = _shown_note_text(shown)
+    return (
+        _measurements(evidence_text)
+        | _range_interval_measurements(evidence_text)
+        | _question_measurements(question)
+        | _measurements(shown_note_text)
+        | _range_interval_measurements(shown_note_text)
+    )
+
+
 def evidence_measurements(
     results: list[tuple[float, dict]],
     *,
+    question: str,
     timeline_context: str | None = None,
     additional_evidence_text: str | None = None,
 ) -> set[str]:
-    """Every measurement the retrieved evidence actually contains, keyed the way the gate keys them."""
-    return _measurements(
-        _gate_evidence_text(
-            _evidence_chunks(results), timeline_context, additional_evidence_text
-        )
+    """Every measurement the gate will accept in an answer, keyed the way the gate keys them.
+
+    The streamed guard is built from this, so it has to take the same question the final gate is called with, or a
+    figure the producer typed would stop the stream that the final gate would have let through.
+    """
+    shown = _evidence_chunks(results)
+    return _accepted_measurements(
+        question, shown, _gate_evidence_text(shown, timeline_context, additional_evidence_text)
     )
 
 
@@ -1030,12 +1248,17 @@ def generated_answer_validation(
     answer_mode: str,
     timeline_context: str | None = None,
     additional_evidence_text: str | None = None,
+    question: str = "",
 ) -> dict:
     """Gate generated prose against the same evidence used for retrieval.
 
     This is deliberately deterministic and provider-independent, so local,
     remote, sync, streaming, and voice generation cannot select different
     standards. Failed generated text is discarded before it reaches a caller.
+
+    `question` is the producer's words this turn, as typed; its figures are accepted in the answer. It is not
+    `query`, which is history-expanded on a follow-up (see _accepted_measurements). Left empty, no figure is
+    accepted on the question's say-so, which is the stricter gate.
     """
     grounding = grounding_report(
         query,
@@ -1070,7 +1293,12 @@ def generated_answer_validation(
         if answer_terms
         else 0.0
     )
-    unsupported_measurements = sorted(_measurements(answer) - _measurements(evidence_text))
+    unsupported_measurements = sorted(
+        _unsupported_measurements(
+            _measurements(answer),
+            _accepted_measurements(question, shown, evidence_text),
+        )
+    )
     # The labels the model was actually given, so a citation is only fabricated if the filename was not on
     # screen. Derived from the same shown list, not from what retrieval could have supplied.
     displayed_filenames = {

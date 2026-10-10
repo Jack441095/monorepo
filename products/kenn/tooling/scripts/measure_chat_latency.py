@@ -175,6 +175,9 @@ def _install_capture(path: Path) -> None:
         with path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps({
                 "question": query,
+                # The question as typed by the producer this turn, before history expansion.
+                # The live gate takes accepted figures from this, not the expanded search query.
+                "typed_question": str(kwargs.get("question") or ""),
                 "answer": answer,
                 "accepted": bool(validation["accepted"]),
                 "warnings": [str(w) for w in validation.get("warnings") or []],

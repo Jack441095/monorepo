@@ -51,3 +51,15 @@ def test_the_commonest_close_word_wins_a_tie():
 
 def test_an_empty_index_changes_nothing():
     assert correct_query_typos("paralel compresion", {"idf": {}, "inverted_index": {}}) == "paralel compresion"
+
+
+def test_typo_query_routes_to_production_and_avoids_weak_match_early_return():
+    from kenn.core import chat_retrieval, chat_routing
+    q = "hwo do i do paralel compresion on drms"
+    assert chat_routing.route_query(q, allow_llm=False) == "production"
+    chunks = chat_retrieval.load_chunks()
+    terms = chat_retrieval.load_terms()
+    results = chat_retrieval.search(q, chunks, terms)
+    assert results
+    assert chat_retrieval.results_are_weak(q, results) is False
+

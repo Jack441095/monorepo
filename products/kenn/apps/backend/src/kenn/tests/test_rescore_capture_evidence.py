@@ -120,6 +120,11 @@ def _replay_to(monkeypatch, results: list[tuple[float, dict]]) -> None:
     would stall a shared machine.
     """
     monkeypatch.setattr(module, "_replay_results", lambda query, chunks, terms: results)
+    # Since 10 Oct 2026 the gate also reads a shown note's other sections from the index, so that copy has to be
+    # the replayed chunks too, or the real sidechain note's figures land in evidence_measurements.
+    from kenn.core import chat_grounding
+
+    monkeypatch.setattr(chat_grounding, "load_chunks", lambda: [chunk for _score, chunk in results])
 
 
 def test_a_stale_capture_field_does_not_make_a_grounded_answer_look_like_a_leak(monkeypatch) -> None:
@@ -265,3 +270,18 @@ def test_a_missing_gold_chunk_excludes_the_row_from_the_rate_instead_of_calling_
     assert summary["numeric_answers"] == 0
     assert summary["numeric_answers_unscorable"] == 1
     assert "excluded from the rate" in capsys.readouterr().out
+
+
+def test_replayed_evidence_prefers_typed_question_over_expanded_query(monkeypatch) -> None:
+    """When a capture recorded an expanded query and a typed question, the gate takes figures from the typed question."""
+    _replay_to(monkeypatch, RESULTS)
+    # The answer repeats 200 ms. If the gate read the expanded question, 200 ms would pass;
+    # preferring typed_question ensures the gate correctly flags 200 ms as unsupported.
+    row = _row(
+        question="Should I set the compressor release to 200 ms? and on the drums?",
+        typed_question="and on the drums?",
+        answer=ANSWER.replace("150 ms", "200 ms"),
+    )
+    item = module.score_item(row, [], {})
+    assert "200ms" in item["unsupported_measurements"]
+

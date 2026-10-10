@@ -12,7 +12,7 @@ import pytest
 from scripts import probe_advanced_questions as tool
 
 
-def _stub(model_on: bool, upgrade_status: str = "accepted"):
+def _stub(model_on: bool, upgrade_status: str = "accepted", **upgrade_extra):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
             pass
@@ -30,7 +30,7 @@ def _stub(model_on: bool, upgrade_status: str = "accepted"):
                 self._send({"ok": True})
             else:
                 self._send({"status": upgrade_status, "answer": "Model text about attack and release.", "seconds": 4,
-                            "reason": "generated answer introduced unsupported measurements"})
+                            "reason": "generated answer introduced unsupported measurements", **upgrade_extra})
 
         def do_POST(self):
             question = json.loads(self.rfile.read(int(self.headers["Content-Length"])))["question"]
@@ -177,8 +177,8 @@ def test_the_summary_counts_expected_abstentions_and_leaves_them_out_of_recall()
     assert "expected_abstain_handled" not in summary["by_category"]["dynamics"]
 
 
-def test_a_real_rejection_travels_from_make_answer_to_the_probe_row(monkeypatch):
-    # Review 5 Oct 2026: the reason tests stubbed every hop, so none showed the real check's words reaching the row.
+def _real_rejection(monkeypatch) -> dict:
+    """One background upgrade run through the real make_answer() and grounding gate, polled until it settles."""
     import time
 
     from kenn.core import answer_upgrades, chat_answer, route_log
@@ -203,10 +203,48 @@ def test_a_real_rejection_travels_from_make_answer_to_the_probe_row(monkeypatch)
         if upgrade["status"] != "pending":
             break
         time.sleep(0.01)
+    return upgrade
 
+
+def test_a_real_rejection_travels_from_make_answer_to_the_probe_row(monkeypatch):
+    # Review 5 Oct 2026: the reason tests stubbed every hop, so none showed the real check's words reaching the row.
+    upgrade = _real_rejection(monkeypatch)
     reason = tool.rejection_reason({}, upgrade, delivered_by_model=False)
     assert upgrade["status"] == "rejected"
     assert reason == "generated answer introduced unsupported measurements"
+
+
+def test_the_refused_text_stays_on_the_server_unless_a_bench_asks_for_it(monkeypatch):
+    # The gate's promise is that failed text never reaches a caller; only a bench run opts out of it.
+    monkeypatch.delenv("KENN_EXPOSE_REJECTED_ANSWERS", raising=False)
+    upgrade = _real_rejection(monkeypatch)
+    assert upgrade["status"] == "rejected"
+    assert "rejected_answer" not in upgrade and "refused_figures" not in upgrade
+
+
+def test_a_bench_run_gets_the_refused_text_and_the_figures_it_was_refused_for(monkeypatch):
+    # 8 Oct 2026: the refused-figures study could find where a refused figure lived but not read the sentence it was in.
+    monkeypatch.setenv("KENN_EXPOSE_REJECTED_ANSWERS", "1")
+    upgrade = _real_rejection(monkeypatch)
+    assert upgrade["rejected_answer"].startswith("Short answer: cut 7 dB at 315 Hz on the bass.")
+    assert upgrade["refused_figures"] == ["315hz", "7db"]
+
+
+def test_the_probe_row_and_review_sheet_carry_the_refused_text():
+    httpd, url = _stub(True, upgrade_status="rejected", rejected_answer="Short answer: cut 7 dB.\nTry this: 315 Hz.",
+                       refused_figures=["315hz", "7db"])
+    try:
+        row = tool.ask(url, "probe-1", CASE, wait=5)
+    finally:
+        httpd.shutdown()
+    assert row["refused_figures"] == ["315hz", "7db"]
+    # Counted from the upgrade now, since the background path leaves the inline validation empty.
+    assert row["unsupported_measurements"] == 2
+    sheet = tool.review_sheet([row])
+    assert "Refused figures: 315hz, 7db" in sheet
+    assert "> Short answer: cut 7 dB.\n> Try this: 315 Hz." in sheet
+    # The producer saw the template, and the sheet has to say so before it shows the text they never saw.
+    assert sheet.index("Template for") < sheet.index("Rejected model text:")
 
 
 def test_a_broken_poll_and_an_upgrade_that_never_settled_are_counted():

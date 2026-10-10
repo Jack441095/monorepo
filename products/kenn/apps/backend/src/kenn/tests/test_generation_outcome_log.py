@@ -213,6 +213,9 @@ def test_a_model_answer_the_quality_gate_swaps_out_is_not_credited_to_the_model(
     assert payload["weak_match"] is True
     assert payload["llm_enhanced"] is False
     assert chat_answer.last_generation_outcome() == "quality gate: answer quality below threshold"
+    # The text the producer never saw is kept for a bench to read, with no figures because the grounding gate passed it.
+    assert chat_answer.last_rejected_generation() == {
+        "answer": "Short answer: a model answer the gate will not like.", "refused_figures": []}
 
 
 def _payload_with_model_answer(tmp_path, monkeypatch, score: int) -> list[tuple[str, bool]]:

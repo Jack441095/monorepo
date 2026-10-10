@@ -546,3 +546,74 @@ def test_the_derived_pass_adds_no_warning_of_its_own() -> None:
 
     assert derived_only["accepted"] is True
     assert derived_only["warnings"] == cited_and_right["warnings"]
+
+
+# 14 probe rejections across 9 runs occurred because the 4B model truncated 12-char hex chunk IDs to 11 chars
+# or made a single-char slip. These tests protect prefix tolerance and ordinal mapping while rejecting fabricated IDs.
+def test_an_11_character_hex_prefix_resolves_to_the_shown_chunk_id() -> None:
+    truncated_id = SIDECHAIN_ID[:11]
+    result = validate(_answer(f"Back the release off to 150 ms [#{truncated_id}]."))
+
+    citations = result["claim_citations"]
+    assert citations["cited"] == 1
+    assert citations["verified"] == 1
+    assert citations["unshown_citations"] == []
+    assert result["accepted"] is True
+
+
+def test_a_single_character_hex_slip_resolves_to_the_shown_chunk_id() -> None:
+    # Flip the last character to a different hex digit
+    last_char = SIDECHAIN_ID[-1]
+    flipped_char = "0" if last_char != "0" else "1"
+    slipped_id = SIDECHAIN_ID[:-1] + flipped_char
+    result = validate(_answer(f"Back the release off to 150 ms [#{slipped_id}]."))
+
+    citations = result["claim_citations"]
+    assert citations["cited"] == 1
+    assert citations["verified"] == 1
+    assert citations["unshown_citations"] == []
+    assert result["accepted"] is True
+
+
+def test_an_ordinal_citation_resolves_to_the_indexed_shown_chunk() -> None:
+    # [#1] maps to the first shown excerpt (RESULTS[0], which is SIDECHAIN_NOTE)
+    result = validate(_answer("Back the release off to 150 ms [#1]."))
+
+    citations = result["claim_citations"]
+    assert citations["cited"] == 1
+    assert citations["verified"] == 1
+    assert citations["unshown_citations"] == []
+    assert result["accepted"] is True
+
+
+def test_an_ordinal_citation_to_an_excerpt_not_containing_the_number_is_rejected() -> None:
+    # 12% is in RESULTS[1] (CLEANING_NOTE), not in RESULTS[0] (SIDECHAIN_NOTE). Citing [#1] for 12% is fabricated attribution.
+    result = validate(_answer("Duck the reverb send to 12% [#1]."))
+
+    citations = result["claim_citations"]
+    assert citations["verified"] == 0
+    assert len(citations["fabricated_attributions"]) == 1
+    assert result["accepted"] is False
+
+
+def test_an_unshown_hex_id_that_matches_no_prefix_is_still_rejected() -> None:
+    result = validate(_answer("Back the release off to 150 ms [#deadbeefcafe]."))
+
+    citations = result["claim_citations"]
+    assert citations["verified"] == 0
+    assert len(citations["unshown_citations"]) == 1
+    assert result["accepted"] is False
+
+
+def test_a_thirteen_character_hex_slip_resolves_to_the_shown_chunk_id() -> None:
+    # 4B model appends a trailing character to the 12-char ID (e.g. [#54d18e203d58b] on q116)
+    extended_id = SIDECHAIN_ID + "b"
+    result = validate(_answer(f"Back the release off to 150 ms [#{extended_id}]."))
+
+    citations = result["claim_citations"]
+    assert citations["cited"] == 1
+    assert citations["verified"] == 1
+    assert citations["unshown_citations"] == []
+    assert result["accepted"] is True
+
+
