@@ -127,9 +127,13 @@ choice.
   synthetic customer data, an isolated database, the verified product metadata,
   and the approved test inbox. Confirm webhook fulfilment, one licence, inbox
   delivery, sign-in, entitlement, download, and duplicate-event behavior.
-  On 2026-10-10, a Stripe CLI-created £2 GBP sandbox Checkout Session is open
-  and unpaid in Safari; the owner must submit the test card before fulfilment
-  can be checked.
+  On 2026-10-10, the owner completed a £2 GBP Stripe Sandbox checkout for NITE
+  Submit (`livemode=false`). Stripe reported the session paid; its matching
+  signed `checkout.session.completed` event reached the local listener with
+  HTTP 200. The isolated checkout-rehearsal database contains one completed
+  purchase and one active entitlement. This proves local Sandbox payment and
+  webhook fulfilment. The local mailer is console-only, so inbox delivery,
+  sign-in, download, and duplicate-event behavior remain unverified.
   The local `backend/tests/test_e2e.py` integration suite passes all 10 tests,
   including purchase-to-activation, duplicate webhook idempotency, download
   authorization, and refund revocation. Its Stripe webhook is signed locally
@@ -137,11 +141,10 @@ choice.
   Submit Checkout session was open and unpaid for £2 GBP; a read-only retrieval
   on 2026-10-10 shows it expired without payment. The saved test key can read
   that session and its line item, but Stripe returns HTTP 403 when it lists
-  active prices or webhook endpoints, so it cannot create a replacement
-  Checkout session or verify test webhook routing. A completed test-mode
-  checkout and inbox delivery are still unverified. The
-  focused commerce/catalog, production-config, and webhook-robustness suites
-  also pass (66 tests).
+  active prices or hosted webhook endpoints. The successful checkout used a
+  local Stripe CLI listener; it does not verify a hosted Sandbox endpoint or
+  customer inbox delivery. The focused commerce/catalog, production-config,
+  and webhook-robustness suites also pass (66 tests).
 - [ ] **Operations: establish durable public staging.** The local rehearsal is
   isolated, but does not prove an external browser can complete the full journey.
   Public tunnel attempts failed to connect and were stopped. Current DNS checks
@@ -340,9 +343,10 @@ choice.
   signer without creating a purchase or charge.
   Stripe's sandbox dashboard shows the restricted `NITE DSP checkout rehearsal`
   key has only `Checkout Sessions: Write` and was used on 2026-10-10. It cannot
-  list sandbox webhook endpoints (HTTP 403), so test-mode routing remains
-  unverified. Checkout remains disabled pending the complete test purchase,
-  legal review, and release checks.
+  list hosted sandbox webhook endpoints (HTTP 403), so hosted test-mode routing
+  remains unverified. A local Stripe CLI listener did receive and fulfil the
+  paid Sandbox checkout on 2026-10-10. Checkout remains disabled pending the
+  remaining customer-journey checks, legal review, and release checks.
 - [ ] **Licensing key provenance:** the lifecycle design says no production key
   was generated, while the deployed backend requires a signing key. Reconcile
   that document with the live secret's origin and check whether the removed
