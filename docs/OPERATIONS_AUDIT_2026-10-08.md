@@ -338,22 +338,20 @@ choice.
   that document with the live secret's origin and check whether the removed
   local rehearsal value matches it without displaying either value. If they
   match, follow the dual-public-key client release sequence before rotation.
-- [ ] **R2 credential rotation:** the earlier bucket-scoped token's one-time
-  credentials were not installed in Fly. The owner reported creating a new
-  token, but its one-time credentials are not in the repository's ignored admin
-  file. The same credential wizard saves a replacement in the ignored admin
-  file with mode 600, tests a ranged read of a current Submit object, updates
-  Fly, and waits for live `/ready`. It leaves the old R2 tokens active until the
-  production token is positively identified. A Cloudflare dashboard inventory
-  on 2026-10-10 shows three active Account API tokens with Object Read & Write
-  on `nite-dsp-releases`, including the owner-created token named NiteDSP
-  releases 2026-10-08. One more token has the same permission on
-  `nite-dsp-release01`.
-  The User API token `client-websites build token` has Admin Read & Write across
-  all buckets. Keep that broad token and the other-bucket token untouched until
-  their use is identified. The one-time secret for the Oct 8 token is not in the
-  ignored admin file, so it cannot be installed as-is. The wizard has not run;
-  existing credentials still serve production storage.
+- [x] **R2 credential rotation:** on 2026-10-10 the Cloudflare dashboard showed
+  the new Account API token scoped to Object Read & Write on
+  `nite-dsp-releases` only. Its one-time credentials are stored in the ignored,
+  mode-600 `backend/admin/.env.operations-r2-replacement` file. A signed list
+  and one-byte ranged read of a current Submit release passed. Those two values
+  were imported into Fly; both machines updated successfully, and the live
+  `/ready` endpoint still reports durable S3 storage. No old token was revoked.
+- [ ] **Cloudflare token cleanup:** identify the remaining token users before
+  retiring credentials. The current account inventory shows four active
+  Account API tokens for `nite-dsp-releases` and one for
+  `nite-dsp-release01`. The User API token `client-websites build token` has
+  Admin Read & Write across all buckets. Keep the broad user token and the
+  other-bucket token untouched until their use is identified; do not revoke
+  older release-bucket tokens until production usage is positively ruled out.
 - [ ] **Email recovery:** assign a monitored caller for
   `sweep_unsent_confirmations`. Its implementation exists, but no recurring
   production job was verified. Stripe's successful webhook acknowledgement does
@@ -450,6 +448,7 @@ choice.
 | Earlier £2 Submit purchase | Exact paid Stripe session matches one completed purchase, one active licence, and a sent confirmation; Resend reported delivered on 2026-09-18, but inbox placement was not verified |
 | Five old live Payment Links | Deactivated with owner approval; saved statuses verified after reload |
 | Current Stripe API and dashboard read | Three live Checkout Sessions remain: one paid and two expired; no open sessions. The three catalog products are archived, and the restricted key cannot list Payment Links or the account object |
+| Scoped R2 replacement | Bucket-only token passed a ranged release read, was imported into Fly, and production `/ready` reports durable S3 storage; older tokens remain active pending usage identification |
 | Backend Fly deployment | Release migration and rolling update passed; both machines use image `deployment-01M4E632FPNQ7R4D23ZCTEEGF2`; current snapshot shows one started with a passing service check and one stopped by the configured auto-stop policy |
 | Production API readiness | Current `/health` and `/ready` return HTTP 200; database, storage, and email checks true; checkout, legal approval, and release readiness false |
 | Full-refund webhook deployment | Image `deployment-01M4JQCJZF070TEDFFH54RKE9E` rolled out; both machines report passing checks; signed synthetic webhook returned HTTP 200 `ignored`; checkout remains closed |
