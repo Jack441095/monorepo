@@ -27,14 +27,13 @@ endpoint rejects them so a stale recovery job cannot mail a stored licence.
 1. `GET /admin/webhooks/failed` lists events whose `processing_error` is set.
 2. Look up the purchase by Stripe Checkout session ID:
    `GET /admin/purchases/search?provider_order_id=...`
-3. Refund or dispute: the webhook already sets `purchase.status` to
-   `refunded` (full refund) or `disputed`. Revoking the licence is a manual
-   decision, never automatic:
-   - If the buyer keeps the product, resolve the purchase status with an
-     operator before resending; the endpoint rejects refunded or disputed rows.
-   - Revoke the licence if the refund stands:
-     `POST /admin/entitlements/{entitlement_id}/revoke` with a reason.
-     Find the entitlement id in the `purchases/search` response.
+3. Refund or dispute: a full-refund event sets `purchase.status` to `refunded`
+   and revokes its active licences. Confirm the purchase and entitlement in
+   `purchases/search`. A dispute sets `purchase.status` to `disputed` but leaves
+   the licence active for review; use
+   `POST /admin/entitlements/{entitlement_id}/revoke` with a reason if the
+   review requires revocation. The purchase search response includes the
+   entitlement id.
 
 ## Downgrade guard
 

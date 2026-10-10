@@ -133,7 +133,7 @@ def test_partial_refund_keeps_purchase_completed(client, db_session):
     assert purchase.refunded_at is None
 
 
-def test_full_refund_preserves_entitlement_for_admin_review(client, db_session):
+def test_full_refund_revokes_the_entitlement_and_records_the_reason(client, db_session):
     _seed_product(db_session)
     _buy_something(client, "evt_approved_src", "txn_approved")
     purchase = db_session.query(models.Purchase).filter(models.Purchase.provider_order_id == "txn_approved").one()
@@ -151,7 +151,14 @@ def test_full_refund_preserves_entitlement_for_admin_review(client, db_session):
     db_session.refresh(entitlement)
     assert purchase.status == "refunded"
     assert purchase.refunded_at is not None
-    assert entitlement.status == "active"  # revocation stays a manual admin decision
+    assert entitlement.status == "revoked"
+    assert entitlement.revoked_at is not None
+    assert entitlement.revoked_reason == "Full refund recorded by Stripe"
+    audit = db_session.query(models.AdminAuditLogEntry).one()
+    assert audit.actor == "stripe_webhook"
+    assert audit.action == "revoke_entitlement"
+    assert audit.target == entitlement.id
+    assert audit.reason == entitlement.revoked_reason
 
 
 def test_second_partial_refund_keeps_purchase_completed(client, db_session):
@@ -175,8 +182,14 @@ def test_duplicate_full_refund_is_idempotent(client, db_session):
 
     _post_webhook(client, _refund_payload("evt_adj_dup_1", "txn_dup_adj", True))
     db_session.refresh(purchase)
+    entitlement = db_session.query(models.Entitlement).filter(
+        models.Entitlement.purchase_id == purchase.id
+    ).one()
+    db_session.refresh(entitlement)
     first_refunded_at = purchase.refunded_at
+    first_revoked_at = entitlement.revoked_at
     assert purchase.status == "refunded"
+    assert entitlement.status == "revoked"
 
     # A second, distinct delivery (different event_id -- not the WebhookEvent
     # dedup path) reporting the same full refund.
@@ -184,8 +197,36 @@ def test_duplicate_full_refund_is_idempotent(client, db_session):
     assert resp.status_code == 200
 
     db_session.refresh(purchase)
+    db_session.refresh(entitlement)
     assert purchase.status == "refunded"
     assert purchase.refunded_at == first_refunded_at  # untouched by the duplicate
+    assert entitlement.status == "revoked"
+    assert entitlement.revoked_at == first_revoked_at
+    assert db_session.query(models.AdminAuditLogEntry).count() == 1
+
+
+def test_replayed_full_refund_repairs_an_unrevoked_refunded_purchase(client, db_session):
+    _seed_product(db_session)
+    _buy_something(client, "evt_legacy_refund_src", "txn_legacy_refund")
+    purchase = db_session.query(models.Purchase).filter(
+        models.Purchase.provider_order_id == "txn_legacy_refund"
+    ).one()
+    entitlement = db_session.query(models.Entitlement).filter(
+        models.Entitlement.purchase_id == purchase.id
+    ).one()
+    # Existing full refunds could have left the licence active under the old
+    # manual-revocation behavior; a later distinct Stripe event must repair it.
+    purchase.status = "refunded"
+    db_session.commit()
+
+    response = _post_webhook(
+        client, _refund_payload("evt_legacy_refund_replay", "txn_legacy_refund", True)
+    )
+
+    assert response.status_code == 200
+    db_session.refresh(entitlement)
+    assert entitlement.status == "revoked"
+    assert entitlement.revoked_reason == "Full refund recorded by Stripe"
 
 
 def test_stale_partial_refund_does_not_regress_full_refund(client, db_session):

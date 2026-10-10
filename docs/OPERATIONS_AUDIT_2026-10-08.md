@@ -194,9 +194,10 @@ choice.
   data transfers, and retention procedures unresolved. Its analytics claims
   also need review against the actual Plausible configuration.
   The deployed refund policy promises a full refund within 14 days and says a
-  refund revokes the licence. The webhook marks a full refund but leaves the
-  entitlement active for an admin decision, so the published policy and current
-  operation do not match. Resolve that mismatch before sales reopen. Para-phase
+  refund revokes the licence. The current source now revokes active entitlements
+  on a full-refund webhook and records the action; the production backend still
+  needs a reviewed deployment and live validation before this mismatch is
+  resolved. Para-phase
   is an online text service: when enabled, the website sends text to the backend,
   which streams it to a separately configured engine. Verify that engine's
   provider, location, logging, and retention before enabling it. Confirm the
@@ -452,6 +453,7 @@ choice.
 | Public email DNS records | SPF/MX, DKIM selector, and DMARC records resolve; `p=none`; message alignment and bounce handling remain unverified |
 | Controlled sign-in email | Resend reports delivered at 14:18 BST; the 14:10 BST screenshot predates the probe, while inbox placement and dashboard/API workspace match remain unverified |
 | Complete customer purchase and inbox delivery | Incomplete; no new paid test purchase made during this audit |
+| Full-refund handling source | Focused commerce, end-to-end, and webhook suites pass (58 tests); production behavior still needs deployment and validation |
 
 Audio_Too's initial test collection failed because the shell could not import
 the repository's `nite_core` package. Running with `PYTHONPATH=../shared` passed

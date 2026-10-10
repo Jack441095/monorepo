@@ -524,11 +524,9 @@ def search_purchase(
     provider_order_id: str, db: Session = Depends(get_db), actor: str = Depends(require_admin)
 ) -> dict:
     """Look up a purchase by Stripe Checkout session ID -- e.g. after a refund
-    webhook records purchase.status="refunded" (commerce.py's
-    _handle_adjustment_created), an admin uses this to find the associated
-    entitlement and decide whether to revoke it via the existing
-    POST /admin/entitlements/{id}/revoke, per this repo's policy that
-    refund-driven revocation is a manual decision, not automatic."""
+    webhook records purchase.status="refunded" and revokes its licence, or a
+    dispute needs review. The response includes associated entitlement state
+    and the admin route used for any separate manual revocation."""
     purchase = (
         db.query(models.Purchase)
         .filter(models.Purchase.provider_order_id == provider_order_id)

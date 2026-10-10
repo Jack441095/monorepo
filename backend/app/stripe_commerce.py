@@ -1,4 +1,4 @@
-"""Verified Stripe events fulfil paid sessions and record refund status."""
+"""Verified Stripe events fulfil paid sessions and apply refund status."""
 from __future__ import annotations
 
 import hashlib
@@ -247,11 +247,26 @@ def _handle_refund_or_dispute(db: Session, payload: dict) -> None:
     if purchase is None:
         return
     if payload["type"] == "charge.refunded":
-        # Partial refunds keep the purchase completed; licence revocation
-        # remains an explicit admin decision, as before the provider change.
-        if data.get("refunded") and purchase.status != "refunded":
-            purchase.status = "refunded"
-            purchase.refunded_at = datetime.now(timezone.utc)
+        # Stripe sends this event for partial refunds too; only `refunded=True`
+        # matches the public promise that a full refund ends the licence.
+        if data.get("refunded"):
+            if purchase.status != "refunded":
+                purchase.status = "refunded"
+                purchase.refunded_at = datetime.now(timezone.utc)
+            for entitlement in db.query(models.Entitlement).filter(
+                models.Entitlement.purchase_id == purchase.id,
+                models.Entitlement.status != "revoked",
+            ).with_for_update().all():
+                reason = "Full refund recorded by Stripe"
+                entitlement.status = "revoked"
+                entitlement.revoked_at = datetime.now(timezone.utc)
+                entitlement.revoked_reason = reason
+                db.add(models.AdminAuditLogEntry(
+                    actor="stripe_webhook",
+                    action="revoke_entitlement",
+                    target=entitlement.id,
+                    reason=reason,
+                ))
     elif purchase.status == "completed":
         purchase.status = "disputed"
 
