@@ -1,5 +1,15 @@
 # NITE DSP operations audit — 2026-10-08
 
+## 2026-10-10 deployment update
+
+Vercel production deployment `dpl_AwWdrveciMEwXAGZKQPXtU7f7e1A` now serves the
+current website source. Its production build guard passed; `/pricing`,
+`/privacy`, and `/terms` return HTTP 200. The privacy page no longer describes
+NiteDSP as a sole trader, and pricing still has no checkout link. Production API
+readiness remains healthy while checkout, legal approval, release readiness, and
+commercial gates remain false. The registered company name, number, and office
+address are still outstanding, so this deployment does not approve sales.
+
 The platform responds in production, but public payment readiness has not been
 proved. Website and backend checkout are disabled. The five old live Stripe
 Payment Links were deactivated on 2026-10-08 after explicit owner approval;
@@ -409,7 +419,7 @@ choice.
 | Thursday preview-handoff, paid-launch, and support helper tests (both copies) | 26 passed in each copy |
 | Audio_Too infrastructure, beta drafting/parser, and funding tests | 34 passed with repository `shared/` on `PYTHONPATH` |
 | Live website browser/HTTPS checks | Product names/status and closed checkout verified; Paddle removed from CSP |
-| Current public storefront/policy check | `/pricing`, `/privacy`, and `/terms` return HTTP 200; pricing HTML has no Stripe Checkout URL or checkout API path; live privacy copy still contains the old sole-trader and nurture claims, and the local corrections are not deployed |
+| 2026-10-10 public storefront/policy check | `/pricing`, `/privacy`, and `/terms` return HTTP 200; pricing HTML has no Stripe Checkout URL or checkout API path; the deployed privacy page no longer contains the old sole-trader claim; registered company particulars and legal review remain outstanding |
 | Earlier £2 Submit purchase | Exact paid Stripe session matches one completed purchase, one active licence, and a sent confirmation; Resend reported delivered on 2026-09-18, but inbox placement was not verified |
 | Five old live Payment Links | Deactivated with owner approval; saved statuses verified after reload |
 | Current Stripe API and dashboard read | Three live Checkout Sessions remain: one paid and two expired; no open sessions. The three catalog products are archived, and the restricted key cannot list Payment Links or the account object |
