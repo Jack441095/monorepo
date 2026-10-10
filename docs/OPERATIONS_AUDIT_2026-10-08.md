@@ -167,6 +167,13 @@ choice.
   the Stripe account object (HTTP 403). Sandbox cleanup deactivated seven old
   Paraphrase Support Payment Links, their three £1/£3/£10 prices, and the
   product; every saved object reported `livemode=false`.
+  The live API-key inventory shows the configured `NITE DSP backend checkout`
+  key has only Checkout Sessions write permission. A second active key,
+  `key_01`, has 138 permissions (46 read and 92 write), including broad account,
+  catalog, payment, and payout permissions. Its visible activity includes two
+  successful Payment Link creation calls on 2026-09-18; the legacy links are
+  deactivated. Owner action: expire `key_01` after confirming no other service
+  still uses it.
   The Stripe dashboard confirms Starling Bank Ltd is the default GBP payout
   destination; account digits are intentionally omitted. Receipt/support
   information still needs review.
