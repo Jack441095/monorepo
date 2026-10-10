@@ -21,6 +21,14 @@ still returns HTTP 200 with database, storage, and email healthy and all sales
 gates false. One warm machine should avoid the observed cold start while it is
 healthy. Sustained memory headroom is still unmeasured.
 
+At 19:44 UTC on 2026-10-10, `/ready` reported `status=ok`; database, durable S3
+storage, and configured/deliverable Resend were true, while checkout, legal
+approval, and release readiness remained false. Fly listed one started machine
+with a passing check and one stopped, both on the same image. The database
+volume had six five-day snapshots; the newest was from 2026-10-09 23:30 UTC.
+The authenticated Prometheus query returned HTTP 401, so this check did not
+establish memory headroom.
+
 The platform responds in production, but public payment readiness has not been
 proved. Website and backend checkout are disabled. The five old live Stripe
 Payment Links were deactivated on 2026-10-08 after explicit owner approval;
