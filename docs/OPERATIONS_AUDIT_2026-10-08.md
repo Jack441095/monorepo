@@ -397,10 +397,13 @@ choice.
   `registry.fly.io/nite-dsp-backend:deployment-01M4E632FPNQ7R4D23ZCTEEGF2`.
   The image replaced for this rollout was
   `registry.fly.io/nite-dsp-backend:deployment-01M4E2NXH9S0E5AHHB3FFMJ2Z6`;
-  redeploy that image with `flyctl deploy --image registry.fly.io/nite-dsp-backend:deployment-01M4E2NXH9S0E5AHHB3FFMJ2Z6 --config fly.toml --dockerfile Dockerfile --yes` to restore the prior code. Rollback preserves current secrets and app config. Both machines are started with one passing health check each; `/health` and `/ready` returned HTTP 200 after deployment. The older image before the replaced rollout was `registry.fly.io/nite-dsp-backend:deployment-01M488Y13N9CV9M68EA7XA20WW`.
+  redeploy that image with `flyctl deploy --image registry.fly.io/nite-dsp-backend:deployment-01M4E2NXH9S0E5AHHB3FFMJ2Z6 --config fly.toml --dockerfile Dockerfile --yes` to restore the prior code. Rollback preserves current secrets and app config. Immediately after deployment, both machines were started with passing health checks; `/health` and `/ready` returned HTTP 200. The older image before the replaced rollout was `registry.fly.io/nite-dsp-backend:deployment-01M488Y13N9CV9M68EA7XA20WW`.
 - [ ] **Fly capacity and staging recovery:** machines remain at 256 MB with
-  auto-stop enabled; review cold starts, memory headroom, and a staging rollback
-  before increasing production workload.
+  auto-stop enabled. On 2026-10-10, Fly listed both AMS machines stopped before a
+  public `/ready` request; the request returned HTTP 200 in 5.32 seconds, and a
+  follow-up list showed one started machine with a passing check and one stopped.
+  This proves one readiness cold start, but not sustained memory headroom or a
+  staging rollback. Review both before increasing production workload.
 - [x] **Rate-limit client identity:** production DNS and HTTPS resolve directly
   to Fly, so the backend now keys requests on Fly's `Fly-Client-IP` header and
   ignores `X-Forwarded-For` there. Focused tests cover spoofed and missing
