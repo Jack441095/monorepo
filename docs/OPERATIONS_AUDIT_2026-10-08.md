@@ -115,11 +115,14 @@ choice.
 
 - [x] **Operations: verify the earlier £2 Submit payment and fulfilment.**
   Matched the paid Stripe session to its completed production purchase, one
-  active licence, and confirmation timestamp. The historical confirmation's
-  provider delivery event was not verified. A separate controlled sign-in email
-  was reported delivered by Resend at 14:18 BST; the owner's screenshot was
-  captured at 14:10 BST and predates that probe. No extra live charge or resend
-  was needed to verify the payment and fulfilment.
+  active licence, and confirmation timestamp. The stored 35-character key used
+  a legacy format the current Submit app rejects. With no active device attached,
+  operations replaced it on 2026-10-10 with a signed `NTSUB1` key matching the
+  app's public key and recorded the change in the admin audit log. The original
+  confirmation is marked sent; its one-off correction email awaits owner approval.
+  No extra live charge was made. A separate controlled sign-in email was reported
+  delivered by Resend at 14:18 BST; the owner's screenshot was captured at 14:10
+  BST and predates that probe.
 - [x] **Operations: pause the five old live Payment Links.** After owner approval,
   deactivated Submit £2, the old “Smart Sample Manager” £9 link, and three old
   Para-phase support links (£1, £3, £10). All five saved statuses read
