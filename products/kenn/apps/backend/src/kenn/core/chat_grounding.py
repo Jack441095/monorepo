@@ -215,7 +215,8 @@ def _measurement_is_supported(measurement: str, allowed: set[str]) -> bool:
 
     Audio engineers write -14 LUFS or -14.0 LUFS interchangeably, and Live meters display decimal true peaks
     like -1.0 dBTP alongside integer bounds like -1 dBTP. Treating -14.0 LUFS as unsupported when the note
-    writes -14 LUFS is a formatting mismatch, not an invention.
+    writes -14 LUFS is a formatting mismatch, not an invention. Similarly, true peak ceilings (-1 dBTP)
+    are routinely cited in mixing advice as 1 dB or 1.0 dB true peak headroom.
     """
     if measurement in allowed:
         return True
@@ -225,6 +226,23 @@ def _measurement_is_supported(measurement: str, allowed: set[str]) -> bool:
     m_dec = re.sub(r"^(-?\d+)([a-z%]+)$", r"\1.0\2", measurement)
     if m_dec in allowed:
         return True
+    # True peak headroom / ceiling equivalence: answers citing 1 dB or 1.0 dB true peak margin against a -1 dBTP ceiling note
+    m_db = re.match(r"^(-?\d+(?:\.0)?)db$", measurement)
+    if m_db:
+        val = m_db.group(1).removesuffix(".0")
+        val_pos = val.lstrip("-")
+        if any(
+            target in allowed
+            for target in (
+                f"{val}dbtp",
+                f"{val}.0dbtp",
+                f"-{val_pos}dbtp",
+                f"-{val_pos}.0dbtp",
+                f"{val_pos}dbtp",
+                f"{val_pos}.0dbtp",
+            )
+        ):
+            return True
     return False
 
 
@@ -448,9 +466,13 @@ def _resolve_chunk_id(
         except ValueError:
             pass
 
-    # Unambiguous hex prefix (at least 6 characters)
+    # Unambiguous hex prefix (at least 6 characters) or 12+ char string starting with a 12-char ID
     if len(cited_id) >= 6 and all(c in "0123456789abcdefABCDEF" for c in cited_id):
-        prefixes = [cid for cid in bodies if cid.lower().startswith(lower)]
+        prefixes = [
+            cid for cid in bodies
+            if cid.lower().startswith(lower)
+            or (len(lower) >= 12 and lower.startswith(cid.lower()))
+        ]
         if len(prefixes) == 1:
             return prefixes[0]
 

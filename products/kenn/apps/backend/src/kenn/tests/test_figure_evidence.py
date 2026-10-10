@@ -236,3 +236,18 @@ def test_make_answer_inner_check_takes_figures_from_typed_question_not_expanded_
         expanded, results, question="and on the drums?", route="production"
     )
     assert "200 ms" not in ans_refused
+
+
+def test_true_peak_decibel_headroom_is_supported_by_dbtp_ceiling():
+    from kenn.core.chat_grounding import _measurement_is_supported
+
+    # Note specifies a -1 dBTP ceiling. Answers phrased as 1 dB or 1.0 dB true peak headroom are accepted.
+    allowed = {"-1dbtp", "-14lufs"}
+    assert _measurement_is_supported("1.0db", allowed) is True
+    assert _measurement_is_supported("1db", allowed) is True
+    assert _measurement_is_supported("-1db", allowed) is True
+    assert _measurement_is_supported("-1.0db", allowed) is True
+    # Unrelated figures remain refused
+    assert _measurement_is_supported("2db", allowed) is False
+    assert _measurement_is_supported("5db", allowed) is False
+

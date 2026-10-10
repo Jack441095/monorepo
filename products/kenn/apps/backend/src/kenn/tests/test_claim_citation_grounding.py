@@ -604,3 +604,16 @@ def test_an_unshown_hex_id_that_matches_no_prefix_is_still_rejected() -> None:
     assert len(citations["unshown_citations"]) == 1
     assert result["accepted"] is False
 
+
+def test_a_thirteen_character_hex_slip_resolves_to_the_shown_chunk_id() -> None:
+    # 4B model appends a trailing character to the 12-char ID (e.g. [#54d18e203d58b] on q116)
+    extended_id = SIDECHAIN_ID + "b"
+    result = validate(_answer(f"Back the release off to 150 ms [#{extended_id}]."))
+
+    citations = result["claim_citations"]
+    assert citations["cited"] == 1
+    assert citations["verified"] == 1
+    assert citations["unshown_citations"] == []
+    assert result["accepted"] is True
+
+
