@@ -187,7 +187,13 @@ choice.
 - [ ] **Release owner: register and accept the SLO artifact before sale.** Verify
   object checksum, supported architectures, licence activation, signing and
   notarization where required, and install/launch on a clean Mac. Repeat the
-  applicable checks for the exact Submit artifact offered to customers.
+  applicable checks for the exact Submit artifact offered to customers. On
+  2026-10-10, the SLO host-release validator rejected the current tree because
+  its candidate branch and source checkpoint do not match this worktree. The
+  Submit `check_distribution_readiness.sh --require-ready` gate also failed:
+  there is no Developer ID identity or notary profile, and no versioned app or
+  DMG is present in the worktree for signature/notarization validation. Neither
+  artifact is ready for paid public distribution.
 - [x] **Operations: archive legacy live Stripe products.** In the live
   dashboard, archived Smart Sample Manager (£9), Paraphrase Support (three
   prices), and the already-inactive Submit (£3) catalog rows. All three now
