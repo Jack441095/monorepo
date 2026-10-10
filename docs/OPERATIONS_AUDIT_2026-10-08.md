@@ -151,10 +151,11 @@ choice.
   customer inbox delivery. The focused commerce/catalog, production-config,
   and webhook-robustness suites also pass (66 tests). A hosted Sandbox Checkout
   completed on 2026-10-10 at 17:38 UTC for £2 GBP (`livemode=false`), but Stripe
-  currently lists no Sandbox webhook endpoints. It redirected to the public
-  pricing page, which showed no purchase confirmation. This verifies hosted
-  payment collection and redirect only; no hosted fulfilment, email, or download
-  was demonstrated.
+  currently lists no Sandbox webhook endpoints. A read-only retrieval at 19:31
+  UTC confirms the browser's session is complete and paid. The pricing page now
+  shows a test-only success notice explaining that no real charge or production
+  licence was created. This verifies hosted payment collection and redirect
+  only; no hosted fulfilment, email, or download was demonstrated.
 - [ ] **Operations: establish durable public staging.** The local rehearsal is
   isolated, but does not prove an external browser can complete the full journey.
   Public tunnel attempts failed to connect and were stopped. Current DNS checks
@@ -282,8 +283,11 @@ choice.
   requested stop with `oom_killed=false` before it auto-started on traffic. The
   Prometheus query returned 401 during organization lookup, so no memory trend
   was verified. This confirms the configured autostart path, not memory
-  headroom. Inspect platform metrics or schedule a supervised memory review
-  before increasing workloads.
+  headroom. On 2026-10-10, retained Fly logs showed two configured autostops
+  with clean SIGINT shutdowns; both restarts passed health checks about two
+  seconds after a transient startup failure. No OOM line appeared in that
+  retained log buffer. Inspect platform metrics or schedule a supervised memory
+  review before increasing workloads.
 - [x] **Source: retire duplicated commerce plans.** Removed the old website
   commerce reports and SLO-hosted platform phase/deployment/launch plans. Kept
   migration history and product engineering evidence. The SLO documentation
@@ -423,12 +427,13 @@ choice.
   revocation remains an explicit admin action. Imported purchases without payment
   intent IDs and out-of-order events require reconciliation.
 - [ ] **Backups:** automatic encrypted volume snapshots and five-day retention
-  are verified; six snapshots totalling 138 MiB were listed at 16:05 UTC on
-  2026-10-08. PostgreSQL WAL backups are disabled on the unmanaged 256 MiB
-  Postgres Flex machine. Choose between migrating to Managed Postgres (Basic
-  currently starts at $38/month plus storage) and building a separately tested
-  off-system dump path. Do not enable the unmanaged cluster's WAL workflow until
-  its compatibility and memory requirements are resolved. Set restore
+  remain enabled on the single encrypted 1 GB database volume. A read-only check
+  at 19:30 UTC on 2026-10-10 listed six snapshots totalling 170 MiB, each with
+  five-day retention. PostgreSQL WAL backups are disabled on the unmanaged
+  256 MiB Postgres Flex machine. Choose between migrating to Managed Postgres
+  (Basic currently starts at $38/month plus storage) and building a separately
+  tested off-system dump path. Do not enable the unmanaged cluster's WAL workflow
+  until its compatibility and memory requirements are resolved. Set restore
   permissions and time/data-loss targets. A local synthetic restore does not
   prove recovery from a production snapshot.
 - [ ] **Monitoring:** assign alerts for API readiness, failed webhooks, pending
