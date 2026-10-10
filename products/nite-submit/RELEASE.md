@@ -60,12 +60,13 @@ The private-beta tester checklist is [NITE_SUBMIT_BETA_HANDOFF.md](NITE_SUBMIT_B
 
 ## Release channel
 
-PUBLIC RELEASE CANDIDATE → commercial release. Core workflows pass the deterministic
-synthetic corpus. The governed first-wave run and wave-3 run both pass for
-reviewed name/title/university fields. Targeted synthetic field-policy coverage
-passes for student-ID/module-code formats, and group-author approval is
-explicit; real student-ID/module-code accuracy still requires authorised tester
-PDFs before a broader real-document claim.
+PRIVATE CANDIDATE — not cleared for paid public distribution. The current app
+is ad-hoc signed and not notarised; public distribution also needs a Developer
+ID identity, a configured notary profile, a notarised disk image, and clean-Mac
+installation and launch checks. Core workflows pass the deterministic synthetic
+corpus. The governed first-wave run and wave-3 run pass for reviewed name/title/
+university fields. Real student-ID/module-code accuracy still needs authorised
+tester PDFs before a broader real-document claim.
 
 ## Known limitations (honest list)
 
@@ -94,8 +95,10 @@ in-tree `tools/` copy. The private key lives outside the source tree, and
 `tools/package_app.sh` and `tools/verify_app_bundle.sh` both refuse a bundle
 that contains any `*private-key*` file.
 
-Price: £3 one-time (lifetime student licence). Payment/checkout lives in the
-website + payment processor, not in the product code.
+Price: £2 one-time is the planned Submit price. Do not publish or accept payment
+at that price until the legal and release gates pass and the active Stripe
+product, price, and fulfilment metadata are verified. Payment/checkout lives in
+the website and Stripe, not in the product code.
 
 ## Rollback plan
 

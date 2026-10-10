@@ -123,8 +123,8 @@ items to be written; missing required fields still block. See
 
 ## Status
 
-Version 1.0.0 — PUBLIC RELEASE CANDIDATE, not yet cleared for sale. The app,
-ZIP and DMG must pass the release-parity gate, then receive Developer ID
+Version 1.0.0 — private candidate, not cleared for paid public distribution.
+The app, ZIP and DMG must pass the release-parity gate, then receive Developer ID
 signing and Apple notarisation before public distribution. Governed real-file
 validation passes for the reviewed fields, while naming presets remain generic
 editable patterns rather than official university rules.
