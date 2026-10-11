@@ -13,6 +13,8 @@ import json
 import os
 import subprocess
 import sys
+import random
+from uuid import uuid4
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -28,7 +30,6 @@ os.environ.setdefault("KENN_EMBEDDING_INTER_OP_THREADS", "1")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 sys.path.insert(0, str(REPO_ROOT / "packages" / "chat"))
 sys.path.insert(0, str(REPO_ROOT / "apps" / "backend" / "src"))
-import app  # noqa: E402
 
 
 CRITERIA = (
@@ -124,6 +125,8 @@ def _select_cases(cases: list[dict], limit: int) -> list[dict]:
 
 
 def build(limit: int) -> dict:
+    # Captured review never imports the engine: imports may initialize retrieval or model assets.
+    import app
     cases_path = REPO_ROOT / "apps" / "backend" / "src" / "kenn" / "evals" / "questions.json"
     cases = json.loads(cases_path.read_text(encoding="utf-8")).get("cases", [])
     rows = []
@@ -197,14 +200,81 @@ def build(limit: int) -> dict:
     }
 
 
+def build_captured(capture: dict) -> tuple[dict, dict]:
+    """Blind every captured case without invoking retrieval or treating acceptance as a grade."""
+    if capture.get("schema") != "kenn.answer_capture.v1" or not isinstance(capture.get("cases"), list) or not capture["cases"]:
+        raise ValueError("Expected a non-empty kenn.answer_capture.v1 capture")
+    identities = set()
+    rows = []
+    build_identity = capture.get("provenance")
+    if not isinstance(build_identity, dict) or not build_identity:
+        raise ValueError("Capture provenance is required; unknown fields may be null")
+    for case in capture["cases"]:
+        if not isinstance(case, dict):
+            raise ValueError("Capture cases must be objects")
+        identity = case.get("case_id")
+        if not isinstance(identity, str):
+            raise ValueError("Capture IDs must be text")
+        identity = identity.strip()
+        if not identity or identity in identities:
+            raise ValueError("Capture IDs must be non-empty and unique")
+        identities.add(identity)
+        if case.get("provenance", build_identity) != build_identity:
+            raise ValueError("Incompatible builds must be reviewed in separate packets")
+        if not all(key in case for key in ("question", "answer", "family", "split", "delivery")):
+            raise ValueError(f"Incomplete capture case {identity}")
+        if any(not isinstance(case[field], str) or not case[field].strip() for field in ("question", "family", "split")) or not isinstance(case["answer"], str):
+            raise ValueError("Capture question, family and split need text; missing answers remain an empty string")
+        if case["delivery"] not in {"accepted", "rejected", "busy", "timeout", "not_attempted"}:
+            raise ValueError("Unknown delivery outcome")
+        rows.append(case)
+    if len({case["split"] for case in rows}) != 1:
+        raise ValueError("Tuning, sealed, human-review and regression splits require separate packets")
+    random.SystemRandom().shuffle(rows)
+    packet_id = uuid4().hex
+    visible, key_rows = [], []
+    for position, case in enumerate(rows):
+        blind_id = f"case-{position + 1:04d}"
+        visible.append({
+            "case_id": blind_id, "category": case["family"], "split": case["split"],
+            "question": case["question"],
+            "response": {"answer": case["answer"], "evidence": case.get("evidence")},
+        })
+        # Delivery, author history and model identity can bias a reviewer; retain them only in the key.
+        key_rows.append({"case_id": blind_id, "capture": case})
+    packet = {
+        "schema": "kenn_chat_human_review_packet.v2", "packet_id": packet_id,
+        "case_count": len(visible), "cases": visible, "criteria": list(CRITERIA),
+        "release_thresholds": RELEASE_THRESHOLDS, "human_review": "pending",
+        "scoring_scale": {"0": "wrong or unsupported", "1": "partial", "2": "correct and useful"},
+        "outcomes_required": ["correct", "clarify", "wrong"],
+    }
+    key = {"schema": "kenn.human_review_key.v1", "packet_id": packet_id, "provenance": build_identity, "cases": key_rows}
+    return packet, key
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--capture", type=Path, help="offline kenn.answer_capture.v1 JSON; no engine import")
+    parser.add_argument("--key-output", type=Path, help="private unblinding key, outside reviewer-visible files")
     args = parser.parse_args()
     if args.limit <= 0:
         parser.error("--limit must be positive")
-    packet = build(args.limit)
+    if args.capture:
+        if not args.key_output or args.key_output.resolve().is_relative_to(args.output.resolve().parent):
+            parser.error("--key-output must be outside the reviewer packet directory")
+        packet, key = build_captured(json.loads(args.capture.read_text(encoding="utf-8")))
+        if args.key_output.exists() or args.output.exists():
+            parser.error("refusing to overwrite a review packet or key")
+        args.key_output.parent.mkdir(parents=True, exist_ok=True)
+        args.key_output.write_text(json.dumps(key, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        # Captured identities stay private even when a shared directory has a permissive umask.
+        args.key_output.chmod(0o600)
+    else:
+        packet = build(args.limit)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.expanduser().resolve().write_text(json.dumps(packet, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps({"status": "created", "output": str(args.output), "case_count": packet["case_count"], "human_review": packet["human_review"]}, sort_keys=True))
     return 0

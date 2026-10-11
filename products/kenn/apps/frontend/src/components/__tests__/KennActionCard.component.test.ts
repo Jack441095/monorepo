@@ -36,3 +36,25 @@ describe('KennActionCard on an applied undo', () => {
     expect(undoCard.text()).toContain('Readback Verified')
   })
 })
+
+
+describe('addressed parameters', () => {
+  const proposal = { action: 'set_device_parameter', operation: 'set_device_parameter', parameter: 'Drive', before: 0.25, after: 0.75,
+    unit: 'value', target_label: 'Return A / Instrument Rack / Bass / Filter / Drive',
+    limitations: ['Raw mapping only; physical units are unqualified.'] }
+
+  it('shows the exact path and limitations while a suggestion awaits Apply', () => {
+    const wrapper = mount(KennActionCard, { props: { proposal, cardStatus: 'pending' } })
+    expect(wrapper.text()).toContain(proposal.target_label)
+    expect(wrapper.text()).toContain(proposal.limitations[0])
+    expect(wrapper.text()).toContain('Ready to Apply')
+    expect(wrapper.text()).not.toContain('Readback Verified')
+  })
+
+  it('offers no Apply or Undo when a write outcome is unknown', () => {
+    const wrapper = mount(KennActionCard, { props: { proposal, cardStatus: 'unknown' } })
+    expect(wrapper.text()).toContain('Outcome Unknown')
+    expect(wrapper.find('.kenn-action-card__btn--apply').exists()).toBe(false)
+    expect(wrapper.find('.kenn-action-card__btn--undo').exists()).toBe(false)
+  })
+})

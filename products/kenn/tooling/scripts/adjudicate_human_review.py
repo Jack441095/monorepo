@@ -80,7 +80,9 @@ def _review_rows(data: Any, reviewer: str) -> list[dict[str, Any]]:
         rows = data
     if not isinstance(rows, list):
         raise ReviewInputError(f"{reviewer}: expected a top-level 'reviews' list")
-    return [row for row in rows if isinstance(row, dict)]
+    if any(not isinstance(row, dict) for row in rows):
+        raise ReviewInputError(f"{reviewer}: every review must be an object")
+    return rows
 
 
 def _reviewer_identity(data: Any, reviewer: str, expected_slot: str) -> str:
@@ -140,6 +142,15 @@ def adjudicate(packet: dict[str, Any], reviewer_a: Any, reviewer_b: Any) -> dict
     cases = [case for case in packet.get("cases", []) if isinstance(case, dict)]
     scores_a = _validated_scores(packet, reviewer_a, "reviewer_a")
     scores_b = _validated_scores(packet, reviewer_b, "reviewer_b")
+    outcome_report = None
+    if packet.get("schema") == "kenn_chat_human_review_packet.v2":
+        digest = hashlib.sha256(json.dumps(packet, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        for form in (reviewer_a, reviewer_b):
+            if form.get("packet_id") != packet.get("packet_id") or form.get("packet_content_sha256") != digest:
+                raise ReviewInputError("Reviewer packet mismatch")
+        outcome_report = review_progress(packet, reviewer_a, reviewer_b)
+        if outcome_report["partial"] or outcome_report["unreviewed"]:
+            raise ReviewInputError("Incomplete outcome reviews")
     categories = {str(case.get("case_id")): str(case.get("category") or "uncategorized") for case in cases}
 
     all_differences = []
@@ -161,6 +172,7 @@ def adjudicate(packet: dict[str, Any], reviewer_a: Any, reviewer_b: Any) -> dict
             bucket["reviewer_a_mean"] += left
             bucket["reviewer_b_mean"] += right
             bucket["combined_mean"] += combined
+            bucket["exact_agreement_rate"] += difference == 0
         category_values[categories[case_id]].append(statistics.mean(combined_case_values))
 
     for bucket in per_criterion.values():
@@ -168,6 +180,7 @@ def adjudicate(packet: dict[str, Any], reviewer_a: Any, reviewer_b: Any) -> dict
         bucket["reviewer_a_mean"] = round(bucket["reviewer_a_mean"] / count, 4)
         bucket["reviewer_b_mean"] = round(bucket["reviewer_b_mean"] / count, 4)
         bucket["combined_mean"] = round(bucket["combined_mean"] / count, 4)
+        bucket["exact_agreement_rate"] = round(bucket["exact_agreement_rate"] / count, 4)
     category_summary = {
         category: {"cases": len(values), "combined_mean": round(statistics.mean(values), 4)}
         for category, values in sorted(category_values.items())
@@ -208,6 +221,11 @@ def adjudicate(packet: dict[str, Any], reviewer_a: Any, reviewer_b: Any) -> dict
         value is True for key, value in threshold_results.items()
         if key != "overall_combined_mean"
     )
+    if outcome_report:
+        # Averaged scores cannot erase a wrong answer or an unresolved outcome disagreement.
+        threshold_results["correctness_at_least_95_percent"] = outcome_report["correct"] / len(cases) >= 0.95
+        threshold_results["zero_wrong"] = outcome_report["wrong"] == 0
+        threshold_results["qualified"] &= threshold_results["correctness_at_least_95_percent"] and threshold_results["zero_wrong"] and outcome_report["disagreements"] == 0
     return {
         "schema": "kenn.human_review_adjudication.v1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -225,6 +243,7 @@ def adjudicate(packet: dict[str, Any], reviewer_a: Any, reviewer_b: Any) -> dict
         },
         "by_criterion": per_criterion,
         "by_category": category_summary,
+        "outcomes": outcome_report,
         "release_threshold_policy": {
             "minimum_overall_combined_mean": overall_floor,
             "minimum_critical_criterion_mean": critical_floor,
@@ -239,6 +258,65 @@ def adjudicate(packet: dict[str, Any], reviewer_a: Any, reviewer_b: Any) -> dict
     }
 
 
+def review_progress(packet: dict, reviewer_a: dict, reviewer_b: dict) -> dict:
+    """Count partial review without allowing an unfinished form to qualify."""
+    maps = []
+    digest = hashlib.sha256(json.dumps(packet, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    expected = [row["case_id"] for row in packet["cases"]]
+    if len(set(expected)) != len(expected):
+        raise ReviewInputError("Duplicate packet IDs")
+    for form in (reviewer_a, reviewer_b):
+        if packet.get("schema") == "kenn_chat_human_review_packet.v2" and (form.get("packet_id") != packet.get("packet_id") or form.get("packet_content_sha256") != digest):
+            raise ReviewInputError("Reviewer packet mismatch")
+        rows = _review_rows(form, "review progress")
+        mapping = {}
+        for row in rows:
+            identity = row.get("case_id")
+            scores = row.get("scores")
+            if not isinstance(identity, str) or not isinstance(scores, dict) or set(scores) != set(packet["criteria"]):
+                raise ReviewInputError("Review IDs and exact criteria are required")
+            if any(value is not None and (type(value) is not int or value not in (0, 1, 2)) for value in scores.values()):
+                raise ReviewInputError("Scores must be blank or integers 0, 1, 2")
+            mapping[identity] = row
+        if len(mapping) != len(rows) or not set(mapping).issubset(expected):
+            raise ReviewInputError("Duplicate or foreign review IDs")
+        maps.append(mapping)
+    counts = {"denominator": len(expected), "correct": 0, "clarify": 0, "wrong": 0, "partial": 0, "unreviewed": 0, "disagreements": 0, "score_disagreements": 0, "by_family": {}}
+    for case in packet["cases"]:
+        reviews = [mapping.get(case["case_id"], {}) for mapping in maps]
+        outcomes = [row.get("outcome") for row in reviews]
+        complete_scores = [bool(row.get("scores")) and all(value is not None for value in row["scores"].values()) for row in reviews]
+        has_score = any(value is not None for row in reviews for value in row.get("scores", {}).values())
+        if any(outcome not in {None, "correct", "clarify", "wrong"} for outcome in outcomes):
+            raise ReviewInputError("Outcome must be correct, clarify or wrong")
+        if outcomes == [None, None] and not has_score:
+            verdict = "unreviewed"
+        elif None in outcomes or not all(complete_scores):
+            verdict = "partial"
+        elif outcomes[0] != outcomes[1]:
+            verdict = "wrong" if "wrong" in outcomes else "clarify"
+        else:
+            verdict = outcomes[0]
+        counts[verdict] += 1
+        # Count disagreements even while other criteria remain blank; partial review still carries evidence.
+        outcome_disagreement = bool(all(outcomes) and outcomes[0] != outcomes[1])
+        score_disagreement = any(
+            reviews[0].get("scores", {}).get(criterion) is not None
+            and reviews[1].get("scores", {}).get(criterion) is not None
+            and reviews[0]["scores"][criterion] != reviews[1]["scores"][criterion]
+            for criterion in packet["criteria"]
+        )
+        counts["disagreements"] += outcome_disagreement
+        counts["score_disagreements"] += score_disagreement
+        family = str(case.get("category") or "uncategorized")
+        bucket = counts["by_family"].setdefault(family, {"denominator": 0, "correct": 0, "clarify": 0, "wrong": 0, "partial": 0, "unreviewed": 0, "disagreements": 0, "score_disagreements": 0})
+        bucket["denominator"] += 1
+        bucket[verdict] += 1
+        bucket["disagreements"] += outcome_disagreement
+        bucket["score_disagreements"] += score_disagreement
+    return counts
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--packet", type=Path, default=DEFAULT_PACKET)
@@ -246,12 +324,19 @@ def main() -> int:
     parser.add_argument("--reviewer-b", type=Path, required=True)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--decision-template", type=Path)
+    parser.add_argument("--progress", action="store_true", help="report unfinished outcomes without qualifying")
     args = parser.parse_args()
+    if args.progress and args.decision_template:
+        parser.error("An unfinished progress report cannot create an adjudication decision")
     try:
         packet = json.loads(args.packet.expanduser().read_text(encoding="utf-8"))
         reviewer_a = json.loads(args.reviewer_a.expanduser().read_text(encoding="utf-8"))
         reviewer_b = json.loads(args.reviewer_b.expanduser().read_text(encoding="utf-8"))
-        result = adjudicate(packet, reviewer_a, reviewer_b)
+        expected_hash = file_sha256(args.packet.expanduser())
+        for form in (reviewer_a, reviewer_b):
+            if form.get("packet_sha256") != expected_hash:
+                raise ReviewInputError("Reviewer file is bound to a different packet")
+        result = review_progress(packet, reviewer_a, reviewer_b) if args.progress else adjudicate(packet, reviewer_a, reviewer_b)
     except (OSError, json.JSONDecodeError, ReviewInputError) as exc:
         parser.error(str(exc))
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"

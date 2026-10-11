@@ -1,42 +1,22 @@
 #!/usr/bin/env python3
-"""Measure the local brain's answer latency and how often its answer is actually used.
+"""Capture route-specific answer delivery, provenance and model-gate outcomes.
 
-    measure_chat_latency.py [--limit 30] [--cases PATH] [--surface stream|payload] [--receipt PATH]
+Local stream/payload and foreground/background HTTP runs stay separate. Missing
+native phases, displayed-answer timing, memory pressure and build identities are
+reported as unknown. Cache conditions record what this caller can actually clear;
+an HTTP caller cannot establish the server's cache state.
 
-Stage 1's open item was blocked on recorded speed. The figures that block it were wrong, so this measures the real
-ones: the median and p95 of accepted answers, and the rate plus top reason for rejection, by asking real knowledge
-questions through KENN's own answer path against the local Ollama brain.
-
-**Two surfaces, and the difference matters.** `stream` is `answer_payload_stream`, what `kenn.core.chat` and
-`chat_cli` use. `payload` is the non-streaming `answer_payload` the browser companion calls. Both reach
-`make_answer()` and both can have the model write the answer, but only when `should_use_llm_rewrite()` clears the
-retrieval-confidence gate. Measured 1 Oct: on the streaming path the brain wrote 2 answers in 10; on the companion
-path it wrote none, and the ~20 s spent there is `post_answer_critique()` grading KENN's own template. So a
-companion-only measurement answers a different question than a streaming one, which is why the surface is a flag
-rather than a detail.
-
-**Why it captures the verdict in flight.** The grounding verdict is never persisted: `save_reasoning_trace` is
-called without a metadata payload, so `generation_validation` -- which holds `attempted`, `accepted` and the warnings
--- exists only in the dict `_answer_payload_stream_raw` yields, and `answer_payload` does not return it. The accepted
-rate cannot be read back from any store after the fact. That is a gap in its own right and it is why this script
-exists rather than a log query.
-
-**Run it with `KENN_LLM_CACHE=0`.** Two caches will otherwise serve a previous run's answer and report
-`attempted=True` for a question no model ever saw. `KENN_LLM_CACHE` (on by default, 512 entries, 24 h TTL in
-`llm_rewrite.py`) replays the model's response for an identical prompt; the semantic answer cache in
-`session_memory` replays whole answer events. This script drops the semantic cache before every question, but it
-cannot reach the response cache from here, so that one is the caller's job. Measured: with it on, all 10 questions
-reported `attempted=True` at a 0.08 s median with no model call at all.
-
-Read-only against Live, and it never writes to one: `answer_payload` only reads the session snapshot.
-
-Needs the knowledge index. `apps/backend/src/kenn/data/` is git-ignored, so run this from the main checkout -- in a
-fresh worktree retrieval silently drops to BM25-only and every answer abstains.
+Use stubs while inference work is active. Real-model runs require the finished
+build and its existing local index; this script never builds an index or writes
+to Live. Offline review consumes the saved capture without rerunning inference.
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
+import platform
+import subprocess
 import json
 import os
 import statistics
@@ -133,16 +113,20 @@ _CAPTURE_PATH: Path | None = None
 # Set by the capture wrapper on every call. A flag rather than a set of questions, because the gate is handed
 # relevance_query and the harness holds the original question, and those two are not always the same string.
 _CAPTURE_HIT = False
+_LAST_CAPTURE_ROW: dict | None = None
+_CAPTURE_CASE_ID: str | None = None
 
 
 def _write_capture_row(row: dict) -> None:
+    global _LAST_CAPTURE_ROW
+    _LAST_CAPTURE_ROW = {**row, "case_id": _CAPTURE_CASE_ID}
     if _CAPTURE_PATH is None:
         return
     with _CAPTURE_PATH.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(row) + "\n")
+        handle.write(json.dumps(_LAST_CAPTURE_ROW) + "\n")
 
 
-def _install_capture(path: Path) -> None:
+def _install_capture(path: Path | None) -> None:
     """Record every candidate answer so a rejection can be re-scored offline.
 
     The payload cannot supply this: when the grounding gate rejects the brain's answer, the streaming
@@ -162,7 +146,8 @@ def _install_capture(path: Path) -> None:
     from kenn.llm.llm_rewrite import resolve_context_chars
 
     global _CAPTURE_PATH, _CAPTURE_HIT
-    path.parent.mkdir(parents=True, exist_ok=True)
+    if path is not None:
+        path.parent.mkdir(parents=True, exist_ok=True)
     _CAPTURE_PATH = path
     _CAPTURE_HIT = False
     real = chat_answer.generated_answer_validation
@@ -172,8 +157,7 @@ def _install_capture(path: Path) -> None:
         _CAPTURE_HIT = True
         validation = real(query, results, answer, **kwargs)
         block, shown = gate_evidence(results)
-        with path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps({
+        _write_capture_row({
                 "question": query,
                 # The question as typed by the producer this turn, before history expansion.
                 # The live gate takes accepted figures from this, not the expanded search query.
@@ -213,7 +197,7 @@ def _install_capture(path: Path) -> None:
                 "abstained": bool(validation.get("abstained")),
                 "abstain_gap": str(validation.get("abstain_gap") or ""),
                 "claim_citations": validation.get("claim_citations") or {},
-            }) + "\n")
+        })
         return validation
 
     chat_answer.generated_answer_validation = capture
@@ -246,27 +230,111 @@ def _ask(chat_answer, question: str, *, allow_llm: bool, surface: str) -> tuple[
     ), 0, None
 
 
-def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream") -> dict:
-    global _CAPTURE_HIT
+def run_provenance(manifest: dict | None = None) -> dict:
+    """Identify this checkout; externally measured model, corpus and hardware fields stay unknown."""
+    def git(*arguments):
+        result = subprocess.run(["git", *arguments], cwd=KENN_ROOT, capture_output=True, check=False)
+        return result.stdout if result.returncode == 0 else b""
+
+    sources = hashlib.sha256()
+    paths = set(git("ls-files", "--", "apps/backend/src/kenn", "tooling/scripts").decode().splitlines())
+    # New files affect the tested build before a commit exists, so they belong in its identity too.
+    paths.update(git("ls-files", "--others", "--exclude-standard", "--", "apps/backend/src/kenn", "tooling/scripts").decode().splitlines())
+    for name in sorted(paths):
+        path = KENN_ROOT / name
+        if path.is_file():
+            sources.update(name.encode() + b"\0" + path.read_bytes())
+    identity = {
+        "source_revision": git("rev-parse", "HEAD").decode().strip() or None,
+        "dirty_diff_sha256": hashlib.sha256(git("diff", "HEAD", "--", ".")).hexdigest(),
+        "source_files_sha256": sources.hexdigest(),
+        "model_name": os.environ.get("KENN_LLM_MODEL") or None,
+        "model_digest": None, "resolved_prompt_sha256": None,
+        "index_version": _index_version() or None, "index_sha256": None, "corpus_sha256": None,
+        "hardware": {"architecture": platform.machine(), "processor": None, "memory_bytes": None},
+        "cache_settings": {"KENN_LLM_CACHE": os.environ.get("KENN_LLM_CACHE"),
+                           "KENN_LLM_CACHE_SIZE": os.environ.get("KENN_LLM_CACHE_SIZE"),
+                           "KENN_LLM_CACHE_TTL": os.environ.get("KENN_LLM_CACHE_TTL")},
+        "manifest": manifest or {},
+    }
+    # The manifest supplements measured identities rather than replacing this checkout's code hash.
+    return identity
+
+
+def _ask_http(question: str, *, surface: str, endpoint: str, timeout: float) -> tuple[dict, int, None]:
+    """Measure actual HTTP delivery; receiving an answer does not prove browser paint or usefulness."""
+    from kenn.core.mcp_facade import KennHTTPClient
+
+    client = KennHTTPClient(endpoint, timeout=timeout)
+    session = f"latency-{uuid.uuid4().hex}"
+    initial = client.post("/api/ask", {"question": question, "session_id": session})
+    if surface == "foreground":
+        return initial, 0, None
+    job = initial.get("answer_upgrade") or {}
+    if not job.get("id"):
+        # No job can mean busy, superseded or ineligible. The current HTTP contract does not distinguish them.
+        return {**initial, "delivery_outcome": "not_attempted", "fallback_reason": "No background job; admission reason unavailable"}, 0, None
+    deadline = time.perf_counter() + timeout
+    while time.perf_counter() < deadline:
+        result = client.get("/api/ask/upgrade", {"id": job["id"], "session_id": session})
+        if result.get("status") != "pending":
+            status = result.get("status")
+            if status not in {"accepted", "rejected", "failed"}:
+                # Missing, cancelled and expired jobs do not establish that inference was attempted.
+                return {**result, "delivery_outcome": "not_attempted", "fallback_reason": status or "Unknown job state"}, 0, None
+            accepted = status == "accepted" and not result.get("abstained")
+            return {**result, "delivery_outcome": "accepted" if accepted else "rejected",
+                    "generation_validation": {"attempted": True, "accepted": accepted,
+                                              "abstained": bool(result.get("abstained")),
+                                              "warnings": [result.get("reason") or result.get("error") or status]}}, 0, None
+        time.sleep(0.05)  # 50 ms polling is a harness setting, never a service inference setting.
+    return {"delivery_outcome": "timeout", "fallback_reason": "Background polling deadline"}, 0, None
+
+
+def answer_capture(report: dict) -> dict:
+    """Export every requested case for offline review, including missing and rejected answers."""
+    return {"schema": "kenn.answer_capture.v1", "provenance": report["provenance"],
+            "cases": [{"case_id": row["id"], "question": row["question"], "answer": row["candidate"] if row.get("candidate") is not None else row["answer"],
+                       "delivered_answer": row["answer"], "family": row["category"], "split": row["split"], "delivery": row["delivery"],
+                       "evidence": row["captured_evidence"], "eligible": row["eligible"],
+                       "candidate_available": row["candidate_available"]} for row in report["rows"]]}
+
+
+def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream",
+            cache_condition: str = "cold", endpoint: str | None = None, timeout: float = 90.0,
+            manifest: dict | None = None) -> dict:
+    global _CAPTURE_HIT, _LAST_CAPTURE_ROW, _CAPTURE_CASE_ID
     from kenn.core import chat_answer
     from kenn.llm.llm_rewrite import capture_usage
 
+    if surface not in {"stream", "payload", "foreground", "background"} or cache_condition not in {"cold", "warm"}:
+        raise ValueError("Unknown delivery surface or cache condition")
+    identities = [str(case.get("id") or case.get("case_id") or "") for case in cases]
+    if not identities or any(not item for item in identities) or len(set(identities)) != len(identities):
+        raise ValueError("Cases require unique IDs")
+    provenance = run_provenance(manifest)
+    provenance.update(surface=surface, cache_condition=cache_condition)
     rows: list[dict] = []
     for case in cases:
         question = str(case.get("question") or "").strip()
         if not question:
-            continue
+            raise ValueError("Empty questions cannot be omitted from a qualification run")
         # The semantic answer cache will otherwise serve a previous run's answer for an identical question, which
         # makes a rerun look like a 0.1 s answer that never called the model. Measured: three questions took
         # 57/54/73 s on the first pass and 0.1/0.1/1.5 s on the second, with "never attempted" nowhere in sight.
-        _drop_semantic_cache()
+        if cache_condition == "cold" and not endpoint:
+            _drop_semantic_cache()
         _CAPTURE_HIT = False
+        _LAST_CAPTURE_ROW = None
+        _CAPTURE_CASE_ID = str(case.get("id") or case.get("case_id"))
         started = time.perf_counter()
         # Replayed metadata can contain an earlier call's usage. Collect actual calls in this
         # context, including route/retry/failure/guard-close, rather than copying that metadata.
         with capture_usage() as provider_calls:
             try:
-                payload, tokens, ttft = _ask(chat_answer, question, allow_llm=allow_llm, surface=surface)
+                payload, tokens, ttft = (_ask_http(question, surface=surface, endpoint=endpoint, timeout=timeout)
+                                        if surface in {"foreground", "background"} else
+                                        _ask(chat_answer, question, allow_llm=allow_llm, surface=surface))
                 error = None
             except Exception as exc:  # a failure is a measurement, not a crash
                 payload, error, tokens, ttft = {}, f"{type(exc).__name__}: {exc}", 0, None
@@ -300,13 +368,34 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
                 "abstain_gap": str(validation.get("abstain_gap") or ""),
                 "claim_citations": {},
             })
+        delivery = payload.get("delivery_outcome") or (
+            "timeout" if error and ("Timeout" in error or "did not complete" in error) else
+            "accepted" if validation.get("accepted") and not validation.get("abstained") else
+            "rejected" if validation.get("attempted") else "not_attempted")
+        calls = [usage.to_dict() for usage in provider_calls]
+        def native_seconds(field):
+            values = [call.get(field) for call in calls]
+            return sum(values) / 1e9 if values and all(value is not None for value in values) else None
         rows.append({
-            "id": str(case.get("id") or "unknown"),
+            "id": str(case.get("id") or case.get("case_id")),
+            "question": question, "answer": str(payload.get("answer") or ""),
+            "split": str(case.get("split") or "regression"), "eligible": case.get("eligible", True) is True,
+            "delivery": delivery, "candidate_available": bool((_LAST_CAPTURE_ROW or {}).get("candidate_text_available")) or delivery == "accepted",
+            "captured_evidence": (_LAST_CAPTURE_ROW or {}).get("evidence_sources", payload.get("sources")),
+            "candidate": (_LAST_CAPTURE_ROW or {}).get("answer") if (_LAST_CAPTURE_ROW or {}).get("candidate_text_available") else None,
+            "fallback_reason": payload.get("fallback_reason") or error or validation.get("warnings"),
+            "first_useful_answer_seconds": None, "final_displayed_answer_seconds": None,
+            "final_received_answer_seconds": round(seconds, 3),
+            "memory_pressure": None, "swap_bytes": None,
+            "phase_seconds": {"admission": None, "queue": None, "context_retrieval": None,
+                              "prefill": native_seconds("prompt_eval_duration_ns"),
+                              "generation": native_seconds("eval_duration_ns"), "verification": None},
             "category": str(case.get("category") or "uncategorized"),
             "seconds": round(seconds, 3),
             "ttft_seconds": round(ttft, 3) if ttft is not None else None,
             "stream_events": tokens,
-            "cache_dropped": True,
+            "cache_dropped": cache_condition == "cold" and not endpoint,
+            "server_cache_condition_verified": False if endpoint else None,
             "surface": surface,
             "provider_calls": [usage.to_dict() for usage in provider_calls],
             "attempted": bool(validation.get("attempted")),
@@ -333,12 +422,17 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
     top_reason, top_count = reasons.most_common(1)[0] if reasons else ("", 0)
     calls = [call for row in rows for call in row["provider_calls"]]
     return {
-        "schema": "kenn.chat_latency.v1",
+        "schema": "kenn.chat_latency.v2",
+        "provenance": provenance,
+        "qualification": "unqualified; delivery is not correctness or displayed-answer timing",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "model": os.environ.get("KENN_LLM_MODEL", ""),
         "index_version": _index_version(),
         "counts": {
             "asked": len(rows),
+            "eligible": sum(r["eligible"] for r in rows),
+            "delivery": dict(Counter(r["delivery"] for r in rows)),
+            "eligible_accepted_within_15_seconds": sum(r["eligible"] and r["delivery"] == "accepted" and r["seconds"] <= 15 for r in rows),
             "llm_attempted": len(attempted),
             "llm_accepted": len(accepted),
             "llm_abstained": len(abstained),
@@ -418,28 +512,43 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=30)
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
     parser.add_argument("--templates-only", action="store_true", help="skip the model, for the floor")
-    parser.add_argument("--surface", choices=("stream", "payload"), default="stream",
+    parser.add_argument("--surface", choices=("stream", "payload", "foreground", "background"), default="stream",
                         help="stream = kenn.core.chat / chat_cli; payload = the browser companion's non-streaming call")
     parser.add_argument("--receipt", type=Path)
     parser.add_argument("--capture-answers", type=Path, metavar="PATH",
                         help="append every candidate answer to PATH as JSONL, including rejected ones, so a "
                              "gate can be re-scored offline. Must be git-ignored: it holds model prose.")
+    parser.add_argument("--endpoint", help="loopback companion URL for foreground/background HTTP measurements")
+    parser.add_argument("--cache-condition", choices=("cold", "warm"), default="cold")
+    parser.add_argument("--timeout", type=float, default=90.0)
+    parser.add_argument("--build-manifest", type=Path, help="exact model/prompt/index/corpus/hardware and supervision identity JSON")
+    parser.add_argument("--review-capture", type=Path, help="all-case offline capture JSON; keep outside git")
     args = parser.parse_args()
+    if args.surface in {"foreground", "background"} and not args.endpoint:
+        parser.error("HTTP delivery requires --endpoint")
+    if args.timeout <= 0:
+        parser.error("--timeout must be positive")
 
     if not args.cases.is_file():
         print(f"No cases at {args.cases}", file=sys.stderr)
         return 1
     current = KENN_ROOT / "apps/backend/src/kenn/data/index/CURRENT"
-    if not current.is_file():
+    if not current.is_file() and not args.endpoint:
         print("chat-latency=NOT_MEASURED no retrieval index in this checkout", file=sys.stderr)
         print("apps/backend/src/kenn/data/ is git-ignored, so a fresh worktree has none and every answer would "
               "abstain. Run from the main checkout.", file=sys.stderr)
         return 2
 
     cases = json.loads(args.cases.read_text(encoding="utf-8")).get("cases", [])[: args.limit]
-    if args.capture_answers:
+    if args.capture_answers or (args.review_capture and not args.endpoint):
         _install_capture(args.capture_answers)
-    report = measure(cases, allow_llm=not args.templates_only, surface=args.surface)
+    report = measure(cases, allow_llm=not args.templates_only, surface=args.surface,
+                     cache_condition=args.cache_condition, endpoint=args.endpoint, timeout=args.timeout,
+                     manifest=json.loads(args.build_manifest.read_text()) if args.build_manifest else None)
+    report["provenance"]["cases_sha256"] = hashlib.sha256(args.cases.read_bytes()).hexdigest()
+    if args.review_capture:
+        args.review_capture.parent.mkdir(parents=True, exist_ok=True)
+        args.review_capture.write_text(json.dumps(answer_capture(report), indent=2) + "\n")
     print(render(report))
     if args.receipt:
         args.receipt.parent.mkdir(parents=True, exist_ok=True)

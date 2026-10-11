@@ -350,6 +350,49 @@ TOOLS: list[dict[str, Any]] = [
         },
     },
     {
+        "name": "inspect_parameter",
+        "description": "Read current raw metadata for a track, return, master or nested rack parameter.",
+        "inputSchema": {
+            "type": "object", "additionalProperties": False,
+            "required": ["address", "parameter_index"],
+            "properties": {
+                "address": {"type": "object", "additionalProperties": False,
+                    "required": ["kind", "index", "device_path"],
+                    "properties": {"kind": {"enum": ["track", "return", "master"]},
+                        "index": {"type": "integer", "minimum": 0},
+                        "device_path": {"type": "array", "minItems": 1, "maxItems": 9,
+                            "items": {"type": "integer", "minimum": 0}}}},
+                "parameter_index": {"type": "integer", "minimum": 0},
+            },
+        },
+    },
+    {
+        "name": "create_parameter_proposal",
+        "description": "Prepare an inspected bus/rack parameter candidate for explicit Apply. Names and raw bounds must match fresh observations; physical units need a qualified mapping. Never executes.",
+        "inputSchema": {
+            "type": "object", "additionalProperties": False,
+            "properties": {
+                "session_id": {"type": "string", "minLength": 1, "maxLength": 128},
+                "address": {
+                    "type": "object", "additionalProperties": False,
+                    "properties": {
+                        "kind": {"type": "string", "enum": ["track", "return", "master"]},
+                        "index": {"type": "integer", "minimum": 0},
+                        "device_path": {"type": "array", "minItems": 1, "maxItems": 9, "items": {"type": "integer", "minimum": 0}},
+                    },
+                    "required": ["kind", "index", "device_path"],
+                },
+                "parameter_index": {"type": "integer", "minimum": 0},
+                "parameter_name": {"type": "string", "minLength": 1, "maxLength": 128},
+                "device_name": {"type": "string", "minLength": 1, "maxLength": 128},
+                "value": {"type": ["number", "string"]},
+                "unit": {"type": "string", "minLength": 1, "maxLength": 128},
+                "relative": {"type": "boolean"},
+            },
+            "required": ["session_id", "address", "parameter_index", "parameter_name", "device_name", "value", "unit"],
+        },
+    },
+    {
         "name": "create_live_recipe_proposal",
         "description": "Create a confirmation-only 1–3 step typed Live recipe. Every step is resolved against the fresh session and the recipe is never applied by this tool.",
         "inputSchema": {

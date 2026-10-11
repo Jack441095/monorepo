@@ -13,10 +13,14 @@ import json
 import os
 import re
 import threading
+import hashlib
+import time
+from uuid import uuid4
 from pathlib import Path
 from typing import Any
 
 from kenn.core.device_units import raw_to_display
+from kenn.core.parameter_contract import indexed_parameter, target_address, validate_parameter
 
 FIXTURE_ENV = "KENN_FAKE_LIVE_FIXTURE"
 DEFAULT_FIXTURE = Path(__file__).with_name("fake_live_fixtures") / "investor_demo.json"
@@ -76,6 +80,8 @@ class FakeLiveBackend:
         }
         self._selected_device = dict(fixture.get("selected_device") or {"track_index": 0, "device_index": 0})
         self._world_fixture = copy.deepcopy(fixture.get("world") or {})
+        self._addressed_buses = copy.deepcopy(fixture.get("addressed_buses") or [])
+        self._target_observations = {}
         # Live's cue points; the playhead stays at beat 0 here, so one locator can be added before the next asks.
         self._locators: list[dict[str, Any]] = copy.deepcopy(fixture.get("locators") or [])
         self._clips: dict[tuple[int, int], dict[str, Any]] = {}
@@ -264,6 +270,68 @@ class FakeLiveBackend:
             ]
             return {"success": True, "device_name": info["device_name"], "parameters": copy.deepcopy(parameters)}
 
+    def _addressed_target(self, address: dict, parameter_index: int):
+        address = target_address(address)
+        bus = next(row for row in self._addressed_buses if row["kind"] == address["kind"] and row["index"] == address["index"])
+        path = address["device_path"]
+        device = bus["devices"][path[0]]
+        objects, labels = [bus, device], [bus["name"], device["name"]]
+        for offset in range(1, len(path), 2):
+            chain = device["chains"][path[offset]]
+            device = chain["devices"][path[offset + 1]]
+            objects.extend((chain, device))
+            labels.extend((chain["name"], device["name"]))
+        parameter = indexed_parameter(device["parameters"], parameter_index)
+        if parameter is None:
+            raise ValueError("No exposed parameter at that index")
+        objects.append(parameter)
+        def topology(row):
+            return {key: topology(value) if isinstance(value, dict) else [topology(item) for item in value] if isinstance(value, list) else value
+                    for key, value in row.items() if key not in {"parameters"}}
+        digest = hashlib.sha256(json.dumps(topology(bus), sort_keys=True).encode()).hexdigest()
+        return bus, device, parameter, objects, labels, digest
+
+    def get_addressed_parameter(self, address: dict, parameter_index: int, reference: str | None = None) -> dict[str, Any]:
+        """Expose synthetic topology as fake evidence, with the same observation guard as the bundle."""
+        with self._lock:
+            try:
+                bus, device, parameter, objects, labels, digest = self._addressed_target(address, parameter_index)
+                now = time.monotonic()
+                self._target_observations = {token: row for token, row in self._target_observations.items() if row["expires"] > now}
+                if reference:
+                    previous = self._target_observations.get(reference)
+                    if previous is None or previous["topology"] != digest or len(objects) != len(previous["objects"]) or any(a is not b for a, b in zip(objects, previous["objects"])):
+                        raise ValueError("Observed objects or topology changed")
+                token = uuid4().hex
+                if len(self._target_observations) >= 256:
+                    self._target_observations.pop(next(iter(self._target_observations)))
+                self._target_observations[token] = {"objects": objects, "topology": digest, "used": False, "expires": now + 300}
+                return {"success": True, "backend": "fake", "evidence_kind": "synthetic", "target_address": address,
+                        "track_name": bus["name"], "device_name": device["name"], "topology": digest,
+                        "observation_token": token, "target_label": " / ".join(labels + [parameter["name"]]),
+                        "parameters": [copy.deepcopy(parameter)], "limitations": ["Synthetic fixture; no real-Live qualification."]}
+            except (ValueError, KeyError, IndexError, StopIteration) as exc:
+                # Unsupported fake locations must refuse rather than falling back to a real Live client.
+                return {"success": False, "error": str(exc)}
+
+    def set_addressed_parameter(self, address: dict, parameter_index: int, value: float, expected: dict) -> bool:
+        with self._lock:
+            info = self.get_addressed_parameter(address, parameter_index, expected["observation_token"])
+            if not info.get("success") or info["parameters"] != expected["parameters"] or info["topology"] != expected["topology"]:
+                return False
+            observation = self._target_observations[expected["observation_token"]]
+            if observation["used"]:
+                return False
+            parameter = self._addressed_target(address, parameter_index)[2]
+            if parameter.get("is_enabled") is not True or parameter.get("state") != 0 or parameter.get("automation_state") != 0:
+                return False
+            if validate_parameter(parameter, value):
+                return False
+            observation["used"] = True
+            parameter["value"] = float(value)
+            self.writes.append(("addressed_parameter", copy.deepcopy(address), parameter_index, float(value)))
+            return True
+
     def get_device_parameter(self, track_index: int, device_index: int, parameter_index: int) -> dict[str, Any]:
         info = self.get_device_parameters(track_index, device_index)
         if not info.get("success"):
@@ -368,12 +436,13 @@ class FakeLiveBackend:
     def set_device_parameter(self, track_index: int, device_index: int, parameter_index: int, value: float) -> bool:
         with self._lock:
             info = self._devices.get((int(track_index), int(device_index)))
-            if info is None or not 0 <= int(parameter_index) < len(info["parameters"]):
+            if info is None:
                 return False
-            parameter = info["parameters"][int(parameter_index)]
-            clamped = min(float(parameter["max"]), max(float(parameter["min"]), float(value)))
-            parameter["value"] = clamped
-            self.writes.append(("device_parameter", int(track_index), int(device_index), int(parameter_index), clamped))
+            parameter = indexed_parameter(info["parameters"], int(parameter_index))
+            if parameter is None or validate_parameter(parameter, value, device_name=info.get("device_name", "")):
+                return False
+            parameter["value"] = float(value)
+            self.writes.append(("device_parameter", int(track_index), int(device_index), int(parameter_index), float(value)))
             return True
 
     def insert_device_with_result(self, track_index: int, device_name: str, insertion_index: int) -> dict[str, Any]:

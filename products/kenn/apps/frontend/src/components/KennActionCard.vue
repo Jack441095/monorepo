@@ -7,7 +7,7 @@
           {{ formattedActionName }}
         </span>
         <span class="kenn-action-card__target-badge">
-          {{ proposal.track_name || `Track ${proposal.track_index != null ? proposal.track_index + 1 : ''}` }}
+          {{ proposal.target_label || proposal.track_name || `Track ${proposal.track_index != null ? proposal.track_index + 1 : ''}` }}
         </span>
       </div>
       <span class="kenn-action-card__status-tag" :class="`kenn-action-card__status-tag--${cardStatus}`">
@@ -71,6 +71,9 @@
 
       <p v-if="proposal.reason" class="kenn-action-card__reason">
         {{ proposal.reason }}
+      </p>
+      <p v-for="limitation in proposal.limitations || []" :key="limitation" class="kenn-action-card__reason">
+        {{ limitation }}
       </p>
       <p v-if="errorMessage && cardStatus !== 'undo_refused'" class="kenn-action-card__error">
         {{ errorMessage }}
@@ -161,7 +164,7 @@ import { formatDb } from '../utils/formatLevel'
 const props = withDefaults(
   defineProps<{
     proposal: KennActionProposal
-    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
+    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'unknown' | 'failed' | 'partial' | 'error'
     receipt?: KennActionReceipt
     errorMessage?: string
     // False on a card that is itself an undo. Its receipt reverses the change before it, so "undoing" it would
@@ -281,6 +284,12 @@ const statusLabel = computed(() => {
       return 'Live 12 Synced'
     case 'rejected':
       return 'Dismissed'
+    case 'failed':
+      return 'Failed — Prepare a Fresh Proposal'
+    case 'partial':
+      return 'Partially Applied — Inspect Live'
+    case 'unknown':
+      return 'Outcome Unknown — Inspect Live'
     case 'error':
       return 'Failed'
     default:

@@ -12,6 +12,7 @@ import logging
 import socket
 import json
 import time
+from uuid import uuid4
 from threading import Lock
 from threading import Event, Lock, Thread
 from typing import Any, Dict, Iterable, List, Optional
@@ -118,6 +119,8 @@ READ_ENDPOINTS = (
     "/live/kenn/version",
     "/live/kenn/get/bus_mixer",
     "/live/kenn/get/device_tree",
+    "/live/kenn/parameter_target/features",
+    "/live/kenn/parameter_target/read",
     "/live/kenn/get/device_parameters",
     "/live/kenn/get/display_table",
     "/live/kenn/get/view_state",
@@ -127,6 +130,7 @@ READ_ENDPOINTS = (
     "/live/m4l/get/parameters",
 )
 WRITE_ENDPOINTS = (
+    "/live/kenn/parameter_target/write",
     "/live/track/set/volume",
     "/live/track/set/panning",
     "/live/track/set/mute",
@@ -1403,6 +1407,57 @@ class AbletonOSCClient:
         """Every parameter of one device with display string and automation state."""
         return self._kenn_json("/live/kenn/get/device_parameters", [str(kind), int(index), int(device_index)])
 
+    def _parameter_target_request(self, operation: str, payload: dict) -> dict[str, Any]:
+        """Skip delayed replies by nonce; never retry a mutation whose outcome is unknown."""
+        address = {
+            "features": "/live/kenn/parameter_target/features",
+            "read": "/live/kenn/parameter_target/read",
+            "write": "/live/kenn/parameter_target/write",
+        }[operation]
+        nonce = uuid4().hex
+        if self._breaker_blocks(False):
+            return {"success": False, "error": "AbletonOSC is unavailable."}
+        with self._exchange_lock:
+            started = time.monotonic()
+            request_id = self.send_command(address, [nonce, json.dumps(payload, allow_nan=False)])
+            response = None
+            deadline = started + self.query_timeout
+            while request_id is not None and time.monotonic() < deadline:
+                candidate = self._receive_response(address, deadline - time.monotonic())
+                if candidate is None:
+                    break
+                args = self._response_args(candidate)
+                if len(args) == 2 and args[0] == nonce:
+                    response = candidate
+                    break
+            self._request_addresses.pop(request_id or -1, None)
+            self._record_exchange(address=address, request_id=request_id, response=response, started=started)
+            if response is None:
+                return {"success": False, "error": "No attributable parameter-target reply.", "outcome": "unknown" if operation == "write" else "unavailable"}
+            self._note_transport_success()
+            try:
+                result = json.loads(self._response_args(response)[1])
+                if not isinstance(result, dict):
+                    raise ValueError("Expected an object")
+                return result
+            except (TypeError, ValueError):
+                # An invalid acknowledgement cannot prove that a write failed to reach Live.
+                return {"success": False, "error": "Invalid parameter-target reply.", "outcome": "unknown"}
+
+    def get_addressed_parameter(self, address: dict, parameter_index: int, reference: str | None = None) -> dict[str, Any]:
+        """Negotiate the shipped feature before addressing returns, master or rack chains."""
+        from kenn.core.parameter_contract import target_address
+        address = target_address(address)
+        features = self._parameter_target_request("features", {})
+        if not features.get("success") or "device_parameter_target.v1" not in features.get("features", []):
+            return {"success": False, "error": "Remote Script does not expose device_parameter_target.v1."}
+        return self._parameter_target_request("read", {"address": address, "parameter_index": parameter_index, "reference": reference})
+
+    def set_addressed_parameter(self, address: dict, parameter_index: int, value: float, expected: dict) -> bool:
+        """Send once with a fresh server guard; the action service separately verifies readback."""
+        result = self._parameter_target_request("write", {"address": address, "parameter_index": parameter_index, "value": value, "expected": expected})
+        return bool(result.get("success") and result.get("sent"))
+
     def get_display_table(self, kind: str, index: int, target: str, samples: int = 101,
                           start: float = 0.0, stop: float = 1.0) -> dict[str, Any]:
         """Live's display string at evenly spaced values of one parameter (read-only, str_for_value)."""
@@ -1507,11 +1562,14 @@ class AbletonOSCClient:
         if names is None or values is None or minimums is None or maximums is None or device_name_args is None:
             return {"success": False, "error": "No complete response from AbletonOSC for that device."}
         device_name = str(_single_value(device_name_args) or f"Device {device_index}")
+        if not names or any(len(items) != len(names) for items in (values, minimums, maximums)):
+            # A truncated UDP array cannot establish the raw range of its remaining controls.
+            return {"success": False, "error": "AbletonOSC returned truncated parameter metadata."}
         parameters: list[dict[str, Any]] = []
         for index, name in enumerate(names):
-            value = values[index] if index < len(values) else None
-            minimum = minimums[index] if index < len(minimums) else 0.0
-            maximum = maximums[index] if index < len(maximums) else 1.0
+            value = values[index]
+            minimum = minimums[index]
+            maximum = maximums[index]
             parameter = {
                 "index": index,
                 "name": str(name),

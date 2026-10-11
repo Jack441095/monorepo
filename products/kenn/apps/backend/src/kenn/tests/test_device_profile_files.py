@@ -93,8 +93,8 @@ def say(profiles, tmp_path, monkeypatch):
     return lambda text: handle_command(text, session_id="profiles", service=service, allow_llm=False)
 
 
-def test_a_qualified_profile_is_all_it_takes_to_set_a_control_in_real_units(profiles, say) -> None:
-    """The chain the device factory feeds: measured, qualified, then "set the compressor makeup to 50%" just works."""
+def test_a_qualified_profile_cannot_override_observed_quantized_semantics(profiles, say) -> None:
+    # Makeup is a toggle in the recorded fixture; a continuous profile cannot turn it into a percentage knob.
     unmeasured = say("set the Drum Bus compressor makeup to 50%")
     assert unmeasured["status"] == "clarification_required" and "no evidence-backed" in unmeasured["answer"]   # fails closed
 
@@ -103,7 +103,7 @@ def test_a_qualified_profile_is_all_it_takes_to_set_a_control_in_real_units(prof
         entry(parameter="Knee", unit="db", mapping="linear", raw_min=0.0, raw_max=18.0, display_min=0.0, display_max=18.0),
         device="Compressor", name="compressor-extra.json")
     makeup = say("set the Drum Bus compressor makeup to 50%")
-    assert makeup["status"] == "confirmation_required" and makeup["proposal"]["after"] == pytest.approx(0.5, abs=1e-3)
+    assert makeup["status"] == "clarification_required" and "quantized" in makeup["answer"]
     knee = say("set the Drum Bus compressor knee to 12 dB")
     assert knee["status"] == "confirmation_required" and knee["proposal"]["after"] == pytest.approx(12.0)
 

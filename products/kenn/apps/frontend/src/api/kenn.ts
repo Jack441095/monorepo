@@ -30,6 +30,9 @@ export type KennActionStep = {
   operation?: string
   track_index?: number
   track_name?: string
+  target_label?: string
+  target_address?: { kind: 'track' | 'return' | 'master'; index: number; device_path: number[] }
+  limitations?: string[]
   parameter?: string
   device_name?: string
   before?: unknown
@@ -50,6 +53,9 @@ export type KennActionProposal = {
   target?: string
   track_index?: number
   track_name?: string
+  target_label?: string
+  target_address?: { kind: 'track' | 'return' | 'master'; index: number; device_path: number[] }
+  limitations?: string[]
   parameter?: string
   device_name?: string
   device_index?: number
@@ -397,14 +403,15 @@ export async function confirmKennAction(params: {
       error: undefined,
     }
   }
-  if (!res.ok && data.error) {
-    throw new ApiError(String(data.error), res.status)
-  }
   const execution = (data.execution && typeof data.execution === 'object') ? (data.execution as Record<string, unknown>) : {}
   const receipt = (data.receipt || execution.receipt) as KennActionReceipt | undefined
+  // A 409 can carry an uncertain-write receipt. Preserve it so the card cannot invite another Apply.
+  if (!res.ok && data.error && !receipt) {
+    throw new ApiError(String(data.error), res.status)
+  }
   return {
-    ok: Boolean(data.status === 'applied' || data.ok || execution.ok),
-    status: String(data.status || 'applied'),
+    ok: Boolean(data.status === 'applied' || data.ok || execution.ok) && receipt?.verified !== false,
+    status: String(receipt?.status || data.status || 'failed'),
     answer: String(data.answer || execution.answer || ''),
     receipt,
     error: data.error ? String(data.error) : undefined,

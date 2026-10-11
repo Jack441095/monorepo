@@ -65,6 +65,37 @@ describe('useKenn investor-facing failure states', () => {
     expect(mockedConfirm).not.toHaveBeenCalled()
   })
 
+  it.each(['receipt', 'network'] as const)('keeps an uncertain %s write from being sent twice', async (failure) => {
+    // A lost acknowledgement may follow a real write, so the same card cannot offer retry.
+    kenn.messages.value = [{ id: 'uncertain', role: 'assistant', actionStatus: 'pending',
+      proposal: { action: 'set_device_parameter', confirmation_token: 'held-token' } }]
+    if (failure === 'receipt') {
+      mockedConfirm.mockResolvedValueOnce({ ok: false, status: 'unknown', receipt: {
+        receipt_id: 'unknown-1', action: 'set_device_parameter', status: 'unknown', verified: false,
+      } })
+    } else {
+      mockedConfirm.mockRejectedValueOnce(new Error('Request timed out'))
+    }
+    await kenn.applyMessageProposal('uncertain')
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'unknown' })
+    await kenn.applyMessageProposal('uncertain')
+    expect(mockedConfirm).toHaveBeenCalledTimes(1)
+    expect(mockedUndo).not.toHaveBeenCalled()
+  })
+
+  it.each(['failed_verification', 'partial_recovery'] as const)('retires a consumed %s proposal without inviting Apply again', async (status) => {
+    kenn.messages.value = [{ id: 'failed', role: 'assistant', actionStatus: 'pending',
+      proposal: { action: 'set_device_parameter', confirmation_token: 'held-token' } }]
+    mockedConfirm.mockResolvedValueOnce({ ok: false, status, receipt: {
+      receipt_id: 'failed-1', action: 'set_device_parameter', status, verified: false,
+    } })
+    await kenn.applyMessageProposal('failed')
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: status.includes('partial') ? 'partial' : 'failed' })
+    await kenn.applyMessageProposal('failed')
+    expect(mockedConfirm).toHaveBeenCalledTimes(1)
+    expect(mockedUndo).not.toHaveBeenCalled()
+  })
+
   it('does not report a dismissed proposal as a Live action', async () => {
     kenn.messages.value = [{
       id: 'dismissed-proposal',

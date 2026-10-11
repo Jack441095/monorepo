@@ -32,7 +32,7 @@ export type KennAssistantMessage = {
   followUp?: string
   proposal?: KennActionProposal
   receipt?: KennActionReceipt
-  actionStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
+  actionStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'unknown' | 'failed' | 'partial' | 'error'
   actionError?: string
   undoOfReceiptId?: string
   /** The model is still writing a fuller answer; the template text is showing meanwhile. */
@@ -344,9 +344,18 @@ async function applyMessageProposal(messageId: string) {
       messages.value = [...messages.value]
       return
     }
+    if (res.status === 'unknown') {
+      msg.receipt = res.receipt
+      msg.actionStatus = 'unknown'
+      msg.actionError = res.error || 'KENN could not observe the outcome. Inspect Live before preparing another change.'
+      messages.value = [...messages.value]
+      return
+    }
     if (!res.ok) {
-      msg.actionStatus = 'pending'
-      msg.actionError = res.error || res.answer || 'Action could not be confirmed — tap Apply to retry.'
+      // A receipt consumes this proposal even when a batch fails; a fresh proposal must re-read Live.
+      msg.receipt = res.receipt
+      msg.actionStatus = res.receipt ? (res.receipt.status.includes('partial') ? 'partial' : 'failed') : 'pending'
+      msg.actionError = res.error || res.answer || 'Action failed. Inspect Live before preparing a fresh proposal.'
       messages.value = [...messages.value]
       return
     }
@@ -362,7 +371,8 @@ async function applyMessageProposal(messageId: string) {
     messages.value = [...messages.value]
     await refreshSessionCard()
   } catch (e) {
-    msg.actionStatus = 'pending'
+    // A lost HTTP reply may hide a completed write; require inspection instead of offering Apply again.
+    msg.actionStatus = 'unknown'
     msg.actionError = userFacingKennError(
       e,
       'KENN could not verify that action. Check Live before retrying; KENN will not send another change automatically.',

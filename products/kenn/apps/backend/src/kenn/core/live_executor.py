@@ -252,7 +252,8 @@ class LiveExecutor:
         proposed_val = float(proposal.get("after", 0.0))
 
         # 2. Verify HMAC confirmation token binding
-        req_text = f"set_device_parameter:{track_idx}:{device_idx}:{param_idx}:{proposed_val}"
+        from kenn.core.parameter_contract import device_confirmation_text
+        req_text = device_confirmation_text(proposal)
         is_verified = consume_confirmation(
             confirm_token,
             session_id=session_id,

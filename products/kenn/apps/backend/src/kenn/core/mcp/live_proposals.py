@@ -93,6 +93,14 @@ def create_live_recipe_proposal(facade: KennMCPFacade, args: dict[str, Any]) -> 
     return result
 
 
+def create_parameter_proposal(facade: KennMCPFacade, args: dict[str, Any]) -> dict[str, Any]:
+    """Send an observed bus/rack candidate through the HTTP proposal boundary."""
+    result = facade.client.post("/api/ableton/parameter/proposal", args)
+    if result.get("receipt") or result.get("changed") is True:
+        raise RuntimeError("KENN returned a mutation from a parameter proposal-only MCP call")
+    return result
+
+
 def create_mix_review_recipe_proposal(facade: KennMCPFacade, args: dict[str, Any]) -> dict[str, Any]:
     review_id = str(args.get("review_id", "")).strip()[:128]
     session_id = str(args.get("session_id", "")).strip()[:128]
@@ -221,3 +229,8 @@ def update_midi_clip_proposal(facade: KennMCPFacade, args: dict[str, Any]) -> di
     if result.get("receipt") or result.get("changed") is True:
         raise RuntimeError("KENN returned a mutation from a MIDI clip update proposal-only MCP call")
     return result
+
+
+def inspect_parameter(facade: KennMCPFacade, args: dict[str, Any]) -> dict[str, Any]:
+    """Read the addressed parameter through HTTP without returning mutation authority."""
+    return facade.client.post("/api/ableton/parameter/inspect", args)

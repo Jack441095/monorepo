@@ -1041,7 +1041,21 @@ def _llm_planner_snapshot(
             "Every write still requires KENN proposal, confirmation, stale-state, readback, and undo gates.",
         ],
     }
-    for device in [item for item in (track.get("devices") or []) if isinstance(item, dict)][:64]:
+    devices = [item for item in (track.get("devices") or []) if isinstance(item, dict)]
+    requested_device = deterministic_intent.get("device")
+    if isinstance(requested_device, dict):
+        matches = [item for item in devices if item.get("index") == requested_device.get("index")]
+        if matches:
+            devices = matches
+    if isinstance(requested_device, str):
+        matches = [item for item in devices if str(item.get("name", "")).casefold() == requested_device.casefold()]
+        if matches:
+            devices = matches
+    # Four devices and 32 controls per device bound planning context. Omitted controls require a new inspection,
+    # never a model guess, and this evidence remains separate from Apply's fresh preconditions.
+    if len(devices) > 4:
+        planner["limitations"].append("Only four matching devices are shown; clarify the target before planning others.")
+    for device in devices[:4]:
         try:
             device_index = int(device.get("index"))
             info = service.client.get_device_parameters(track_index, device_index)
@@ -1050,12 +1064,22 @@ def _llm_planner_snapshot(
         if not isinstance(info, dict) or not info.get("success"):
             continue
         parameters = []
-        for parameter in (info.get("parameters") or [])[:128]:
+        observed = info.get("parameters") or []
+        hint = deterministic_intent.get("parameter")
+        if isinstance(hint, dict):
+            hint = hint.get("name")
+        if isinstance(hint, str) and hint:
+            matching = [row for row in observed if isinstance(row, dict) and hint.casefold() in str(row.get("name", "")).casefold()]
+            if matching:
+                observed = matching
+        if len(observed) > 32:
+            planner["limitations"].append(f"Only 32 controls on {info.get('device_name', '')} are shown; request a specific parameter.")
+        for parameter in observed[:32]:
             if not isinstance(parameter, dict) or not str(parameter.get("name", "")).strip():
                 continue
             parameters.append({
                 key: parameter[key]
-                for key in ("index", "name", "value", "min", "max", "value_display", "readable", "quantized")
+                for key in ("index", "name", "value", "min", "max", "value_display", "readable", "quantized", "choices", "is_enabled", "state", "automation_state", "macro_controlled")
                 if key in parameter
             })
         planner["entries"].append({
@@ -2109,10 +2133,6 @@ def _resolve_device_parameter(
             if conversion_error:
                 return {"ok": False, "clarification": conversion_error}
             requested_value = float(converted_value)
-        elif unit.lower() == "db" and relative_profile is None:
-            # Legacy raw==dB passthrough for unmapped parameters (e.g. EQ
-            # band gains whose raw values already read in dB).
-            requested_value = current + requested_value
         else:
             converted_delta, conversion_error = display_to_raw(
                 device_name=device_name,
@@ -2124,7 +2144,9 @@ def _resolve_device_parameter(
             if conversion_error:
                 return {"ok": False, "clarification": conversion_error}
             requested_value = current + float(converted_delta)
-    elif unit in {"%", "ms", "ratio"}:
+    else:
+        # Every physical unit needs an established raw conversion, including dB and Hz.
+        # display_to_raw also handles explicitly raw requests without inventing a mapping.
         converted_value, conversion_error = display_to_raw(
             device_name=device_name,
             parameter_name=str(parameter.get("name", "")),
@@ -2134,25 +2156,6 @@ def _resolve_device_parameter(
         if conversion_error:
             return {"ok": False, "clarification": conversion_error}
         requested_value = float(converted_value)
-    else:
-        # Absolute display-unit values (dB, Hz) convert through an
-        # evidence-backed profile when one exists. Without a profile the
-        # legacy raw passthrough applies and Live's own range check decides.
-        profile = find_profile(
-            device_name=device_name,
-            parameter_name=str(parameter.get("name", "")),
-            unit=unit,
-        )
-        if profile is not None:
-            converted_value, conversion_error = display_to_raw(
-                device_name=device_name,
-                parameter_name=str(parameter.get("name", "")),
-                value=requested_value,
-                unit=unit,
-            )
-            if conversion_error:
-                return {"ok": False, "clarification": conversion_error}
-            requested_value = float(converted_value)
     result = service.propose_device_action(
         track_index=int(track["index"]),
         device_index=int(device_index),
@@ -2191,8 +2194,15 @@ def _resolve_device_choice(
     name = str(parameter.get("name", ""))
     choice = device_units.find_choice(device_name, name)
     label = str(intent.get("choice_label") or "")
-    raw = next((option for option, text in (choice.options if choice else ()) if text.casefold() == label.casefold()), None)
-    if choice is None or raw is None:
+    observed = parameter.get("choices")
+    try:
+        options = [(float(row["raw"]), row["label"]) for row in observed] if observed else (choice.options if choice else ())
+    except (KeyError, TypeError, ValueError):
+        # A partial option table cannot authorize a label by guessing its position.
+        return {"ok": False, "clarification": "Live returned incomplete chooser options; inspect again."}
+    matches = [option for option, text in options if str(text).casefold() == label.casefold()]
+    raw = matches[0] if len(matches) == 1 else None
+    if raw is None:
         return {"ok": False, "clarification": f"I don't have Live's options for {name} on {device_name} checked yet, so I won't guess a value."}
     try:
         current = float(parameter["value"])
@@ -2201,7 +2211,7 @@ def _resolve_device_choice(
         return {"ok": False, "clarification": "Live returned an unreadable value for that control, so I will not create a proposal."}
     if not low <= raw <= high:
         return {"ok": False, "clarification": f"{label} isn't in the range Live reports for {name}; nothing changed."}
-    before_label = device_units.choice_label(choice, current)
+    before_label = next((str(text) for option, text in options if option == current), "")
     if before_label and before_label.casefold() == label.casefold():
         return {"ok": False, "clarification": f"{name} on {device_name} is already {before_label}; nothing to change."}
     result = service.propose_device_action(
@@ -2209,8 +2219,7 @@ def _resolve_device_choice(
         proposed_value=float(raw), reason=f"User command: {command}", session_id=session_id, parameter_name=name,
         unit="choice", track_name=str(track.get("name", "")), observed_state=observed_state, observed_parameter_info=info,
     )
-    if result.get("ok") and isinstance(result.get("proposal"), dict):
-        result["proposal"].update({"before_label": before_label, "after_label": label})
+    # The planner binds observed labels before minting confirmation; changing them here would invalidate it.
     return result
 
 

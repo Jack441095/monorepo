@@ -137,6 +137,6 @@ def test_a_device_write_whose_readback_failed_still_stops_the_walk(kenn, monkeyp
     failed = kenn.apply("set the Drum Bus compressor threshold to -20 dB", card)
     monkeypatch.setattr(kenn.fake, "get_device_parameters", real_read)
 
-    assert sent and failed["receipt"]["status"] == "failed"
+    assert sent and failed["receipt"]["status"] == "unknown"
     assert "write_attempted" not in failed["receipt"]
     assert not (kenn.ask_undo().get("proposal") or {}).get("confirmation_token")

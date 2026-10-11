@@ -32,6 +32,44 @@ def tool():
     return _load()
 
 
+def test_all_delivery_outcomes_stay_in_the_eligible_denominator_with_unknown_paint_time(tool, monkeypatch):
+    # Accepted-only latency used to hide busy and timed-out requests from the product gate.
+    outcomes = iter(("accepted", "rejected", "busy", "timeout", "not_attempted"))
+    def ask(*args, **kwargs):
+        outcome = next(outcomes)
+        return {"answer": "Synthetic answer", "delivery_outcome": outcome,
+                "generation_validation": {"attempted": outcome in {"accepted", "rejected"}, "accepted": outcome == "accepted"}}, 0, None
+    monkeypatch.setattr(tool, "_ask_http", ask)
+    report = tool.measure([{"id": f"c-{number}", "question": "Synthetic", "split": "regression"} for number in range(5)],
+                          surface="background", endpoint="http://127.0.0.1:1", cache_condition="warm")
+    assert report["counts"]["eligible"] == 5
+    assert report["counts"]["delivery"] == {outcome: 1 for outcome in ("accepted", "rejected", "busy", "timeout", "not_attempted")}
+    assert report["counts"]["eligible_accepted_within_15_seconds"] == 1
+    assert report["counts"]["llm_attempted"] == 2
+    assert all(row["final_displayed_answer_seconds"] is None and row["first_useful_answer_seconds"] is None and row["ttft_seconds"] is None for row in report["rows"])
+    assert all(row["cache_dropped"] is False and row["server_cache_condition_verified"] is False for row in report["rows"])
+    assert tool.answer_capture(report)["cases"][2]["delivery"] == "busy"
+    assert report["provenance"]["model_digest"] is None
+
+
+def test_expired_background_job_does_not_claim_an_inference_attempt(tool, monkeypatch):
+    from kenn.core import mcp_facade
+    requests = []
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+        def post(self, path, body):
+            requests.append(body)
+            return {"answer_upgrade": {"id": "fixture-job"}}
+        def get(self, path, query):
+            assert query["session_id"] == requests[0]["session_id"]
+            return {"status": "expired"}
+    monkeypatch.setattr(mcp_facade, "KennHTTPClient", Client)
+    payload, _, _ = tool._ask_http("Synthetic", surface="background", endpoint="http://127.0.0.1:1", timeout=1)
+    assert payload["delivery_outcome"] == "not_attempted"
+    assert "generation_validation" not in payload
+
+
 def test_percentile_uses_the_top_of_a_small_sample_not_an_interpolation(tool):
     """p95 of 10 answers is the slowest, not something between the two slowest.
 
@@ -204,7 +242,7 @@ def test_prefix_rejection_capture_cannot_be_mistaken_for_the_model_candidate(too
     monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
     monkeypatch.setattr(tool, "_ask", lambda *a, **k: (payload, 0, None))
     monkeypatch.setattr(tool, "_write_capture_row", captures.append)
-    tool.measure([{"question": "What release?"}])
+    tool.measure([{"id": "release", "question": "What release?"}])
     (row,) = captures
     assert row["candidate_text_available"] is False
     assert row["gate_ran"] is False
@@ -237,7 +275,7 @@ def test_replayed_usage_metadata_is_not_counted_as_a_current_provider_call(tool,
     payload = {"semantic_cache_hit": True, "llm_usage": {"load_duration_ns": 123},
                "generation_validation": {"attempted": True, "accepted": True}}
     monkeypatch.setattr(tool, "_ask", lambda *a, **k: (payload, 1, 0.01))
-    report = tool.measure([{"question": "Explain compression"}])
+    report = tool.measure([{"id": "compression", "question": "Explain compression"}])
     assert report["rows"][0]["provider_calls"] == []
     assert report["counts"]["provider_attempts"] == 0
 
@@ -250,7 +288,7 @@ def test_provider_failure_is_kept_even_when_the_question_raises(tool, monkeypatc
         llm_rewrite._add_usage(llm_rewrite.LLMUsage(status="failed", error_type="TimeoutError"))
         raise TimeoutError("test timeout")
     monkeypatch.setattr(tool, "_ask", ask)
-    report = tool.measure([{"question": "Explain compression"}])
+    report = tool.measure([{"id": "compression", "question": "Explain compression"}])
     assert report["rows"][0]["provider_calls"][0]["error_type"] == "TimeoutError"
     assert report["counts"]["provider_failures"] == report["counts"]["errors"] == 1
 
@@ -264,7 +302,7 @@ def test_each_question_captures_only_its_calls_and_counts_response_cache_hits(to
                                                  cache_hit=True, status="cache_hit"))
         return {}, 1, 0.01
     monkeypatch.setattr(tool, "_ask", ask)
-    report = tool.measure([{"question": "first"}, {"question": "second"}])
+    report = tool.measure([{"id": "first", "question": "first"}, {"id": "second", "question": "second"}])
     assert [[call["task"] for call in row["provider_calls"]] for row in report["rows"]] == [["first"], ["second"]]
     assert report["counts"]["provider_attempts"] == 0
     assert report["counts"]["response_cache_hits"] == 2

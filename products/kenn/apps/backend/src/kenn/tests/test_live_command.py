@@ -2114,13 +2114,13 @@ def test_eq_band_gain_confirmation_is_idempotent_and_undoable() -> None:
     assert "already executed" in replay["answer"]
     assert len(fake.writes) == 1
 
-    undo = service.propose_undo(applied["receipt"], session_id="command-eq-lifecycle-undo")
+    undo = service.propose_undo(applied["receipt"], session_id="command-eq-lifecycle")
     assert undo["ok"] is True
     undo_proposal = undo["proposal"]
     undone = service.execute_device_action(
         undo_proposal,
         confirm_token=undo_proposal["confirmation_token"],
-        session_id="command-eq-lifecycle-undo",
+        session_id="command-eq-lifecycle",
         idempotency_key=undo_proposal["id"],
     )
     assert undone["ok"] is True
@@ -2156,13 +2156,13 @@ def test_eq_band_boost_applies_positive_gain_and_undoes() -> None:
     assert applied["receipt"]["verified"] is True
     assert fake.eq_gain == 3.0
 
-    undo = service.propose_undo(applied["receipt"], session_id="command-eq-boost-undo")
+    undo = service.propose_undo(applied["receipt"], session_id="command-eq-boost")
     assert undo["ok"] is True
     undo_proposal = undo["proposal"]
     undone = service.execute_device_action(
         undo_proposal,
         confirm_token=undo_proposal["confirmation_token"],
-        session_id="command-eq-boost-undo",
+        session_id="command-eq-boost",
         idempotency_key=undo_proposal["id"],
     )
     assert undone["ok"] is True
@@ -2198,13 +2198,13 @@ def test_compressor_threshold_display_db_converts_to_measured_raw() -> None:
     assert fake.threshold == 0.4
     assert fake.writes == [("threshold", 2, 0, 0, 0.4)]
 
-    undo = service.propose_undo(applied["receipt"], session_id="command-threshold-display-undo")
+    undo = service.propose_undo(applied["receipt"], session_id="command-threshold-display")
     assert undo["ok"] is True
     undo_proposal = undo["proposal"]
     undone = service.execute_device_action(
         undo_proposal,
         confirm_token=undo_proposal["confirmation_token"],
-        session_id="command-threshold-display-undo",
+        session_id="command-threshold-display",
         idempotency_key=undo_proposal["id"],
     )
     assert undone["ok"] is True

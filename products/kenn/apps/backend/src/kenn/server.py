@@ -2087,6 +2087,8 @@ class Handler(BaseHTTPRequestHandler):
             "/api/ableton/osc/tempo", "/api/ableton/osc/clip/launch",
             "/api/ableton/osc/scene/launch", "/api/ableton/osc/undo",
             "/api/ableton/command",
+            "/api/ableton/parameter/inspect",
+            "/api/ableton/parameter/proposal",
             "/api/ableton/confirmation/revoke",
             "/api/ableton/midi-clip/proposal",
             "/api/ableton/midi-clip/update-proposal",
@@ -2463,6 +2465,19 @@ class Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/api/ableton/command":
             self.handle_live_command(payload)
+            return
+        if parsed.path == "/api/ableton/parameter/inspect":
+            from kenn.routes.daw_routes import handle_parameter_inspection
+
+            status, result = handle_parameter_inspection(payload)
+            self.send_json(status, result)
+            return
+
+        if parsed.path == "/api/ableton/parameter/proposal":
+            from kenn.routes.daw_routes import handle_parameter_proposal
+
+            status, result = handle_parameter_proposal(payload)
+            self.send_json(status, result)
             return
         if parsed.path == "/api/ableton/midi-clip/proposal":
             session_id = str(payload.get("session_id", "")).strip()

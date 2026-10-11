@@ -7,6 +7,7 @@ from functools import partial
 from typing import Tuple, Any
 
 from .handler import AbletonOSCHandler
+from .parameter_target import register_parameter_targets
 
 class SongHandler(AbletonOSCHandler):
     def __init__(self, manager):
@@ -14,6 +15,7 @@ class SongHandler(AbletonOSCHandler):
         self.class_identifier = "song"
 
     def init_api(self):
+        self.parameter_targets = register_parameter_targets(self.osc_server, self.song)
         #--------------------------------------------------------------------------------
         # Callbacks for Song: methods
         #--------------------------------------------------------------------------------

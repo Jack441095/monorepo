@@ -121,6 +121,9 @@ def _payload_of(tmp_path: Path, name: str, args: dict[str, Any]) -> dict:
 # Every advertised intent called with no arguments: what it reaches, what it
 # refuses, and the shape of what it returns when the empty call is legal.
 OUTCOMES: dict[str, dict[str, Any]] = {
+    # Addressed reads and candidates leave validation to the shared HTTP policy/service boundary.
+    "inspect_parameter": {"calls": ["POST /api/ableton/parameter/inspect"], "keys": ["changed", "ok", "proposal", "status"]},
+    "create_parameter_proposal": {"calls": ["POST /api/ableton/parameter/proposal"], "keys": ["changed", "ok", "proposal", "status"]},
     "analyze_sample_library_entry": {"calls": [], "error": "ValueError: sample_id is required"},
     "apply_live_proposal": {"calls": [], "error": "ValueError: proposal must be a non-empty object"},
     "ask_audio_engineering_question": {"calls": [], "error": "ValueError: question is required"},
@@ -308,6 +311,10 @@ TASK = {"task_id": "task-1", "step_id": "step-1", "session_id": "route"}
 # generator, the stores) still carry a ``calls`` list, usually empty, and
 # ``refused: False`` is the load-bearing part for them.
 ROUTES: list[tuple[str, str, dict[str, Any], dict[str, Any]]] = [
+    ("inspect_parameter", "return rack", {"address": {"kind": "return", "index": 0, "device_path": [0, 0, 1]}, "parameter_index": 4},
+     {"calls": ["POST /api/ableton/parameter/inspect"], "refused": False}),
+    ("create_parameter_proposal", "raw candidate", {"session_id": "route", "address": {"kind": "master", "index": 0, "device_path": [0]}, "parameter_index": 4, "device_name": "Utility", "parameter_name": "Gain", "value": 0.5, "unit": "raw"},
+     {"calls": ["POST /api/ableton/parameter/proposal"], "refused": False}),
     # Session, plug-in, and Mix Review reads.
     ("live_snapshot", "detail", {"detail": "understanding"},
      {"calls": ["GET /api/ableton/osc/session"], "refused": False}),

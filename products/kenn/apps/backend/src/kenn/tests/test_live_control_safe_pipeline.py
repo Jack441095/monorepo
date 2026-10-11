@@ -98,7 +98,8 @@ class TestLiveControlSafePipeline(unittest.TestCase):
 
         token = proposal.get("confirmation_token")
         self.assertIsNotNone(token)
-        req_text = "set_device_parameter:0:0:0:-14.0"
+        from kenn.core.parameter_contract import device_confirmation_text
+        req_text = device_confirmation_text(proposal)
         self.assertTrue(verify_confirmation(token, session_id="test_session", service_id="ableton_control", text=req_text))
 
     def test_parse_and_propose_converts_qualified_display_units_before_raw_proposal(self):
