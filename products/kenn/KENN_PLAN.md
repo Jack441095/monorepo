@@ -901,6 +901,32 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   Test typed MCP proposals through the actual HTTP gateway and validate native
   Apply/Undo outcomes and receipts before displaying success. Resolve the unused
   planner dB conversion path; keep direct C++ writes off pending parity qualification.
+- [ ] **Stage 2/3 guarded parameter control, 11 Oct: integration in progress.** This is Jack's branch
+  `codex/kenn-stage2-stage3-integration` (`18c15c38..db4d027c`, 6 commits). It adds inspect → proposal → explicit
+  Apply → readback → Undo for any device parameter, holds retained target references in the AbletonOSC handler, and
+  adds two routes: `/api/ableton/parameter/inspect` and `/api/ableton/parameter/proposal`. It touches L1, L3, L4 and
+  L5 and C1–C5. Claims and evidence:
+  [KENN_STAGE2_STAGE3_INTEGRATION_2026-10-11.md](docs/evidence/KENN_STAGE2_STAGE3_INTEGRATION_2026-10-11.md).
+  - The test branch is `draft/stage23-onto-main`, in worktree `workspace/worktrees/kenn/stage23-onto-main`. It is
+    the branch plus a clean merge of main `24afff63` (`a4215fd8`).
+  - The knowledge-answer path is unchanged. Chat never reaches the new code, and `session_context.py` changes only
+    the Live-command resolver. So the v7 gate counts on `f2c4d738` still describe the merged answer path.
+  - The branch's own run reported 1 failure. That run had no linked index, so 137 tests skipped. With the index
+    linked, 6 more tests failed, all on the branch alone:
+    - 5 `test_internal_beta_gate` human-review tests. Adding captured mode to `build_human_review_packet.py`
+      changed that builder's sha256. The beta gate binds the 24 Sept packet to that hash, so the human-review gate
+      went from pending to fail.
+    - `test_http_undo_dispatches_device_proposal_to_device_executor`. The branch now binds a device-parameter
+      receipt to the session that applied it, and the test undid from a second session, which returned 409.
+  - Fix `43e416d2`:
+    - Captured mode moves to a new `tooling/scripts/build_captured_review_packet.py`, and the old builder is
+      restored byte for byte.
+    - A new test fails if the two builders' copies of the criteria or the release bars drift apart.
+    - The smoke test now undoes in its own session and checks that a different session gets a 409.
+  - After the fix, the backend suite gives 4818 passed and 16 skipped. Frontend: vitest gives 80 passed, vue-tsc
+    is clean and the vite build works.
+  - An outside adversary review of `git diff main draft/stage23-onto-main` is running. The merge waits for its
+    sign-off.
 
 ### 4. Qualify listening, memory and creation
 
