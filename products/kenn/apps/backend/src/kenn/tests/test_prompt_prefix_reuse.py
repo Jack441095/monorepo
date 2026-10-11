@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from kenn.llm.llm_rewrite import build_system_prompt
+from kenn.llm.llm_rewrite import MODE_INSTRUCTIONS, build_system_prompt
 
 # One turn for each input that changes the system prompt: the route, the mode, a query that asks for sources, a
 # skill level, and a query that pulls in a genre profile and acoustic guidance ("techno", "boomy").
@@ -33,3 +33,10 @@ def test_the_turn_specific_lines_still_reach_the_prompt() -> None:
                  "new to this", "Genre Target Profile", "Acoustic Translation Guidance", "Length:"):
         assert line in prompt, line
     assert "Sources: (List sources ONLY as markdown links" in build_system_prompt(**TURNS[2])
+
+
+def test_the_quick_fix_mode_asks_for_the_short_answer() -> None:
+    # Regression (11 Oct A/B, 4B): quick_fix asked for a "single-paragraph response", and once the mode line sat below
+    # the Rules a drum-balance answer came back without "Short answer:" in both runs.
+    assert "Short answer" in MODE_INSTRUCTIONS["quick_fix"]
+    assert "single-paragraph response" not in MODE_INSTRUCTIONS["quick_fix"]
