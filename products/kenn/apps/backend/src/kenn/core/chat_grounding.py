@@ -1206,26 +1206,41 @@ def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
 # The marker is not enough on its own: "(e.g., never past 10 dB)" is still a limit, so an aside with a limit or
 # condition word stays too. A marked value with no such word ("Set the threshold (e.g., -18 dB)") does go, and the
 # step reads "Set the threshold": vaguer, but the model offered the figure as an example, and that beats losing
-# the step to the sentence drop.
+# the step to the sentence drop. The apostrophe in "n't" is either kind, because the model writes the curly one
+# more often than the straight (34 to 14 across the 479 probe answers of 10 Oct).
+#
+# An example also has to end on its figure. Whatever follows the figure inside the aside is either a qualifier
+# that makes it a limit after all ("10 dB or less", "2 kHz tops") or the model already writing its next step
+# ("— like one at 2 kHz, then key it from the kick —", a comma splice the third review on 11 Oct shipped with
+# "key it from the kick" gone). Every one of the 13 saves in the 12 probe runs ends on its figure.
 _EXAMPLE_MARKER = r"(?:(?:like|such as|for example|for instance|say)\b|e\.g\.)"
 _LIMIT_WORDS_RE = re.compile(
-    r"\b(?:never|not|no more|only|if|unless|under|over|past|above|below|beyond|at least|at most|up to|less than"
-    r"|more than|exceed\w*|max(?:imum)?|min(?:imum)?)\b|n't\b",
+    r"\b(?:never|not|no (?:more|higher|lower|louder|quieter|further)|only|if|unless|under|over|past|above|below"
+    r"|beyond|within|at least|at most|at the most|up to|as much as|less than|more than|exceed\w*|max(?:imum)?"
+    r"|min(?:imum)?|cap(?:s|ped|ping)?|ceiling|stop at)\b|n[’']t\b|[<>≤≥]",
+    re.IGNORECASE,
+)
+# The word before the aside can need it as its object: "keep the depth under (e.g., 10 dB) so..." would ship as
+# "keep the depth under so...", and "Set the threshold to (e.g., -18 dB) on the bus" as "to on the bus".
+_LEADS_INTO_ASIDE_RE = re.compile(
+    r"\b(?:to|at|by|of|for|from|under|over|below|above|than|around|near|about|past|beyond|between|within|is|are|be)"
+    r"[ \t]*$",
     re.IGNORECASE,
 )
 # "apply a linear-phase EQ to the low-mid range (e.g., 100–300 Hz) to check..." The 60-character limit keeps us to
 # a short aside; a longer bracket is a clause of its own and goes with its sentence instead.
 _BRACKET_ASIDE_RE = re.compile(rf"[ \t]*\((?={_EXAMPLE_MARKER})([^()\n]{{1,60}})\)", re.IGNORECASE)
 # "...exceeds a threshold—like a narrow resonance at 3500 Hz—without affecting other moments." The aside stops at
-# any clause end, or "— like one at 2 kHz. Then key it from the kick — not the snare —" ran on to the next
+# a sentence end, or "— like one at 2 kHz. Then key it from the kick — not the snare —" ran on to the next
 # sentence's dash and took "key it from the kick" with it (the same with ";", ":" and "…" in the 11 Oct review).
-# Brackets, quotes and markdown stars stop it as well, because a step marker "2)", a citation or a bold heading
-# inside an aside means we are already in the next step. The one full stop allowed is a decimal point, "2.5 kHz";
-# an "e.g." partway in ends the aside, which only costs a save. Each dash closes only on its own kind, and never
-# on one with a number straight after it, signed or not, because that is the dash inside a range: "— like at
-# 3 kHz or the 200 – 400 Hz zone", "the -18 – -6 dBFS window". An en dash only counts with spaces round it,
-# because unspaced it is the one inside "100–300 Hz".
-_ASIDE_BODY = r"(?:[^\n.!?;:…()\[\]\"“”*]|\.(?=\d))"
+# A comma does not stop it, since "say, 3 kHz" needs one; a comma clause that runs on is refused instead by the
+# ends-on-its-figure rule above. Brackets, quotes and markdown stars stop it as well, because a step marker "2)",
+# a citation or a bold heading inside an aside means we are already in the next step. The one full stop allowed
+# is a decimal point between digits, "2.5 kHz", not "Hz.2 key it"; an "e.g." partway in ends the aside, which only
+# costs a save. Each dash closes only on its own kind, and never on one with a number straight after it, signed
+# or not, because that is the dash inside a range: "— like at 3 kHz or the 200 – 400 Hz —", "the -18 – -6 dBFS".
+# An en dash only counts with spaces round it, because unspaced it is the one inside "100–300 Hz".
+_ASIDE_BODY = r"(?:[^\n.!?;:…()\[\]\"“”*]|(?<=\d)\.(?=\d))"
 _DASH_EXAMPLE_RE = re.compile(
     rf"[ \t]*—[ \t]*({_EXAMPLE_MARKER}{_ASIDE_BODY}{{1,80}}?)[ \t]*—(?![ \t]*[-+−]?\d)[ \t]*"
     rf"|[ \t]+–[ \t]+({_EXAMPLE_MARKER}{_ASIDE_BODY}{{1,80}}?)[ \t]+–(?![ \t]*[-+−]?\d)[ \t]*",
@@ -1238,12 +1253,14 @@ _DASH_EXAMPLE_RE = re.compile(
 # next clause so "at 100 Hz by 3 dB", where the place and the amount go together, is left alone. "to" only starts
 # a clause when no number follows, hedged or signed: "at 30 Hz to about 40 Hz depending on..." is a range and
 # "at 100 Hz to -12 dB per octave" a slope, neither of which we can cut cleanly, so the sentence drop takes them.
-# A negated move ("don't high-pass at 100 Hz on the bass") reads wider once its figure goes; none of the 12 runs
-# had one, so we have not guarded it.
+# Nor does a clause that limits the figure, "at 100 Hz, but no higher" or "at 100 Hz and not above": without the
+# figure it limits nothing. A negated move ("don't high-pass at 100 Hz on the bass") reads wider once its figure
+# goes; none of the 12 runs had one, so we have not guarded it.
 _PLACED_FIGURE_RE = re.compile(
     r"\b(?P<move>(?:high|low)[- ]?pass(?:[ \t]+filter)?|hpf|lpf)"
     r"(?P<place>[ \t]+(?:at|around|near)[ \t]+(?:(?:around|about|roughly|approximately)[ \t]+)?"
     r"(?:\d+(?:\.\d+)?[ \t]*(?:k?hz)?[ \t]*(?:[–-]|to)[ \t]*)?\d+(?:\.\d+)?[ \t]*k?hz)"
+    r"(?![ \t]*,?[ \t]*(?:but|or|and[ \t]+(?:no|not|never)|no|not|never)\b)"
     r"(?=[ \t]+(?:to\b(?![ \t]*(?:(?:around|about|roughly|approximately)[ \t]+)?[-+−]?\d)"
     r"|(?:on|for|in|so|and|with|before|after|if|when|until)\b)"
     r"|[ \t]*[,.;:)\[]|[ \t]*$)",
@@ -1257,18 +1274,26 @@ def _excise_illustrative_figures(answer: str, unsupported: set[str]) -> str:
     def holds_a_refused_figure(phrase: str) -> bool:
         return bool(_measurements(phrase) & unsupported)
 
-    def an_example_to_cut(aside: str) -> bool:
-        return holds_a_refused_figure(aside) and not _LIMIT_WORDS_RE.search(aside)
+    def an_example_to_cut(m: re.Match, aside: str) -> bool:
+        figures = list(_MEASUREMENT_RE.finditer(aside))
+        return (
+            holds_a_refused_figure(aside)
+            and bool(figures)
+            and figures[-1].end() == len(aside.rstrip())
+            and not _LIMIT_WORDS_RE.search(aside)
+            # endpos makes "$" in the pattern mean the start of this aside.
+            and not _LEADS_INTO_ASIDE_RE.search(m.string, 0, m.start())
+        )
 
     def dash_aside(m: re.Match) -> str:
         # Group 1 is an em-dash aside, group 2 a spaced en-dash one; only one of them took part.
-        if not an_example_to_cut(m.group(1) or m.group(2)):
+        if not an_example_to_cut(m, m.group(1) or m.group(2)):
             return m.group(0)
         # The two dashes stood between words, so one space has to stay, unless punctuation follows.
         follows = m.string[m.end():m.end() + 1]
         return "" if not follows or follows in ",.;:!?)" else " "
 
-    answer = _BRACKET_ASIDE_RE.sub(lambda m: "" if an_example_to_cut(m.group(1)) else m.group(0), answer)
+    answer = _BRACKET_ASIDE_RE.sub(lambda m: "" if an_example_to_cut(m, m.group(1)) else m.group(0), answer)
     answer = _DASH_EXAMPLE_RE.sub(dash_aside, answer)
     return _PLACED_FIGURE_RE.sub(
         lambda m: m.group("move") if holds_a_refused_figure(m.group("place")) else m.group(0), answer
