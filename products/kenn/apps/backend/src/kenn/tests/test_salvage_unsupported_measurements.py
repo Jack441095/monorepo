@@ -181,8 +181,9 @@ def test_the_dynamic_eq_answer_keeps_no_empty_step_and_counts_from_one():
 
 
 # The figures in these tests are the shapes refused across the 12 probe runs of 10 Oct 2026, where cutting the
-# whole sentence saved none of 32 answers: it took a step with it and the answer fell under the quality floor.
-# The frequencies in brackets and on the high-pass are not in the sidechain note.
+# whole sentence saved none of 32 answers: 19 had too little left once the sentence went, and the other 13 lost a
+# step or the Check line and fell under the gate's quality floor. The frequencies in brackets and on the high-pass
+# are not in the sidechain note.
 ILLUSTRATED = ACCEPTED_ANSWER.replace(
     "1. In Live, put a compressor on the bass bus and send the kick to its sidechain input.",
     "1. In Live, put a compressor on the bass bus (e.g., the 40–120 Hz body) and send the kick to its sidechain input.",
@@ -229,6 +230,32 @@ def test_an_example_between_dashes_goes_and_the_sentence_closes_up():
 def test_a_range_inside_a_spaced_dash_aside_is_not_taken_for_its_closing_dash():
     text = "Find the mud – like 100–300 Hz – before you cut."
     assert _excise_illustrative_figures(text, {"300hz"}) == "Find the mud before you cut."
+    # Review of a4570f80, 11 Oct 2026: a spaced range closed the aside and this came out "Tame it 400 Hz zone."
+    for spaced_range in ("Tame it — like at 3 kHz or the 200 – 400 Hz zone.", "Tame it – like at 3 kHz or the 200 – 400 Hz zone."):
+        assert _excise_illustrative_figures(spaced_range, {"3khz"}) == spaced_range
+
+
+def test_a_bracket_or_dash_without_an_example_marker_is_part_of_the_step_and_stays():
+    # Review of a4570f80, 11 Oct 2026: these brackets were cut and the step shipped without its condition or limit.
+    for step, figures in (
+        ("Set the threshold (-18 dB) and a 4:1 ratio.", {"-18db"}),
+        ("Set the depth to 6 dB (only if the bass peaks above -6 dBFS) so it stays shallow.", {"-6dbfs"}),
+        ("Push the depth (never past 10 dB) so the pumping stays shallow.", {"10db"}),
+        ("Cut the mud — the 300 Hz build-up — before the boost.", {"300hz"}),
+    ):
+        assert _excise_illustrative_figures(step, figures) == step
+
+
+def test_a_long_bracket_is_a_clause_of_its_own_and_stays_for_the_sentence_drop():
+    step = "Cut the mud (e.g., the build-up you hear around 300 Hz on most close-miked guitars) first."
+    assert _excise_illustrative_figures(step, {"300hz"}) == step
+
+
+def test_a_dash_aside_never_runs_on_into_the_next_sentence():
+    # Review of a4570f80, 11 Oct 2026: the aside closed on the next sentence's dash and "Then key it from the kick"
+    # went with it, through the gate.
+    text = "Put a compressor on the bass bus — like one at 2 kHz. Then key it from the kick — not the snare — via its input."
+    assert _excise_illustrative_figures(text, {"2khz"}) == text
 
 
 def test_a_high_pass_keeps_its_instruction_without_the_frequency():
@@ -239,6 +266,12 @@ def test_a_high_pass_keeps_its_instruction_without_the_frequency():
     assert _excise_illustrative_figures("Apply a high-pass filter at 100 Hz [#578a1b0b8faa].", {"100hz"}) == (
         "Apply a high-pass filter [#578a1b0b8faa]."
     )
+
+
+def test_a_high_pass_range_that_runs_on_into_its_clause_is_left_for_the_sentence_drop():
+    # Review of a4570f80, 11 Oct 2026: "to 40 Hz" was read as the next clause and this came out "high-pass to 40 Hz".
+    step = "Use a high-pass at 30 Hz to 40 Hz depending on the source."
+    assert _excise_illustrative_figures(step, {"30hz", "40hz"}) == step
 
 
 def test_a_boost_or_cut_keeps_its_frequency_because_without_it_there_is_no_instruction():
@@ -281,3 +314,24 @@ def test_make_answer_keeps_every_step_when_only_asides_held_the_invented_figures
     assert enhanced is True
     assert "Hz" not in answer and "3. Set the ratio to 4:1" in answer
     assert logged[-1][0] is True and logged[-1][1]["salvaged"] == ["120hz", "30hz", "40hz"]
+
+
+def test_a_capped_answer_gets_the_same_two_endings_after_the_cut_as_before_it(monkeypatch):
+    # Review of a4570f80, 11 Oct 2026: no test reached the second ending. The whole-sentence ending ships when it
+    # passes; when it loses a step, the text as the cap left it gets its turn, as on the first pass.
+    monkeypatch.setattr(chat_answer, "load_chunks", lambda: list(CHUNKS))
+    monkeypatch.setattr(chat_answer, "search", lambda *a, **k: list(CHUNKS))
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *a, **k: True)
+    monkeypatch.setattr("kenn.llm.linter.lint_response", lambda answer, mode: answer)
+
+    def answer_capped_at(words: str) -> str:
+        capped = ILLUSTRATED.split(words)[0] + words
+        monkeypatch.setattr(chat_answer, "llm_enhance_answer", lambda *a, **k: capped)
+        answer, enhanced = chat_answer.make_answer(QUERY, list(CHUNKS), route="production")
+        assert enhanced is True and "Hz" not in answer
+        return answer
+
+    # Cut inside step 3: dropping the half step still leaves two, so the whole-sentence ending ships.
+    assert answer_capped_at("so the pumping stays").endswith("add a high-pass filter to clear rumble.")
+    # Cut inside step 2: the whole-sentence ending is down to one step and fails, so the capped text ships.
+    assert answer_capped_at("at 30 Hz to clear").endswith("add a high-pass filter to clear")

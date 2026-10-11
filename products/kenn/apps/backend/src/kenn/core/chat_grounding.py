@@ -1198,26 +1198,40 @@ def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
 # the object of the step, "set the preamp so the input is at -18 dBFS") still costs its sentence: without the
 # figure that step says nothing.
 #
+# A bracket or dash aside only goes when it opens on an example marker. Unmarked, the same brackets hold the
+# step's own figure or its limit, "Set the threshold (-18 dB)" or "push the depth (never past 10 dB)", and cutting
+# those shipped a different instruction through the gate in review on 11 Oct. All the bracket saves in the v3
+# runs opened on "e.g."; the marker costs us one save across the 12 runs, an unmarked "(above 1 kHz)".
+_EXAMPLE_MARKER = r"(?:(?:like|such as|for example|for instance|say)\b|e\.g\.)"
 # "apply a linear-phase EQ to the low-mid range (e.g., 100–300 Hz) to check..." The 60-character limit keeps us to
 # a short aside; a longer bracket is a clause of its own and goes with its sentence instead.
-_BRACKET_ASIDE_RE = re.compile(r"[ \t]*\(([^()\n]{1,60})\)")
-# "...exceeds a threshold—like a narrow resonance at 3500 Hz—without affecting other moments." An en dash only
-# counts with spaces round it, because unspaced it is the one inside "100–300 Hz".
-_DASH_OPEN = r"(?:[ \t]*—[ \t]*|[ \t]+–[ \t]+)"
+_BRACKET_ASIDE_RE = re.compile(rf"[ \t]*\((?={_EXAMPLE_MARKER})([^()\n]{{1,60}})\)", re.IGNORECASE)
+# "...exceeds a threshold—like a narrow resonance at 3500 Hz—without affecting other moments." The aside stops at a
+# sentence end, or "— like one at 2 kHz. Then key it from the kick — not the snare —" ran on to the next
+# sentence's dash and took "key it from the kick" with it. A full stop inside a number ("2.5 kHz", "e.g.") is not
+# an end. Each dash closes only on its own kind, and never on one with a number straight after it, because that
+# is the dash inside a range: "— like at 3 kHz or the 200 – 400 Hz zone." An en dash only counts with spaces
+# round it, because unspaced it is the one inside "100–300 Hz".
+_ASIDE_BODY = r"(?:[^\n.!?]|\.(?!\s))"
 _DASH_EXAMPLE_RE = re.compile(
-    rf"{_DASH_OPEN}((?:(?:like|such as|for example|for instance|say)\b|e\.g\.)[^\n]{{1,80}}?){_DASH_OPEN}",
+    rf"[ \t]*—[ \t]*({_EXAMPLE_MARKER}{_ASIDE_BODY}{{1,80}}?)[ \t]*—(?![ \t]*\d)[ \t]*"
+    rf"|[ \t]+–[ \t]+({_EXAMPLE_MARKER}{_ASIDE_BODY}{{1,80}}?)[ \t]+–(?![ \t]*\d)[ \t]*",
     re.IGNORECASE,
 )
 # "apply a high-pass filter at around 100 Hz to reduce the effect" is still an instruction without the frequency,
 # because a high- or low-pass says what it does on its own. A cut, boost, bell or notch does not: "Boost at 5 kHz."
 # would come out as "Boost.", so those keep their figure and go to the sentence drop. Only a frequency introduced
 # by at/around/near is cut ("set it to 100 Hz" makes the figure the instruction), and the lookahead stops at the
-# next clause so "at 100 Hz by 3 dB", where the place and the amount go together, is left alone.
+# next clause so "at 100 Hz by 3 dB", where the place and the amount go together, is left alone. "to" only starts
+# a clause when no number follows; "at 30 Hz to 40 Hz depending on..." is a range we cannot cut cleanly, and the
+# sentence drop takes it. A negated move ("don't high-pass at 100 Hz on the bass") reads wider once its figure
+# goes; none of the 12 runs had one, so we have not guarded it.
 _PLACED_FIGURE_RE = re.compile(
     r"\b(?P<move>(?:high|low)[- ]?pass(?:[ \t]+filter)?|hpf|lpf)"
     r"(?P<place>[ \t]+(?:at|around|near)[ \t]+(?:(?:around|about|roughly|approximately)[ \t]+)?"
     r"(?:\d+(?:\.\d+)?[ \t]*(?:k?hz)?[ \t]*(?:[–-]|to)[ \t]*)?\d+(?:\.\d+)?[ \t]*k?hz)"
-    r"(?=[ \t]+(?:to|on|for|in|so|and|with|before|after|if|when|until)\b|[ \t]*[,.;:)\[]|[ \t]*$)",
+    r"(?=[ \t]+(?:to\b(?![ \t]*\d)|(?:on|for|in|so|and|with|before|after|if|when|until)\b)"
+    r"|[ \t]*[,.;:)\[]|[ \t]*$)",
     re.IGNORECASE | re.MULTILINE,
 )
 
@@ -1229,7 +1243,8 @@ def _excise_illustrative_figures(answer: str, unsupported: set[str]) -> str:
         return bool(_measurements(phrase) & unsupported)
 
     def dash_aside(m: re.Match) -> str:
-        if not holds_a_refused_figure(m.group(1)):
+        # Group 1 is an em-dash aside, group 2 a spaced en-dash one; only one of them took part.
+        if not holds_a_refused_figure(m.group(1) or m.group(2)):
             return m.group(0)
         # The two dashes stood between words, so one space has to stay, unless punctuation follows.
         follows = m.string[m.end():m.end() + 1]
@@ -1259,8 +1274,10 @@ def salvage_unsupported_figures(answer: str, unsupported: list[str]) -> str:
         # nothing changed, and we hand back "" as drop_unsupported_sentences does, so the caller never re-judges
         # an unchanged answer.
         return excised if excised != answer else ""
-    # drop_unsupported_sentences measures its kept-share floor against the excised text, a few words shorter than
-    # the original. Each aside is at most 80 characters, so the floor moves by a word or two, not by a step.
+    # drop_unsupported_sentences measures its kept-share floor against the excised text, not the original, so the
+    # asides already cut do not count as loss. With several gone the shipped answer can be well under 60% of what
+    # the model wrote (49 of 100 words in one review case on 11 Oct). We accept that: what went first was examples,
+    # the floor still guards the steps, and the gate judges the result again.
     return drop_unsupported_sentences(excised, left)
 
 
