@@ -337,6 +337,14 @@ def test_an_example_joined_to_a_second_clause_by_a_word_stays():
         assert _excise_illustrative_figures(step, {"2khz", "6db"}) == step
     step = "Cut the mud (e.g., 300 Hz with a cut of 3 dB) first."
     assert _excise_illustrative_figures(step, {"300hz", "3db"}) == step
+    # Sixth review: no word list is whole, so a long example stays whatever joins it.
+    for run_on in ("so you key it from the kick at", "before you key it from the kick at", "keyed from the kick at"):
+        step = f"Put a compressor on the bass bus — like one at 2 kHz {run_on} 6 dB — not the snare — via its input."
+        assert _excise_illustrative_figures(step, {"2khz", "6db"}) == step
+    # The longest probe save is five words and still goes.
+    assert _excise_illustrative_figures("Tame it—like a narrow resonance at 3500 Hz—without the rest.", {"3500hz"}) == (
+        "Tame it without the rest."
+    )
 
 
 def test_an_example_that_the_word_before_it_needs_stays():

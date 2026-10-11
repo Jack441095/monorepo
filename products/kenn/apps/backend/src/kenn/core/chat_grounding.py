@@ -1233,6 +1233,13 @@ _LIMIT_WORDS_RE = re.compile(
 # "or" is off the list because "e.g., 100 Hz or 120 Hz" is two examples, not a second step; none of the 13 saves
 # has any of these words.
 _JOINS_A_CLAUSE_RE = re.compile(r"\b(?:and|then|while|plus|with|but)\b", re.IGNORECASE)
+# No list of joining words is ever whole: the sixth review shipped the same run-on with "so you", "before you", and
+# "keyed from the kick" with no joining word at all. So an example is also capped at 6 words once its figures are
+# out, marker included. The longest of the 10 asides the probe saves cut is 5, "like a narrow resonance at
+# 3500 Hz"; a second step with its own verb and object runs past 6. The list above still catches the short joins
+# the cap lets by, "(e.g., 300 Hz with a cut of 3 dB)" being 6.
+_MAX_EXAMPLE_WORDS = 6
+_WORD_RE = re.compile(r"[A-Za-z]+")
 # The word before the aside can need it as its object: "keep the depth under (e.g., 10 dB) so..." would ship as
 # "keep the depth under so...", and "Set the threshold to (e.g., -18 dB) on the bus" as "to on the bus". The hedges
 # and joiners at the end ("Aim for roughly (e.g., -14 LUFS) on the master", "-14 LUFS or (e.g., -16 LUFS)") came
@@ -1313,6 +1320,7 @@ def _excise_illustrative_figures(answer: str, unsupported: set[str]) -> str:
             and figures[-1].end() == len(aside.rstrip())
             and not _LIMIT_WORDS_RE.search(aside)
             and not _JOINS_A_CLAUSE_RE.search(aside)
+            and len(_WORD_RE.findall(_MEASUREMENT_RE.sub("", aside))) <= _MAX_EXAMPLE_WORDS
             # endpos makes "$" in the pattern mean the start of this aside.
             and not _LEADS_INTO_ASIDE_RE.search(m.string, 0, m.start())
         )
