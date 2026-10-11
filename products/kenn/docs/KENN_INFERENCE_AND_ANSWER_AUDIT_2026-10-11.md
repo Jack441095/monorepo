@@ -65,7 +65,7 @@ Source: [probe harness](../tooling/scripts/probe_advanced_questions.py), `ask` n
 
 There is **no verified completed qualification satisfying delivery conditions and owner correctness** in the evidence inspected.
 
-Raw receipts are outside Git under `/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/kenn-evaluation-data/`: `2026-10-11-gate-qualification-bench-v4/`, `2026-10-11-gate-qualification-bench-v5/`, `2026-10-10-gate-qualification-bench-v3/`, `2026-10-08-retrieval-bench/`, and `2026-10-06-answer-tune/results.md`. The latter folder contains an **8 October** experiment despite its folder date. Each v4/v5 `*.summary.json` records commit, case checksum, model, index and power; `bench.sh` and companion logs provide the invocation and workload checks.
+Raw receipts are outside Git under `kenn-evaluation-data/` (in the folder beside the monorepo): `2026-10-11-gate-qualification-bench-v4/`, `2026-10-11-gate-qualification-bench-v5/`, `2026-10-10-gate-qualification-bench-v3/`, `2026-10-08-retrieval-bench/`, and `2026-10-06-answer-tune/results.md`. The latter folder contains an **8 October** experiment despite its folder date. Each v4/v5 `*.summary.json` records commit, case checksum, model, index and power; `bench.sh` and companion logs provide the invocation and workload checks.
 
 ### Checkouts and disagreements between records
 
