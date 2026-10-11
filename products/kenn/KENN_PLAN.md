@@ -1626,6 +1626,48 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       (probe ×3, held-out ×3, v5's order) on `2377eed1` unchanged, or one more fix first. The cheapest candidate is
       the 2 misattributed figures; the 8 invented figures are the larger pool but have no quick fix.
       The gate also still owes owner-graded correctness (8 Oct decision above), whatever the counts.
+  - [x] Citation repair, 11 Oct, at Jack's call ("fix it first rather than gamble"). Branch `draft/citation-repair`
+    (worktree `workspace/worktrees/kenn/citation-repair/`, from `1cbaa916`), merged into main as `f2c4d738`
+    (`--no-ff`).
+    - Diagnosis, on non-held-out rows only. Held-out was read in aggregate only, per the rule. We replayed every
+      distinct rejected dev answer from the 10–11 Oct runs (159) through `answer_payload`, with the model text
+      fixed. 25 were rejected for a misattributed figure. In 10 of them that was the only fault, and the same answer
+      with the tag removed already passed: the figure check (`_unsupported_measurements`) found the figure in
+      another shown excerpt or in the question. The other 15 also held an invented figure.
+    - `778e2210`: on the rejection path, `repair_misattributed_citations` (chat_grounding.py) fixes each wrong
+      `[#n]`. It points the tag at the first shown excerpt that holds the figure. If none does (a figure taken from
+      the question, say), it drops the tag. Only tags change, never the text. The result goes back through the same
+      gate, in the same retry as the invented-figure cut, so an answer with one fault of each kind is judged once
+      with both fixed. `verify_claim_citations` now also returns, per claim, which tag it used (`citation_index`) and
+      which excerpts hold its figure (`attributed_ordinals`). Accepted rows log `repaired citation: <figure>`.
+    - Policy change: an answer whose only fault was a wrong tag now ships with the tag corrected. Which numbers can
+      reach the producer does not change. Every figure still has to be in the shown excerpts or the question.
+    - Replay after the fix: 25 of the 159 accepted (was 16). All 9 saved came from the 10 answers whose only fault
+      was a wrong tag: 5 tags moved, 4 dropped. The rows were psy-masking-bands, dyn-attack-release ×3, q265,
+      q279-prev, q094 and q202 ×2. Nothing that passed before fails now. Still rejected:
+      - q219: its other tag is an 11-character hex id from the pre-ordinal prompt, so it is refused as never shown.
+        v6 had 0 of those.
+      - All 15 answers with an invented figure, since the figure cut could not save them.
+    - `eb29d303`: the audit doc committed in `1cbaa916` carried the absolute drive path. That failed
+      `test_personal_path_gate`. It now reads `kenn-evaluation-data/` (beside the monorepo).
+    - Tests: `test_citation_repair.py`, 6 tests:
+      - a wrong tag moves to the excerpt that holds the figure;
+      - a tag on a figure from the question is dropped;
+      - an invented figure is still refused once its tag is gone;
+      - an answer with all tags right has nothing to repair;
+      - `make_answer` keeps an answer whose only fault was a wrong tag;
+      - one retry fixes both a wrong tag and an invented figure.
+      Turning the repair off fails both `make_answer` tests. Running the cut on the unrepaired text fails the last
+      test. Full suite on `eb29d303`: 4640 passed, 16 skipped.
+    - Not covered:
+      - The streamed path. Its tokens are already on the wire, as with the figure cut.
+      - A figure carried into the wrong context, such as a broadcast −23 LUFS target offered for film. The gate never
+        checked this. The repaired tag now names the true source, which makes it easier to spot when grading.
+      - A dropped tag at the very start of a line leaves a leading space. We did not see this in the dev answers.
+    - Expected effect: v6's 2 held-out misattributed rejections are the class this fixes. Whether both now pass is
+      for the bench to say.
+    - Next: the full qualifying bench (probe ×3, held-out ×3, v5's order) on `f2c4d738`, on mains, Live open, Mac
+      quiet. Bench dir `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v7`. Waiting on Jack to say when.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
