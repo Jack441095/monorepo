@@ -261,4 +261,8 @@ def test_a_typed_true_peak_keeps_its_sign_when_it_becomes_a_db_figure():
     assert _refused("Cut 1 dB on the vocal bus.", [OTHER_NOTE], question, question) == ["1db"]
     question = "Limiter reads -0.3 true peak"
     assert _refused("Boost the vocal by 0.3 dB.", [OTHER_NOTE], question, question) == ["0.3db"]
+    # The hyphen in a typed range is not a minus.
+    question = "Should I leave 1-2 true peak of headroom?"
+    assert _refused("Leave 2 dB.", [OTHER_NOTE], question, question) == []
+    assert _refused("Leave -2 dB.", [OTHER_NOTE], question, question) == ["-2db"]
 

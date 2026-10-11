@@ -275,8 +275,9 @@ def _question_measurements(question: str) -> set[str]:
     q = re.sub(r"\b(\d+(?:\.\d+)?)\s*k\b", r"\1 kHz", q, flags=re.IGNORECASE)
     q = re.sub(r"\+(\d+(?:\.\d+)?)", r"\1", q)
     # The sign goes into both copies. Until 11 Oct the dB copy dropped it, so a producer's "-1 true peak" let the
-    # answer "cut 1 dB on the vocal bus" through and refused "-1 dB", the figure they actually typed.
-    q = re.sub(r"(-?\b\d+(?:\.\d+)?)\s*true\s*peak\b", r"\1 dBTP \1 dB", q, flags=re.IGNORECASE)
+    # answer "cut 1 dB on the vocal bus" through and refused "-1 dB", the figure they actually typed. The
+    # lookbehind keeps the hyphen in "1-2 true peak" a range rather than the minus of a "-2 dB" nobody typed.
+    q = re.sub(r"(?<![\d.])(-?\b\d+(?:\.\d+)?)\s*true\s*peak\b", r"\1 dBTP \1 dB", q, flags=re.IGNORECASE)
     q = re.sub(r"\b(\d+(?:\.\d+)?)\s*peak\b", r"\1 dB", q, flags=re.IGNORECASE)
     return _measurements(q)
 
