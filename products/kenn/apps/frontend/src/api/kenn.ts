@@ -381,7 +381,8 @@ export async function confirmKennAction(params: {
   proposal: KennActionProposal
   confirmToken: string
   sessionId: string
-}): Promise<{ ok: boolean; status: string; answer?: string; receipt?: KennActionReceipt; error?: string }> {
+}): Promise<{ ok: boolean; status: string; answer?: string; receipt?: KennActionReceipt; error?: string;
+  nextProposal?: KennActionProposal; nextProposalAnswer?: string }> {
   await ensureAuthSession()
   const base = getApiBase()
   const res = await fetch(`${base}${API_PATHS.kenn.command}`, {
@@ -417,6 +418,9 @@ export async function confirmKennAction(params: {
     answer: String(data.answer || execution.answer || ''),
     receipt,
     error: data.error ? String(data.error) : undefined,
+    // A verified insertion may return a separately confirmed card built from the new device's actual controls.
+    nextProposal: data.next_proposal as KennActionProposal | undefined,
+    nextProposalAnswer: data.next_proposal_answer ? String(data.next_proposal_answer) : undefined,
   }
 }
 

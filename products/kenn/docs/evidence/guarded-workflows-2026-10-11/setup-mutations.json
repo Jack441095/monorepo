@@ -1,0 +1,167 @@
+{
+  "schema": "kenn.regression_mutations.v1",
+  "synthetic_only": true,
+  "live_writes": 0,
+  "checks": [
+    {
+      "guard": "deferred_intent_binding",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_insertion_confirmation_binds_its_deferred_configuration_intent",
+      "replacement": "pass",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "052515da10913e70fd02dd23b0ed1a079079a84b3fd65e5272363798c4af66dc"
+    },
+    {
+      "guard": "same_device_across_configuration_reads",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_replacement_between_configuration_observations_withholds_the_second_card",
+      "replacement": "                if False:",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "052515da10913e70fd02dd23b0ed1a079079a84b3fd65e5272363798c4af66dc"
+    },
+    {
+      "guard": "retained_single_control",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_single_configuration_construction_retains_its_first_observation",
+      "replacement": "parameter_name=spec[\"name\"], device_name=device_name, session_id=session_id,\n                observed_parameter_info=None,",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "052515da10913e70fd02dd23b0ed1a079079a84b3fd65e5272363798c4af66dc"
+    },
+    {
+      "guard": "unique_indexed_control",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_failed_configuration_inspection_keeps_verified_insertion_without_writing_controls[duplicate]",
+      "replacement": "if False:",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "052515da10913e70fd02dd23b0ed1a079079a84b3fd65e5272363798c4af66dc"
+    },
+    {
+      "guard": "binary_enable_semantics",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_failed_configuration_inspection_keeps_verified_insertion_without_writing_controls[enable_semantics]",
+      "replacement": "if False:",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "052515da10913e70fd02dd23b0ed1a079079a84b3fd65e5272363798c4af66dc"
+    },
+    {
+      "guard": "separate_configuration_apply",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_setup_needs_two_applies_and_each_verified_stage_has_its_own_undo",
+      "replacement": "response[\"configuration_proposal\"] = configuration[\"proposal\"]\n                from kenn.core.live_recipe import LiveRecipeService\n                LiveRecipeService(self).execute_recipe(configuration[\"proposal\"], confirm_token=configuration[\"proposal\"][\"confirmation_token\"], session_id=session_id)",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "052515da10913e70fd02dd23b0ed1a079079a84b3fd65e5272363798c4af66dc"
+    },
+    {
+      "guard": "api_preserves_next_card",
+      "source": "products/kenn/apps/frontend/src/api/kenn.ts",
+      "test": "src/api/kenn.test.ts",
+      "replacement": "nextProposal: undefined,",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "7cbbe25ea5740ac758daa746eaaa217df2c7f42eebbb40f11c07fd77c53ace14"
+    },
+    {
+      "guard": "chat_displays_separate_next_card",
+      "source": "products/kenn/apps/frontend/src/composables/useKenn.ts",
+      "test": "src/composables/useKenn.test.ts",
+      "replacement": "if (false) {",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "e829441d727e218296c0e61ea7f0de7d5004f4ee3c940f3a5eef5a4e10c69519"
+    },
+    {
+      "guard": "unknown_insertion_receipt",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_unobservable_insertion_stays_unknown_without_a_configuration_card_or_retry[lost_ack]",
+      "replacement": "\"status\": \"failed\",",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "052515da10913e70fd02dd23b0ed1a079079a84b3fd65e5272363798c4af66dc"
+    },
+    {
+      "guard": "unknown_gateway_outcome",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_command.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_unobservable_insertion_stays_unknown_without_a_configuration_card_or_retry[lost_ack]",
+      "replacement": "outcome_unknown = False",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "1f4080ac2a1acc85af7db16fb2bf605c988c80e788e96269c891034bd82b9b46"
+    },
+    {
+      "guard": "unknown_receipt_survives_logging_failure",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_command.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_unobservable_insertion_stays_unknown_without_a_configuration_card_or_retry[bookkeeping_failure]",
+      "replacement": "uncertain_change = None",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "1f4080ac2a1acc85af7db16fb2bf605c988c80e788e96269c891034bd82b9b46"
+    },
+    {
+      "guard": "token_only_followup_registration",
+      "source": "products/kenn/apps/backend/src/kenn/routes/daw_command_handler.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_token_only_http_client_must_confirm_the_registered_configuration_card_separately",
+      "replacement": "for field in (\"proposal\",):",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "ceb7811a97bb72f484f64bbb45de3b666f643e407724319ab22e76891342930f"
+    },
+    {
+      "guard": "no_retry_after_internal_attribute_error",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_unobservable_insertion_stays_unknown_without_a_configuration_card_or_retry[attribute_exception]",
+      "replacement": "except Exception as exc:\n            if isinstance(exc, AttributeError):\n                self.client.create_device(int(proposal[\"track_index\"]), str(proposal[\"device_name\"]))\n            return self._insertion_failure(proposal, key, f\"Live device insertion raised an exception: {exc}\", outcome_unknown=True)",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "052515da10913e70fd02dd23b0ed1a079079a84b3fd65e5272363798c4af66dc"
+    },
+    {
+      "guard": "read_only_insertion_refusal",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_read_only_setup_refuses_before_dispatch_and_does_not_claim_an_unknown_write[insertion]",
+      "replacement": "if False:\n            # An intentionally disabled backend",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "052515da10913e70fd02dd23b0ed1a079079a84b3fd65e5272363798c4af66dc"
+    },
+    {
+      "guard": "read_only_parameter_refusal",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_device_setup.py::test_read_only_setup_refuses_before_dispatch_and_does_not_claim_an_unknown_write[configuration]",
+      "replacement": "if False:\n            # A disabled writer",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "052515da10913e70fd02dd23b0ed1a079079a84b3fd65e5272363798c4af66dc"
+    },
+    {
+      "guard": "read_only_backend_declaration",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_backend.py",
+      "test": "kenn/tests/test_live_backend.py::test_read_only_mcp_backend_enters_kenn_proposal_path_but_cannot_apply",
+      "replacement": "read_only = False",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "b498343f2a95133b1aa180895948a0e8acf936fc21831c0593e5178289dc4f44"
+    }
+  ]
+}

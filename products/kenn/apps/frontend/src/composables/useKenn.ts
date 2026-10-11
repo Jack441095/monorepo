@@ -361,6 +361,17 @@ async function applyMessageProposal(messageId: string) {
     }
     msg.receipt = res.receipt
     msg.actionStatus = 'applied'
+    if (res.nextProposal) {
+      // Keep the verified insertion receipt on its original card. Configuration needs its own explicit Apply.
+      msg.text = res.answer
+      messages.value.push({
+        id: newId('assistant'), role: 'assistant', text: res.nextProposalAnswer,
+        proposal: res.nextProposal, actionStatus: 'pending',
+      })
+    } else if (res.answer && msg.proposal?.action === 'insert_device') {
+      // A follow-up inspection failure still leaves the insertion applied; show the server's verified outcome.
+      msg.text = res.answer
+    }
     if (msg.undoOfReceiptId) {
       const reverted = messages.value.find(
         (m) => m.role === 'assistant' && m.receipt?.receipt_id === msg.undoOfReceiptId,

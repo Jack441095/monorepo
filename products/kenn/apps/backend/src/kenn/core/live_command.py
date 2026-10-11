@@ -1508,6 +1508,9 @@ def _values_match_bpm(before: Any, after: Any) -> bool:
 
 
 def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, kind: str) -> dict[str, Any]:
+    if kind == "device_setup" and proposal.get("schema") == "kenn.ableton_device_insertion_proposal.v1":
+        # Production setup starts with insertion; the future controls have no inspected before-values yet.
+        kind = "device_insertion"
     _update_lifecycle(
         response,
         "proposal_ready",
@@ -1590,6 +1593,11 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
             if isinstance(follow_up_notes, list) and any(str(note).strip() for note in follow_up_notes)
             else ""
         )
+        if "configuration_specs" in proposal:
+            controls = ", ".join(
+                f"{item['name']} to {item['display_value']:g} {item['unit']}" for item in proposal["configuration_specs"]
+            )
+            follow_up_text += f" Then I will inspect {controls} and show a separate configuration card. This Apply only inserts the device."
         response.update({
             "status": "confirmation_required",
             "answer": f"I can append {proposal.get('device_name', 'the device')} to '{target}'. Current devices: {before_devices}. After confirmation: {after_devices}. Nothing has changed. Confirm this exact proposal to apply it.{follow_up_text}",
@@ -3324,20 +3332,32 @@ def _handle_command_impl(
                 response["receipt"] = result["receipt"]
             return response
 
+        # An uncertain receipt cannot become a no-change claim at the gateway boundary.
+        outcome_unknown = (result.get("receipt") or {}).get("status") == "unknown"
         response.update({
-            "status": "applied" if result.get("ok") else "failed",
-            "changed": bool(result.get("ok")),
+            "status": "applied" if result.get("ok") else ("unknown" if outcome_unknown else "failed"),
+            "changed": None if outcome_unknown else bool(result.get("ok")),
             "answer": "Live change applied and verified." if result.get("ok") else result.get("error", "Live change failed."),
             "execution": result,
         })
         _update_lifecycle(
             response,
-            "verified" if result.get("ok") else "failed",
+            "verified" if result.get("ok") else ("unknown" if outcome_unknown else "failed"),
             execution_elapsed_ms=round(max(0.0, time.monotonic() - execution_started) * 1000.0, 1),
             verification="readback_verified" if result.get("ok") else "not_verified",
         )
         if result.get("receipt"):
             response["receipt"] = result["receipt"]
+        if result.get("ok") and result.get("configuration_proposal"):
+            next_card = _recipe_response({}, result["configuration_proposal"])
+            response["answer"] = f"{proposal.get('device_name', 'Device')} inserted and verified. Review the freshly inspected configuration card and Apply it separately."
+            response["next_proposal"] = next_card["proposal"]
+            response["next_proposal_answer"] = next_card["answer"].replace(
+                "Nothing has changed yet.", "The device is inserted; its parameters have not been changed."
+            )
+        elif result.get("ok") and result.get("configuration_error"):
+            # The first action succeeded even when no second card can be prepared; report that state without inviting insertion again.
+            response["answer"] = f"{proposal.get('device_name', 'Device')} inserted and verified. Its parameters were not changed. {result['configuration_error']}"
         return response
 
     if recipe_steps is not None:
@@ -3962,7 +3982,12 @@ def handle_command(
         # "Nothing was changed" and drop the receipt, telling the producer their set was untouched at
         # the moment we had just written to it. `result` being set proves the write already happened.
         applied_change = result if result is not None and result.get("changed") else None
-        if isinstance(exc, TimeoutError) or "timed out" in message or "timeout" in message:
+        uncertain_change = result if result is not None and (result.get("receipt") or {}).get("status") == "unknown" else None
+        if uncertain_change is not None:
+            # Logging cannot turn an unobserved write into a no-change claim or discard its consumed-action receipt.
+            answer = "The Live outcome is unknown, and the session log could not be completed. Inspect Live before preparing another proposal."
+            error_code = "unknown_but_unlogged"
+        elif isinstance(exc, TimeoutError) or "timed out" in message or "timeout" in message:
             answer = "Ableton Live isn't responding — check the connection and try again."
             error_code = "ableton_timeout"
         elif applied_change is not None:
@@ -3976,8 +4001,8 @@ def handle_command(
             error_code = "command_failed_safely"
         response = _base_response(_clean_text(command, 4000), _clean_text(session_id, 128))
         response.update({
-            "status": "failed",
-            "changed": applied_change is not None,
+            "status": "unknown" if uncertain_change is not None else "failed",
+            "changed": None if uncertain_change is not None else applied_change is not None,
             "confirmation_required": False,
             "answer": answer,
             "error_code": error_code,
@@ -3988,9 +4013,11 @@ def handle_command(
         })
         if applied_change is not None and applied_change.get("receipt"):
             response["receipt"] = applied_change["receipt"]
-        _update_lifecycle(response, "failed", verification="not_verified")
+        elif uncertain_change is not None:
+            response["receipt"] = uncertain_change["receipt"]
+        _update_lifecycle(response, "unknown" if uncertain_change is not None else "failed", verification="not_verified")
         logging.getLogger("kenn.core.live_command").warning(
-            "handle_command failed after the Live write completed; reporting the change as applied",
+            "handle_command failed; retaining any observed or uncertain Live write receipt",
             exc_info=True,
         )
         return response
