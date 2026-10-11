@@ -246,6 +246,19 @@ def test_a_plain_db_figure_never_borrows_a_dbtp_ceiling(index):
     assert _refused("Leave 1 dB of headroom. Cut 1 dB at the vocal bus.", [SHOWN]) == ["1db"]
     assert _refused("Set the limiter ceiling to +1 dB.", [SHOWN]) == ["1db"]
     assert _refused("Leave 1 dB of headroom so the encode does not clip.", [SHOWN]) == ["1db"]
-    # The ceiling as the note writes it is what the model is told to use.
+    # Keeping the sign or the decimal does not make it the ceiling either.
+    assert _refused("Cut -1 dB on the vocal bus.", [SHOWN]) == ["-1db"]
+    assert _refused("Cut 1.0 dB on the vocal bus.", [SHOWN]) == ["1.0db"]
+    # The ceiling written the way the note writes it still passes.
     assert _refused("Keep the true peak at -1 dBTP so the encode does not clip.", [SHOWN]) == []
+
+
+def test_a_typed_true_peak_keeps_its_sign_when_it_becomes_a_db_figure():
+    # Until 11 Oct the dB copy of "-1 true peak" lost its minus, so the sign-flipped "1 dB" passed and the
+    # producer's own -1 dB was refused.
+    question = "My master hits -1 true peak, is that OK?"
+    assert _refused("At -1 dB you have room for the encode.", [OTHER_NOTE], question, question) == []
+    assert _refused("Cut 1 dB on the vocal bus.", [OTHER_NOTE], question, question) == ["1db"]
+    question = "Limiter reads -0.3 true peak"
+    assert _refused("Boost the vocal by 0.3 dB.", [OTHER_NOTE], question, question) == ["0.3db"]
 

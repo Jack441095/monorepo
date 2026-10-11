@@ -231,12 +231,13 @@ def _measurement_is_supported(measurement: str, allowed: set[str]) -> bool:
 def _unsupported_measurements(found: set[str], allowed: set[str]) -> set[str]:
     """Measurements in found that are not permitted by allowed.
 
-    A plain dB figure never stands in for a dBTP one. From 10 Oct 2026 "1 dB" was accepted against a note's
-    -1 dBTP ceiling as the same headroom written the other way round, and any "cut 1 dB" on the vocal passed with
-    it. Narrowing that to headroom clauses still let an EQ move through ("cut 1 dB on the vocal and keep the true
-    peak at -1 dBTP", or a sign flip to +1 dB). Replaying all 18 runs of the 10 Oct qualification benches (v1 to
-    v3) without the equivalence changed no verdict, so it went altogether on 11 Oct. The prompt lists -1 dBTP as a
-    figure the model may use, and the model can write it that way.
+    A plain dB figure in the answer never stands in for a note's dBTP one. From 10 Oct 2026 "1 dB" was accepted
+    against a note's -1 dBTP ceiling as the same headroom written the other way round, and any "cut 1 dB" on the
+    vocal passed with it. Narrowing that to headroom clauses still let an EQ move through ("cut 1 dB on the vocal
+    and keep the true peak at -1 dBTP", or a sign flip to +1 dB). Replaying all 18 runs of the 10 Oct
+    qualification benches (v1 to v3) without the equivalence changed no verdict, so it went altogether on 11 Oct.
+    The ceiling still passes when the answer writes it as the note does, -1 dBTP. The one place a dB copy is made
+    is the producer's own "N true peak" (`_question_measurements`), and that copy keeps its sign.
     """
     return {m for m in found if not _measurement_is_supported(m, allowed)}
 
@@ -273,7 +274,9 @@ def _question_measurements(question: str) -> set[str]:
     q = question
     q = re.sub(r"\b(\d+(?:\.\d+)?)\s*k\b", r"\1 kHz", q, flags=re.IGNORECASE)
     q = re.sub(r"\+(\d+(?:\.\d+)?)", r"\1", q)
-    q = re.sub(r"\b(\d+(?:\.\d+)?)\s*true\s*peak\b", r"\1 dBTP \1 dB", q, flags=re.IGNORECASE)
+    # The sign goes into both copies. Until 11 Oct the dB copy dropped it, so a producer's "-1 true peak" let the
+    # answer "cut 1 dB on the vocal bus" through and refused "-1 dB", the figure they actually typed.
+    q = re.sub(r"(-?\b\d+(?:\.\d+)?)\s*true\s*peak\b", r"\1 dBTP \1 dB", q, flags=re.IGNORECASE)
     q = re.sub(r"\b(\d+(?:\.\d+)?)\s*peak\b", r"\1 dB", q, flags=re.IGNORECASE)
     return _measurements(q)
 
