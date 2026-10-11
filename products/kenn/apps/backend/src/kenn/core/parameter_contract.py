@@ -71,6 +71,20 @@ def parameter_guard(parameter: dict) -> dict:
     )}
 
 
+def _same_number_same_json(value: Any) -> Any:
+    """`value` with every number as a float, so an equal number always serialises the same way."""
+    if isinstance(value, bool) or value is None or isinstance(value, str):
+        return value
+    if isinstance(value, (int, float)):
+        # 0.0 for -0.0 too, as confirmation._canonical_number does: JSON.stringify writes -0 as 0.
+        return 0.0 if value == 0 else float(value)
+    if isinstance(value, dict):
+        return {key: _same_number_same_json(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_same_number_same_json(item) for item in value]
+    return value
+
+
 def device_confirmation_text(proposal: dict) -> str:
     """Bind identity, before-state and semantics as well as the requested raw value."""
     fields = {key: proposal.get(key) for key in (
@@ -79,6 +93,12 @@ def device_confirmation_text(proposal: dict) -> str:
         "unit", "valid_range", "parameter_guard", "target_address", "topology", "observation_token",
         "target_label", "before_label", "after_label", "before_display", "after_display",
     )}
+    # This many fields would make plain text long, so we bind a digest of them instead. The cost is that the
+    # digest is opaque to confirmation._request_hash, which makes equal numbers agree only by rewriting them in
+    # plain text. So we make them agree here first. The browser echoes the proposal through JSON.stringify,
+    # which writes 1.0 as 1, so `valid_range` [0.0, 1.0] came back as ints [0, 1]. Until 11 Oct that changed the
+    # digest and refused every device Apply from the web UI, while a Python round trip in the tests passed.
+    fields = _same_number_same_json(fields)
     digest = hashlib.sha256(json.dumps(fields, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
     return f"set_device_parameter:{digest}"
 

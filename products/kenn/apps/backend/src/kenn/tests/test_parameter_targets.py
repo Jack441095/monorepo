@@ -105,6 +105,29 @@ def test_confirmation_refuses_tampered_identity_units_and_before_state(target, f
     assert backend.writes == []
 
 
+
+def _as_a_browser_echoes_it(value):
+    # JSON.stringify drops an integral float's ".0", so 1.0 comes back to the server as the int 1.
+    return json.loads(json.dumps(value), parse_float=lambda text: int(float(text)) if float(text).is_integer() else float(text))
+
+
+def test_cards_echoed_through_browser_json_still_apply_and_undo(target):
+    # 11 Oct review: valid_range [0.0, 1.0] came back as [0, 1], the bound digest changed, and every device,
+    # recipe and Undo card Applied from the web UI was refused while the Python round trip here passed.
+    from kenn.core.live_recipe import LiveRecipeService
+
+    backend, service = target
+    result = apply(service, _as_a_browser_echoes_it(candidate(service)["proposal"]))
+    assert result["ok"] and result["receipt"]["verified"] is True
+    inverse = _as_a_browser_echoes_it(service.propose_undo(result["receipt"], session_id="target-tests")["proposal"])
+    assert apply(service, inverse)["receipt"]["verified"] is True
+    spec = {"action": "set_device_parameter", "address": {"kind": "track", "index": 0, "device_path": [1]},
+            "device_name": "Test Filter", "parameter_index": 4, "parameter": "Drive", "value": 0.75, "unit": "raw"}
+    recipes = LiveRecipeService(service)
+    recipe = _as_a_browser_echoes_it(recipes.propose_recipe([spec], reason="Explicit drive", session_id="target-tests")["proposal"])
+    assert recipes.execute_recipe(recipe, confirm_token=recipe["confirmation_token"], session_id="target-tests")["ok"]
+    assert len(backend.writes) == 3
+
 def test_cross_session_apply_undo_and_independent_edit_are_refused(target):
     backend, service = target
     proposal = candidate(service)["proposal"]
