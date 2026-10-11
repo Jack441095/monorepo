@@ -214,9 +214,15 @@ def build_acoustic_guidance_prompt(query: str) -> str:
 
     lines = ["\nAcoustic Translation Guidance:"]
     for r in recs:
-        move = r.filter_type.replace("_", "-")
-        # A gain of 0 or None means the filter type is the whole move (a high-pass, a de-esser).
-        if r.suggested_gain_db:
-            move += " cut" if r.suggested_gain_db < 0 else " boost"
+        if r.category == "dynamics":
+            # "flabby" carries filter_type "bell" only because the field is required. Its fix is a fast compressor
+            # (see its explanation), and "bell" would point the model at an EQ move instead.
+            move = "compressor"
+        else:
+            move = r.filter_type.replace("_", "-")
+            # Only a bell or a shelf has a direction. A high-pass or a de-esser is the whole move, and "de-esser cut"
+            # reads as if there were some other kind.
+            if r.suggested_gain_db and r.filter_type in ("bell", "low_shelf", "high_shelf"):
+                move += " cut" if r.suggested_gain_db < 0 else " boost"
         lines.append(f"- '{r.descriptor}': {move}. {r.explanation}")
     return "\n".join(lines)

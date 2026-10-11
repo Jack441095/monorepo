@@ -61,4 +61,9 @@ def test_build_system_prompt_incorporates_acoustic_guidance():
     )
     assert "Acoustic Translation Guidance:" in sys_prompt
     assert "'harsh': bell cut." in sys_prompt
-    assert "'sibilant': de-esser" in sys_prompt
+    assert "'sibilant': de-esser." in sys_prompt
+
+
+def test_a_dynamics_word_asks_for_a_compressor_not_an_eq_band():
+    # 11 Oct review: "flabby" read "'flabby': bell." though its fix is a fast compressor.
+    assert "'flabby': compressor." in build_acoustic_guidance_prompt("The bass is flabby.")
