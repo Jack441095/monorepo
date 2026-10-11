@@ -1239,6 +1239,11 @@ _JOINS_A_CLAUSE_RE = re.compile(r"\b(?:and|then|while|plus|with|but)\b", re.IGNO
 # 3500 Hz"; a second step with its own verb and object runs past 6. The list above still catches the short joins
 # the cap lets by, "(e.g., 300 Hz with a cut of 3 dB)" being 6.
 _MAX_EXAMPLE_WORDS = 6
+# The cap still let a short run-on through in the seventh review: "— like 2 kHz keyed from the kick at 6 dB —" is 6
+# words and shipped "...on the bass bus not the snare — via its sidechain input." Two figures in one example sit
+# side by side, "3 dB at 300 Hz", "100 Hz or 120 Hz", "3 kHz or the 200 – 400 Hz"; more than 2 words between them is
+# a second step with its own verb. One-figure asides are not affected, so none of the 13 saves move.
+_MAX_WORDS_BETWEEN_FIGURES = 2
 _WORD_RE = re.compile(r"[A-Za-z]+")
 # The word before the aside can need it as its object: "keep the depth under (e.g., 10 dB) so..." would ship as
 # "keep the depth under so...", and "Set the threshold to (e.g., -18 dB) on the bus" as "to on the bus". The hedges
@@ -1321,6 +1326,10 @@ def _excise_illustrative_figures(answer: str, unsupported: set[str]) -> str:
             and not _LIMIT_WORDS_RE.search(aside)
             and not _JOINS_A_CLAUSE_RE.search(aside)
             and len(_WORD_RE.findall(_MEASUREMENT_RE.sub("", aside))) <= _MAX_EXAMPLE_WORDS
+            and all(
+                len(_WORD_RE.findall(aside[a.end():b.start()])) <= _MAX_WORDS_BETWEEN_FIGURES
+                for a, b in zip(figures, figures[1:])
+            )
             # endpos makes "$" in the pattern mean the start of this aside.
             and not _LEADS_INTO_ASIDE_RE.search(m.string, 0, m.start())
         )

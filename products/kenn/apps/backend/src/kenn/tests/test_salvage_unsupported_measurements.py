@@ -341,6 +341,17 @@ def test_an_example_joined_to_a_second_clause_by_a_word_stays():
     for run_on in ("so you key it from the kick at", "before you key it from the kick at", "keyed from the kick at"):
         step = f"Put a compressor on the bass bus — like one at 2 kHz {run_on} 6 dB — not the snare — via its input."
         assert _excise_illustrative_figures(step, {"2khz", "6db"}) == step
+    # Seventh review: a run-on short enough for the cap still shipped "...not the snare — via its sidechain input."
+    for run_on in ("keyed from the kick at", "keyed off the kick at", "so you key it at"):
+        step = f"Put a compressor on the bass bus — like 2 kHz {run_on} 6 dB — not the snare — via its sidechain input."
+        assert _excise_illustrative_figures(step, {"2khz", "6db"}) == step
+    # Two figures side by side are still one example.
+    assert _excise_illustrative_figures("Cut the mud (e.g., 3 dB at 300 Hz) first.", {"3db", "300hz"}) == (
+        "Cut the mud first."
+    )
+    assert _excise_illustrative_figures("Cut the mud (say, 3 dB around 300 Hz) first.", {"3db", "300hz"}) == (
+        "Cut the mud first."
+    )
     # The longest probe save is five words and still goes.
     assert _excise_illustrative_figures("Tame it—like a narrow resonance at 3500 Hz—without the rest.", {"3500hz"}) == (
         "Tame it without the rest."
