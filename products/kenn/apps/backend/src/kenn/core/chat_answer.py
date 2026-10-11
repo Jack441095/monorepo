@@ -1119,11 +1119,30 @@ def make_answer(
             if unsupported
             else repaired
         )
+        # The figure cut can remove a real step too. Comparing with the original verdict would let a dropped tag
+        # hide that new quality fault: "4:1 [#2]. Then" becomes "4:1. Then", a false numbered step (12 Oct recheck).
+        # Apply the same figure cut to the original, so each repaired ending is judged against its unrepaired twin.
+        unrepaired = (
+            salvage_unsupported_figures(enhanced, validation["unsupported_measurements"])
+            if repaired and unsupported else enhanced
+        )
         # An excised answer keeps the capped ending it came with, so it gets the same two tries as the first
         # pass: the whole-sentence ending, then the text as written. A sentence-dropped answer is already cut
-        # to a whole sentence, and dict.fromkeys collapses the pair so the gate does not judge it twice.
-        endings = dict.fromkeys((end_on_a_whole_sentence(fixed), fixed)) if fixed else {}
-        for candidate in endings:
+        # to a whole sentence, and the pair collapses to one key so the gate does not judge it twice.
+        endings = {}
+        if fixed:
+            endings[end_on_a_whole_sentence(fixed)] = end_on_a_whole_sentence(unrepaired)
+            endings.setdefault(fixed, unrepaired)
+        for candidate, twin in endings.items():
+            if repaired and (not twin or set(_check(twin)["warnings"]) - {unsupported_warning, misattributed_warning}):
+                # other_faults above read the text as written, and the cut ending can be refused for more. One
+                # answer ending "ratio of 4:1 [#2]. Then listen to the bass against the kick. 2. Set the" was
+                # refused for the tag alone, because the dangling "2. Set the" counted as a step. Its cut lost
+                # that step and failed on quality too, then the dropped tag made "4:1. Then" a step and the cut
+                # shipped with one real step (review, 11 Oct). So a repaired ending ships only if its twin has no
+                # fault the repair could hide; an empty twin means the cut found no usable answer either. The
+                # figure cut alone (repaired == "") edits no tag and is not held.
+                continue
             retry = _check(candidate)
             if retry["accepted"]:
                 _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000

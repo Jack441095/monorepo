@@ -9,7 +9,12 @@ from __future__ import annotations
 import pytest
 
 from kenn.core import chat_answer
-from kenn.core.chat_grounding import generated_answer_validation, repair_misattributed_citations
+from kenn.core.chat_grounding import (
+    end_on_a_whole_sentence,
+    generated_answer_validation,
+    repair_misattributed_citations,
+    salvage_unsupported_figures,
+)
 from kenn.tests.test_claim_citation_grounding import QUERY as SIDECHAIN_QUERY
 from kenn.tests.test_claim_citation_grounding import RESULTS, _answer, validate
 from kenn.tests.test_salvage_unsupported_measurements import INVENTED_IN_A_STEP
@@ -94,6 +99,8 @@ def _check_with_question_figure(answer: str) -> dict:
         ("Keep the release at 300 ms\u00a0[#1].", "Keep the release at 300 ms."),
         ("Keep the release at 300 ms [#1] for now.", "Keep the release at 300 ms for now."),
         ("At 300 ms [#1]\nkeep it.", "At 300 ms\nkeep it."),
+        # A space after a tag that ends its line stayed until 12 Oct.
+        ("At 300 ms [#1] \nkeep it.", "At 300 ms\nkeep it."),
     ],
 )
 def test_a_dropped_tag_leaves_no_stray_space_or_brackets(written, shipped):
@@ -117,9 +124,32 @@ def test_a_junk_tag_split_by_the_range_rewrite_stops_the_repair():
     assert _repaired(answer) == ""
 
 
-def _make_answer_returning(monkeypatch, text: str) -> tuple[str, bool, list]:
-    monkeypatch.setattr(chat_answer, "load_chunks", lambda: list(CHUNKS))
-    monkeypatch.setattr(chat_answer, "search", lambda *a, **k: list(CHUNKS))
+@pytest.mark.parametrize(
+    ("written", "shipped"),
+    [
+        # Until 12 Oct each of these lost the space between the figure and the next word ("300 msfor now."). A
+        # figure glued to a word is one the measurement check cannot see.
+        ("Keep the release at 300 ms[#1] for now.", "Keep the release at 300 ms for now."),
+        ("Keep the release at 300 ms([#1]) for now.", "Keep the release at 300 ms for now."),
+        ("Keep the release at 300 ms[#1]for now.", "Keep the release at 300 ms for now."),
+        ("Keep the release at 300 ms [#1]for now.", "Keep the release at 300 ms for now."),
+        ("Keep the release at 300 ms\t[#1]for now.", "Keep the release at 300 ms\tfor now."),
+    ],
+)
+def test_a_dropped_tag_never_glues_its_figure_to_the_next_word(written, shipped):
+    assert _repaired(_answer(written), _check_with_question_figure) == _answer(shipped)
+
+
+def test_a_repair_that_would_change_a_figure_repairs_nothing():
+    # "300[#1] ms" holds no figure as written. Without its tag it reads "300 ms", a figure the gate never judged.
+    answer = _answer("Keep the release at 300[#1] ms.")
+
+    assert repair_misattributed_citations(answer, [{"citation_index": 0, "attributed_ordinals": []}]) == ""
+
+
+def _make_answer_returning(monkeypatch, text: str, chunks=CHUNKS, query=QUERY, **kwargs) -> tuple[str, bool, list]:
+    monkeypatch.setattr(chat_answer, "load_chunks", lambda: list(chunks))
+    monkeypatch.setattr(chat_answer, "search", lambda *a, **k: list(chunks))
     monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *a, **k: True)
     monkeypatch.setattr(chat_answer, "llm_enhance_answer", lambda *a, **k: text)
     monkeypatch.setattr("kenn.llm.linter.lint_response", lambda answer, mode: answer)
@@ -127,7 +157,7 @@ def _make_answer_returning(monkeypatch, text: str) -> tuple[str, bool, list]:
     monkeypatch.setattr(
         chat_answer, "_log_generation_outcome", lambda accepted, validation, seconds: logged.append((accepted, validation))
     )
-    answer, enhanced = chat_answer.make_answer(QUERY, list(CHUNKS), route="production")
+    answer, enhanced = chat_answer.make_answer(query, list(chunks), route="production", **kwargs)
     return answer, enhanced, logged
 
 
@@ -190,3 +220,66 @@ def test_make_answer_does_not_credit_a_repair_the_figure_cut_threw_away(monkeypa
     assert "900" not in answer and "5 ms" not in answer
     assert logged[-1][1]["salvaged"] == ["900ms"]
     assert logged[-1][1]["repaired_citations"] == []
+
+
+def test_make_answer_never_ships_an_invented_figure_once_its_tag_is_dropped(monkeypatch):
+    # 11 Oct review: dropping the tag from "900 ms[#2] so" took the only space, the gate could not see "900 msso" as
+    # a figure, and the step shipped with its invented 900 ms.
+    answer, _enhanced, _logged = _make_answer_returning(
+        monkeypatch,
+        INVENTED_IN_A_STEP.replace(
+            "out to 900 ms if the kick feels choked.", "out to 900 ms[#2] so the kick breathes. Start from 900 ms."
+        ),
+    )
+
+    assert "900" not in answer
+
+
+# The text as written passes everything but the tag, because the dangling "2. Set the" counts as a step. The cut
+# ending loses that step, and dropping the tag turns "4:1. Then" into one.
+CUT_LOSES_A_STEP = (
+    "Short answer: Pull the bass compressor release in from 300 ms so the bass recovers before the kick.\n\n"
+    "Check: Compare the bass in context.\n\n"
+    "Try this: 1. Key the bass bus compressor from the kick at 300 ms with a ratio of 4:1 [#2]. "
+    "Then listen to the bass against the kick. 2. Set the"
+)
+
+
+def test_make_answer_does_not_repair_a_cut_ending_refused_for_quality(monkeypatch):
+    # 11 Oct review: the repair ran on the warnings for the text as written, and then shipped the cut ending, which
+    # also failed on quality, with "4:1. Then" standing in for the step the cut took.
+    whole = end_on_a_whole_sentence(CUT_LOSES_A_STEP)
+    assert _check_with_question_figure(CUT_LOSES_A_STEP)["warnings"] == [MISATTRIBUTED]
+    assert "generated answer is below the quality threshold" in _check_with_question_figure(whole)["warnings"]
+    assert _check_with_question_figure(whole.replace(" [#2]", ""))["accepted"] is True
+
+    answer, enhanced, _logged = _make_answer_returning(
+        monkeypatch,
+        CUT_LOSES_A_STEP,
+        chunks=RESULTS,
+        query=SIDECHAIN_QUERY,
+        answer_mode="mix_diagnosis",
+        question="My release is at 300 ms. " + SIDECHAIN_QUERY,
+    )
+
+    assert enhanced is True
+    assert answer == CUT_LOSES_A_STEP.replace(" [#2]", "")
+
+
+def test_make_answer_does_not_repair_quality_lost_when_an_invented_step_is_cut(monkeypatch):
+    # 12 Oct recheck: the original passed quality, but cutting its invented second step left one real step.
+    # Dropping the tag then made "4:1. Then" count as the missing step unless the cut twin was checked too.
+    written = CUT_LOSES_A_STEP.replace("2. Set the", "2. Set the attack to 900 ms.")
+    validation = _check_with_question_figure(written)
+    assert set(validation["warnings"]) == {MISATTRIBUTED, "generated answer introduced unsupported measurements"}
+    cut = salvage_unsupported_figures(written, validation["unsupported_measurements"])
+    assert "generated answer is below the quality threshold" in _check_with_question_figure(cut)["warnings"]
+    assert _check_with_question_figure(cut.replace(" [#2]", ""))["accepted"] is True
+
+    _answer, enhanced, logged = _make_answer_returning(
+        monkeypatch, written, chunks=RESULTS, query=SIDECHAIN_QUERY, answer_mode="mix_diagnosis",
+        question="My release is at 300 ms. " + SIDECHAIN_QUERY,
+    )
+
+    assert enhanced is False
+    assert logged[-1][0] is False

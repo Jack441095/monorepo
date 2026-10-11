@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections import Counter
 
 
 from kenn.retrieval.retrieval import (
@@ -983,10 +984,11 @@ def _shown_note_text(shown: list[tuple[float, dict, str]]) -> str:
 # Only the measurement check widens. Overlap and product checks still read evidence_text alone, and the query is
 # still kept out of overlap (see the comment in generated_answer_validation). verify_claim_citations still reads the
 # excerpts only, so a whole-note or question figure tagged with an excerpt id is still named a misattribution: the
-# model cannot have read it in that excerpt. Since 11 Oct that no longer costs the answer. No excerpt holds the
-# figure, so repair_misattributed_citations() drops the tag and the answer ships as its untagged copy would. The
-# review of that change named this as a further widening (11 Oct). We kept it, because it is the widening untagged
-# claims already had, and a tag no excerpt backs tells the reader less than no tag.
+# model cannot have read it in that excerpt. Since 11 Oct that no longer costs the answer on its own. No excerpt
+# holds the figure, so repair_misattributed_citations() drops the tag and the answer ships as its untagged copy
+# would. When the gate found anything else wrong as well, make_answer does not repair and the answer is still
+# refused. The review of that change named this as a further widening (11 Oct). We kept it, because it is the
+# widening untagged claims already had, and a tag no excerpt backs tells the reader less than no tag.
 def _accepted_measurements(
     question: str, shown: list[tuple[float, dict, str]], evidence_text: str
 ) -> set[str]:
@@ -1411,8 +1413,9 @@ def repair_misattributed_citations(answer: str, misattributed: list[dict]) -> st
     other way ("-14.0 LUFS" against "-14 LUFS"). Those lose a good tag and ship as the untagged answer would; we
     have not widened the body match for them.
 
-    Only tags change, never a figure, so the measurement check still decides every number that ships. The caller
-    must validate the result again, and should call this only when a wrong tag (with or without an invented
+    Only tags and the spacing beside a dropped one change, never a figure: a repair that would change any figure
+    returns "" instead. So the measurement check still decides every number that ships. The caller must validate
+    the result again, and should call this only when a wrong tag (with or without an invented
     figure) is all the gate found. Dropping a tag edits the prose that the quality and overlap checks read.
 
     11 Oct 2026: on the v6 development bench this warning alone cost 2 of 72 held-out answers, one short of the
@@ -1451,18 +1454,38 @@ def repair_misattributed_citations(answer: str, misattributed: list[dict]) -> st
         if answer[start - 1:start] == "(" and answer[end:end + 1] == ")":
             start, end = start - 1, end + 1
         repaired += answer[kept_to:start]
-        # The tag goes with the space on one side of it, never both and never a line break. A space after it goes
-        # first, so "150 ms [#2] then" reads "150 ms then" and a tag opening a list item leaves "- Set", not "-Set".
+        # The tag goes with at most the space on one side of it, never a line break, and the words either side
+        # stay apart. With space on both sides the space after goes, so "150 ms [#2] then" reads "150 ms then" and
+        # a tag opening a list item leaves "- Set", not "-Set". A tag written hard against its figure keeps the
+        # space after it: until 12 Oct that went too, "900 ms[#2] so" shipped as "900 msso", and the measurement
+        # check, which needs a unit to end at a word boundary, no longer saw an invented 900 ms (review, 11 Oct).
+        # A word straight after the tag ("150 ms [#2]then") keeps the space before, or gets one if there was none.
         # With punctuation or a line end after it, the space before goes instead, and "150 ms [#2]." closes up to
-        # "150 ms.". That trim runs on everything kept so far, so two dropped tags in a row close up as well. It
-        # takes any horizontal space, not only ASCII, since a no-break space before a tag would leave "150 ms ." too.
+        # "150 ms."; that trim runs on everything kept so far, so two dropped tags in a row close up as well. All
+        # of this takes any horizontal space, not only ASCII: a no-break space before a tag would leave "150 ms ."
+        spaced_before = not repaired or repaired[-1].isspace() or repaired[-1] == "("
         after = _HORIZONTAL_SPACE_RE.match(answer, end).end()
-        if after > end:
+        if answer[after:after + 1] in ("", "\r", "\n"):
+            repaired = _TRAILING_HORIZONTAL_SPACE_RE.sub("", repaired)
             end = after
+        elif after > end:
+            if spaced_before:
+                end = after
+        elif answer[end].isalnum():
+            if not spaced_before:
+                repaired += " "
         else:
             repaired = _TRAILING_HORIZONTAL_SPACE_RE.sub("", repaired)
         kept_to = end
-    return repaired + answer[kept_to:]
+    repaired += answer[kept_to:]
+    # The spacing above is meant to leave every figure as written, and this holds it to that. If a figure was lost
+    # or changed anyway (a tag written inside one, or a spacing shape we have not met), nothing is repaired and the
+    # answer stays rejected, which is where it was before the repair existed.
+    if Counter(key for key, _, _ in _measurement_spans(answer)) != Counter(
+        key for key, _, _ in _measurement_spans(repaired)
+    ):
+        return ""
+    return repaired
 
 
 _WHOLE_SENTENCE_RE = re.compile(r".*[.!?](?=\s|$)", re.DOTALL)
