@@ -37,7 +37,19 @@ def resolve_device_rules(
             device_candidates.append((device_index, name))
         else:
             device_candidates.append((device_index, str(device)))
-    device = next(((index, name) for index, name in device_candidates if name and name.lower() in lower), None)
+    named = [(index, name) for index, name in device_candidates if name and name.lower() in lower]
+    number = re.search(r"\bdevice\s+(\d+)\b", lower)
+    if number:
+        # Displayed device numbers are one-based; they narrow the observed matches without inventing a device.
+        named = [item for item in named if item[0] == int(number.group(1)) - 1]
+    if len(named) > 1:
+        # Duplicate names previously selected the first match, so a perfectly readable request hit the wrong copy.
+        base["missing_fields"].append("device")
+        base["device_choices"] = [{"index": index, "name": name, "number": index + 1} for index, name in named[:8]]
+        choices = ", ".join(f'device {index + 1} "{name}"' for index, name in named[:8])
+        base["ambiguity"].append(f"Which exact device on '{track.get('name', '')}': {choices}? Include its device number; nothing changed.")
+        return base
+    device = named[0] if named else None
     if device is None and re.search(r"\b(?:threshold|ratio|attack|release|frequency|gain|q)\b", lower):
         base["missing_fields"].append("device")
         base["ambiguity"].append("I couldn't find that device on the track. Name the device as it appears in Live.")

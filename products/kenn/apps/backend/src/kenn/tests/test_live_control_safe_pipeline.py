@@ -60,6 +60,8 @@ class TestLiveControlSafePipeline(unittest.TestCase):
         import os
         os.environ["AUDIO_TOO_ALLOW_DAW_CONTROL"] = "1"
         self.mock_osc_client = MagicMock()
+        # These fixtures exercise the legacy fake contract; production requires the negotiated target handler.
+        self.mock_osc_client.requires_guarded_parameter_targets = False
         # Default device parameters for track 0, device 0
         self.mock_osc_client.get_device_parameters.return_value = {
             "success": True,

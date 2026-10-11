@@ -57,4 +57,14 @@ describe('addressed parameters', () => {
     expect(wrapper.find('.kenn-action-card__btn--apply').exists()).toBe(false)
     expect(wrapper.find('.kenn-action-card__btn--undo').exists()).toBe(false)
   })
+
+  it('shows qualified choice labels and physical units instead of their raw positions', () => {
+    // Sparse choices and normalized time controls must display the value the producer approved.
+    const choice = mount(KennActionCard, { props: { proposal: { ...proposal, before: 2, after: 7, before_label: 'A', after_label: 'B' } } })
+    expect(choice.find('.kenn-action-card__val-before').text()).toBe('A')
+    expect(choice.find('.kenn-action-card__val-after').text()).toBe('B')
+    const time = mount(KennActionCard, { props: { proposal: { ...proposal, before_display: '5 ms', after_display: '10 ms' } } })
+    expect(time.find('.kenn-action-card__val-before').text()).toBe('5 ms')
+    expect(time.find('.kenn-action-card__val-after').text()).toBe('10 ms')
+  })
 })

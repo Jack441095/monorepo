@@ -318,14 +318,18 @@ class FakeLiveBackend:
         with self._lock:
             info = self.get_addressed_parameter(address, parameter_index, expected["observation_token"])
             if not info.get("success") or info["parameters"] != expected["parameters"] or info["topology"] != expected["topology"]:
+                # A changed observation cannot authorize a write to the new state or replacement object.
                 return False
             observation = self._target_observations[expected["observation_token"]]
             if observation["used"]:
+                # A repeated packet cannot repeat a setter whose acknowledgement may have been lost.
                 return False
             parameter = self._addressed_target(address, parameter_index)[2]
             if parameter.get("is_enabled") is not True or parameter.get("state") != 0 or parameter.get("automation_state") != 0:
+                # Unknown permission flags withhold authority just as the bundled writer does.
                 return False
             if validate_parameter(parameter, value):
+                # The fake must reject invalid semantics, rather than making a production refusal look tested.
                 return False
             observation["used"] = True
             parameter["value"] = float(value)

@@ -65,6 +65,8 @@ export type KennActionProposal = {
   after_db?: number | '-inf' | null
   before_display?: string
   after_display?: string
+  before_label?: string
+  after_label?: string
   unit?: string
   reason?: string
   confirmation_token?: string

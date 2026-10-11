@@ -117,6 +117,53 @@ def test_cross_session_apply_undo_and_independent_edit_are_refused(target):
     assert len(backend.writes) == 1
 
 
+def test_undo_cannot_rebind_to_a_replacement_after_its_identity_checked_read(target, monkeypatch):
+    # Rediscovering after receipt validation used to give an identical replacement its own Undo token.
+    backend, service = target
+    receipt = apply(service, candidate(service)["proposal"])["receipt"]
+    read = backend.get_addressed_parameter
+    calls = []
+    def replace_after_read(address, parameter_index, reference=None):
+        info = read(address, parameter_index, reference)
+        calls.append(reference)
+        if len(calls) == 1:
+            bus = next(row for row in backend._addressed_buses if row["kind"] == "track")
+            bus["devices"][1] = copy.deepcopy(bus["devices"][1])
+        return info
+    monkeypatch.setattr(backend, "get_addressed_parameter", replace_after_read)
+    inverse = service.propose_undo(receipt, session_id="target-tests")
+    assert len(calls) == 1 and inverse["ok"]
+    assert not apply(service, inverse["proposal"])["ok"]
+    assert len(backend.writes) == 1
+
+
+@pytest.mark.parametrize("fault", [None, "replacement", "handler", "state_changed", "disabled"])
+def test_regular_parameter_proposer_requires_guarded_capabilities_when_backend_requires_them(target, monkeypatch, fault):
+    # Production bulk reads can inform language resolution, but must never authorize a positional fallback.
+    backend, service = target
+    monkeypatch.setattr(backend, "requires_guarded_parameter_targets", True, raising=False)
+    address = {"kind": "track", "index": 0, "device_path": [1]}
+    info = backend.get_addressed_parameter(address, 4)
+    state = {"status": "online", "tracks": [{"index": 0, "name": "Duplicate", "devices": [{"name": "Test Filter"}, {"name": "Test Filter"}]}]}
+    if fault == "handler":
+        monkeypatch.setattr(backend, "get_addressed_parameter", lambda *args: {"success": False, "error": "Missing handler"})
+    elif fault in {"state_changed", "disabled"}:
+        parameter = backend._addressed_buses[0]["devices"][1]["parameters"][0]
+        parameter["value" if fault == "state_changed" else "is_enabled"] = 0.5 if fault == "state_changed" else False
+    result = service.propose_device_action(track_index=0, device_index=1, parameter_index=4, proposed_value=0.75,
+                                           reason="Explicit request", session_id="target-tests", parameter_name="Drive", unit="raw",
+                                           observed_state=state, observed_parameter_info=info)
+    if fault in {"handler", "state_changed", "disabled"}:
+        assert not result["ok"] and backend.writes == []
+        return
+    assert result["proposal"]["target_address"] == address
+    if fault == "replacement":
+        backend._addressed_buses[0]["devices"][1] = copy.deepcopy(backend._addressed_buses[0]["devices"][1])
+        assert not apply(service, result["proposal"])["ok"] and backend.writes == []
+    else:
+        assert apply(service, result["proposal"])["receipt"]["verified"] is True
+
+
 @pytest.mark.parametrize("field,value", [("min", None), ("max", float("nan")), ("value", float("inf")),
                                          ("is_enabled", False), ("state", 1), ("automation_state", 1),
                                          ("macro_controlled", True), ("state", None)])
@@ -147,6 +194,68 @@ def test_relative_raw_and_sparse_chooser_use_actual_values(target):
     assert not candidate(service, value=3, unit="raw")["ok"]
     parameter["choices"].append({"raw": 11, "label": "RMS"})
     assert not candidate(service, value="RMS", unit="choice")["ok"]
+
+
+@pytest.mark.parametrize("semantic", ["choice", "physical"])
+def test_addressed_undo_restores_raw_with_confirmation_bound_display_semantics(target, semantic):
+    # Undo used raw units for restoration and lost the readable choice or dB value on its confirmation card.
+    backend, service = target
+    device = backend._addressed_buses[0]["devices"][1]
+    parameter = device["parameters"][0]
+    if semantic == "choice":
+        parameter.update(value=2, min=2, max=11, quantized=True,
+                         choices=[{"raw": 2, "label": "Peak"}, {"raw": 7, "label": "RMS"}, {"raw": 11, "label": "Auto"}])
+        proposal = candidate(service, value="RMS", unit="choice")["proposal"]
+    else:
+        device["name"] = "Saturator"
+        proposal = service.propose_addressed_parameter_action(
+            address={"kind": "track", "index": 0, "device_path": [1]}, parameter_index=4,
+            parameter_name="Drive", device_name="Saturator", value=0, unit="dB", session_id="target-tests")["proposal"]
+    receipt = apply(service, proposal)["receipt"]
+    inverse = service.propose_undo(receipt, session_id="target-tests")["proposal"]
+    assert inverse["after"] == receipt["before"]
+    if semantic == "choice":
+        assert (inverse["before_label"], inverse["after_label"]) == ("RMS", "Peak")
+    else:
+        assert (inverse["before_display"], inverse["after_display"]) == ("0.0 dB", "-18.0 dB")
+    assert apply(service, inverse)["receipt"]["verified"] is True
+
+
+def test_guarded_production_backends_refuse_legacy_recipe_compound_and_recovery_writes(target, monkeypatch):
+    # Positional compatibility paths must not bypass the retained-object requirement, even during rollback.
+    from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
+    from kenn.core.live_action_service import DEVICE_SETUP_PROPOSAL_SCHEMA, EQ_BAND_TUNING_GAIN_PROPOSAL_SCHEMA
+
+    backend, service = target
+    monkeypatch.setattr(backend, "requires_guarded_parameter_targets", True, raising=False)
+    recipes = LiveRecipeService(service)
+    step = {"action": "set_device_parameter"}
+    result = recipes.execute_recipe({"schema": RECIPE_SCHEMA, "steps": [step]}, confirm_token="unused", session_id="target-tests")
+    assert not result["ok"] and "guarded" in result["error"]
+    assert recipes._apply_step(step)[0] is False
+    assert recipes._restore_step({"action": "set_device_parameter"}) is False
+    result = service.execute_eq_band_tuning_gain({"schema": EQ_BAND_TUNING_GAIN_PROPOSAL_SCHEMA}, confirm_token="unused", session_id="target-tests")
+    assert not result["ok"] and "guarded" in result["error"]
+    assert service._restore_device_parameter(0, 1, 4, 0.25)["attempted"] is False
+    result = service.execute_device_setup_action({"schema": DEVICE_SETUP_PROPOSAL_SCHEMA}, confirm_token="unused", session_id="target-tests")
+    assert not result["ok"] and "addressed" in result["error"]
+    assert backend.writes == []
+
+
+def test_undo_uses_qualified_choice_labels_when_host_only_exposes_raw_bounds(target, monkeypatch):
+    from kenn.core import device_units
+
+    backend, service = target
+    parameter = backend._addressed_buses[0]["devices"][1]["parameters"][0]
+    parameter.update(quantized=True, value=0, min=0, max=1)
+    # This synthetic qualification stands in for an offline table; value_items alone never proves the raw mapping.
+    monkeypatch.setattr(device_units, "find_choice", lambda *args: SimpleNamespace(options=((0, "Off"), (1, "On"))))
+    proposal = candidate(service, value="On", unit="choice")["proposal"]
+    receipt = apply(service, proposal)["receipt"]
+    inverse = service.propose_undo(receipt, session_id="target-tests")["proposal"]
+    assert inverse["unit"] == "value" and inverse["after"] == 0
+    assert (inverse["before_label"], inverse["after_label"]) == ("On", "Off")
+    assert apply(service, inverse)["receipt"]["verified"] is True
 
 
 def test_missing_ack_is_reconciled_once_and_failed_readback_stays_unknown(target, monkeypatch):
@@ -257,3 +366,44 @@ def test_25_device_milestone_counts_fake_lifecycles_and_remaining_stock():
     assert report["live_writes"] == 0
     assert all(row["fake_tested"] and not row["real_live_qualified"] and not row["observed_in_current_live"] for row in report["parameters"])
     assert len(report["remaining_stock"]) == 53
+
+
+def test_five_turn_knowledge_to_apply_uses_registered_http_routes(target, tmp_path, monkeypatch):
+    from fastapi.testclient import TestClient
+    from kenn.core import chat_answer, live_command, live_receipt_journal, session_memory
+    import kenn.core.live_action_service as services
+    from kenn.routes import daw_command_handler
+    from kenn.routes.fastapi_app import app
+
+    backend, service = target
+    monkeypatch.setenv("KENN_ALLOW_DAW_CONTROL", "1")
+    monkeypatch.setattr(session_memory, "DB_PATH", tmp_path / "chat.db")
+    monkeypatch.setattr(session_memory, "CHATS_DIR", tmp_path / "chats")
+    monkeypatch.setattr(session_memory, "SESSION_FILE", tmp_path / "session.json")
+    monkeypatch.setattr(live_receipt_journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
+    monkeypatch.setattr(services, "LiveActionService", lambda *args, **kwargs: service)
+    monkeypatch.setattr(daw_command_handler, "_get_handle_command", lambda: lambda command, **kwargs: live_command.handle_command(command, service=service, **kwargs))
+    # The provider's text is deliberately synthetic. This checks route delivery, not explanation correctness.
+    monkeypatch.setattr(chat_answer, "_answer_payload", lambda *args, **kwargs: {
+        "answer": "Synthetic advice: inspect Drive and prepare an explicit raw change.", "sources": [],
+    })
+    client = TestClient(app)
+    address = {"kind": "master", "index": 0, "device_path": [1]}
+    for question in ("What does Drive do?", "Suggest a value for that parameter."):
+        advice = client.post("/api/ask", json={"question": question, "session_id": "target-tests"})
+        assert advice.status_code == 200 and advice.json()["answer"].startswith("Synthetic advice")
+        assert advice.json().get("receipt") is None and backend.writes == []
+    observed = client.post("/api/ableton/parameter/inspect", json={"address": address, "parameter_index": 4}).json()
+    assert observed["changed"] is False and observed["parameters"][0]["value"] == 0.25
+    proposed = client.post("/api/ableton/parameter/proposal", json={
+        "address": address, "parameter_index": 4, "device_name": "Test Filter", "parameter_name": "Drive",
+        "value": 0.75, "unit": "raw", "session_id": "target-tests",
+    }).json()
+    assert proposed["status"] == "confirmation_required" and backend.writes == []
+    proposal = proposed["proposal"]
+    applied = client.post("/api/ableton/command", json={
+        "command": "Apply that", "proposal": proposal, "confirm_token": proposal["confirmation_token"],
+        "session_id": "target-tests", "deterministic_only": True,
+    }).json()
+    assert applied["receipt"]["verified"] is True
+    assert backend.writes == [("addressed_parameter", address, 4, 0.75)]

@@ -283,6 +283,7 @@ class LiveControlPlanner:
         track_name: str = "",
         observed_parameter_info: Dict[str, Any] | None = None,
         target_address: Dict[str, Any] | None = None,
+        display_unit: str = "",
     ) -> Dict[str, Any]:
         """Query current parameter state from Live, construct an ActionProposal, and issue an HMAC token."""
         # The command gateway may pass the exact parameter block it just read
@@ -355,7 +356,9 @@ class LiveControlPlanner:
 
         proposal_payload = proposal.payload()
         proposal_payload["parameter_guard"] = parameter_guard(target_param)
-        if unit == "choice":
+        if target_param.get("value_display"):
+            proposal_payload["before_display"] = str(target_param["value_display"])
+        if unit == "choice" or display_unit == "choice" or target_param.get("choices"):
             from kenn.core.device_units import find_choice
 
             qualified = find_choice(device_name, param_name)
@@ -388,6 +391,17 @@ class LiveControlPlanner:
             if isinstance(display, dict) and display.get("success") and display.get("value_string") not in (None, ""):
                 proposal_payload["before_display"] = str(display["value_string"])
                 proposal_payload["display_metadata"] = "AbletonOSC value_string"
+        # Display values participate in approval. Resolve the qualified proposed value before issuing a token,
+        # so command and Undo cards cannot invalidate their own confirmation by adding units afterward.
+        from kenn.core.device_units import display_text
+
+        # Undo restores raw exactly; its original unit still lets the card show the qualified physical value.
+        shown_unit = display_unit or unit
+        shown = display_text(device_name, param_name, shown_unit, clamped_val)
+        if shown:
+            proposal_payload["after_display"] = shown
+            if not proposal_payload.get("before_display"):
+                proposal_payload["before_display"] = display_text(device_name, param_name, shown_unit, current_val)
         fingerprint = _state_fingerprint(
             track_index=track_index,
             device_index=device_index,

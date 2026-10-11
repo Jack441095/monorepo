@@ -2169,10 +2169,6 @@ def _resolve_device_parameter(
         observed_state=observed_state,
         observed_parameter_info=info,
     )
-    if result.get("ok") and isinstance(result.get("proposal"), dict):
-        after_display = display_text(device_name, str(parameter.get("name", "")), unit, result["proposal"].get("after"))
-        if after_display:
-            result["proposal"]["after_display"] = after_display
     return result
 
 
@@ -3129,6 +3125,25 @@ def _handle_command_impl(
             )
         if context_resolution.get("resolution") == "correction_requires_clarification":
             correction_snapshot = _command_snapshot(live, include_mixer=True)
+            if context_resolution.get("requested_device"):
+                from kenn.core.session_context import live_conversation_context
+
+                last = live_conversation_context(response["session_id"])
+                matching_tracks = [row for row in correction_snapshot.get("tracks", [])
+                                   if row.get("name") == last.get("last_track") and
+                                   (last.get("last_track_index") is None or row.get("index") == last["last_track_index"])]
+                if len(matching_tracks) != 1:
+                    # A renamed, moved or duplicate track cannot inherit the remembered device choices.
+                    return _clarification(response, {"action": "correct_target", "missing_fields": ["which_track"]},
+                                          "Which exact track and device number? Name both and the value; the previous track identity is no longer unique. Nothing changed.")
+                track = matching_tracks[0]
+                choices = [{"index": index, "number": index + 1, "name": row.get("name")}
+                           for index, row in enumerate(track.get("devices", [])) if isinstance(row, dict)
+                           and row.get("name") == context_resolution["requested_device"]][:8]
+                # A class reference cannot authorize another instance. Show actual positions and await an exact request.
+                listed = ", ".join(f'device {row["number"]} "{row["name"]}"' for row in choices)
+                return _clarification(response, {"action": "correct_target", "device_choices": choices},
+                                      f"Which exact device on '{last.get('last_track', '')}': {listed or 'none observed'}? Include its device number and value; nothing changed.")
             other = _resolve_other_target(response["session_id"], correction_snapshot)
             if other:
                 from kenn.core.session_context import live_conversation_context

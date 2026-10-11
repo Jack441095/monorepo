@@ -202,6 +202,10 @@ def _single_value(args: Iterable[Any], expected_index: int | None = None) -> Any
 class AbletonOSCClient:
     """Thread-safe standard OSC client for AbletonOSC."""
 
+    # A production parameter proposal must prove the original objects and protection flags through the
+    # negotiated protocol. Older scripts may still supply read-only bulk data, but cannot authorize Apply.
+    requires_guarded_parameter_targets = True
+
     def __init__(
         self,
         host: str = DEFAULT_LIVE_OSC_HOST,

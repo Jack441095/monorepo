@@ -250,6 +250,7 @@ const formattedBefore = computed(() => {
     return String(props.proposal.device_name || 'Device')
   }
   // Device controls: Live's own display ("0.00 dB") when KENN has both ends of the change in display units.
+  if (props.proposal.after_label) return props.proposal.before_label || formatVal(props.proposal.before, props.proposal.parameter)
   if (props.proposal.before_display && props.proposal.after_display) return props.proposal.before_display
   return formatDb(props.proposal.before_db) ?? formatVal(props.proposal.before, props.proposal.parameter)
 })
@@ -261,6 +262,7 @@ const formattedAfter = computed(() => {
   if (props.proposal.action === 'remove_device') {
     return '(Removed)'
   }
+  if (props.proposal.after_label) return props.proposal.after_label
   if (props.proposal.before_display && props.proposal.after_display) return props.proposal.after_display
   return formatDb(props.proposal.after_db) ?? formatVal(props.proposal.after, props.proposal.parameter)
 })

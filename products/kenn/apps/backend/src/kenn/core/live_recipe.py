@@ -252,6 +252,9 @@ class LiveRecipeService:
     def _apply_step(self, step: dict[str, Any]) -> tuple[bool, dict[str, Any], str]:
         """Apply one step after fresh identity checks and verify its readback."""
         action = str(step.get("action", ""))
+        if action == "set_device_parameter" and getattr(self.client, "requires_guarded_parameter_targets", False):
+            # Keep direct step callers behind the same refusal as recipe Apply.
+            return False, {}, "Device recipe step requires a guarded parameter target."
         if action in SUPPORTED_TRACK_ACTIONS:
             state = self.service.snapshot()
             track = _exact_track(state, int(step["track_index"]), str(step.get("track_name", "")))
@@ -422,6 +425,9 @@ class LiveRecipeService:
     def _restore_step(self, receipt: dict[str, Any]) -> bool:
         target = receipt.get("target") or {}
         action = str(receipt.get("action", ""))
+        if action == "set_device_parameter" and getattr(self.client, "requires_guarded_parameter_targets", False):
+            # A legacy rollback has no original-object reference, so a positional restore could hit a replacement.
+            return False
         try:
             if action in SUPPORTED_TRACK_ACTIONS:
                 field = SUPPORTED_TRACK_ACTIONS[action][0]
@@ -495,6 +501,11 @@ class LiveRecipeService:
         steps = recipe.get("steps")
         if not isinstance(steps, list) or not 1 <= len(steps) <= MAX_RECIPE_STEPS:
             return {"ok": False, "error": f"Recipes must contain between 1 and {MAX_RECIPE_STEPS} steps."}
+        if getattr(self.client, "requires_guarded_parameter_targets", False) and any(
+            isinstance(step, dict) and step.get("action") == "set_device_parameter" for step in steps
+        ):
+            # Refuse before any mixer step: the legacy recipe cannot safely Apply or roll back its device controls.
+            return {"ok": False, "error": "Device recipes require guarded parameter targets; prepare individual addressed changes."}
         if not recipe.get("requires_confirmation") or str(recipe.get("confirmation_token", "")) != str(confirm_token):
             return {"ok": False, "error": "Confirmation is required for this exact recipe."}
         key = str(idempotency_key or recipe.get("action_id") or "").strip()

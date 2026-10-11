@@ -47,6 +47,7 @@ def validate_parameter(parameter: dict, requested: Any, *, device_name: str = ""
         try:
             options = [float(row["raw"]) for row in choices]
         except (KeyError, TypeError, ValueError):
+            # Partial options cannot prove that the requested raw value belongs to this chooser.
             return "Live returned incomplete chooser metadata."
         if not options or any(not math.isfinite(item) for item in options) or value not in options:
             return "That raw value is not an exposed chooser option."

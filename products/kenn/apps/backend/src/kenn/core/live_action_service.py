@@ -1747,6 +1747,21 @@ class LiveActionService(Tier2Tier3ControlMixin):
             observed_parameter_info = self.client.get_device_parameters(track_index, device_index)
         if observed_parameter_info.get("device_name") != observed_device_name:
             return {"ok": False, "error": "Live device identity changed during inspection."}
+        address = None
+        if getattr(self.client, "requires_guarded_parameter_targets", False):
+            address = {"kind": "track", "index": track_index, "device_path": [device_index]}
+            previous_parameter = indexed_parameter(observed_parameter_info.get("parameters", []), parameter_index)
+            observed_parameter_info = self.inspect_addressed_parameter(address, parameter_index)
+            parameter = indexed_parameter(observed_parameter_info.get("parameters", []), parameter_index)
+            if not observed_parameter_info.get("success") or observed_parameter_info.get("device_name") != observed_device_name:
+                # Missing handler or a changed device grants no fallback to the positional writer.
+                return {"ok": False, "error": observed_parameter_info.get("error", "Guarded device inspection failed.")}
+            if parameter is None or parameter.get("is_enabled") is not True or parameter.get("state") != 0 or parameter.get("automation_state") != 0:
+                # A readable legacy value is not proof that the original control remains writable.
+                return {"ok": False, "error": "Guarded enabled/state/automation metadata does not permit this write."}
+            if previous_parameter is None or any(previous_parameter.get(field) != parameter.get(field) for field in ("name", "value", "min", "max", "quantized")):
+                # Relative conversions used the earlier raw value; refuse if it moved during feature negotiation.
+                return {"ok": False, "error": "Parameter state changed during guarded inspection; inspect again."}
         return planner.propose_parameter_change(
             track_index=track_index,
             device_index=device_index,
@@ -1758,6 +1773,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             unit=unit,
             track_name=str(track.get("name", "")),
             observed_parameter_info=observed_parameter_info,
+            target_address=address,
         )
 
     def inspect_addressed_parameter(self, address: dict, parameter_index: int) -> dict[str, Any]:
@@ -1778,6 +1794,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
     def propose_addressed_parameter_action(
         self, *, address: dict, parameter_index: int, value: Any, unit: str,
         parameter_name: str, device_name: str, session_id: str, relative: bool = False,
+        observed_parameter_info: dict[str, Any] | None = None,
+        display_unit: str = "",
     ) -> dict[str, Any]:
         """Resolve a non-executable candidate through fresh, capability-negotiated metadata."""
         from kenn.core.device_units import display_to_raw, raw_to_display, normalize_unit
@@ -1789,7 +1807,9 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 raise ValueError("Parameter index must be a non-negative integer.")
             if not session_id or isinstance(value, bool) or type(relative) is not bool:
                 raise ValueError("Session, numeric/choice value and boolean relative flag are required.")
-            info = self.inspect_addressed_parameter(address, parameter_index)
+            # Undo supplies its just-checked receipt observation. Rediscovery could bind to a replacement
+            # between validation and proposal construction; Apply still rereads this exact reference.
+            info = observed_parameter_info if observed_parameter_info is not None else self.inspect_addressed_parameter(address, parameter_index)
             if not info.get("success"):
                 return {"ok": False, "error": info.get("error", "Target inspection failed.")}
             parameter = indexed_parameter(info["parameters"], parameter_index)
@@ -1827,6 +1847,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 parameter_index=parameter_index, proposed_value=float(raw), reason="Inspected parameter candidate",
                 session_id=session_id, parameter_name=parameter_name, unit=normalized,
                 track_name=info["track_name"], observed_parameter_info=info, target_address=address,
+                display_unit=display_unit,
             )
         except (KeyError, TypeError, ValueError) as exc:
             # Schema-valid candidates still need actual readable metadata; failure cannot mint a token.
@@ -2130,6 +2151,9 @@ class LiveActionService(Tier2Tier3ControlMixin):
         _cleanup_memory()
         if not isinstance(proposal, dict) or proposal.get("schema") != DEVICE_SETUP_PROPOSAL_SCHEMA:
             return {"ok": False, "error": "A valid KENN device-setup proposal is required."}
+        if getattr(self.client, "requires_guarded_parameter_targets", False):
+            # Setup still configures by position after insertion. Refuse before insertion so an unsupported control cannot leave a new device behind.
+            return {"ok": False, "error": "Device setup requires addressed parameter configuration; this legacy setup format is unavailable."}
         if not proposal.get("requires_confirmation") or str(proposal.get("confirmation_token", "")) != str(confirm_token):
             return {"ok": False, "status": "requires_confirmation", "error": "Explicit confirmation is required for this exact device-setup proposal."}
         key = str(idempotency_key or proposal.get("action_id") or "").strip()
@@ -3163,6 +3187,9 @@ class LiveActionService(Tier2Tier3ControlMixin):
 
         address = proposal.get("target_address")
         if address is None:
+            if getattr(self.client, "requires_guarded_parameter_targets", False):
+                # Cached legacy tokens cannot acquire new authority after a transport upgrade or reconnect.
+                return fail("This backend requires a fresh guarded parameter proposal; inspect the target again.")
             try:
                 state = self.snapshot(include_mixer=False)
             except Exception as exc:
@@ -3325,6 +3352,9 @@ class LiveActionService(Tier2Tier3ControlMixin):
         return {"ok": True, "receipt": receipt}
 
     def _restore_device_parameter(self, track_index: int, device_index: int, parameter_index: int, before: Any) -> dict[str, Any]:
+        if getattr(self.client, "requires_guarded_parameter_targets", False):
+            # Positional recovery cannot prove the original object; inspection must resolve an addressed recovery.
+            return {"attempted": False, "restored": False, "error": "Recovery requires an observed parameter target."}
         try:
             self.client.set_device_parameter(track_index, device_index, parameter_index, float(before))
             info = self.client.get_device_parameters(track_index, device_index)
@@ -3346,6 +3376,9 @@ class LiveActionService(Tier2Tier3ControlMixin):
         _cleanup_memory()
         if not isinstance(proposal, dict) or proposal.get("schema") != EQ_BAND_TUNING_GAIN_PROPOSAL_SCHEMA:
             return {"ok": False, "error": "A valid KENN compound EQ proposal is required."}
+        if getattr(self.client, "requires_guarded_parameter_targets", False):
+            # This legacy compound format has two positions but no retained Live object references.
+            return {"ok": False, "error": "Compound EQ Apply requires guarded parameter targets; prepare individual addressed changes."}
         if not proposal.get("requires_confirmation") or str(proposal.get("confirmation_token", "")) != str(confirm_token):
             return {"ok": False, "status": "requires_confirmation", "error": "Explicit confirmation is required for this exact compound EQ proposal."}
         try:
@@ -3468,15 +3501,6 @@ class LiveActionService(Tier2Tier3ControlMixin):
         """Create a fresh, confirmed proposal to reverse a verified receipt."""
         result = self._propose_undo(receipt, session_id=session_id)
         proposal = result.get("proposal") if isinstance(result, dict) and result.get("ok") else None
-        if isinstance(proposal, dict) and proposal.get("device_name") and proposal.get("before_display") \
-                and not proposal.get("after_display"):
-            # "from 0.75 ratio to 0.5 ratio" on the undo card; the change it reverses was shown in Live's units.
-            from kenn.core.device_units import display_text
-
-            shown = display_text(str(proposal["device_name"]), str(proposal.get("parameter") or ""),
-                                 str(proposal.get("unit") or ""), proposal.get("after"))
-            if shown:
-                proposal["after_display"] = shown
         if isinstance(proposal, dict) and str(proposal.get("reason") or "").startswith(("Explicit user request",
                                                                                          "Restore verified KENN")):
             # The undo card showed "Explicit user request for set_volume on track 'Bass'", as if asked for afresh.
@@ -3717,6 +3741,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 return self.propose_addressed_parameter_action(
                     address=address, parameter_index=parameter_index, value=float(receipt["before"]),
                     unit="raw", parameter_name=expected_parameter, device_name=expected_device, session_id=session_id,
+                    observed_parameter_info=parameters,
+                    display_unit=str(receipt.get("unit", "")),
                 )
             return self.propose_device_action(
                 track_index=int(target["track_index"]),
