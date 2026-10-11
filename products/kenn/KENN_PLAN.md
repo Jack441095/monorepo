@@ -1439,7 +1439,7 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     `kenn-evaluation-data/2026-10-11-note-first-pack/note-first-key.json`. `build_pack.py` in that folder rebuilds
     the pack from the pinned index. To score it, join the grades with the key and add up each side. Note-first is
     wired in only if its total is at least today's.
-  - [ ] Stable system-prompt prefix, branch `draft/stable-prefix`, commit `60d889e0` on main `5170743b`, worktree
+  - [x] Stable system-prompt prefix, branch `draft/stable-prefix`, commit `60d889e0` on main `5170743b`, worktree
     `workspace/worktrees/kenn/stable-prefix/`. It moves the route, sources, mode and skill-level lines of
     `SYSTEM_PROMPT_TEMPLATE` (llm_rewrite.py) below the Rules, so every Ollama answer opens with the same 544
     tokens. Before, a new route reused 24 tokens and a new mode 248. In v4, 49 of 354 calls cached under 100 tokens.
@@ -1452,7 +1452,7 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     - Risk it could not measure: mode guidance now sits after the Rules, so it may win by recency. Watch for an
       abstain reply with a boundary line appended (fails `whole_reply_abstain_gap`, chat_grounding.py:650) or a
       dropped "Short answer:". Checked by the A/B run below and one probe pass before merge.
-  - [ ] KENN's own prompt hands the model figures the gate then refuses (found 11 Oct, aggregate counts only).
+  - [x] KENN's own prompt hands the model figures the gate then refuses (found 11 Oct, aggregate counts only).
     `build_system_prompt` appends a genre profile (`core/genre_profiles.py`: target LUFS, max peak dBFS and
     frequency bands in the description) whenever a genre word is in the question, and acoustic guidance
     (`core/acoustic_translator.py`: frequency, gain and Q) whenever a word like "boomy" is. Neither is an excerpt,
@@ -1487,13 +1487,25 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       steps" (uncommitted in the stable-prefix and prompt-figures worktrees). `check.sh` there runs the 11
       quick-fix rows on the old order with the prompt-figures fix (worktree `order-check`, main `5170743b` plus
       `bf4391da` uncommitted) and on the new order with the reworded line, to see which it is.
+    - Check result (18:15–18:19, `check.log`, `O1.*` and `F1.*` there): it was the reorder. On the old order (O1)
+      q265 wrote "Short answer:" and was accepted; on the new order with the reworded line (F1) it wrote "Short
+      answer:" again but was refused on -18 dBFS, the known gain-staging retrieval miss. No model answer lacked
+      "Short answer" in either run. Accepted O1 6 of 7, F1 5 of 7, B1 and B2 7 of 7 on these rows: noise at this
+      size. The first O1 ran without the index link (notes-only BM25) and was voided, outputs in `void-O1-no-index/`;
+      `check.sh` now refuses to run a label whose server did not load `v-5f6964698b76`.
+    - The reword is commit `d45536ef` on `draft/stable-prefix`, with `test_the_quick_fix_mode_asks_for_the_short_answer`
+      in `test_prompt_prefix_reuse.py`. quick_fix is also the fallback for any answer_mode not in MODE_INSTRUCTIONS,
+      so it reaches more turns than its name.
     - Adversary review of prompt-figures done inline (the read-only reviewer agent was refused by the permission
       check): no figure reaches either prompt path for any of the 6 genre profiles or 14 acoustic words. Two wording
       faults to fix before merge: "flabby" reads "bell" though its fix is a compressor, and "de-esser cut" reads
       oddly. Fix: in `build_acoustic_guidance_prompt`, a dynamics entry says "compressor", and cut or boost is added
       only for a bell or shelf; plus a test that "flabby" says compressor.
-    - Left: the q265 check, the wording fixes with tests, rebase prompt-figures onto stable-prefix, one probe
-      pass, merge both branches in order.
+    - Done: prompt-figures rebased onto `d45536ef` (its fix is now `dadb8ec8`), and the wording fix is `398546aa`
+      with `test_a_dynamics_word_asks_for_a_compressor_not_an_eq_band`. Full suite on `398546aa`: 4633 passed,
+      16 skipped.
+    - Merged 11 Oct into main as `e3673444` (stable-prefix) then `def7a83c` (prompt-figures), both `--no-ff`. The
+      probe pass before merge is the v5 bench's first probe run instead of a separate run.
   - [x] Count how often the HTTP background path reruns routing and retrieval in `answer_payload` after it
     builds the template, and drop the repeat if it costs time. Closed 11 Oct: v4 template_seconds median 0.07 s, max
     0.14 s, n=378. The repeat is not worth a change.
@@ -1512,6 +1524,13 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   - [ ] v5 bench. Copy `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v4/bench.sh`, then change its OUT
     folder, worktree and index check to the new index. Keep the same run order (probe, held-out ×2, probe,
     held-out, probe), Live open, mains power. Record each run here as it finishes.
+    - Runs on the pinned index `v-5f6964698b76`, not a rebuilt one, while the reference note waits on Jack (above),
+      so v5 compares directly with v4 and the two merged fixes can be credited. Harness unchanged from v4 (no
+      cool-down) until Jack answers the question above.
+    - Script `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v5/bench.sh`, worktree
+      `workspace/worktrees/kenn/bench-v5/` at the commit that records this entry (code as `def7a83c`), with the
+      index and minilm links under `apps/backend/src/kenn/`, port 8095. Plan edits during the bench stay
+      uncommitted until it ends, so the receipts sit on the bench commit or its child.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
