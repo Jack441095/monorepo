@@ -1673,7 +1673,37 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v7/bench.sh` (v6's harness with v5's six runs).
     Worktree `workspace/worktrees/kenn/bench-v5/` moved to `f2c4d738` (detached), port 8095, pinned index
     `v-5f6964698b76` (companion confirmed it), Live open, mains, no builds, swap 2.8 GB used (v6 3.0 GB). Started
-    22:17. Results to follow here.
+    22:17, ended 23:10.
+    - Counts, `gate_model_within_15s`, every run on `f2c4d738` with Live open and on mains. All six companions loaded
+      `v-5f6964698b76` with no warm-up or embed errors, and the harness never had to wait for quiet. Swap stayed at
+      3.1–3.2 GB.
+
+      | Run | Window | Within 15 s | Bar | Median final | Errors | Model answers over 15 s |
+      |---|---|---|---|---|---|---|
+      | Probe 1 | 22:17–22:24 | 37/44 | 31 | 6.14 s | 0 | 0 |
+      | Held-out 1 | 22:24–22:35 | 55/72 | 51 | 6.15 s | 0 | 0 |
+      | Held-out 2 | 22:35–22:46 | 54/72 | 51 | 6.15 s | 0 | 0 |
+      | Probe 2 | 22:46–22:52 | 36/44 | 31 | 5.66 s | 0 | 0 |
+      | Held-out 3 | 22:52–23:04 | 55/72 | 51 | 6.15 s | 0 | 0 |
+      | Probe 3 | 23:04–23:10 | 36/44 | 31 | 5.66 s | 0 | 0 |
+
+      Held-out mean 54.67. Every held-out run is over 51 on its own, not just on average. The earlier best held-out
+      runs were v4 48 and v6 50.
+    - Held-out, aggregate only:
+      - Rejections a run: 4 unsupported figures each run. 0 misattributed (v6 had 2). 0 unshown ids. 0–2 overlap
+        or quality. 1 structure check.
+      - Rescues: the citation repair rescued 2, 4 and 3 answers. The figure cut alone rescued 4, 7 and 6.
+      - Model accepted 55, 54 and 55 of 67.
+    - Probe: the citation repair rescued 0 in each run; the figure cut rescued 3, 6 and 6. Rejections were 3–4 a
+      run, from figures, structure, overlap and quality.
+    - Counts helper: `v7sum.py` in the bench dir, which prints counts only.
+    - Verdict on the counts: both halves of the 15 s gate are met in one session, three probe runs in a row and three
+      held-out runs. The gate itself stays open on two things:
+      1. Owner-graded correctness (8 Oct decision). The review sheets for grading are `cand-*.review.md` in the bench
+         dir.
+      2. The adversary review of `draft/citation-repair` was not done before its merge. It is running now, after the
+         fact, and its result goes here. The same review was missed for `draft/audit-fixes` (`2377eed1`), which
+         also feeds these runs. Its "Review (inline)" note above is the builder's own read.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
