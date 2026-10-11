@@ -1303,10 +1303,70 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
 - [x] Candidate qualification bench v3, 10 Oct 2026 (`draft/excerpt-id-format` `f82d4bdd`):
   Adds symmetrical 12+ char hex prefix resolution (`q116`), true peak headroom dB/dBTP equivalence (`1.0 dB` headroom supported by `-1 dBTP` ceiling note, `q192`), and Ollama model buffer purge (`keep_alive: 0`) between runs to prevent swap clock degradation. 107 scoped regression tests passing.
   Local 4B model (`qwen3:4b-instruct-2507-q4_K_M`), fake Live, Live closed, mains power, pinned index `v-5f6964698b76`, `KENN_LLM_CACHE=0`.
-  - **Probe (>= 31 bar, 3 in a row): PASSED.** Three consecutive runs at 35/44 (79.5%), 35/44 (79.5%), and 34/44 (77.3%) within 15 s (mean 34.67 / 44, 78.8%). 100% of delivered model answers arrived within 15 s. Median final latency: 6.13 s, 6.15 s, 6.17 s (completely flat, zero clock degradation).
-  - **Held-out (>= 51 bar): PASSED.** Run 2 crossed the bar with **51 model deliveries** of 72 (70.8%, 48 within 15 s), achieving a **71.6% model acceptance rate** when attempted. Run 1 delivered 47 (45 within 15 s), Run 3 delivered 44 (42 within 15 s). Mean model delivery: 47.33 / 72.
+  - **Probe (>= 31 bar, 3 in a row): met on paper, Live closed.** Three consecutive runs at 35/44 (79.5%), 35/44 (79.5%), and 34/44 (77.3%) within 15 s (mean 34.67 / 44, 78.8%). 100% of delivered model answers arrived within 15 s. Median final latency: 6.13 s, 6.15 s, 6.17 s. Not a qualifying session: the gate asks for Live open.
+  - **Held-out (>= 51 within 15 s): not met.** 45, 48, 42 of 72 within 15 s (`gate_model_within_15s`, the metric this receipt names), mean 45.0 against main's 44.75. Run 2 had 51 model deliveries, but 3 of them were context-only setup turns, which the gate does not count (none of the 51 was late), so delivery alone does not cross the bar. The probe moved +2.7 and held-out +0.25, so the gain is mostly on the set we tune against.
+  - **Gate stays open** (8 Oct decision below): owner-graded correctness is still owed, and no adversary review of `draft/excerpt-id-format` is recorded before its merge to main (`22ab2210`). A read on 11 Oct found two grounding holes in it: `chunk12` resolves to excerpt 2 while `chunk1`/`excerpt1` never resolve, and any "1 dB" figure (an EQ cut, say) passes whenever a `-1 dBTP` ceiling note is shown.
+  - **Held-out rows tuned on:** the v3 fixes name `q116` and `q192`, and both are held-out ids. Those two of the 72 are no
+    longer clean. From here, diagnose on the probe and the 225 non-held-out rows only.
   - **Rejections:** Unshown excerpt citations dropped to 0 in run 2; unsupported measurements dropped to 11.
   - **Blind grading:** Generated `heldout-grading.html` (56 differing questions, 98 answers to grade) for Jack's blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench-v3/`).
+    Published privately for Jack on 11 Oct (claude.ai artifact). `grade_page.py` was edited a minute after the page
+    was written; a fresh regeneration from cand-heldout2 is byte-identical to the page and key on disk.
+- [x] Grounding holes, 11 Oct 2026 (`draft/grounding-holes` `f1524def` to `376b4f00`, merged `5aeee7f1`). An ordinal citation
+  resolves only on a full match (`source1`, `excerpt1`, `chunk1`, `ex1`, `1`), and one past the shown excerpts
+  resolves to nothing, so `chunk12` no longer lands on excerpt 2. The dB/dBTP equivalence from `f82d4bdd` is gone
+  outright: a rework that kept it for headroom clauses still let EQ moves and sign flips through. Replaying all 18
+  runs of the v1–v3 benches without it changed no verdict. Also stops `test_llm_task_switch` reading the local `.env`.
+  Full suite 4564 passed, 16 skipped at `7d5bdea8`.
+  - Adversary review of `f1524def` found 10 things; dropping the equivalence closes 1, 2, 3, 6 and 8. Finding 9 (a
+    unit split across two stream chunks gets past the prefix guard) is already on main. The re-review of `7d5bdea8`
+    ran once Jack gave the go-ahead. It found that a typed "-1 true peak" became a plain "1 dB", so "cut 1 dB on
+    the vocal bus" passed; `fd87aaf7` keeps the sign and `376b4f00` keeps "1-2 true peak" a range. Merge-ready at
+    `376b4f00`; replaying the v1–v3 benches with both commits changes no verdict.
+  - Decided 11 Oct, with Jack's go-ahead to make the open calls (he can reverse any of them):
+    - Ordinal ids keep resolving, on a full match and only inside the shown excerpts (finding 4). The figure still
+      has to be in the excerpt the id lands on, so an ordinal cannot bring in a figure; refusing them would only
+      cost answers that cite by position.
+    - The dB/dBTP equivalence stays out, although that undoes part of the `q192` accommodation. It was tuned on a
+      held-out row, and its narrower rework still leaked.
+    - `q116` and `q192` stay named above and in `test_claim_citation_grounding.py`: they are in git history
+      already, and deleting the names hides nothing. The next qualifying run reports held-out on all 72 and on
+      the 70 rows still clean.
+    - The 11-character near-miss id (`psy-masking-bands`, below) stays refused. Accepting a shortened id is the
+      same kind of loosening `chunk12` was.
+- [x] Figure excision, 11 Oct 2026 (`draft/figure-excision` `a4570f80` to `cf15592f`, merged `ec6a4b9d`). Before
+  a refused figure costs its sentence, cut it out when it only sat beside the step: an aside in brackets or between
+  dashes that opens on "e.g.", "like", "such as" and the like, or the frequency on a high- or low-pass. Anything
+  else still takes its sentence. Over the 12 probe runs of 10 Oct the sentence drop saved 0 of 32 figure refusals;
+  this saves 13, and the v3 probe would read 37, 37, 36. Held-out, counted only: 1 save a run, so 46, 49, 43 against
+  51. Excision does not close the held-out bar on its own.
+  - Seven adversary rounds; the fix from the seventh (`cf15592f`) was not reviewed again. Every round confirmed each
+    salvaged text is judged by the gate again, so no refused figure can ship. Their fixes stop a sound step shipping
+    as a different instruction: unmarked brackets (conditions, limits) stay; an aside ends at any clause break or at
+    a second comma; a range dash never closes one; an example stays when it states a limit, does not end on its
+    figure, is needed by the word before it, or runs on into a second step (a joining word, more than 6 words, or
+    more than 2 words between two figures); and a high-pass keeps its figure when a bound follows (", max", ". No
+    higher."). After each round's fixes the 32 refused probe answers salvage to the same text, so the 13 saves held,
+    and held-out still saves 3, all inside 15 s. The new tests of the last two rounds fail on the commit before.
+  - Accepted, not fixed, since none ships a refused figure: a bound off the list (", nothing more.", ", cap it
+    there.", ", that's your limit.") leaves "Set the high-pass, nothing more."; a dash that closes one aside and
+    opens the next leaves an unpaired dash; a negated move ("don't high-pass at 100 Hz") reads wider without its
+    figure; a Unicode minus is not read as a sign; the stream guard's false stops were on main before this.
+  - Full suite 4588 passed, 16 skipped on main with both branches merged (`ec6a4b9d`).
+  - No cut can save a figure that is the step itself: `dig-gain-staging` asks for -18 dBFS on all 12 runs and the
+    note has no such figure (the reference-numbers note above), and likewise -2 dBTP, LUFS targets, 0 dB on the
+    phase step and 15 ms feed-forward.
+  - Saved answers often lose their Check line: the 128-token cap cuts it mid-sentence, the whole-sentence ending
+    drops it, and the gate accepts the answer without it.
+- [x] Late answers, 11 Oct 2026: there are none. In v3, 0 probe and 0 held-out model answers came after 15 s
+  (median final 6.1–6.7 s, Live closed; re-measure with Live open). Every probe miss is a refusal or an abstain:
+  - 3 figure refusals a run (excision above), 1–2 unshown-id citations (`psy-masking-bands` cites an 11-character
+    id, one short of a shown 12-character one, on every run), and 1 overlap or misattribution;
+  - 4 abstains a run, the same four rows. `live-sends-prepost`, `syn-resonance` and `psy-precedence` were shown
+    excerpts that name their topic and the model still answered "insufficient context". `dig-oversampling-saturation`
+    was shown nothing on aliasing although 31 chunks mention it (the synonym item above).
+  - Held-out, counted only: 11–14 figure refusals a run (6–10 where the figure is the step), 4 abstains, 2–6
+    citation, overlap or quality refusals, 3 not sent to the model.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
