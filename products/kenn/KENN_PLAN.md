@@ -1398,7 +1398,10 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   written while answers were late; v3 had none, so its speed work waits on v4's Live-open timings. What it says
   about wrong and missing answers still holds. Since 8 Oct owner grades, not delivery, are the measure, so each
   item is judged on grades as well as the gate.
-  Jack, 11 Oct: make these once the v4 bench has finished, in this order.
+  Jack, 11 Oct: make these once the v4 bench has finished, in this order. After v4 he asked for the fixes and a v5
+  bench. He chose to grade the note-first pack before it counts (it counts and is wired in only if notes grade at
+  least as well as the current answers), and approved drafting the reference-numbers note for his check and
+  rebuilding the index, so v5 runs both sets on the new index and is not directly comparable with v1–v4.
   - [ ] Note-first comparison first ([5 Oct research §7.1](docs/research/KENN_GLM_COMPREHENSIVE_RESEARCH_2026-10-05.md),
     and "Review of 4 October" above). 6–10 held-out refusals a run are rows where the refused figure is the step
     itself, which no excision can save, and a served note's figures are right by construction. Build the
@@ -1426,6 +1429,46 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   - Product rather than gate (5 Oct stage 2): the producer's measured LUFS, true peak and crest as evidence the
     model may cite, and the selected track's device chain in the prompt. That is what only KENN can do, but a
     fake-Live bench cannot see it, so it needs its own owner-graded set.
+- [ ] Work in flight toward the v5 bench, 11 Oct 2026. Pick up here: each line says where the work is and what is
+  left. Jack asked for every change to be written down here as it lands.
+  - [ ] Note-first grading pack, built and waiting on Jack's grades. 40 questions: 20 probe and 20 from the
+    non-held-out set, none from the 75 held-out. Each shows today's answer (fallbacks included) and the Short answer
+    and Try this of the top retrieved note, served as written, in shuffled A/B order. Grades are Right 2, Partly 1
+    and Wrong 0. Page: https://claude.ai/artifact/G3A5dmySDgPnwLErYqLzrt (private to Jack). Grades are stored in its
+    `grades` collection as `<id>-<A|B>`. Which slot is the note is in
+    `kenn-evaluation-data/2026-10-11-note-first-pack/note-first-key.json`. `build_pack.py` in that folder rebuilds
+    the pack from the pinned index. To score it, join the grades with the key and add up each side. Note-first is
+    wired in only if its total is at least today's.
+  - [ ] Stable system-prompt prefix, branch `draft/stable-prefix`, commit `60d889e0` on main `5170743b`, worktree
+    `workspace/worktrees/kenn/stable-prefix/`. It moves the route, sources, mode and skill-level lines of
+    `SYSTEM_PROMPT_TEMPLATE` (llm_rewrite.py) below the Rules, so every Ollama answer opens with the same 544
+    tokens. Before, a new route reused 24 tokens and a new mode 248. In v4, 49 of 354 calls cached under 100 tokens.
+    Measured on the 4B: those calls spent about 4.0 s reading the prompt against 1.7 s with the prefix reused, and
+    5 of the 13 answers over 12 s were among them. The new test `test_prompt_prefix_reuse.py` fails on main and
+    passes on the branch. Full suite: 4590 passed, 16 skipped. Left: adversary review, then merge.
+  - [ ] KENN's own prompt hands the model figures the gate then refuses (found 11 Oct, aggregate counts only).
+    `build_system_prompt` appends a genre profile (`core/genre_profiles.py`: target LUFS, max peak dBFS and
+    frequency bands in the description) whenever a genre word is in the question, and acoustic guidance
+    (`core/acoustic_translator.py`: frequency, gain and Q) whenever a word like "boomy" is. Neither is an excerpt,
+    so the gate refuses any of those figures in the answer.
+    - v4 probe: 0 of 141 row-runs got a genre profile, so the probe never sees this.
+    - v4 held-out: 90 of 237 row-runs got one and 24 got acoustic guidance. 10 answers were rejected for
+      refusing a figure KENN's own system prompt supplied, about 3 a run against a gap of about 6 to the bar.
+    - The genre keywords fire on 27 of the 75 held-out questions and 101 of the 240 non-held-out ones.
+    - Plan: on the Ollama answer path, keep the genre and acoustic lines' words but drop their figures, so the
+      prompt stops offering numbers the gate refuses. Do not widen the gate to accept them instead: the profiles'
+      -0.3 dBFS peak contradicts the -1 dBTP convention, and some acoustic targets look wrong (boomy → 40 Hz
+      high-pass). Check the fix on non-held-out rows only. New worktree `workspace/worktrees/kenn/prompt-figures/`,
+      tests, adversary review, merge.
+  - [ ] Count how often the HTTP background path reruns routing and retrieval in `answer_payload` after it
+    builds the template, and drop the repeat if it costs time.
+  - [ ] Reference-numbers note: draft it from published conventions for Jack to check, then rebuild the index.
+  - [ ] Ask Jack about a declared cool-down between bench runs. The fanless Air's decode fell from about 29 to
+    about 20 tok/s mid-session in v4, and 255 of 339 calls hit the 128-token cap. Do not change the harness
+    without his OK.
+  - [ ] v5 bench. Copy `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v4/bench.sh`, then change its OUT
+    folder, worktree and index check to the new index. Keep the same run order (probe, held-out ×2, probe,
+    held-out, probe), Live open, mains power. Record each run here as it finishes.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
