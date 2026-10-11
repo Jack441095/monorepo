@@ -1445,7 +1445,13 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     tokens. Before, a new route reused 24 tokens and a new mode 248. In v4, 49 of 354 calls cached under 100 tokens.
     Measured on the 4B: those calls spent about 4.0 s reading the prompt against 1.7 s with the prefix reused, and
     5 of the 13 answers over 12 s were among them. The new test `test_prompt_prefix_reuse.py` fails on main and
-    passes on the branch. Full suite: 4590 passed, 16 skipped. Left: adversary review, then merge.
+    passes on the branch. Full suite: 4590 passed, 16 skipped.
+    - Adversary review (11 Oct): merge after fixes. All 2160 rendered combinations hold the same words as before,
+      only reordered; the test fails on old code; 55 scoped tests pass; no new ruff errors. The comment fixes it asked
+      for (machine, n, tokenizer, and when reuse does not happen) are commit `f38d2712` on the same branch.
+    - Risk it could not measure: mode guidance now sits after the Rules, so it may win by recency. Watch for an
+      abstain reply with a boundary line appended (fails `whole_reply_abstain_gap`, chat_grounding.py:650) or a
+      dropped "Short answer:". Checked by the A/B run below and one probe pass before merge.
   - [ ] KENN's own prompt hands the model figures the gate then refuses (found 11 Oct, aggregate counts only).
     `build_system_prompt` appends a genre profile (`core/genre_profiles.py`: target LUFS, max peak dBFS and
     frequency bands in the description) whenever a genre word is in the question, and acoustic guidance
@@ -1460,9 +1466,29 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       -0.3 dBFS peak contradicts the -1 dBTP convention, and some acoustic targets look wrong (boomy → 40 Hz
       high-pass). Check the fix on non-held-out rows only. New worktree `workspace/worktrees/kenn/prompt-figures/`,
       tests, adversary review, merge.
-  - [ ] Count how often the HTTP background path reruns routing and retrieval in `answer_payload` after it
-    builds the template, and drop the repeat if it costs time.
+    - Done as branch `draft/prompt-figures`, commit `bf4391da` (built on `60d889e0`; rebase onto `f38d2712` before
+      merge). `_FIGURE_ASIDE_RE` in llm_rewrite.py strips bracketed figures from the genre description, the LUFS,
+      peak and crest targets are left out on both the Ollama and MLX paths, and `build_acoustic_guidance_prompt`
+      now says "'muddy': bell cut." with no Hz, dB or Q. The DSPRecommendation keeps its numbers for code that sets
+      EQ Eight. New `tests/test_prompt_figures.py`: 41 of its cases fail on old code, each on its figures. Full
+      suite on the branch: 4631 passed, 16 skipped.
+    - A/B check on 40 non-held-out rows that fire a genre or acoustic word (39 genre, 3 acoustic; seed 20261011),
+      in `kenn-evaluation-data/2026-10-11-prompt-figures/` (`select.py`, `ids.txt`, `run.sh`). Order A1 B1 B2 A2,
+      A = stable-prefix `f38d2712`, B = prompt-figures `bf4391da`, pinned index `v-5f6964698b76`, port 8097.
+      Results go in `<label>.jsonl`, `.summary.json`, `.out` and `run.log` there. Started 17:47.
+    - Left: A/B results here, one probe pass on the branch, adversary review, merge both branches in order.
+  - [x] Count how often the HTTP background path reruns routing and retrieval in `answer_payload` after it
+    builds the template, and drop the repeat if it costs time. Closed 11 Oct: v4 template_seconds median 0.07 s, max
+    0.14 s, n=378. The repeat is not worth a change.
   - [ ] Reference-numbers note: draft it from published conventions for Jack to check, then rebuild the index.
+    - Checked first (11 Oct): the premise is mostly false. -18 dBFS (`jack-gain-staging-targets.md`), -14 LUFS
+      and -1 dBTP are already in indexed notes. The misses are retrieval: dig-gain-staging pulls three general
+      gain-staging notes instead. Across the 3 v4 probe runs 11 figures were refused, 6 of them on dig-gain-staging,
+      and two of the others were wrong anyway (-16 LUFS, 300 ms momentary). The 8 Oct study puts figures in no note
+      at all at 9 of 116.
+    - Upside is about 2 answers a run at most, and a rebuild makes v5 incomparable with v4. Recommended to Jack:
+      hold the note and the rebuild until after v5, and run v5 on the pinned index so the two fixes can be credited.
+      Waiting on his answer.
   - [ ] Ask Jack about a declared cool-down between bench runs. The fanless Air's decode fell from about 29 to
     about 20 tok/s mid-session in v4, and 255 of 339 calls hit the 128-token cap. Do not change the harness
     without his OK.
