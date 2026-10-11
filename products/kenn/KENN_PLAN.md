@@ -1,6 +1,6 @@
 # KENN plan
 
-Updated 2 October 2026. This is KENN's sole product roadmap, architecture direction,
+Updated 11 October 2026. This is KENN's sole product roadmap, architecture direction,
 work queue and progress checklist. Start here, then read the named source, tests and
 evidence for the task. `AGENTS.md` governs repository work. Dated reports describe
 their recorded commit and environment; they do not authorize work or prove today's
@@ -1393,7 +1393,8 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     median final rose run by run from 6.6 s to 8.2 s with swap flat at 4.2–4.6 GB.
     Where held-out rows go, per run over the 76 that expect an answer: 12–13 rejected for unsupported figures,
     about 8 never sent to the model (weak results, guards, caveats), 4 abstains, 0–3 late, 0–3 other rejections.
-    20 rows are lost in all three runs, 7 in two, 10 in one.
+    20 rows are lost in all three runs, 7 in two, 10 in one. (Over the 72 gate-eligible rows, without the four
+    setup turns, that is 19, 7 and 10; Jack's 11 Oct audit recounted it.)
 - [ ] Next steps from the 2, 3 and 5 Oct research, read against the v3 misses on 11 Oct. Most of the research was
   written while answers were late; v3 had none, so its speed work waits on v4's Live-open timings. What it says
   about wrong and missing answers still holds. Since 8 Oct owner grades, not delivery, are the measure, so each
@@ -1531,6 +1532,100 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       `workspace/worktrees/kenn/bench-v5/` at the commit that records this entry (code as `def7a83c`), with the
       index and minilm links under `apps/backend/src/kenn/`, port 8095. Plan edits during the bench stay
       uncommitted until it ends, so the receipts sit on the bench commit or its child.
+    - Probe run 1 (18:25–18:33): 32/44 within 15 s (bar 31), median final 6.15 s, 0 errors, no late answers; v4
+      had 35. Model accepted 32 of 45, and every model answer kept "Short answer:". Rejections: 4 citing an excerpt
+      id never shown (each a garbled copy of a real 12-hex id, e.g. `#56b4b3076d` for `#56b4b3da1e6b`), 3
+      unsupported figures (150 ms, -10 dBFS, and -18/-12 dBFS on dig-gain-staging again). Against v4 run 1, three
+      rows lost to garbled ids, two to figures, and psy-masking-bands now abstains on its own ("critical bands" is
+      in none of its three excerpts, which is true); two rows gained. Swap 2.4 GB at the end.
+    - Held-out run 1 (18:33–18:45): 43/72 within 15 s (bar 51), median final 7.15 s, 0 errors, one late answer
+      (15.3 s); v4 had 48/44/43. Model accepted 44 of 67. Rejections: 11 unsupported figures (v4 13/12/13), 2
+      structure check (v4 1 in three runs; no text is exposed for those, so the cause is unknown), 2 misattributed
+      figures, 1 garbled excerpt id. The figures fix did its job: 0 of the 11 refused a figure the old prompt
+      supplied, against 2/4/3 in v4 (`prompt_figures_v5.py` in the v5 folder, aggregate only; `v5sum.py` there
+      prints each run). But the model still invents other figures on those rows, so the count barely fell. Against
+      the rows v4 delivered in at least two of three runs, 9 were lost (4 to figures, 2 to misattributed figures, 2
+      to the model abstaining on its own, 1 late) and 6 rows v4 mostly missed came through. Model-written abstains:
+      5 here and 6 on probe run 1, against 4 and 5 in every v4 run; one more each, worth watching on runs 2 and 3.
+    - Held-out run 2 (18:45–18:59): 42/72 within 15 s, median final 8.63 s, model accepted 42 of 67. Rejections:
+      8 unsupported figures, 3 excerpt ids never shown, 3 quality, 2 overlap, 2 structure, 1 Live claim. 0 refused
+      a figure the old prompt supplied; 5 model-written abstains.
+    - Stopped at 19:00 during probe run 2, at Jack's call: held-out 43 and 42 cannot average up to 51 in the
+      remaining run, so the time goes to the audit fixes. The partial run 2 output is in `partial/`, not counted.
+    - Verdict: not qualified. Probe 32 on one run; held-out 43 and 42 against v4's 48/44/43. The figures fix is a
+      real gain (0 prompt-supplied figures refused, against 2–4 a run). The loss came with the stable-prefix
+      reorder: v5 held-out had 7 to 10 rejections a run for structure, quality, overlap and unshown ids, where v4
+      had 0 to 3. That is the reorder's measured cost, so it was reverted rather than split out on a further A/B
+      (audit item 1 below).
+  - [ ] Jack's inference and answer audit, `docs/KENN_INFERENCE_AND_ANSWER_AUDIT_2026-10-11.md`, written with
+    ChatGPT during v5 (evidence to about 18:42). It starts no new programme; its five items are read into this list.
+    Checked against the raw data the same evening:
+    - Confirmed: accepted generation rows in `routes.jsonl` log milliseconds × 1000. `make_answer` passes
+      `_ma_llm_ms` into the `seconds` argument of `_log_generation_outcome` (chat_answer.py:1089 and 1107); the
+      rejected paths pass seconds. Provider phase details and the harness clocks are not affected.
+    - Confirmed: main's own index is `v-db8c6334cf63`. The gate benches pin `v-5f6964698b76`, so a pass would not
+      qualify the index main ships.
+    - Confirmed: the answer-tune correctness figures below are Claude's partly blind grades (its `results.md` says
+      so); now marked there.
+    - Next, after v5 ends, one change per A/B on the probe and non-held-out rows only:
+      1. If v5 held-out averages below v4, split the two merged changes (old prompt order with the figures fix
+         against the new order), so a cost from the reorder is not hidden by the figures gain.
+      2. Fix the accepted-row timing with a unit test, then take timing from request-scoped usage rather than the
+         global last call.
+      3. Short ordinal citations ([1], [2], [3]) for the shown excerpts instead of 12-hex ids. v5 probe run 1 lost 4
+         answers to garbled ids, and the resolver already maps an ordinal on a full match.
+      4. An answer contract that fits 128 tokens: 255 of 339 v4 calls ended on the cap.
+      5. The synonym fix, then the reranker only if a ranking gap remains (above).
+      Note-first stays waiting on Jack's grades.
+    - Done 11 Oct as branch `draft/audit-fixes` (worktree `workspace/worktrees/kenn/audit-fixes/`, on `20b3de3c`),
+      merged into main as `2377eed1` (`--no-ff`). Jack asked for these and then one probe and one held-out run, not
+      three of each, to get a faster read. Items 1–3 only; 4 and 5 not started.
+      - `5f6029df` reverts the stable-prefix merge `e3673444`: route and mode lines back above the Rules, the
+        quick_fix line back to its old wording, `test_prompt_prefix_reuse.py` removed. The prompt-figures fix
+        (`dadb8ec8`, `398546aa`) stays. Item 1 called for an A/B to split the two; the v5 counts above already
+        put the extra rejections on the reorder, so it was reverted outright to save a bench.
+      - `c288275a` passes seconds to `_log_generation_outcome` on both accepted paths of `make_answer`. Two
+        tests in `test_generation_outcome_log.py` drive a 6 s fake clock through each path and expect 6.0. The
+        request-scoped usage half of item 2 is not done.
+      - `d783942b` numbers the excerpts in `model_evidence` (`id="1"`, `id="2"`…) instead of the 12-hex chunk id,
+        and the Rules line now reads "a figure from the excerpt with id="2" is written 150 ms [#2]". The gate builds
+        its shown list through the same `model_evidence` call on the same budget, and `_resolve_chunk_id` already
+        maps an ordinal n to `shown[n - 1]`, so the number and the excerpt checked cannot drift. New tests: the
+        prompt's ids match the gate's, `[#1]`/`[#2]` resolve to the right chunks, and `[#3]` with two shown is
+        refused as never shown. The Sources list is unchanged.
+      - Full suite on `d783942b`: 4634 passed, 16 skipped (with the index and minilm links in the worktree; without
+        them `test_query_typo_correction` fails and about 71 skip).
+      - Review (inline): nothing outside the tests parses the `[#…]` tag, enhance() hands the model and the gate
+        the same `results`, and the 128-token cap is unchanged.
+      - Follow-up for the product, not the gate: answers show `[#2]` to the producer as written (before, a 12-hex
+        id). Strip the tags or map them to the Sources list numbering.
+      - Watch in v6: misattributed figures. A model that tags every figure [#1] is now caught as misattribution
+        rather than as an unshown id, so that count may rise as the unshown count falls.
+  - [ ] v6 development bench, 11 Oct: one probe run and one held-out run on main `2377eed1`, at Jack's call. A read
+    on the audit fixes, not a qualification: a pass here earns the full three-run bench. Script
+    `kenn-evaluation-data/2026-10-11-gate-dev-bench-v6/bench.sh` (v5's harness with only `cand-run1` and
+    `cand-heldout1`), worktree `workspace/worktrees/kenn/bench-v5/` detached at `2377eed1`, port 8095, pinned
+    index `v-5f6964698b76`, Live open, mains. Started 19:59.
+    - Probe run 1 (19:59–20:07): 37/44 within 15 s (bar 31), the best probe run so far (v3 35/35/34, v4 35, v5
+      32). Median final 6.13 s, 0 errors, no late answers, every model answer kept "Short answer:". Model accepted
+      37 of 45. Rejections: 2 unsupported figures, 1 structure check. 0 unshown excerpt ids (v5 run 1 had 4) and 0
+      misattributed figures.
+    - Held-out run 1 (20:07–20:18): 50/72 within 15 s (bar 51), one short, the best held-out run so far (v4
+      48/44/43, v5 43/42). Median final 6.19 s (v5 7.15 and 8.63), 0 errors, no model answer over 15 s. Model
+      accepted 50 of 67. Rejections: 8 unsupported figures (0 of them a figure the pre-fix prompt supplied), 2
+      misattributed figures, 1 structure check, 1 overlap, 0 unshown ids, 0 quality; plus 2 weak-results guards and 1
+      hardware caveat that never reach the model. Against the 49 rows v4 delivered in at least two of three runs,
+      5 were lost (2 misattributed, 2 figures, 1 overlap) and 9 others came through.
+    - Why it is faster and cites less: model seconds on held-out fell to a median of 6.2 s and a max of 9.6 s (v5
+      7.4 and 8.5, max 14.9). Only 4 of 53 held-out model answers carry a `[#n]` tag at all, where 17 to 19 carried a
+      hex tag in v5. So most of the gain is the model dropping tags rather than copying them right. Grounding is
+      unchanged by that: every figure in an answer is still checked against the shown excerpts
+      (`_unsupported_measurements` in chat_grounding.py, tag or no tag); a tag only adds the per-excerpt check.
+    - Read: one run each, and v4's held-out spread was 5 rows run to run, so 50 is within noise of both 51 and 46.
+      It is the first time a run has come within one row of the bar. Next, Jack's call: the full qualifying bench
+      (probe ×3, held-out ×3, v5's order) on `2377eed1` unchanged, or one more fix first. The cheapest candidate is
+      the 2 misattributed figures; the 8 invented figures are the larger pool but have no quick fix.
+      The gate also still owes owner-graded correctness (8 Oct decision above), whatever the counts.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
@@ -1567,7 +1662,7 @@ phrasings, so this run stops early and is judged only on sets it never saw.
   training prompt (substring check, 8 Oct).
 - [x] Teacher answers from `qwen3:32b`. 505 were kept: 448 train and 57 valid.
 - [ ] Jack grades about 40 of the kept answers before training. Not done: the grading page was built, but training
-  went ahead with no grades in. A 40-answer sample graded on 8 Oct was 37% right, 45% partly right and 17% wrong.
+  went ahead with no grades in. A 40-answer sample Claude graded on 8 Oct was 37% right, 45% partly right and 17% wrong.
   That is no better than the plain 4B, so the teacher was not a stronger source of correct answers.
 - [x] LoRA on GPU 0 in the existing `c6/venv`: rank 16, best validation loss 0.693 at step 60, early stop at 68.
 - [x] Merged, converted to Q4_K_M and served on the Mac as `kenn-answer1`. Benched 8 Oct on main `86f69540` with index
@@ -1576,9 +1671,10 @@ phrasings, so this run stops early and is judged only on sets it never saw.
   - held-out 58/72 vs 44/72;
   - held-out median 6.13 s vs 6.67 s.
 - [x] Keep it only if both sets rise, the median is no slower and the negative-advice guard holds. **Not kept.** It
-  meets the first two on paper, and the guard was not checked. Grading the 62 held-out rows where the two models
-  differ found that the extra deliveries are mostly wrong advice. Of the 16 rows it newly got through, 1 is right,
-  7 are partly right and 8 are wrong, e.g. de-ess at 500 Hz, a "Warp device" in Live, and high crest factor called
+  meets the first two on paper, and the guard was not checked. Claude's partly blind grading (not Jack's; his
+  blind page is still the authority) of the 62 held-out rows where the two models differ found that the extra
+  deliveries are mostly wrong advice. Of the 16 rows it newly got through, 1 is right, 7 are partly right and 8
+  are wrong, e.g. de-ess at 500 Hz, a "Warp device" in Live, and high crest factor called
   squashed. Overall it is 26% right / 28% wrong against main's 33% / 17%.
 
   The gate counts delivery, so it could not see this. `kenn-answer1` stays in Ollama on the Mac but is not wired
