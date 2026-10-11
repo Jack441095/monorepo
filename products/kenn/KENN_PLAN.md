@@ -1367,15 +1367,38 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     was shown nothing on aliasing although 31 chunks mention it (the synonym item above).
   - Held-out, counted only: 11–14 figure refusals a run (6–10 where the figure is the step), 4 abstains, 2–6
     citation, overlap or quality refusals, 3 not sent to the model.
-- [ ] Candidate qualification bench v4, 11 Oct 2026 (main `412fc628`, both merges above), the first with Live open.
+- [x] Candidate qualification bench v4, 11 Oct 2026 (main `412fc628`, both merges above), the first with Live open.
   Same harness as v3: `qwen3:4b-instruct-2507-q4_K_M`, fake Live backend (Live is open as load only), mains, pinned
   index `v-5f6964698b76`, `KENN_LLM_CACHE=0`, model purged between runs. Started 16:07 with 2 GB of swap already in
   use. Results in `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v4/`.
   - Probe run 1: 35/44 within 15 s (bar 31), median final 6.62 s, 0 errors. Excision projected 37.
+  - Held-out run 1: 48/72 within 15 s (bar 51), median final 7.18 s, 0 errors; v3 had 45, excision projected 46.
+    Model accepted 48 of 67 attempts; 13 rejections for unsupported measurements. No model answer past 15 s in
+    either run so far. Swap 3.9 GB at start, 4.6 GB at the end.
+  - Held-out run 2: 44/72 within 15 s (bar 51), median final 7.70 s, 0 errors; v3 had 48, excision projected 49.
+    Model accepted 46 of 67; 12 unsupported-measurement rejections. Two model answers landed late (17.3 s, 18.9 s),
+    the first late answers with Live open. Swap 4.6 GB at start, 4.4 GB at the end.
+  - Probe run 2: 34/44 within 15 s (bar 31), median final 8.20 s, 0 errors; v3 had 35. Model accepted 36 of 45;
+    rejections were 2 citing an excerpt id never shown, 1 misattributed figure, 1 unsupported figure. Two model
+    answers late (16.3 s, 20.4 s). Swap 4.3 GB at the end.
+  - Held-out run 3: 43/72 within 15 s (bar 51), median final 8.22 s, 0 errors; v3 had 42, excision projected 43.
+    Model accepted 46 of 67; 13 unsupported-measurement rejections. Three model answers late (15.8–17.9 s), which
+    would have made 46. Swap 4.2 GB at the end.
+  - Probe run 3: 34/44 within 15 s (bar 31), median final 7.71 s, 0 errors; v3 had 34. Model accepted 35 of 45;
+    2 more citations of an excerpt id never shown. One model answer late (17.9 s). Finished 17:11.
+  - **Not qualified.** Probe passes three in a row (35/34/34, v3 35/35/34). Held-out misses all three
+    (48/44/43 against 51; v3 45/48/42). Both average 45 a run: the row a run the excision was projected to add
+    went to late answers instead (5 held-out answers past 15 s over the three runs, none in v3).
+    Live open cost speed rather than answers: 8 late model answers over the last four runs, none in v3, and the
+    median final rose run by run from 6.6 s to 8.2 s with swap flat at 4.2–4.6 GB.
+    Where held-out rows go, per run over the 76 that expect an answer: 12–13 rejected for unsupported figures,
+    about 8 never sent to the model (weak results, guards, caveats), 4 abstains, 0–3 late, 0–3 other rejections.
+    20 rows are lost in all three runs, 7 in two, 10 in one.
 - [ ] Next steps from the 2, 3 and 5 Oct research, read against the v3 misses on 11 Oct. Most of the research was
   written while answers were late; v3 had none, so its speed work waits on v4's Live-open timings. What it says
   about wrong and missing answers still holds. Since 8 Oct owner grades, not delivery, are the measure, so each
   item is judged on grades as well as the gate.
+  Jack, 11 Oct: make these once the v4 bench has finished, in this order.
   - [ ] Note-first comparison first ([5 Oct research §7.1](docs/research/KENN_GLM_COMPREHENSIVE_RESEARCH_2026-10-05.md),
     and "Review of 4 October" above). 6–10 held-out refusals a run are rows where the refused figure is the step
     itself, which no excision can save, and a served note's figures are right by construction. Build the
@@ -1391,9 +1414,15 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     ([Experiment 2](docs/research/KENN_PRODUCT_AND_OPEN_SOURCE_RESEARCH_2026-10-02.md#experiment-2-test-whether-passage-reranking-improves-the-existing-retrieval)).
     Its bar: 0.05 more recall@4 or 20% fewer retrieval-caused failures, inside 150 ms p95 and 250 MB. It adds
     onnxruntime and a model file, so it needs Jack's OK.
-  - [ ] Speed, only if v4 shows late answers with Live open: in the 3 Oct order, MLX against Ollama on the same 4B
+  - [ ] Speed. v4 had 8 late answers with Live open, so this is on. In the 3 Oct order, MLX against Ollama on the same 4B
     checkpoint, then a matched draft model for speculative decoding. MoE (DeepSeek-V2-Lite is ~8–9 GB resident,
     per the 5 Oct corrections) and Kev-0.8B routing (torch, hundreds of ms on a Mac) stay parked.
+    Two cheaper checks go first, since neither needs a new runtime (2 Oct research §12, 5 Oct stage 1 #4): read the
+    load / prefill / decode split `LLMUsage` now records for the late answers, and if prefill or load dominates, keep
+    the system prompt and evidence order fixed so Ollama reuses the cached prefix; then count how often the HTTP
+    background path reruns routing and retrieval in `answer_payload` after building the template.
+    LoRA was asked about on 11 Oct: it does not speed up a merged model, and S-LoRA serves many adapters on one
+    server. Revisit an answer tune only on answers Jack has graded right (the note-first pack starts that set).
   - Product rather than gate (5 Oct stage 2): the producer's measured LUFS, true peak and crest as evidence the
     model may cite, and the selected track's device chain in the prompt. That is what only KENN can do, but a
     fake-Live bench cannot see it, so it needs its own owner-graded set.
