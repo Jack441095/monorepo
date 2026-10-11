@@ -670,6 +670,12 @@ def _build_headers(cfg: dict) -> dict[str, str]:
 from kenn.core.acoustic_translator import build_acoustic_guidance_prompt
 from kenn.core.genre_profiles import detect_genre_from_query, get_genre_profile
 
+# A bracketed aside that holds a digit, such as "(30-60 Hz)" or "(>10 kHz)" in a genre description. The genre
+# lines below give the model a genre's character but none of its figures: the grounding gate passes a figure
+# only when a shown excerpt prints it, so a target the system prompt supplies is one the gate refuses. On the
+# v4 bench (11 Oct) 10 held-out answers were rejected for quoting a figure KENN's own prompt had given them.
+_FIGURE_ASIDE_RE = re.compile(r"\s*\([^)]*\d[^)]*\)")
+
 # Measured 2 Oct 2026 over the 29 real captured answers: p50 173 words, p95 220, max 228. At roughly
 # 1.33 tokens per word that is p50 ~230 tokens, p95 ~293, max ~303.
 #
@@ -825,11 +831,12 @@ def build_system_prompt(
     genre_instr = ""
     if detected_genre_key:
         gp = get_genre_profile(detected_genre_key)
+        # The loudness, peak and crest targets are left out (see _FIGURE_ASIDE_RE). The -0.3 dBFS peak in the
+        # profiles also disagrees with the -1 dBTP ceiling the notes teach, so we would not want them quoted
+        # even if the gate allowed it. Loudness figures reach the model through the notes it is shown.
         genre_instr = (
-            f"\nGenre Target Profile ({gp.display_name}): Target Delivery {gp.target_lufs:.1f} LUFS, "
-            f"Max Peak {gp.max_peak_dbfs:.1f} dBFS, Sub-Bass Weight: {gp.sub_bass_weight}, "
-            f"Target Crest Factor {gp.target_crest_range_db[0]:.0f}-{gp.target_crest_range_db[1]:.0f} dB, "
-            f"Compression Character: {gp.compression_character}. {gp.description}"
+            f"\nGenre Target Profile ({gp.display_name}): Sub-Bass Weight: {gp.sub_bass_weight}, "
+            f"Compression Character: {gp.compression_character}. {_FIGURE_ASIDE_RE.sub('', gp.description)}"
         )
 
     if asks_for_sources(query):
@@ -1764,9 +1771,9 @@ def format_turn_directives(
         try:
             from kenn.core.target_curves import get_genre_profile
             gp = get_genre_profile(detected_genre_key)
+            # No LUFS range here either, for the same gate reason as build_system_prompt (_FIGURE_ASIDE_RE).
             genre_instr = (
-                f"Genre Target Profile ({gp['name']}): Target Delivery {gp['target_integrated_lufs'][0]} to {gp['target_integrated_lufs'][1]} LUFS. "
-                f"{gp['description']}"
+                f"Genre Target Profile ({gp['name']}): {_FIGURE_ASIDE_RE.sub('', gp['description'])}"
             )
         except Exception:
             pass

@@ -201,17 +201,22 @@ def analyze_acoustic_descriptors(query: str) -> list[DSPRecommendation]:
 
 
 def build_acoustic_guidance_prompt(query: str) -> str:
-    """Generate precise DSP guidance to append to the LLM system prompt if acoustic terms are present."""
+    """Name the kind of move each acoustic word in `query` calls for, for the LLM system prompt; "" when none.
+
+    The frequency, gain and Q stay on the DSPRecommendation for code that sets EQ Eight, but the prompt gets
+    words only. The grounding gate passes a figure only when a shown excerpt prints it, so "~3500 Hz" handed
+    over here was a figure the gate then refused (10 held-out answers on the 11 Oct v4 bench, counting the genre
+    profile's figures too).
+    """
     recs = analyze_acoustic_descriptors(query)
     if not recs:
         return ""
 
     lines = ["\nAcoustic Translation Guidance:"]
     for r in recs:
-        freq_str = f"{r.target_frequency_hz:.0f} Hz" if r.target_frequency_hz else "N/A"
-        gain_str = f"{r.suggested_gain_db:+.1f} dB" if r.suggested_gain_db is not None else "N/A"
-        q_str = f"Q={r.suggested_q:.1f}" if r.suggested_q else ""
-        lines.append(
-            f"- '{r.descriptor}': Target ~{freq_str} ({r.filter_type}, {gain_str} {q_str}). {r.explanation}"
-        )
+        move = r.filter_type.replace("_", "-")
+        # A gain of 0 or None means the filter type is the whole move (a high-pass, a de-esser).
+        if r.suggested_gain_db:
+            move += " cut" if r.suggested_gain_db < 0 else " boost"
+        lines.append(f"- '{r.descriptor}': {move}. {r.explanation}")
     return "\n".join(lines)
