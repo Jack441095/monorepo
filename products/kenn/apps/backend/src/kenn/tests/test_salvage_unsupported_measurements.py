@@ -326,6 +326,19 @@ def test_an_example_holds_no_comma_but_the_one_after_its_marker():
     assert _excise_illustrative_figures("Tame it — say, 3500 Hz — without the rest.", {"3500hz"}) == "Tame it without the rest."
 
 
+def test_an_example_joined_to_a_second_clause_by_a_word_stays():
+    # Fifth review of 096ad1cb, 11 Oct 2026: with "and" in place of the comma this still shipped as "put a
+    # compressor on the bass bus not the snare — via its sidechain input."
+    for joiner in ("and", "then", "while you", "plus", "but"):
+        step = (
+            f"Put a compressor on the bass bus — like one at 2 kHz {joiner} key it from the kick at 6 dB — not the snare"
+            " — via its sidechain input."
+        )
+        assert _excise_illustrative_figures(step, {"2khz", "6db"}) == step
+    step = "Cut the mud (e.g., 300 Hz with a cut of 3 dB) first."
+    assert _excise_illustrative_figures(step, {"300hz", "3db"}) == step
+
+
 def test_an_example_that_the_word_before_it_needs_stays():
     # Third review of 4b092902, 11 Oct 2026: these shipped as "keep the depth under so..." and "to on the bus".
     for step, figures in (
@@ -407,9 +420,18 @@ def test_a_high_pass_figure_with_a_limit_after_it_keeps_its_figure():
         "Set the high-pass at 100 Hz, nothing higher.",
         # A decimal point is not the end of the sentence the bound is in.
         "Set the high-pass at 100 Hz on a 1.5 s reverb, no higher.",
+        # Fifth review: each of these shipped its bound with no figure in front of it.
+        "Set the high-pass at 100 Hz, at the very most.",
+        "Set the high-pass at 100 Hz; don't go higher.",
+        "Set the high-pass at 100 Hz. Go no higher.",
+        "Set the high-pass at 100 Hz, as an upper limit.",
+        "Set the high-pass at 100 Hz, as the ceiling.",
+        "Set the high-pass at 100 Hz and stop there.",
     ):
         assert _excise_illustrative_figures(step, {"100hz"}) == step
-    # That check has a short list of its own, so a later clause about something else does not block the cut.
+    # That check has a short list of its own, so "keep" in a later clause does not block the cut. The list can
+    # still catch a later clause about something else ("push the shelf to max"); that figure goes to the
+    # sentence drop, which is the safe side to be wrong on.
     assert _excise_illustrative_figures("Use a high-pass at 100 Hz to keep the low end clean.", {"100hz"}) == (
         "Use a high-pass to keep the low end clean."
     )

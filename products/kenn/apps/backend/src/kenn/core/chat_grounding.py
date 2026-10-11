@@ -1228,6 +1228,11 @@ _LIMIT_WORDS_RE = re.compile(
     r"|keep\w*|hold\w*|limit\w*)\b|n[’']t\b|[<>≤≥]",
     re.IGNORECASE,
 )
+# A joining word starts a second clause just as the comma does: "— like one at 2 kHz and key it from the kick at
+# 6 dB —" still shipped as "...on the bass bus not the snare" in the fifth review on 11 Oct, with "then" the same.
+# "or" is off the list because "e.g., 100 Hz or 120 Hz" is two examples, not a second step; none of the 13 saves
+# has any of these words.
+_JOINS_A_CLAUSE_RE = re.compile(r"\b(?:and|then|while|plus|with|but)\b", re.IGNORECASE)
 # The word before the aside can need it as its object: "keep the depth under (e.g., 10 dB) so..." would ship as
 # "keep the depth under so...", and "Set the threshold to (e.g., -18 dB) on the bus" as "to on the bus". The hedges
 # and joiners at the end ("Aim for roughly (e.g., -14 LUFS) on the master", "-14 LUFS or (e.g., -16 LUFS)") came
@@ -1283,9 +1288,13 @@ _PLACED_FIGURE_RE = re.compile(
 )
 # A decimal point does not end the sentence; the trailing \s* steps over to the start of the next one.
 _REST_OF_SENTENCE_RE = re.compile(r"((?:[^.!?\n]|(?<=\d)\.(?=\d))*)[.!?]*\s*")
+# "at the very most", "ceiling", "upper limit", "stop there" and the "go" forms ("don't go higher", ". Go no
+# higher.") came from the fifth review, each shipping its bound with no figure in front of it.
 _BOUND_AFTER_FIGURE_RE = re.compile(
-    r"\b(?:max(?:imum)?|min(?:imum)?|at (?:most|least|the most)|tops|or (?:less|lower|more|higher|so)"
-    r"|(?:no|not|nothing|never)[ \t]+(?:\w+er|above|below|past|beyond|over|under))\b",
+    r"\b(?:max(?:imum)?|min(?:imum)?|at (?:the )?(?:very )?(?:most|least)|tops|or (?:less|lower|more|higher|so)"
+    r"|ceiling|(?:upper|lower) limit|stop there"
+    r"|(?:no|not|nothing|never)[ \t]+(?:\w+er|above|below|past|beyond|over|under)"
+    r"|(?:do(?:n[’']t|[ \t]+not)[ \t]+)?go[ \t]+(?:no[ \t]+)?(?:\w+er|above|below|past|beyond|over|under))\b",
     re.IGNORECASE,
 )
 
@@ -1303,6 +1312,7 @@ def _excise_illustrative_figures(answer: str, unsupported: set[str]) -> str:
             and bool(figures)
             and figures[-1].end() == len(aside.rstrip())
             and not _LIMIT_WORDS_RE.search(aside)
+            and not _JOINS_A_CLAUSE_RE.search(aside)
             # endpos makes "$" in the pattern mean the start of this aside.
             and not _LEADS_INTO_ASIDE_RE.search(m.string, 0, m.start())
         )
