@@ -2,6 +2,9 @@ from kenn.llm import llm_rewrite
 
 
 def test_command_planner_can_be_enabled_without_chat_llm(monkeypatch) -> None:
+    # The product-root .env on a dev Mac sets KENN_LLM_ENABLED=1, and config() reads it back in after the delenv
+    # below, so this test failed on any machine set up to run the companion.
+    monkeypatch.setattr(llm_rewrite, "load_env", lambda: None)
     for name in ("KENN_LLM_ENABLED", "AUDIO_TOO_LLM_ENABLED", "KENN_LLM_ENABLED_COMMAND"):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("KENN_LLM_ENABLED_COMMAND", "1")
