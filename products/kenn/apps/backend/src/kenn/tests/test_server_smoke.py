@@ -1623,13 +1623,20 @@ def test_http_undo_dispatches_device_proposal_to_device_executor(running_server:
     assert applied["receipt"]["verified"] is True
     assert fake.value == 0.0
 
+    # Since 11 Oct a device-parameter receipt undoes only in the session that applied it; this test used to undo
+    # from a second session id, and the binding made it 409.
+    with pytest.raises(urllib.error.HTTPError) as foreign:
+        post("/api/ableton/osc/undo", {"session_id": "http-device-undo-elsewhere", "receipt": applied["receipt"]})
+    assert foreign.value.code == 409
+    assert fake.value == 0.0
+
     undo_proposed = post("/api/ableton/osc/undo", {
-        "session_id": "http-device-undo-reverse",
+        "session_id": session_id,
         "receipt": applied["receipt"],
     })
     undo = undo_proposed["proposal"]
     undone = post("/api/ableton/osc/undo", {
-        "session_id": "http-device-undo-reverse",
+        "session_id": session_id,
         "receipt": applied["receipt"],
         "proposal": undo,
         "confirm_token": undo["confirmation_token"],

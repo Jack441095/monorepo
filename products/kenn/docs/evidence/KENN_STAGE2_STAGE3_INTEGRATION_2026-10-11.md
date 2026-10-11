@@ -93,7 +93,7 @@ Local cold runs clear only the existing semantic answer-cache tiers; warm runs r
 Build a separate packet per route/build/dataset split from a private completed capture; retain keys outside reviewer-visible directories. Export new forms for each packet, then adjudicate only independently completed forms:
 
 ```sh
-"$KENN_BACKEND_PYTHON" products/kenn/tooling/scripts/build_human_review_packet.py --capture "$KENN_CAPTURE" --output "$KENN_PACKET" --key-output "$KENN_PRIVATE_KEY"
+"$KENN_BACKEND_PYTHON" products/kenn/tooling/scripts/build_captured_review_packet.py --capture "$KENN_CAPTURE" --output "$KENN_PACKET" --key-output "$KENN_PRIVATE_KEY"
 "$KENN_BACKEND_PYTHON" products/kenn/tooling/scripts/export_human_review_forms.py --packet "$KENN_PACKET" --output-dir "$KENN_FORMS"
 "$KENN_BACKEND_PYTHON" products/kenn/tooling/scripts/adjudicate_human_review.py --packet "$KENN_PACKET" --reviewer-a "$KENN_FORMS/reviewer-a.json" --reviewer-b "$KENN_FORMS/reviewer-b.json" --output "$KENN_ADJUDICATION"
 ```

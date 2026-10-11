@@ -11,7 +11,8 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[5] / "tooling/scripts"))
 from adjudicate_human_review import ReviewInputError, adjudicate, review_progress
-from build_human_review_packet import build_captured
+import build_human_review_packet
+from build_captured_review_packet import CRITERIA, RELEASE_THRESHOLDS, build_captured
 from export_human_review_forms import build_form
 
 
@@ -117,3 +118,9 @@ def test_partial_reports_reject_foreign_or_malformed_forms(fault):
         right["reviews"][0] = None
     with pytest.raises(ReviewInputError):
         review_progress(packet, left, right)
+
+
+def test_captured_packets_are_scored_on_the_same_criteria_and_bars_as_the_chat_packet():
+    # The captured builder keeps its own copy so it never imports the engine; this is what stops the copies drifting.
+    assert CRITERIA == build_human_review_packet.CRITERIA
+    assert RELEASE_THRESHOLDS == build_human_review_packet.RELEASE_THRESHOLDS
