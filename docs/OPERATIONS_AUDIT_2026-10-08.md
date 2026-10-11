@@ -1,5 +1,14 @@
 # NITE DSP operations audit — 2026-10-08
 
+## 2026-10-11 operations check
+
+Production `/ready` returned HTTP 200 with database, durable S3 storage, and
+deliverable Resend checks true. Checkout, legal approval, release readiness,
+commercial gates, and the hosted customer rehearsal remain false. Fly reports
+one started AMS machine with a passing check and one stopped machine. The live
+Stripe API Keys page now lists only the restricted `NITE DSP backend checkout`
+secret key; the broad legacy key no longer appears. No customer charge was made.
+
 ## 2026-10-10 deployment update
 
 Vercel production deployment `dpl_8V43GpwAvN9rBqR33AbT2JJwFuJa` is READY and
@@ -225,9 +234,8 @@ choice.
   deactivated. On 2026-10-10, a fingerprint-only comparison confirmed Fly's
   running production `STRIPE_SECRET_KEY` matches the ignored local operations
   credential and does not match `key_01` (suffix `A9KW`). The production key is
-  the restricted Checkout Sessions write key. The Stripe dashboard has the
-  `key_01` expiration confirmation open; the owner must click **Expire** to
-  retire this broad key, which the checked production service no longer uses.
+  the restricted Checkout Sessions write key. On 2026-10-11, the live API Keys
+  page listed only that restricted key; the broad legacy key no longer appears.
   The Stripe dashboard confirms Starling Bank Ltd is the default GBP payout
   destination; account digits are intentionally omitted. Receipt/support
   information still needs review. On 2026-10-10, successful-payment and refund
