@@ -64,7 +64,7 @@ def test_the_excerpt_is_cut_on_a_word_boundary_with_both_tags_intact() -> None:
     # The id is the first attribute now: the Rules block asks the model to tag every number with it, so the tag
     # has to carry one and the order is what puts it where the model copies it from.
     assert re.search(
-        rf'<source_excerpt id="[0-9a-f]{{12}}" label="{re.escape(REAL_LABEL)}" relevance="9.4">', block
+        rf'<source_excerpt id="1" label="{re.escape(REAL_LABEL)}" relevance="9.4">', block
     ), block
     assert block.rstrip().endswith("</source_excerpt>")
     body = block.split("\n", 2)[2].removesuffix("</source_excerpt>").strip()

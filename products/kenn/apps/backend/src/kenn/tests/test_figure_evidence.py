@@ -238,16 +238,31 @@ def test_make_answer_inner_check_takes_figures_from_typed_question_not_expanded_
     assert "200 ms" not in ans_refused
 
 
-def test_true_peak_decibel_headroom_is_supported_by_dbtp_ceiling():
-    from kenn.core.chat_grounding import _measurement_is_supported
+def test_a_plain_db_figure_never_borrows_a_dbtp_ceiling(index):
+    # 10 to 11 Oct 2026: "1 dB" passed against SHOWN's -1 dBTP ceiling, first anywhere and then in any clause that
+    # mentioned headroom, so an EQ move or a ceiling with its sign flipped got through with it.
+    assert _refused("Cut 1 dB on the vocal bus before the limiter.", [SHOWN]) == ["1db"]
+    assert _refused("Cut 1 dB on the vocal and keep the true peak at -1 dBTP.", [SHOWN]) == ["1db"]
+    assert _refused("Leave 1 dB of headroom. Cut 1 dB at the vocal bus.", [SHOWN]) == ["1db"]
+    assert _refused("Set the limiter ceiling to +1 dB.", [SHOWN]) == ["1db"]
+    assert _refused("Leave 1 dB of headroom so the encode does not clip.", [SHOWN]) == ["1db"]
+    # Keeping the sign or the decimal does not make it the ceiling either.
+    assert _refused("Cut -1 dB on the vocal bus.", [SHOWN]) == ["-1db"]
+    assert _refused("Cut 1.0 dB on the vocal bus.", [SHOWN]) == ["1.0db"]
+    # The ceiling written the way the note writes it still passes.
+    assert _refused("Keep the true peak at -1 dBTP so the encode does not clip.", [SHOWN]) == []
 
-    # Note specifies a -1 dBTP ceiling. Answers phrased as 1 dB or 1.0 dB true peak headroom are accepted.
-    allowed = {"-1dbtp", "-14lufs"}
-    assert _measurement_is_supported("1.0db", allowed) is True
-    assert _measurement_is_supported("1db", allowed) is True
-    assert _measurement_is_supported("-1db", allowed) is True
-    assert _measurement_is_supported("-1.0db", allowed) is True
-    # Unrelated figures remain refused
-    assert _measurement_is_supported("2db", allowed) is False
-    assert _measurement_is_supported("5db", allowed) is False
+
+def test_a_typed_true_peak_keeps_its_sign_when_it_becomes_a_db_figure():
+    # Until 11 Oct the dB copy of "-1 true peak" lost its minus, so the sign-flipped "1 dB" passed and the
+    # producer's own -1 dB was refused.
+    question = "My master hits -1 true peak, is that OK?"
+    assert _refused("At -1 dB you have room for the encode.", [OTHER_NOTE], question, question) == []
+    assert _refused("Cut 1 dB on the vocal bus.", [OTHER_NOTE], question, question) == ["1db"]
+    question = "Limiter reads -0.3 true peak"
+    assert _refused("Boost the vocal by 0.3 dB.", [OTHER_NOTE], question, question) == ["0.3db"]
+    # The hyphen in a typed range is not a minus.
+    question = "Should I leave 1-2 true peak of headroom?"
+    assert _refused("Leave 2 dB.", [OTHER_NOTE], question, question) == []
+    assert _refused("Leave -2 dB.", [OTHER_NOTE], question, question) == ["-2db"]
 

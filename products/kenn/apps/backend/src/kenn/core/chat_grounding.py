@@ -215,8 +215,7 @@ def _measurement_is_supported(measurement: str, allowed: set[str]) -> bool:
 
     Audio engineers write -14 LUFS or -14.0 LUFS interchangeably, and Live meters display decimal true peaks
     like -1.0 dBTP alongside integer bounds like -1 dBTP. Treating -14.0 LUFS as unsupported when the note
-    writes -14 LUFS is a formatting mismatch, not an invention. Similarly, true peak ceilings (-1 dBTP)
-    are routinely cited in mixing advice as 1 dB or 1.0 dB true peak headroom.
+    writes -14 LUFS is a formatting mismatch, not an invention.
     """
     if measurement in allowed:
         return True
@@ -226,28 +225,20 @@ def _measurement_is_supported(measurement: str, allowed: set[str]) -> bool:
     m_dec = re.sub(r"^(-?\d+)([a-z%]+)$", r"\1.0\2", measurement)
     if m_dec in allowed:
         return True
-    # True peak headroom / ceiling equivalence: answers citing 1 dB or 1.0 dB true peak margin against a -1 dBTP ceiling note
-    m_db = re.match(r"^(-?\d+(?:\.0)?)db$", measurement)
-    if m_db:
-        val = m_db.group(1).removesuffix(".0")
-        val_pos = val.lstrip("-")
-        if any(
-            target in allowed
-            for target in (
-                f"{val}dbtp",
-                f"{val}.0dbtp",
-                f"-{val_pos}dbtp",
-                f"-{val_pos}.0dbtp",
-                f"{val_pos}dbtp",
-                f"{val_pos}.0dbtp",
-            )
-        ):
-            return True
     return False
 
 
 def _unsupported_measurements(found: set[str], allowed: set[str]) -> set[str]:
-    """Measurements in found that are not permitted by allowed."""
+    """Measurements in found that are not permitted by allowed.
+
+    A plain dB figure in the answer never stands in for a note's dBTP one. From 10 Oct 2026 "1 dB" was accepted
+    against a note's -1 dBTP ceiling as the same headroom written the other way round, and any "cut 1 dB" on the
+    vocal passed with it. Narrowing that to headroom clauses still let an EQ move through ("cut 1 dB on the vocal
+    and keep the true peak at -1 dBTP", or a sign flip to +1 dB). Replaying all 18 runs of the 10 Oct
+    qualification benches (v1 to v3) without the equivalence changed no verdict, so it went altogether on 11 Oct.
+    The ceiling still passes when the answer writes it as the note does, -1 dBTP. The one place a dB copy is made
+    is the producer's own "N true peak" (`_question_measurements`), and that copy keeps its sign.
+    """
     return {m for m in found if not _measurement_is_supported(m, allowed)}
 
 
@@ -283,7 +274,10 @@ def _question_measurements(question: str) -> set[str]:
     q = question
     q = re.sub(r"\b(\d+(?:\.\d+)?)\s*k\b", r"\1 kHz", q, flags=re.IGNORECASE)
     q = re.sub(r"\+(\d+(?:\.\d+)?)", r"\1", q)
-    q = re.sub(r"\b(\d+(?:\.\d+)?)\s*true\s*peak\b", r"\1 dBTP \1 dB", q, flags=re.IGNORECASE)
+    # The sign goes into both copies. Until 11 Oct the dB copy dropped it, so a producer's "-1 true peak" let the
+    # answer "cut 1 dB on the vocal bus" through and refused "-1 dB", the figure they actually typed. The
+    # lookbehind keeps the hyphen in "1-2 true peak" a range rather than the minus of a "-2 dB" nobody typed.
+    q = re.sub(r"(?<![\d.])(-?\b\d+(?:\.\d+)?)\s*true\s*peak\b", r"\1 dBTP \1 dB", q, flags=re.IGNORECASE)
     q = re.sub(r"\b(\d+(?:\.\d+)?)\s*peak\b", r"\1 dB", q, flags=re.IGNORECASE)
     return _measurements(q)
 
@@ -364,16 +358,16 @@ def _claim_citations(answer: str) -> list[dict]:
     text = _RANGE_RE.sub(r"\1\3 \2\3", answer)
     spans = _measurement_spans(text)
     citations = [(m.group(1), m.start()) for m in CLAIM_CITATION_RE.finditer(text)]
-    cited = [""] * len(spans)
+    cited = [-1] * len(spans)
     taken: set[int] = set()
     for index, (_key, start, end) in enumerate(spans):
         next_start = spans[index + 1][1] if index + 1 < len(spans) else len(text)
         found = _first_free_citation(citations, end, min(next_start, end + _CLAIM_LINK_WINDOW_CHARS), taken)
         if found >= 0:
             taken.add(found)
-        cited[index] = citations[found][0] if found >= 0 else ""
+        cited[index] = found
     for index, (_key, start, _end) in enumerate(spans):
-        if cited[index]:
+        if cited[index] >= 0:
             continue
         previous_end = spans[index - 1][2] if index else 0
         found = _first_free_citation(
@@ -381,10 +375,18 @@ def _claim_citations(answer: str) -> list[dict]:
         )
         if found >= 0:
             taken.add(found)
-        cited[index] = citations[found][0] if found >= 0 else ""
+        cited[index] = found
     return [
-        {"value": key, "cited": bool(cited_id), "cited_chunk": cited_id}
-        for (key, _start, _end), cited_id in zip(spans, cited)
+        {
+            "value": key,
+            "cited": found >= 0,
+            "cited_chunk": citations[found][0] if found >= 0 else "",
+            # Which [#...] in the answer this claim used, counting from 0 in the order written, or -1 for none.
+            # repair_misattributed_citations() edits the tag by this count. The count is the same on the answer as
+            # written as on the range-rewritten text it was taken from, for the reason _measurement_spans() gives.
+            "citation_index": found,
+        }
+        for (key, _start, _end), found in zip(spans, cited)
     ]
 
 
@@ -427,6 +429,13 @@ def _attribution_class(holders: list[str]) -> str:
     return _AMBIGUOUSLY_ATTRIBUTED
 
 
+# The ask path retrieves 16 chunks and the context budget showed 4 of them when measured on 2 Oct 2026 (see
+# llm_rewrite.model_evidence), so two digits covers every real ordinal. Until 11 Oct 2026 the alias prefix was cut
+# at len("source") for every alias, which left "excerpt1" and "chunk1" unresolved and read "chunk12" as excerpt 2,
+# so a citation to an excerpt that was never shown could pass as verified.
+_ORDINAL_CITATION_RE = re.compile(r"(?:source|excerpt|chunk|ex)?(\d{1,2})")
+
+
 def _resolve_chunk_id(
     cited_id: str,
     bodies: dict[str, str],
@@ -439,7 +448,7 @@ def _resolve_chunk_id(
     This caused 14 rejections across 9 probe runs for 'cites an excerpt id that was never shown'.
     We resolve:
     1. Exact match against shown chunk IDs.
-    2. 1-based ordinal indices (e.g. '1', '2', '3' or 'source1', 'excerpt1').
+    2. 1-based ordinal indices ('1', 'source1', 'excerpt1', 'chunk1', 'ex1') that land on a shown excerpt.
     3. Unambiguous prefix of at least 6 hex characters matching exactly one shown chunk.
     4. Single-character substitution slip in a 12-char hex string matching exactly one shown chunk.
     """
@@ -448,23 +457,15 @@ def _resolve_chunk_id(
     if cited_id in bodies:
         return cited_id
 
-    # 1-based ordinal index or 'source1' / 'excerpt1' alias
-    raw_digits = ""
     lower = cited_id.lower()
-    if lower.isdigit():
-        raw_digits = lower
-    elif lower.startswith(("source", "excerpt", "chunk")) and lower[len("source"):].isdigit():
-        raw_digits = lower[len("source"):]
-    elif lower.startswith("ex") and lower[2:].isdigit():
-        raw_digits = lower[2:]
-
-    if raw_digits:
-        try:
-            idx = int(raw_digits) - 1
-            if 0 <= idx < len(shown):
-                return get_chunk_id(shown[idx][1])
-        except ValueError:
-            pass
+    ordinal = _ORDINAL_CITATION_RE.fullmatch(lower)
+    if ordinal:
+        idx = int(ordinal.group(1)) - 1
+        if 0 <= idx < len(shown):
+            return get_chunk_id(shown[idx][1])
+        # An ordinal past the end names an excerpt the model was never shown. One or two digits is too short to be
+        # a hex prefix below, so there is nothing else to try and the citation stays unresolved.
+        return None
 
     # Unambiguous hex prefix (at least 6 characters) or 12+ char string starting with a 12-char ID
     if len(cited_id) >= 6 and all(c in "0123456789abcdefABCDEF" for c in cited_id):
@@ -512,8 +513,13 @@ def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) ->
     evidence, so no existing warning could fire on it.
     """
     bodies: dict[str, str] = {}
-    for _score, chunk, body in shown:
-        bodies.setdefault(get_chunk_id(chunk), body)
+    # The number each excerpt carried in the prompt. model_evidence() numbers them by their place in `shown`, from 1,
+    # and this is the same list, so a tag repaired to one of these points where the model was looking.
+    ordinals: dict[str, int] = {}
+    for ordinal, (_score, chunk, body) in enumerate(shown, start=1):
+        chunk_id = get_chunk_id(chunk)
+        bodies.setdefault(chunk_id, body)
+        ordinals.setdefault(chunk_id, ordinal)
     # One regex pass per shown body rather than one per claim. The derived pass has to look at every body anyway,
     # and the citation check used to rescan a whole body for each cited claim, so this costs less than it did
     # before on any answer with more than one claim.
@@ -525,6 +531,7 @@ def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) ->
         holders = [cid for cid in bodies if value in body_measurements[cid]]
         claim["attribution"] = _attribution_class(holders)
         claim["attributed_chunks"] = holders
+        claim["attributed_ordinals"] = [ordinals[cid] for cid in holders]
         resolved_id = _resolve_chunk_id(cited_id, bodies, shown)
         if resolved_id:
             claim["cited_chunk"] = resolved_id
@@ -1191,6 +1198,238 @@ def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
     if after < _SALVAGE_MIN_WORDS or after < before * _SALVAGE_MIN_KEPT_SHARE:
         return ""
     return trimmed
+
+
+# The three shapes below are every way a refused figure sat beside a step, rather than in it, across the 12 probe
+# runs of 10 Oct 2026. Each is cut phrase and all, so the step that held it stays. Anything else (a figure that is
+# the object of the step, "set the preamp so the input is at -18 dBFS") still costs its sentence: without the
+# figure that step says nothing.
+#
+# A bracket or dash aside only goes when it opens on an example marker. Unmarked, the same brackets hold the
+# step's own figure or its limit, "Set the threshold (-18 dB)" or "push the depth (never past 10 dB)", and cutting
+# those shipped a different instruction through the gate in review on 11 Oct. All the bracket saves in the v3
+# runs opened on "e.g."; the marker costs us one save across the 12 runs, an unmarked "(above 1 kHz)".
+#
+# The marker is not enough on its own: "(e.g., never past 10 dB)" is still a limit, so an aside with a limit or
+# condition word stays too. A marked value with no such word ("Set the threshold (e.g., -18 dB)") does go, and the
+# step reads "Set the threshold": vaguer, but the model offered the figure as an example, and that beats losing
+# the step to the sentence drop. The apostrophe in "n't" is either kind, because the model writes the curly one
+# more often than the straight (34 to 14 across the 479 probe answers of 10 Oct).
+#
+# An example also has to end on its figure. Whatever follows the figure inside the aside is either a qualifier
+# that makes it a limit after all ("10 dB or less", "2 kHz tops") or the model already writing its next step
+# ("— like one at 2 kHz, then key it from the kick —", a comma splice the third review on 11 Oct shipped with
+# "key it from the kick" gone). Every one of the 13 saves in the 12 probe runs ends on its figure.
+#
+# Ending on a figure is not enough either, because the run-on can end on one of its own: "— like one at 2 kHz,
+# then key it from the kick at 6 dB —" and "(say, 10 dB or less, ideally 6 dB)" both did in the fourth review on
+# 11 Oct. So the only comma an example may hold is the one straight after its marker ("e.g., 300 Hz"); a later
+# comma means a second clause and the aside stays. None of the 13 saves has a second comma.
+_EXAMPLE_MARKER = r"(?:(?:like|such as|for example|for instance|say)\b|e\.g\.)"
+# "or less", "tops", "no greater than" and "keep/hold/limit it to" came from the fourth review: each turns the
+# figure after it into a bound, "(e.g., 3 dB or less around 300 Hz)" ends on a figure and is still a limit.
+_LIMIT_WORDS_RE = re.compile(
+    r"\b(?:never|not|no \w+er|only|if|unless|under|over|past|above|below|beyond|within|at least|at most"
+    r"|at the most|up to|as much as|less than|more than|exceed\w*"
+    r"|or (?:less|lower|more|higher|fewer)|tops|max(?:imum)?|min(?:imum)?|cap(?:s|ped|ping)?|ceiling|stop at"
+    r"|keep\w*|hold\w*|limit\w*)\b|n[’']t\b|[<>≤≥]",
+    re.IGNORECASE,
+)
+# A joining word starts a second clause just as the comma does: "— like one at 2 kHz and key it from the kick at
+# 6 dB —" still shipped as "...on the bass bus not the snare" in the fifth review on 11 Oct, with "then" the same.
+# "or" is off the list because "e.g., 100 Hz or 120 Hz" is two examples, not a second step; none of the 13 saves
+# has any of these words.
+_JOINS_A_CLAUSE_RE = re.compile(r"\b(?:and|then|while|plus|with|but)\b", re.IGNORECASE)
+# No list of joining words is ever whole: the sixth review shipped the same run-on with "so you", "before you", and
+# "keyed from the kick" with no joining word at all. So an example is also capped at 6 words once its figures are
+# out, marker included. The longest of the 10 asides the probe saves cut is 5, "like a narrow resonance at
+# 3500 Hz"; a second step with its own verb and object runs past 6. The list above still catches the short joins
+# the cap lets by, "(e.g., 300 Hz with a cut of 3 dB)" being 6.
+_MAX_EXAMPLE_WORDS = 6
+# The cap still let a short run-on through in the seventh review: "— like 2 kHz keyed from the kick at 6 dB —" is 6
+# words and shipped "...on the bass bus not the snare — via its sidechain input." Two figures in one example sit
+# side by side, "3 dB at 300 Hz", "100 Hz or 120 Hz", "3 kHz or the 200 – 400 Hz"; more than 2 words between them is
+# a second step with its own verb. One-figure asides are not affected, so none of the 13 saves move.
+_MAX_WORDS_BETWEEN_FIGURES = 2
+_WORD_RE = re.compile(r"[A-Za-z]+")
+# The word before the aside can need it as its object: "keep the depth under (e.g., 10 dB) so..." would ship as
+# "keep the depth under so...", and "Set the threshold to (e.g., -18 dB) on the bus" as "to on the bus". The hedges
+# and joiners at the end ("Aim for roughly (e.g., -14 LUFS) on the master", "-14 LUFS or (e.g., -16 LUFS)") came
+# from the fourth review: the step reads as garbled rather than wrong, but it is no better than the sentence drop.
+_LEADS_INTO_ASIDE_RE = re.compile(
+    r"\b(?:to|at|by|of|for|from|under|over|below|above|than|around|near|about|past|beyond|between|within|is|are|be"
+    r"|into|onto|toward|towards|roughly|approximately|just|or|and)[ \t]*$",
+    re.IGNORECASE,
+)
+# "apply a linear-phase EQ to the low-mid range (e.g., 100–300 Hz) to check..." The 60-character limit keeps us to
+# a short aside; a longer bracket is a clause of its own and goes with its sentence instead.
+_BRACKET_ASIDE_RE = re.compile(rf"[ \t]*\((?={_EXAMPLE_MARKER},?[^(),\n]*\))([^()\n]{{1,60}})\)", re.IGNORECASE)
+# "...exceeds a threshold—like a narrow resonance at 3500 Hz—without affecting other moments." The aside stops at
+# a sentence end, or "— like one at 2 kHz. Then key it from the kick — not the snare —" ran on to the next
+# sentence's dash and took "key it from the kick" with it (the same with ";", ":" and "…" in the 11 Oct review).
+# A comma stops it too, except the one straight after the marker that "say, 3 kHz" needs (see the run-on above).
+# Brackets, quotes and markdown stars stop it as well, because a step marker "2)",
+# a citation or a bold heading inside an aside means we are already in the next step. The one full stop allowed
+# is a decimal point between digits, "2.5 kHz", not "Hz.2 key it"; an "e.g." partway in ends the aside, which only
+# costs a save. Each dash closes only on its own kind, and never on one with a number straight after it, signed
+# or not, because that is the dash inside a range: "— like at 3 kHz or the 200 – 400 Hz —", "the -18 – -6 dBFS".
+# An en dash only counts with spaces round it, because unspaced it is the one inside "100–300 Hz".
+_ASIDE_BODY = r"(?:[^\n.!?;:…,()\[\]\"“”*]|(?<=\d)\.(?=\d))"
+_DASH_EXAMPLE_RE = re.compile(
+    rf"[ \t]*—[ \t]*({_EXAMPLE_MARKER},?{_ASIDE_BODY}{{1,80}}?)[ \t]*—(?![ \t]*[-+−]?\d)[ \t]*"
+    rf"|[ \t]+–[ \t]+({_EXAMPLE_MARKER},?{_ASIDE_BODY}{{1,80}}?)[ \t]+–(?![ \t]*[-+−]?\d)[ \t]*",
+    re.IGNORECASE,
+)
+# "apply a high-pass filter at around 100 Hz to reduce the effect" is still an instruction without the frequency,
+# because a high- or low-pass says what it does on its own. A cut, boost, bell or notch does not: "Boost at 5 kHz."
+# would come out as "Boost.", so those keep their figure and go to the sentence drop. Only a frequency introduced
+# by at/around/near is cut ("set it to 100 Hz" makes the figure the instruction), and the lookahead stops at the
+# next clause so "at 100 Hz by 3 dB", where the place and the amount go together, is left alone. "to" only starts
+# a clause when no number follows, hedged or signed: "at 30 Hz to about 40 Hz depending on..." is a range and
+# "at 100 Hz to -12 dB per octave" a slope, neither of which we can cut cleanly, so the sentence drop takes them.
+# Nor does a clause that limits the figure, "at 100 Hz, but no higher" or "at 100 Hz and not above": without the
+# figure it limits nothing. The lookahead only knows those joiners, so the cut also checks the rest of the sentence
+# and the start of the next for a bound: "at 100 Hz, max." shipped as "Set the high-pass, max." and "at 100 Hz.
+# No higher." left "No higher." pointing at nothing in the fourth review. That check has its own short list rather
+# than the aside one, because "under", "if" or "keep" anywhere later in a sentence ("to keep the low end clean")
+# is usually about something else. "or so" is on it too: not a bound, but "Set the high-pass or so" says nothing.
+# A negated move ("don't high-pass at 100 Hz on the bass") reads wider once its figure goes; none of the 12 runs
+# had one, so we have not guarded it.
+_PLACED_FIGURE_RE = re.compile(
+    r"\b(?P<move>(?:high|low)[- ]?pass(?:[ \t]+filter)?|hpf|lpf)"
+    r"(?P<place>[ \t]+(?:at|around|near)[ \t]+(?:(?:around|about|roughly|approximately)[ \t]+)?"
+    r"(?:\d+(?:\.\d+)?[ \t]*(?:k?hz)?[ \t]*(?:[–-]|to)[ \t]*)?\d+(?:\.\d+)?[ \t]*k?hz)"
+    r"(?![ \t]*,?[ \t]*(?:but|or|and[ \t]+(?:no|not|never)|no|not|never)\b)"
+    r"(?=[ \t]+(?:to\b(?![ \t]*(?:(?:around|about|roughly|approximately)[ \t]+)?[-+−]?\d)"
+    r"|(?:on|for|in|so|and|with|before|after|if|when|until)\b)"
+    r"|[ \t]*[,.;:)\[]|[ \t]*$)",
+    re.IGNORECASE | re.MULTILINE,
+)
+# A decimal point does not end the sentence; the trailing \s* steps over to the start of the next one.
+_REST_OF_SENTENCE_RE = re.compile(r"((?:[^.!?\n]|(?<=\d)\.(?=\d))*)[.!?]*\s*")
+# "at the very most", "ceiling", "upper limit", "stop there" and the "go" forms ("don't go higher", ". Go no
+# higher.") came from the fifth review, each shipping its bound with no figure in front of it.
+_BOUND_AFTER_FIGURE_RE = re.compile(
+    r"\b(?:max(?:imum)?|min(?:imum)?|at (?:the )?(?:very )?(?:most|least)|tops|or (?:less|lower|more|higher|so)"
+    r"|ceiling|(?:upper|lower) limit|stop there"
+    r"|(?:no|not|nothing|never)[ \t]+(?:\w+er|above|below|past|beyond|over|under)"
+    r"|(?:do(?:n[’']t|[ \t]+not)[ \t]+)?go[ \t]+(?:no[ \t]+)?(?:\w+er|above|below|past|beyond|over|under))\b",
+    re.IGNORECASE,
+)
+
+
+def _excise_illustrative_figures(answer: str, unsupported: set[str]) -> str:
+    """The answer with every aside or placement that holds an unsupported figure cut out; the rest untouched."""
+
+    def holds_a_refused_figure(phrase: str) -> bool:
+        return bool(_measurements(phrase) & unsupported)
+
+    def an_example_to_cut(m: re.Match, aside: str) -> bool:
+        figures = list(_MEASUREMENT_RE.finditer(aside))
+        return (
+            holds_a_refused_figure(aside)
+            and bool(figures)
+            and figures[-1].end() == len(aside.rstrip())
+            and not _LIMIT_WORDS_RE.search(aside)
+            and not _JOINS_A_CLAUSE_RE.search(aside)
+            and len(_WORD_RE.findall(_MEASUREMENT_RE.sub("", aside))) <= _MAX_EXAMPLE_WORDS
+            and all(
+                len(_WORD_RE.findall(aside[a.end():b.start()])) <= _MAX_WORDS_BETWEEN_FIGURES
+                for a, b in zip(figures, figures[1:])
+            )
+            # endpos makes "$" in the pattern mean the start of this aside.
+            and not _LEADS_INTO_ASIDE_RE.search(m.string, 0, m.start())
+        )
+
+    def a_bound_follows(m: re.Match) -> bool:
+        # Anywhere in the rest of this sentence, or as the first words of the next one.
+        rest = _REST_OF_SENTENCE_RE.match(m.string, m.end())
+        return bool(_BOUND_AFTER_FIGURE_RE.search(rest.group(1)) or _BOUND_AFTER_FIGURE_RE.match(m.string, rest.end()))
+
+    def dash_aside(m: re.Match) -> str:
+        # Group 1 is an em-dash aside, group 2 a spaced en-dash one; only one of them took part.
+        if not an_example_to_cut(m, m.group(1) or m.group(2)):
+            return m.group(0)
+        # The two dashes stood between words, so one space has to stay, unless punctuation follows.
+        follows = m.string[m.end():m.end() + 1]
+        return "" if not follows or follows in ",.;:!?)" else " "
+
+    answer = _BRACKET_ASIDE_RE.sub(lambda m: "" if an_example_to_cut(m, m.group(1)) else m.group(0), answer)
+    answer = _DASH_EXAMPLE_RE.sub(dash_aside, answer)
+    return _PLACED_FIGURE_RE.sub(
+        lambda m: m.group("move")
+        if holds_a_refused_figure(m.group("place")) and not a_bound_follows(m)
+        else m.group(0),
+        answer,
+    )
+
+
+def salvage_unsupported_figures(answer: str, unsupported: list[str]) -> str:
+    """The answer without the figures the notes lack, or "" if that cannot be done and leave enough answer.
+
+    11 Oct 2026: replayed over the 12 probe runs of 10 Oct, drop_unsupported_sentences saved none of the 32
+    answers refused for a figure. 19 had too little left, and the other 13 lost a step or the Check line and fell
+    under the quality floor, often when the figure was only an example in brackets or a frequency on a filter move.
+    Those asides are cut first; a figure still standing after that takes its sentence with it, as before. The
+    caller must validate the result again; this only edits.
+    """
+    bad = set(unsupported)
+    excised = _excise_illustrative_figures(answer, bad)
+    left = sorted(_measurements(excised) & bad)
+    if not left:
+        # Every refused figure sat in an aside. When none was in the text at all (or `unsupported` was empty)
+        # nothing changed, and we hand back "" as drop_unsupported_sentences does, so the caller never re-judges
+        # an unchanged answer.
+        return excised if excised != answer else ""
+    # drop_unsupported_sentences measures its kept-share floor against the excised text, not the original, so the
+    # asides already cut do not count as loss. With several gone the shipped answer can be well under 60% of what
+    # the model wrote (49 of 100 words in one review case on 11 Oct). We accept that: what went first was examples,
+    # the floor still guards the steps, and the gate judges the result again.
+    return drop_unsupported_sentences(excised, left)
+
+
+def repair_misattributed_citations(answer: str, misattributed: list[dict]) -> str:
+    """The answer with each wrong excerpt tag pointed at an excerpt that holds its figure, or "" if no tag was wrong.
+
+    `misattributed` is the "fabricated_attributions" list verify_claim_citations() made from this same text. The
+    tag moves to the first excerpt, in prompt order, whose body holds the figure. A figure no shown body holds
+    loses its tag instead: the aggregate check passed it from the question, a note's title or the middle of a
+    quoted range, so there is no excerpt to point at. Only tags change, never a figure, so the measurement check
+    still decides every number that ships; the caller must validate the result again.
+
+    11 Oct 2026: on the v6 development bench this warning alone cost 2 of 72 held-out answers, one short of the
+    51 the gate needs. The rule was rejecting the model for trying to cite: the same answer with no tag passes,
+    because an uncited figure does not warn (see verify_claim_citations). A tag pointed at the right excerpt is
+    worth more to the reader than either, and when the model has carried a figure over from another context (a
+    broadcast -23 LUFS offered for a film mix, in one development answer), the repaired tag names the excerpt it
+    really came from. Replayed over the 25 development answers from 10-11 Oct rejected with this warning, the
+    repair saved 9, moving 5 tags and dropping 4.
+    """
+    targets = {claim["citation_index"]: claim["attributed_ordinals"] for claim in misattributed}
+    if not targets:
+        # Nothing was misattributed. "" rather than the answer, as salvage_unsupported_figures() does, so the
+        # caller never re-judges an unchanged answer.
+        return ""
+    pieces: list[str] = []
+    kept_to = 0
+    # The citation_index was counted on the range-rewritten text and is used here on the answer as written. Both
+    # scans find the same tags in the same order, because the rewrite cannot reach inside a tag.
+    for index, match in enumerate(CLAIM_CITATION_RE.finditer(answer)):
+        if index not in targets:
+            continue
+        holders = targets[index]
+        if holders:
+            # Only the id inside the brackets changes, so a tag keeps whatever spacing the model gave it.
+            pieces += [answer[kept_to:match.start(1)], str(holders[0])]
+            kept_to = match.end(1)
+            continue
+        # All 407 tags in the 10-11 Oct development answers followed a space, so the space goes with the tag and
+        # "150 ms [#2]." closes up to "150 ms." rather than leaving "150 ms .".
+        start = match.start() - 1 if answer[match.start() - 1:match.start()] == " " else match.start()
+        pieces.append(answer[kept_to:start])
+        kept_to = match.end()
+    pieces.append(answer[kept_to:])
+    return "".join(pieces)
 
 
 _WHOLE_SENTENCE_RE = re.compile(r".*[.!?](?=\s|$)", re.DOTALL)

@@ -27,7 +27,6 @@ from typing import Any, Callable, Generator
 import httpx
 
 from kenn.core.chat_constants import ANSWER_MODES, EVIDENCE_SCAN_WINDOW, count_actionable_steps
-from kenn.knowledge.reasoning import get_chunk_id
 from kenn.paths import PRODUCT_ROOT
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -90,8 +89,8 @@ Mode-specific guidance:
 Rules:
 - Answer ONLY using the provided context. Do not invent plugins, settings, prices, or policies.
 - If context is insufficient, name the specific gap (e.g. "We need a note on parallel compression").
-- Tag every number you state with the id of the excerpt it came from, like 150 ms [#3f2a9c1b7e40]. Copy the
-  id exactly as printed on the excerpt. An id that is not on an excerpt above is counted as invented.
+- Tag every number you state with the id of the excerpt it came from: a figure from the excerpt with id="2"
+  is written 150 ms [#2]. An id that is not on an excerpt above is counted as invented.
 - When the excerpts do not hold the answer, write one line and stop: Insufficient context: <the specific
   fact you are missing>. That line is a whole answer. Put no number, estimate or step after it.
 - Use only numbers that are printed in an excerpt. If no excerpt gives a figure for it, say it in words
@@ -124,7 +123,7 @@ Answer structure (strictly required):
 Rules:
 - Answer ONLY using the provided context. Do not invent plugins, settings, prices, or policies.
 - If context is insufficient, name the specific gap (e.g. "We need a note on parallel compression").
-- Tag every number you state with the id of the excerpt it came from, like 150 ms [#3f2a9c1b7e40]. Copy the id exactly as printed on the excerpt. An id that is not on an excerpt above is counted as invented.
+- Tag every number you state with the id of the excerpt it came from: a figure from the excerpt with id="2" is written 150 ms [#2]. An id that is not on an excerpt above is counted as invented.
 - When the excerpts do not hold the answer, write one line and stop: Insufficient context: <the specific fact you are missing>. That line is a whole answer. Put no number, estimate or step after it.
 - Use only numbers that are printed in an excerpt. If no excerpt gives a figure for it, say it in words
   ("a fast attack") instead of guessing a frequency, time or dB value.
@@ -654,6 +653,12 @@ def _build_headers(cfg: dict) -> dict[str, str]:
 from kenn.core.acoustic_translator import build_acoustic_guidance_prompt
 from kenn.core.genre_profiles import detect_genre_from_query, get_genre_profile
 
+# A bracketed aside that holds a digit, such as "(30-60 Hz)" or "(>10 kHz)" in a genre description. The genre
+# lines below give the model a genre's character but none of its figures: the grounding gate passes a figure
+# only when a shown excerpt prints it, so a target the system prompt supplies is one the gate refuses. On the
+# v4 bench (11 Oct) 10 held-out answers were rejected for quoting a figure KENN's own prompt had given them.
+_FIGURE_ASIDE_RE = re.compile(r"\s*\([^)]*\d[^)]*\)")
+
 # Measured 2 Oct 2026 over the 29 real captured answers: p50 173 words, p95 220, max 228. At roughly
 # 1.33 tokens per word that is p50 ~230 tokens, p95 ~293, max ~303.
 #
@@ -809,11 +814,12 @@ def build_system_prompt(
     genre_instr = ""
     if detected_genre_key:
         gp = get_genre_profile(detected_genre_key)
+        # The loudness, peak and crest targets are left out (see _FIGURE_ASIDE_RE). The -0.3 dBFS peak in the
+        # profiles also disagrees with the -1 dBTP ceiling the notes teach, so we would not want them quoted
+        # even if the gate allowed it. Loudness figures reach the model through the notes it is shown.
         genre_instr = (
-            f"\nGenre Target Profile ({gp.display_name}): Target Delivery {gp.target_lufs:.1f} LUFS, "
-            f"Max Peak {gp.max_peak_dbfs:.1f} dBFS, Sub-Bass Weight: {gp.sub_bass_weight}, "
-            f"Target Crest Factor {gp.target_crest_range_db[0]:.0f}-{gp.target_crest_range_db[1]:.0f} dB, "
-            f"Compression Character: {gp.compression_character}. {gp.description}"
+            f"\nGenre Target Profile ({gp.display_name}): Sub-Bass Weight: {gp.sub_bass_weight}, "
+            f"Compression Character: {gp.compression_character}. {_FIGURE_ASIDE_RE.sub('', gp.description)}"
         )
 
     if asks_for_sources(query):
@@ -841,8 +847,10 @@ def build_system_prompt(
     cap = MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS)
     if answer_mode != "voice" and cap <= _GENERAL_MAX_TOKENS:
         # 4 Oct probe: 21 of 23 accepted answers were cut off by the cap, because the five-section structure above
-        # asks for roughly twice what 128 tokens hold. A word is about 1.3 tokens and each [#id] tag costs ~9, so
+        # asks for roughly twice what 128 tokens hold. A word is about 1.3 tokens and each [#id] tag cost ~9, so
         # we quote about half the cap in words and drop the two sections nobody misses when they are short.
+        # Ordinal tags (11 Oct 2026) cost ~3, but the word budget stays where it is: a longer answer contract is
+        # its own experiment, and mixing it into the citation change would leave neither result readable.
         # The Check and the mode's own line ("Mastering boundary:", "Live safety:") stay, because
         # answer_quality_report() scores them: a missing check costs 8 points and a missing boundary 10, against 62.
         base_prompt += (
@@ -1050,12 +1058,15 @@ def model_evidence(
         label = source_label(chunk)
         # The id is the whole point of the tag going out with the label. Until 2 Oct 2026 the only identifier the
         # model could see was the human label, and the Rules block above asks for an excerpt id, so a prompt that
-        # never printed one left the model nothing to copy. It costs 18 characters per excerpt against the same
-        # 1200 the bodies are cut from; measured 2 Oct the block averages 596 of 1200 with 2-4 excerpts, so 4 ids
-        # take 72 and the tightest fixture (966 chars, 4 excerpts) still lands at 1038. The gate recomputes it
-        # through the same get_chunk_id() rather than parsing the tag back, so a tag we cut short cannot
-        # desynchronise the two sides.
-        opening = f'<source_excerpt id="{get_chunk_id(chunk)}" label="{label}" relevance="{score:.1f}">'
+        # never printed one left the model nothing to copy.
+        # It is the excerpt's place in this list, 1 for the first, rather than the chunk's 12-hex id. The 4B
+        # copied the hex badly: "cites an excerpt id that was never shown" cost 1-4 answers a probe run and 0-3 a
+        # held-out run across the v3, v4 and v5 benches (10-11 Oct 2026), and each hex tag spends about 9 of the
+        # 128 output tokens where "[#2]" spends about 3. The gate's _resolve_chunk_id() maps an ordinal n to
+        # shown[n - 1], and the gate builds `shown` through this same function on the same budget, so the number
+        # the model reads and the excerpt the gate checks it against cannot drift apart. The Sources list the
+        # producer sees comes from source_label(), not from this tag, so it does not change.
+        opening = f'<source_excerpt id="{len(shown) + 1}" label="{label}" relevance="{score:.1f}">'
         closing = "\n</source_excerpt>"
         # Budget the tag before slicing. Slicing the assembled block is what produced an unterminated
         # <source_excerpt label="... chapter (curated note, section Dry/Wet para</source_excerpt>, so the model was
@@ -1748,9 +1759,9 @@ def format_turn_directives(
         try:
             from kenn.core.target_curves import get_genre_profile
             gp = get_genre_profile(detected_genre_key)
+            # No LUFS range here either, for the same gate reason as build_system_prompt (_FIGURE_ASIDE_RE).
             genre_instr = (
-                f"Genre Target Profile ({gp['name']}): Target Delivery {gp['target_integrated_lufs'][0]} to {gp['target_integrated_lufs'][1]} LUFS. "
-                f"{gp['description']}"
+                f"Genre Target Profile ({gp['name']}): {_FIGURE_ASIDE_RE.sub('', gp['description'])}"
             )
         except Exception:
             pass

@@ -59,7 +59,6 @@ from kenn.core.chat_grounding import (
     answer_quality_report,
     answer_self_check,
     calibrate_answer_for_grounding,
-    drop_unsupported_sentences,
     end_on_a_whole_sentence,
     evidence_measurements,
     explicit_abstain_gap,
@@ -68,6 +67,8 @@ from kenn.core.chat_grounding import (
     grounding_report,
     mode_signature,
     names_a_product,
+    repair_misattributed_citations,
+    salvage_unsupported_figures,
     should_use_llm_rewrite,
     text_mentions_product,
 )
@@ -1086,22 +1087,56 @@ def make_answer(
         if validation["accepted"]:
             _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
             print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced)", file=_sys.stderr, flush=True)
-            _log_generation_outcome(True, validation, _ma_llm_ms)
+            # _log_generation_outcome() takes seconds. Until 11 Oct 2026 both accepted paths handed it these
+            # milliseconds and it multiplied by 1000 again, so a 6 s answer reached the route log as 6000 s.
+            _log_generation_outcome(True, validation, _ma_llm_ms / 1000.0)
             return enhanced, True
-        # One invented number used to cost the whole answer. Cut the sentences that carry it and let the gate
-        # judge what is left; it is the same gate, so a number the notes lack still cannot get through.
-        trimmed = (
-            drop_unsupported_sentences(enhanced, validation["unsupported_measurements"])
-            if "generated answer introduced unsupported measurements" in validation["warnings"]
-            else ""
+        # A tag naming the wrong excerpt used to cost the whole answer too, though the same answer untagged passed.
+        # Point it at the excerpt that holds the figure, or drop it, and let the gate judge the result. It runs
+        # before the cut below and is judged in the same retry, so an answer with one fault of each kind does not
+        # fail on whichever was fixed second. Replaying the 10-11 Oct development runs, 15 of the 25 answers
+        # rejected with a wrong tag also held an invented figure; none of those 15 survived the cut, and the 9
+        # answers the repair saved all came from the other 10.
+        misattributed = validation["claim_citations"]["fabricated_attributions"]
+        repaired = repair_misattributed_citations(enhanced, misattributed)
+        # One invented number used to cost the whole answer. Cut the figure (or, failing that, its sentence) and
+        # let the gate judge what is left; it is the same gate, so a number the notes lack still cannot get through.
+        # When the cut cannot leave enough answer there is nothing to retry, since a repaired tag alone would still
+        # fail on the figure.
+        unsupported = "generated answer introduced unsupported measurements" in validation["warnings"]
+        fixed = (
+            salvage_unsupported_figures(repaired or enhanced, validation["unsupported_measurements"])
+            if unsupported
+            else repaired
         )
-        if trimmed:
-            retry = _check(trimmed)
+        # An excised answer keeps the capped ending it came with, so it gets the same two tries as the first
+        # pass: the whole-sentence ending, then the text as written. A sentence-dropped answer is already cut
+        # to a whole sentence, and dict.fromkeys collapses the pair so the gate does not judge it twice.
+        endings = dict.fromkeys((end_on_a_whole_sentence(fixed), fixed)) if fixed else {}
+        for candidate in endings:
+            retry = _check(candidate)
             if retry["accepted"]:
                 _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
-                print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced, unsupported sentences dropped)", file=_sys.stderr, flush=True)
-                _log_generation_outcome(True, {**retry, "salvaged": validation["unsupported_measurements"]}, _ma_llm_ms)
-                return trimmed, True
+                fixes = ", ".join(
+                    label
+                    for label, applied in (
+                        ("citations repaired", repaired),
+                        ("unsupported figures removed", unsupported),
+                    )
+                    if applied
+                )
+                print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced, {fixes})", file=_sys.stderr, flush=True)
+                # Both lists are empty when their fix did not run, so each log line names only what was changed.
+                _log_generation_outcome(
+                    True,
+                    {
+                        **retry,
+                        "salvaged": validation["unsupported_measurements"],
+                        "repaired_citations": [claim["value"] for claim in misattributed],
+                    },
+                    _ma_llm_ms / 1000.0,
+                )
+                return candidate, True
         # Measured 1 Oct on the owner's M3: 26 of 30 background swaps were rejected, and nothing recorded why.
         # Track D's standing question is "how often does the model's answer land", and a rejection rate with no
         # reason attached cannot answer "why not" -- establishing that these are `unsupported measurements`
@@ -1201,7 +1236,8 @@ def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) ->
         detail = _last_call_timing()
         detail += [f"unsupported measurement: {m}" for m in (validation.get("unsupported_measurements") or [])]
         detail += [f"fabricated source: {s}" for s in (validation.get("fabricated_sources") or [])]
-        detail += [f"dropped sentence with: {m}" for m in (validation.get("salvaged") or [])]
+        detail += [f"removed figure: {m}" for m in (validation.get("salvaged") or [])]
+        detail += [f"repaired citation: {m}" for m in (validation.get("repaired_citations") or [])]
         brain = accepted and not abstained
         if brain and getattr(_last_outcome, "hold", False):
             # answer_payload() runs a quality check after make_answer() that can still swap this text for the
