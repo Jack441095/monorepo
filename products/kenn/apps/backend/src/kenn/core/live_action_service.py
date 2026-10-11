@@ -3421,8 +3421,13 @@ class LiveActionService(Tier2Tier3ControlMixin):
             return fail("This backend is read-only; device parameter writes are disabled.")
         write_error = None
         write_started = True
+        # The write uses up the proposal's own observation, not the fresh one inspect() just made, because the
+        # proposal's is the token the receipt keeps. The Remote Script holds a used observation past 300 s, so Undo
+        # can still prove the device is the same object. Until 11 Oct the write used the fresh token, and Undo was
+        # left with a reference that expired after five minutes.
+        consumed = {**pre_info, "observation_token": proposal.get("observation_token")} if address is not None else pre_info
         try:
-            write_ok = bool(write(requested, pre_info))
+            write_ok = bool(write(requested, consumed))
         except Exception as exc:
             # A UDP mutation can reach Live and still lose its acknowledgement.
             # Do not return before the authoritative readback: the caller must

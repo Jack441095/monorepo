@@ -139,6 +139,23 @@ def test_bundle_refuses_replacement_replay_and_missing_permission_flags(bundle):
     assert parameter.writes == []
 
 
+def test_bundle_keeps_a_written_observation_for_undo_but_never_writes_with_it_again(bundle):
+    # Undo rereads against the observation its change used, often after the 300 s window (11 Oct review).
+    handler, parameter = bundle
+    targets = handler.parameter_targets
+    address = {"kind": "track", "index": 0, "device_path": [0]}
+    expected = targets.read(address, 0)
+    assert targets.write(address, 0, 0.5, expected)["sent"]
+    targets.observations.clear()
+    assert targets.read(address, 0, expected["observation_token"])["success"]
+    with pytest.raises(ValueError, match="already attempted"):
+        targets.write(address, 0, 0.25, expected)
+    handler.song.tracks[0].devices[0].parameters[0] = Parameter()
+    with pytest.raises(ValueError, match="objects"):
+        targets.read(address, 0, expected["observation_token"])
+    assert parameter.writes == [0.5]
+
+
 def test_missing_feature_is_not_inferred_from_allowlist(monkeypatch):
     client = AbletonOSCClient(defer_bind=True)
     monkeypatch.setattr(client, "_parameter_target_request", lambda operation, payload: {"success": True, "features": []})

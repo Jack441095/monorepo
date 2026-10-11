@@ -16,6 +16,11 @@ class ParameterTargets:
         self.song = song
         self.epoch = uuid.uuid4().hex
         self.observations = {}
+        # Observations a write has used. They never authorise another write, but Undo rereads against them to
+        # prove the device is the same object, so they outlive the 300 s window. Until 11 Oct they expired with
+        # it, and card Undo refused every change older than five minutes. The last 256 writes bound memory
+        # instead; Undo of an older change refuses rather than guess which object it was.
+        self.written = {}
 
     def _resolve(self, address, parameter_index):
         if not isinstance(address, dict) or set(address) != {"kind", "index", "device_path"}:
@@ -79,7 +84,7 @@ class ParameterTargets:
         now = time.monotonic()
         self.observations = {token: row for token, row in self.observations.items() if row["expires"] > now}
         if reference:
-            previous = self.observations.get(reference)
+            previous = self.observations.get(reference) or self.written.get(reference)
             if previous is None or len(objects) != len(previous["objects"]) or any(a is not b for a, b in zip(objects, previous["objects"])) or topology != previous["topology"]:
                 raise ValueError("Observed objects or topology changed; inspect again")
         token = uuid.uuid4().hex
@@ -97,7 +102,10 @@ class ParameterTargets:
     def write(self, address, parameter_index, value, expected):
         reference = expected["observation_token"]
         fresh = self.read(address, parameter_index, reference)
-        observation = self.observations[reference]
+        observation = self.observations.get(reference) or self.written.get(reference)
+        if observation is None:
+            # The read above evicted the reference as the oldest of 256; the write has nothing to stand on.
+            raise ValueError("Observation expired; inspect again")
         if observation["used"]:
             raise ValueError("This observation already attempted a write; inspect state before retrying")
         parameter = fresh["parameters"][0]
@@ -115,6 +123,9 @@ class ParameterTargets:
             raise ValueError("Intermediate chooser values need a qualified raw option table")
         # Mark before the setter: an exception may have happened after Live accepted the value.
         observation["used"] = True
+        if len(self.written) >= 256:
+            self.written.pop(next(iter(self.written)))
+        self.written[reference] = observation
         _, _, live_parameter, _, _ = self._resolve(address, parameter_index)
         live_parameter.value = value
         return {"success": True, "sent": True, "verified": False}

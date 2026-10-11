@@ -82,6 +82,8 @@ class FakeLiveBackend:
         self._world_fixture = copy.deepcopy(fixture.get("world") or {})
         self._addressed_buses = copy.deepcopy(fixture.get("addressed_buses") or [])
         self._target_observations = {}
+        # Used observations, kept past their 300 s for Undo's identity check, as ParameterTargets.written does.
+        self._written_observations = {}
         # Live's cue points; the playhead stays at beat 0 here, so one locator can be added before the next asks.
         self._locators: list[dict[str, Any]] = copy.deepcopy(fixture.get("locators") or [])
         self._clips: dict[tuple[int, int], dict[str, Any]] = {}
@@ -299,10 +301,12 @@ class FakeLiveBackend:
                 now = time.monotonic()
                 self._target_observations = {token: row for token, row in self._target_observations.items() if row["expires"] > now}
                 if reference:
-                    previous = self._target_observations.get(reference)
+                    previous = self._target_observations.get(reference) or self._written_observations.get(reference)
                     if previous is None or previous["topology"] != digest or len(objects) != len(previous["objects"]) or any(a is not b for a, b in zip(objects, previous["objects"])):
                         raise ValueError("Observed objects or topology changed")
                 token = uuid4().hex
+                # 256 observations and 300 s, the Remote Script's bounds: they cap memory and match the 300 s
+                # confirmation expiry, so a card can never outlive the observation it was proposed from.
                 if len(self._target_observations) >= 256:
                     self._target_observations.pop(next(iter(self._target_observations)))
                 self._target_observations[token] = {"objects": objects, "topology": digest, "used": False, "expires": now + 300}
@@ -320,7 +324,10 @@ class FakeLiveBackend:
             if not info.get("success") or info["parameters"] != expected["parameters"] or info["topology"] != expected["topology"]:
                 # A changed observation cannot authorize a write to the new state or replacement object.
                 return False
-            observation = self._target_observations[expected["observation_token"]]
+            observation = self._target_observations.get(expected["observation_token"]) or self._written_observations.get(expected["observation_token"])
+            if observation is None:
+                # The read above evicted the reference as the oldest of 256, as the Remote Script can.
+                return False
             if observation["used"]:
                 # A repeated packet cannot repeat a setter whose acknowledgement may have been lost.
                 return False
@@ -332,6 +339,9 @@ class FakeLiveBackend:
                 # The fake must reject invalid semantics, rather than making a production refusal look tested.
                 return False
             observation["used"] = True
+            if len(self._written_observations) >= 256:
+                self._written_observations.pop(next(iter(self._written_observations)))
+            self._written_observations[expected["observation_token"]] = observation
             parameter["value"] = float(value)
             self.writes.append(("addressed_parameter", copy.deepcopy(address), parameter_index, float(value)))
             return True

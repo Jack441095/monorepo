@@ -128,6 +128,52 @@ def test_cards_echoed_through_browser_json_still_apply_and_undo(target):
     assert recipes.execute_recipe(recipe, confirm_token=recipe["confirmation_token"], session_id="target-tests")["ok"]
     assert len(backend.writes) == 3
 
+
+@pytest.mark.parametrize("lapse", ["five_minutes", "256_later_reads"])
+def test_card_undo_outlives_the_observation_window(target, lapse):
+    # 11 Oct review: Undo reread against an observation that expired after 300 s or was pushed out by 256 later
+    # reads, so card Undo refused every change older than five minutes.
+    backend, service = target
+    receipt = apply(service, candidate(service)["proposal"])["receipt"]
+    if lapse == "five_minutes":
+        for row in backend._target_observations.values():
+            row["expires"] = 0
+    else:
+        for _ in range(256):
+            backend.get_addressed_parameter({"kind": "return", "index": 0, "device_path": [0]}, 4)
+    inverse = service.propose_undo(receipt, session_id="target-tests")
+    assert inverse["ok"], inverse
+    assert apply(service, inverse["proposal"])["receipt"]["verified"] is True
+    assert len(backend.writes) == 2
+
+
+def test_undo_after_the_observation_window_still_refuses_a_same_name_replacement(target):
+    # Keeping a used observation longer must not loosen the identity check it is kept for.
+    backend, service = target
+    receipt = apply(service, candidate(service)["proposal"])["receipt"]
+    backend._target_observations.clear()
+    bus = backend._addressed_buses[0]
+    bus["devices"][1] = copy.deepcopy(bus["devices"][1])
+    assert not service.propose_undo(receipt, session_id="target-tests")["ok"]
+    assert len(backend.writes) == 1
+
+
+def test_chat_undo_read_back_from_the_journal_refuses_a_same_name_replacement(target, tmp_path, monkeypatch):
+    # 11 Oct review: the journal dropped observation_token along with the real secrets, so chat "undo that" ran
+    # with no identity check and wrote to a Cmd-D copy left behind when the original was deleted.
+    from kenn.core import live_receipt_journal as journal
+
+    monkeypatch.setattr(journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
+    backend, service = target
+    assert journal.record_receipt(apply(service, candidate(service)["proposal"])["receipt"], session_id="target-tests")
+    receipt = journal.list_receipts(session_id="target-tests")[0]["receipt"]
+    assert service.propose_undo(receipt, session_id="target-tests")["ok"]
+    bus = backend._addressed_buses[0]
+    bus["devices"][1] = copy.deepcopy(bus["devices"][1])
+    assert not service.propose_undo(receipt, session_id="target-tests")["ok"]
+    assert len(backend.writes) == 1
+
+
 def test_cross_session_apply_undo_and_independent_edit_are_refused(target):
     backend, service = target
     proposal = candidate(service)["proposal"]
