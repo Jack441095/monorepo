@@ -49,8 +49,8 @@ def test_build_acoustic_guidance_prompt_empty():
 def test_build_acoustic_guidance_prompt_active():
     prompt = build_acoustic_guidance_prompt("The bass synth sounds boomy and muddy.")
     assert "Acoustic Translation Guidance:" in prompt
-    assert "'boomy': Target ~40 Hz" in prompt
-    assert "'muddy': Target ~300 Hz" in prompt
+    assert "'boomy': high-pass." in prompt
+    assert "'muddy': bell cut." in prompt
 
 
 def test_build_system_prompt_incorporates_acoustic_guidance():
@@ -60,5 +60,10 @@ def test_build_system_prompt_incorporates_acoustic_guidance():
         query="The vocal track is sounding harsh and sibilant.",
     )
     assert "Acoustic Translation Guidance:" in sys_prompt
-    assert "'harsh': Target ~3500 Hz" in sys_prompt
-    assert "'sibilant': Target ~7000 Hz" in sys_prompt
+    assert "'harsh': bell cut." in sys_prompt
+    assert "'sibilant': de-esser." in sys_prompt
+
+
+def test_a_dynamics_word_asks_for_a_compressor_not_an_eq_band():
+    # 11 Oct review: "flabby" read "'flabby': bell." though its fix is a fast compressor.
+    assert "'flabby': compressor." in build_acoustic_guidance_prompt("The bass is flabby.")

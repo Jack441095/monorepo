@@ -201,17 +201,28 @@ def analyze_acoustic_descriptors(query: str) -> list[DSPRecommendation]:
 
 
 def build_acoustic_guidance_prompt(query: str) -> str:
-    """Generate precise DSP guidance to append to the LLM system prompt if acoustic terms are present."""
+    """Name the kind of move each acoustic word in `query` calls for, for the LLM system prompt; "" when none.
+
+    The frequency, gain and Q stay on the DSPRecommendation for code that sets EQ Eight, but the prompt gets
+    words only. The grounding gate passes a figure only when a shown excerpt prints it, so "~3500 Hz" handed
+    over here was a figure the gate then refused (10 held-out answers on the 11 Oct v4 bench, counting the genre
+    profile's figures too).
+    """
     recs = analyze_acoustic_descriptors(query)
     if not recs:
         return ""
 
     lines = ["\nAcoustic Translation Guidance:"]
     for r in recs:
-        freq_str = f"{r.target_frequency_hz:.0f} Hz" if r.target_frequency_hz else "N/A"
-        gain_str = f"{r.suggested_gain_db:+.1f} dB" if r.suggested_gain_db is not None else "N/A"
-        q_str = f"Q={r.suggested_q:.1f}" if r.suggested_q else ""
-        lines.append(
-            f"- '{r.descriptor}': Target ~{freq_str} ({r.filter_type}, {gain_str} {q_str}). {r.explanation}"
-        )
+        if r.category == "dynamics":
+            # "flabby" carries filter_type "bell" only because the field is required. Its fix is a fast compressor
+            # (see its explanation), and "bell" would point the model at an EQ move instead.
+            move = "compressor"
+        else:
+            move = r.filter_type.replace("_", "-")
+            # Only a bell or a shelf has a direction. A high-pass or a de-esser is the whole move, and "de-esser cut"
+            # reads as if there were some other kind.
+            if r.suggested_gain_db and r.filter_type in ("bell", "low_shelf", "high_shelf"):
+                move += " cut" if r.suggested_gain_db < 0 else " boost"
+        lines.append(f"- '{r.descriptor}': {move}. {r.explanation}")
     return "\n".join(lines)
