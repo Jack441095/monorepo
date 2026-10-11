@@ -1668,6 +1668,12 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       for the bench to say.
     - Next: the full qualifying bench (probe ×3, held-out ×3, v5's order) on `f2c4d738`, on mains, Live open, Mac
       quiet. Bench dir `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v7`. Waiting on Jack to say when.
+  - [ ] v7 qualification bench, 11 Oct, at Jack's call ("let's go then"): the full sequence in v5's order (probe 1,
+    held-out 1, held-out 2, probe 2, held-out 3, probe 3) on main `f2c4d738`. Script
+    `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v7/bench.sh` (v6's harness with v5's six runs).
+    Worktree `workspace/worktrees/kenn/bench-v5/` moved to `f2c4d738` (detached), port 8095, pinned index
+    `v-5f6964698b76` (companion confirmed it), Live open, mains, no builds, swap 2.8 GB used (v6 3.0 GB). Started
+    22:17. Results to follow here.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
