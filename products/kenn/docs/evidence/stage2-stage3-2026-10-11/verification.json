@@ -1,0 +1,144 @@
+{
+  "schema": "kenn.stage23_verification.v1",
+  "base_revision": "00f2ad604cd814a2bf6981b3a277dc188dec67a2",
+  "source_revision": "aecac1de223c39816127e8ce05a0459cbe7d9e97",
+  "source_commits": [
+    "18c15c38",
+    "aecac1de"
+  ],
+  "live_writes": 0,
+  "model_runs": 0,
+  "dependencies_added": false,
+  "ci_changed": false,
+  "permission_changes": false,
+  "checks": [
+    {
+      "name": "full_backend",
+      "cwd": "products/kenn/apps/backend/src",
+      "command": "KENN_LIVE_BACKEND=fake ../.venv/bin/python -m pytest -q -p no:randomly",
+      "exit_code": 1,
+      "passed": 4527,
+      "failed": 1,
+      "skipped": 137,
+      "warnings": 5,
+      "seconds": 105.14,
+      "log": "/tmp/kenn-stage23-backend-final-after-context.txt"
+    },
+    {
+      "name": "fixed_base_typo_reproduction",
+      "source_revision": "00f2ad604cd814a2bf6981b3a277dc188dec67a2",
+      "command": "KENN_LIVE_BACKEND=fake python -m pytest -q -p no:randomly kenn/tests/test_query_typo_correction.py",
+      "exit_code": 1,
+      "passed": 9,
+      "failed": 1,
+      "log": "/tmp/kenn-stage23-base-query.txt"
+    },
+    {
+      "name": "final_scoped_context",
+      "passed": 183,
+      "failed": 0,
+      "warnings": 2,
+      "exit_code": 0,
+      "log": "/tmp/kenn-stage23-context-final.txt"
+    },
+    {
+      "name": "frontend_vitest",
+      "command": "ARM Node node_modules/vitest/vitest.mjs run",
+      "passed": 77,
+      "test_files": 9,
+      "exit_code": 0,
+      "log": "/tmp/kenn-stage23-frontend-final.txt"
+    },
+    {
+      "name": "frontend_typecheck",
+      "command": "ARM Node node_modules/vue-tsc/bin/vue-tsc.js -b",
+      "exit_code": 0,
+      "log": "/tmp/kenn-stage23-typecheck-final.txt"
+    },
+    {
+      "name": "frontend_build",
+      "command": "ARM Node node_modules/vite/bin/vite.js build",
+      "exit_code": 0,
+      "log": "/tmp/kenn-stage23-build-final.txt"
+    },
+    {
+      "name": "mutations",
+      "command": "backend Python products/kenn/docs/evidence/stage2-stage3-2026-10-11/run_mutation_checks.py",
+      "caught": 14,
+      "total": 14,
+      "sources_restored": true,
+      "exit_code": 0
+    },
+    {
+      "name": "parameter_qualification_fake",
+      "devices": 25,
+      "parameters": 92,
+      "fake_writes": 184,
+      "live_writes": 0,
+      "remaining_stock_entries": 53,
+      "exit_code": 0
+    },
+    {
+      "name": "recipe_recheck_fake",
+      "passed": 15,
+      "total": 15,
+      "live_writes": 0,
+      "exit_code": 0
+    },
+    {
+      "name": "synthetic_delivery_contracts",
+      "reports": 24,
+      "eligible_cases_per_report": 5,
+      "provider_calls": 0,
+      "http_requests": 0,
+      "cache_clear_stubbed": true,
+      "exit_code": 0
+    },
+    {
+      "name": "blank_review_progress",
+      "denominator": 5,
+      "unreviewed": 5,
+      "correct": 0,
+      "clarify": 0,
+      "wrong": 0,
+      "exit_code": 0
+    },
+    {
+      "name": "incomplete_review_adjudication",
+      "exit_code": 2,
+      "expected_rejection": true,
+      "log": "/tmp/kenn-stage23-review-private/incomplete-review-rejection.txt"
+    }
+  ],
+  "pre_existing_failure": {
+    "test": "kenn/tests/test_query_typo_correction.py::test_typo_query_routes_to_production_and_avoids_weak_match_early_return",
+    "expected_route": "production",
+    "actual_route": "unknown",
+    "reproduced_at_fixed_base": true
+  },
+  "limitations": [
+    "No retrieval index or private knowledge notes in isolated worktree.",
+    "Installed entries are not observed or qualified.",
+    "Fake and synthetic evidence is not human, model, performance or real-Live qualification.",
+    "Guarded migration of legacy production setup, compound EQ, device recipes and positional recovery is unfinished implementation.",
+    "Source verification reused existing main checkout dependencies; temporary environment symlink will be removed."
+  ],
+  "artifact_sha256": {
+    "products/kenn/docs/evidence/KENN_STAGE2_STAGE3_INTEGRATION_2026-10-11.md": "368fd196f70b4d9f695859ed8332e370aeb6af3a7e7c90fa6747e854a1cea4d5",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/capture_synthetic_delivery.py": "2d139098f3502dde25940380fa0fbcfbd96aa0d0b9e394f503b88de012a4a565",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/changed-files.json": "f8289a7462aa5d84f3755f6a6868bd87d5b67f87552b665723cd7f60d775f572",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/conversation-examples.json": "4dbbb43b5f4c1eeec60ce72ae3793027b62f9ef2340a13f104512d0d0fff7664",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/installed-catalog.json": "7a429dc526bff506cc9a7131f29eaefad1a0c46b4aef972749721ea820a4b782",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/installed-catalog.md": "ce700680ab00a40b33174432672d6b0333eb7afeffd0e9225e724c589cc85183",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/mutation-results.json": "12b35b8c5300efe2e716bda53f261dcc0e30d51df1ddf9aad9ad73c39fcd7c2c",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/parameter-coverage.json": "29859553c368b03a3c9babb182fc9ebcf89151cfa9f43cd1fe941f3da11fe4a7",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/qualification-manifest.template.json": "db1074472dbaf2da1147890a90476ad5c40c7290fd4e574b3cd1bcb6f77d62c9",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/recipe-recheck.json": "3eb38f40468e3f44688a63115fbe869b8dab009490a31cf2eb6ccd4b29ebbee7",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/forms/reviewer-a.json": "b2b302b08e9c2f218d3f4cfbfb17abe7ea6a656fe93d298b4a8f1ccf7f0e31af",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/forms/reviewer-b.json": "ce5ea33241bb4df93047edd2072f19ac37931142a353d076a85724121a214a9f",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/packet.json": "d0e23aac8c68232663984d341ff764c807cba3e92c7d77f535439b149ac6a628",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/progress.json": "ccf9c6cbb042e31ee2e492dea5b0268ad4ae3d9101286067f97281b5af6b84ad",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/run_mutation_checks.py": "c75ebce21b12841ba2567e11e16626f7ab4245b6c1de035d762a09dbf0a3ba1a",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/synthetic-delivery-contracts.json": "dc6a5fe6709c133fde7984f621434ac7d6f81a39773204628ac6e6ec39922ea5"
+  }
+}

@@ -1,0 +1,5191 @@
+{
+  "schema": "kenn.parameter_qualification.v1",
+  "evidence_kind": "synthetic",
+  "model_run": false,
+  "live_writes": 0,
+  "device_count": 25,
+  "parameter_count": 92,
+  "fake_writes": 184,
+  "parameters": [
+    {
+      "address": {
+        "kind": "track",
+        "index": 0,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "EQ Eight",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 0,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "EQ Eight",
+      "parameter": {
+        "index": 1,
+        "name": "Frequency",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "20.00 Hz",
+        "end_display": "20000.00 Hz",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "20.00 Hz",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "EQ Eight",
+            "parameter_name": "Frequency",
+            "display_unit": "hz",
+            "raw_min": 0.09006341340106347,
+            "raw_max": 0.9876159632964067,
+            "display_min": 20.0,
+            "display_max": 20000.0,
+            "raw_values": [],
+            "display_values": [],
+            "mapping": "log"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 0,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "EQ Eight",
+      "parameter": {
+        "index": 2,
+        "name": "Gain",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "-15.00 dB",
+        "end_display": "15.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "-15.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 0,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "EQ Eight",
+      "parameter": {
+        "index": 3,
+        "name": "Q",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.10",
+        "end_display": "18.00",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.10",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 1,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Compressor",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 1,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Compressor",
+      "parameter": {
+        "index": 1,
+        "name": "Threshold",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "-60.00 dB",
+        "end_display": "0.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "-60.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Compressor",
+            "parameter_name": "Threshold",
+            "display_unit": "db",
+            "raw_min": 0.0,
+            "raw_max": 1.0,
+            "display_min": -57.2,
+            "display_max": 6.0,
+            "raw_values": [
+              0.05,
+              0.1,
+              0.15,
+              0.2,
+              0.25,
+              0.3,
+              0.35,
+              0.4,
+              0.45,
+              0.5,
+              0.55,
+              0.6,
+              0.65,
+              0.7,
+              0.75,
+              0.8,
+              0.85,
+              0.9,
+              0.95,
+              1.0
+            ],
+            "display_values": [
+              -57.2,
+              -48.6,
+              -41.0,
+              -34.4,
+              -28.8,
+              -24.2,
+              -20.6,
+              -18.0,
+              -16.0,
+              -14.0,
+              -12.0,
+              -10.0,
+              -8.0,
+              -6.0,
+              -4.0,
+              -2.0,
+              0.0,
+              2.0,
+              4.0,
+              6.0
+            ],
+            "mapping": "table"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 1,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Compressor",
+      "parameter": {
+        "index": 2,
+        "name": "Ratio",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "1.00 : 1",
+        "end_display": "20.00 : 1",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "1.00 : 1",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Compressor",
+            "parameter_name": "Ratio",
+            "display_unit": "ratio",
+            "raw_min": 0,
+            "raw_max": 0.99,
+            "display_min": 1,
+            "display_max": 100,
+            "raw_values": [
+              0,
+              0.2,
+              0.335,
+              0.43,
+              0.5,
+              0.6,
+              0.665,
+              0.715,
+              0.75,
+              0.8,
+              0.835,
+              0.875,
+              0.9,
+              0.935,
+              0.95,
+              0.965,
+              0.98,
+              0.99
+            ],
+            "display_values": [
+              1,
+              1.25,
+              1.5,
+              1.75,
+              2,
+              2.5,
+              2.99,
+              3.51,
+              4,
+              5,
+              6.06,
+              8,
+              10,
+              15.4,
+              20,
+              28.6,
+              50,
+              100
+            ],
+            "mapping": "table"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 1,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Compressor",
+      "parameter": {
+        "index": 3,
+        "name": "Attack",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.00 ms",
+        "end_display": "2000.00 ms",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.00 ms",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Compressor",
+            "parameter_name": "Attack",
+            "display_unit": "ms",
+            "raw_min": 0,
+            "raw_max": 1,
+            "display_min": 0.01,
+            "display_max": 1000,
+            "raw_values": [],
+            "display_values": [],
+            "mapping": "log"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 1,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Compressor",
+      "parameter": {
+        "index": 4,
+        "name": "Model",
+        "min": 0.0,
+        "max": 2.0,
+        "value": 0.0,
+        "value_display": "Peak",
+        "end_display": "Expand",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Peak"
+          ],
+          [
+            1.0,
+            "RMS"
+          ],
+          [
+            2.0,
+            "Expand"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 2.0,
+      "displayed_value": "Peak",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Utility",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Utility",
+      "parameter": {
+        "index": 1,
+        "name": "Gain",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "-60.00 dB",
+        "end_display": "60.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "-60.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Utility",
+      "parameter": {
+        "index": 2,
+        "name": "Output",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "-60.00 dB",
+        "end_display": "60.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "-60.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Utility",
+      "parameter": {
+        "index": 3,
+        "name": "Width",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "200 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Utility",
+      "parameter": {
+        "index": 4,
+        "name": "Quality",
+        "min": 0.0,
+        "max": 2.0,
+        "value": 0.0,
+        "value_display": "High",
+        "end_display": "Low",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "High"
+          ],
+          [
+            1.0,
+            "Medium"
+          ],
+          [
+            2.0,
+            "Low"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 2.0,
+      "displayed_value": "High",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 3,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Limiter",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 3,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Limiter",
+      "parameter": {
+        "index": 1,
+        "name": "Threshold",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "-60.00 dB",
+        "end_display": "0.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "-60.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 3,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Limiter",
+      "parameter": {
+        "index": 2,
+        "name": "Ceiling",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "-20.00 dB",
+        "end_display": "0.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "-20.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 3,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Limiter",
+      "parameter": {
+        "index": 3,
+        "name": "Release",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.00 ms",
+        "end_display": "500.00 ms",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.00 ms",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 3,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Limiter",
+      "parameter": {
+        "index": 4,
+        "name": "Mode",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "True",
+        "end_display": "False",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "True"
+          ],
+          [
+            1.0,
+            "False"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "True",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 4,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Reverb",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 4,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Reverb",
+      "parameter": {
+        "index": 1,
+        "name": "Predelay",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.00 ms",
+        "end_display": "200.00 ms",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.00 ms",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 4,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Reverb",
+      "parameter": {
+        "index": 2,
+        "name": "Size",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.50 s",
+        "end_display": "22.00 s",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.50 s",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 4,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Reverb",
+      "parameter": {
+        "index": 3,
+        "name": "Dry/Wet",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          1
+        ]
+      },
+      "device_name": "Hybrid Reverb",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          1
+        ]
+      },
+      "device_name": "Hybrid Reverb",
+      "parameter": {
+        "index": 1,
+        "name": "Decay",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.10 s",
+        "end_display": "60.00 s",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.10 s",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          1
+        ]
+      },
+      "device_name": "Hybrid Reverb",
+      "parameter": {
+        "index": 2,
+        "name": "Dry/Wet",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Hybrid Reverb",
+            "parameter_name": "Dry/Wet",
+            "display_unit": "%",
+            "raw_min": 0.0,
+            "raw_max": 1.0,
+            "display_min": 0.0,
+            "display_max": 100.0,
+            "raw_values": [],
+            "display_values": [],
+            "mapping": "linear"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          1
+        ]
+      },
+      "device_name": "Hybrid Reverb",
+      "parameter": {
+        "index": 3,
+        "name": "Color",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 6,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Delay",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 6,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Delay",
+      "parameter": {
+        "index": 1,
+        "name": "Time",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.00 s",
+        "end_display": "2.00 s",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.00 s",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 6,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Delay",
+      "parameter": {
+        "index": 2,
+        "name": "Feedback",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 6,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Delay",
+      "parameter": {
+        "index": 3,
+        "name": "Dry/Wet",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 7,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Echo",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 7,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Echo",
+      "parameter": {
+        "index": 1,
+        "name": "L Time",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.00 s",
+        "end_display": "4.00 s",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.00 s",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 7,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Echo",
+      "parameter": {
+        "index": 2,
+        "name": "Dry Wet",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Echo",
+            "parameter_name": "Dry Wet",
+            "display_unit": "%",
+            "raw_min": 0.0,
+            "raw_max": 1.0,
+            "display_min": 0.0,
+            "display_max": 100.0,
+            "raw_values": [],
+            "display_values": [],
+            "mapping": "linear"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 7,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Echo",
+      "parameter": {
+        "index": 3,
+        "name": "Feedback",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Saturator",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Saturator",
+      "parameter": {
+        "index": 1,
+        "name": "Drive",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.00 dB",
+        "end_display": "48.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Saturator",
+            "parameter_name": "Drive",
+            "display_unit": "db",
+            "raw_min": 0.0,
+            "raw_max": 1.0,
+            "display_min": -36.0,
+            "display_max": 36.0,
+            "raw_values": [],
+            "display_values": [],
+            "mapping": "linear"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Saturator",
+      "parameter": {
+        "index": 2,
+        "name": "Base",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.00 dB",
+        "end_display": "24.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Saturator",
+      "parameter": {
+        "index": 3,
+        "name": "Dry/Wet",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Saturator",
+            "parameter_name": "Dry/Wet",
+            "display_unit": "%",
+            "raw_min": 0.0,
+            "raw_max": 1.0,
+            "display_min": 0.0,
+            "display_max": 100.0,
+            "raw_values": [],
+            "display_values": [],
+            "mapping": "linear"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Saturator",
+      "parameter": {
+        "index": 4,
+        "name": "Mode",
+        "min": 0.0,
+        "max": 3.0,
+        "value": 0.0,
+        "value_display": "Digital",
+        "end_display": "Warm",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Digital"
+          ],
+          [
+            1.0,
+            "Analog"
+          ],
+          [
+            2.0,
+            "Digital 2"
+          ],
+          [
+            3.0,
+            "Warm"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 3.0,
+      "displayed_value": "Digital",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 9,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Auto Filter",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 9,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Auto Filter",
+      "parameter": {
+        "index": 1,
+        "name": "Frequency",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "20.00 Hz",
+        "end_display": "18000.00 Hz",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "20.00 Hz",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Auto Filter",
+            "parameter_name": "Frequency",
+            "display_unit": "hz",
+            "raw_min": 0.0,
+            "raw_max": 1.0,
+            "display_min": 20.0,
+            "display_max": 20000.0,
+            "raw_values": [],
+            "display_values": [],
+            "mapping": "log"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 9,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Auto Filter",
+      "parameter": {
+        "index": 2,
+        "name": "Resonance",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.00 %",
+        "end_display": "100.00 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.00 %",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Auto Filter",
+            "parameter_name": "Resonance",
+            "display_unit": "%",
+            "raw_min": 0.0,
+            "raw_max": 1.0,
+            "display_min": 0.0,
+            "display_max": 100.0,
+            "raw_values": [],
+            "display_values": [],
+            "mapping": "linear"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 9,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Auto Filter",
+      "parameter": {
+        "index": 3,
+        "name": "Dry/Wet",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Auto Filter",
+            "parameter_name": "Dry/Wet",
+            "display_unit": "%",
+            "raw_min": 0.0,
+            "raw_max": 1.0,
+            "display_min": 0.0,
+            "display_max": 100.0,
+            "raw_values": [],
+            "display_values": [],
+            "mapping": "linear"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 9,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Auto Filter",
+      "parameter": {
+        "index": 4,
+        "name": "Type",
+        "min": 0.0,
+        "max": 3.0,
+        "value": 0.0,
+        "value_display": "Notch",
+        "end_display": "36 dB",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Notch"
+          ],
+          [
+            1.0,
+            "12 dB"
+          ],
+          [
+            2.0,
+            "24 dB"
+          ],
+          [
+            3.0,
+            "36 dB"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 3.0,
+      "displayed_value": "Notch",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 10,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Glue Compressor",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 10,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Glue Compressor",
+      "parameter": {
+        "index": 1,
+        "name": "Threshold",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "-60.00 dB",
+        "end_display": "0.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "-60.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 10,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Glue Compressor",
+      "parameter": {
+        "index": 2,
+        "name": "Ratio",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "1.00 : 1",
+        "end_display": "20.00 : 1",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "1.00 : 1",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Glue Compressor",
+            "parameter_name": "Ratio",
+            "display_unit": "ratio",
+            "raw_min": 0.0,
+            "raw_max": 2.0,
+            "display_min": 2.0,
+            "display_max": 10.0,
+            "raw_values": [
+              0.0,
+              1.0,
+              2.0
+            ],
+            "display_values": [
+              2.0,
+              4.0,
+              10.0
+            ],
+            "mapping": "linear"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 10,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Glue Compressor",
+      "parameter": {
+        "index": 3,
+        "name": "Dry/Wet",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [
+        {
+          "profile": {
+            "device_name": "Glue Compressor",
+            "parameter_name": "Dry/Wet",
+            "display_unit": "%",
+            "raw_min": 0.0,
+            "raw_max": 1.0,
+            "display_min": 0.0,
+            "display_max": 100.0,
+            "raw_values": [],
+            "display_values": [],
+            "mapping": "linear"
+          },
+          "owner": "kenn.core.device_units",
+          "measurement_source": null
+        }
+      ],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          3
+        ]
+      },
+      "device_name": "Multiband Dynamics",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 1.0,
+        "value_display": "On",
+        "end_display": "On",
+        "quantized": true,
+        "readable": true,
+        "options": [
+          [
+            0.0,
+            "Off"
+          ],
+          [
+            1.0,
+            "On"
+          ]
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": "On",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          3
+        ]
+      },
+      "device_name": "Multiband Dynamics",
+      "parameter": {
+        "index": 1,
+        "name": "Dry/Wet",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0 %",
+        "end_display": "100 %",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0 %",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          3
+        ]
+      },
+      "device_name": "Multiband Dynamics",
+      "parameter": {
+        "index": 2,
+        "name": "Threshold",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "-60.00 dB",
+        "end_display": "0.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "-60.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          3
+        ]
+      },
+      "device_name": "Multiband Dynamics",
+      "parameter": {
+        "index": 3,
+        "name": "Range",
+        "min": 0.0,
+        "max": 1.0,
+        "value": 0.0,
+        "value_display": "0.00 dB",
+        "end_display": "24.00 dB",
+        "quantized": false,
+        "readable": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "recorded_reset_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.0,
+      "raw_requested": 1.0,
+      "displayed_value": "0.00 dB",
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 12,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Analog",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 12,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Analog",
+      "parameter": {
+        "index": 4,
+        "name": "Osc1 Octave",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 12,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Analog",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 13,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Operator",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 13,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Operator",
+      "parameter": {
+        "index": 4,
+        "name": "Osc A Level",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 13,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Operator",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          4
+        ]
+      },
+      "device_name": "Wavetable",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          4
+        ]
+      },
+      "device_name": "Wavetable",
+      "parameter": {
+        "index": 4,
+        "name": "Osc 1 Position",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          4
+        ]
+      },
+      "device_name": "Wavetable",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 15,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Simpler",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 15,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Simpler",
+      "parameter": {
+        "index": 4,
+        "name": "Volume",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 15,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Simpler",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 16,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Sampler",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 16,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Sampler",
+      "parameter": {
+        "index": 4,
+        "name": "Volume",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 16,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Sampler",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          5
+        ]
+      },
+      "device_name": "Drift",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          5
+        ]
+      },
+      "device_name": "Drift",
+      "parameter": {
+        "index": 4,
+        "name": "Osc 1 Shape",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          5
+        ]
+      },
+      "device_name": "Drift",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 18,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Meld",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 18,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Meld",
+      "parameter": {
+        "index": 4,
+        "name": "Osc A Macro 1",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 18,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Meld",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 19,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Instrument Rack",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 19,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Instrument Rack",
+      "parameter": {
+        "index": 4,
+        "name": "Macro 1",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 19,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Instrument Rack",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          6,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Audio Effect Rack",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          6,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Audio Effect Rack",
+      "parameter": {
+        "index": 4,
+        "name": "Macro 1",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          6,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Audio Effect Rack",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 21,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "MIDI Effect Rack",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 21,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "MIDI Effect Rack",
+      "parameter": {
+        "index": 4,
+        "name": "Macro 1",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 21,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "MIDI Effect Rack",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 22,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Drum Rack",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 22,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Drum Rack",
+      "parameter": {
+        "index": 4,
+        "name": "Macro 1",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "return",
+        "index": 22,
+        "device_path": [
+          0
+        ]
+      },
+      "device_name": "Drum Rack",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          7
+        ]
+      },
+      "device_name": "Arpeggiator",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          7
+        ]
+      },
+      "device_name": "Arpeggiator",
+      "parameter": {
+        "index": 4,
+        "name": "Rate",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "master",
+        "index": 0,
+        "device_path": [
+          7
+        ]
+      },
+      "device_name": "Arpeggiator",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 24,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Pitch",
+      "parameter": {
+        "index": 0,
+        "name": "Device On",
+        "value": 1,
+        "min": 0,
+        "max": 1,
+        "quantized": true,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 1.0,
+      "raw_requested": 0.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 24,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Pitch",
+      "parameter": {
+        "index": 4,
+        "name": "Pitch",
+        "value": 0.25,
+        "min": 0,
+        "max": 1,
+        "quantized": false,
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 0.25,
+      "raw_requested": 1.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    },
+    {
+      "address": {
+        "kind": "track",
+        "index": 24,
+        "device_path": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "device_name": "Pitch",
+      "parameter": {
+        "index": 9,
+        "name": "Synthetic chooser",
+        "value": 2,
+        "min": 2,
+        "max": 11,
+        "quantized": true,
+        "choices": [
+          {
+            "raw": 2,
+            "label": "A"
+          },
+          {
+            "raw": 7,
+            "label": "B"
+          },
+          {
+            "raw": 11,
+            "label": "C"
+          }
+        ],
+        "is_enabled": true,
+        "state": 0,
+        "automation_state": 0,
+        "macro_controlled": false
+      },
+      "metadata_provenance": "modeled_unqualified_metadata",
+      "catalog_version": "Live 12.4.6 recorded baseline; modeled entries unqualified",
+      "installed": null,
+      "observed_in_current_live": false,
+      "host_id": null,
+      "raw_before": 2.0,
+      "raw_requested": 7.0,
+      "displayed_value": null,
+      "unit": "raw",
+      "conversion_provenance": [],
+      "read": true,
+      "propose": true,
+      "apply": true,
+      "readback": true,
+      "undo": true,
+      "fake_tested": true,
+      "real_live_qualified": false,
+      "limitations": [
+        "Synthetic topology and permission flags; chooser and modeled controls need host qualification."
+      ]
+    }
+  ],
+  "remaining_stock": [
+    {
+      "device": "Align Delay",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Amp",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Auto Pan-Tremolo",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Auto Shift",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Beat Repeat",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "CC Control",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Cabinet",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Channel EQ",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Chord",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Chorus-Ensemble",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Collision",
+      "category": "Instruments",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Corpus",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Drum Buss",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Drum Sampler",
+      "category": "Instruments",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Drum Synth",
+      "category": "Instruments",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Dynamic Tube",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "EQ Three",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Electric",
+      "category": "Instruments",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Envelope Follower",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Envelope MIDI",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Erosion",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Expression Control",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "External Audio Effect",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "External Instrument",
+      "category": "Instruments",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Filter Delay",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Gate",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Grain Delay",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Impulse",
+      "category": "Instruments",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "LFO",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Looper",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "MIDI Monitor",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "MPE Control",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Note Echo",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Note Length",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Overdrive",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Pedal",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Phaser-Flanger",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Random",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Redux",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Resonators",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Roar",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Scale",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Shaper",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Shaper MIDI",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Shifter",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Spectral Resonator",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Spectral Time",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Spectrum",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Tension",
+      "category": "Instruments",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Tuner",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Velocity",
+      "category": "MIDI Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Vinyl Distortion",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    },
+    {
+      "device": "Vocoder",
+      "category": "Audio Effects",
+      "reason": "No fake lifecycle in this run; current observation and real qualification unknown."
+    }
+  ],
+  "additional_inventory": {
+    "Packs": "unknown",
+    "Max for Live": "unknown",
+    "third_party_plugins": "unknown"
+  }
+}

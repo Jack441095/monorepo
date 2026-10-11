@@ -1,0 +1,147 @@
+{
+  "schema": "kenn.regression_mutations.v1",
+  "synthetic_only": true,
+  "live_writes": 0,
+  "checks": [
+    {
+      "guard": "confirmation_display",
+      "source": "products/kenn/apps/backend/src/kenn/core/parameter_contract.py",
+      "test": "kenn/tests/test_parameter_targets.py::test_confirmation_refuses_tampered_identity_units_and_before_state",
+      "mutant": "\"before_label\", \"after_label\",",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "f78262a901f6d629409fd9adcc1b97813cea22f979290143a92a01798b54bb65"
+    },
+    {
+      "guard": "original_object_identity",
+      "source": "products/kenn/apps/backend/src/kenn/core/fake_live.py",
+      "test": "kenn/tests/test_parameter_targets.py::test_apply_refuses_identical_replacements_and_stale_topology",
+      "mutant": "False",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "29793c1ea49d57cfcb546b25f28cc2e983588e30123d252b733f65c44d100cc8"
+    },
+    {
+      "guard": "sparse_index_uniqueness",
+      "source": "products/kenn/apps/backend/src/kenn/core/parameter_contract.py",
+      "test": "kenn/tests/test_parameter_targets.py::test_partial_metadata_and_duplicate_indices_cannot_resolve_by_position",
+      "mutant": "return matches[0] if matches else None",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "f78262a901f6d629409fd9adcc1b97813cea22f979290143a92a01798b54bb65"
+    },
+    {
+      "guard": "quantized_raw_options",
+      "source": "products/kenn/apps/backend/src/kenn/core/parameter_contract.py",
+      "test": "kenn/tests/test_parameter_targets.py::test_unqualified_chooser_does_not_invent_contiguous_intermediate_raw_values",
+      "mutant": "elif False:",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "f78262a901f6d629409fd9adcc1b97813cea22f979290143a92a01798b54bb65"
+    },
+    {
+      "guard": "review_wrong_outcome",
+      "source": "products/kenn/tooling/scripts/adjudicate_human_review.py",
+      "test": "kenn/tests/test_captured_review_contract.py::test_accepted_but_wrong_answer_and_disagreement_remain_wrong",
+      "mutant": "verdict = \"correct\"",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "110beb95802308fecf913674cc4b4e58ba85638e08b4aad0017fc2a5fdd1e4d6"
+    },
+    {
+      "guard": "review_packet_binding",
+      "source": "products/kenn/tooling/scripts/adjudicate_human_review.py",
+      "test": "kenn/tests/test_captured_review_contract.py::test_partial_reports_reject_foreign_or_malformed_forms",
+      "mutant": "False",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "110beb95802308fecf913674cc4b4e58ba85638e08b4aad0017fc2a5fdd1e4d6"
+    },
+    {
+      "guard": "eligible_denominator",
+      "source": "products/kenn/tooling/scripts/measure_chat_latency.py",
+      "test": "kenn/tests/test_measure_chat_latency.py::test_all_delivery_outcomes_stay_in_the_eligible_denominator_with_unknown_paint_time",
+      "mutant": "\"eligible\": sum(r[\"eligible\"] and r[\"delivery\"] == \"accepted\" for r in rows)",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "efe84f575e68fa7456872b9918c599ac986a4ecae120d9448d4b5808159b2487"
+    },
+    {
+      "guard": "undo_original_observation",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_parameter_targets.py::test_undo_cannot_rebind_to_a_replacement_after_its_identity_checked_read",
+      "mutant": "",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "9b5e030118a267df77e0ef7c3aaac24a5b4e20e7b08f53ff4431f50427462c43"
+    },
+    {
+      "guard": "qualified_undo_labels",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_control_planner.py",
+      "test": "kenn/tests/test_parameter_targets.py::test_undo_uses_qualified_choice_labels_when_host_only_exposes_raw_bounds",
+      "mutant": "",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "80696702f2ccf024e211a790660faea0f19c02f5dd4a3b0a4ab32477b1d46864"
+    },
+    {
+      "guard": "duplicate_device_clarification",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_intent_rules/device_rules.py",
+      "test": "kenn/tests/test_stage23_conversation_journeys.py::test_five_turn_duplicate_device_clarification_corrected_target_revision_and_apply",
+      "mutant": "if False:",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "af8bb58973714f423b08e835f7cc2df51f13a21f7cd9d8d35ae4af6e8a30e59c"
+    },
+    {
+      "guard": "production_setup_refusal",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_parameter_targets.py::test_guarded_production_backends_refuse_legacy_recipe_compound_and_recovery_writes",
+      "mutant": "if False:\n            # Setup still",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "9b5e030118a267df77e0ef7c3aaac24a5b4e20e7b08f53ff4431f50427462c43"
+    },
+    {
+      "guard": "actual_handler_registration",
+      "source": "products/kenn/integrations/ableton-osc/abletonosc/song.py",
+      "test": "kenn/tests/test_parameter_target_transport.py::test_real_registration_serialization_and_lost_ack_readback",
+      "mutant": "",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "3c3d26aa9c5f0db87950117e487d81f00e7c092f0aba059bd4e2eb0dbc2f7dce"
+    },
+    {
+      "guard": "production_recipe_refusal",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_recipe.py",
+      "test": "kenn/tests/test_parameter_targets.py::test_guarded_production_backends_refuse_legacy_recipe_compound_and_recovery_writes",
+      "mutant": "if False and any(",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "56c187e408ee38f89c4753aaba43cd4652a3f2a8a0bc75bc2bc9f871ec1b13f9"
+    },
+    {
+      "guard": "selected_duplicate_track_context",
+      "source": "products/kenn/apps/backend/src/kenn/core/session_context.py",
+      "test": "kenn/tests/test_stage23_conversation_journeys.py::test_five_turn_other_compressor_lists_devices_from_the_selected_duplicate_track",
+      "mutant": "state[\"last_track_index\"] = None",
+      "exit_code": 1,
+      "killed": true,
+      "source_restored": true,
+      "restored_sha256": "f8aab7909abbe0fd8c093224e474488724dba4f0a45c608af290034e08bca7a6"
+    }
+  ]
+}

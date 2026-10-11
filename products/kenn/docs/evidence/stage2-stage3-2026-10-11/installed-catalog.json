@@ -1,0 +1,1775 @@
+{
+ "schema": "kenn.device_coverage.v2",
+ "summary": {
+  "live_version": "12.4.6 (2026-09-10_0de5c8fa9a)",
+  "devices": 78,
+  "by_category": {
+   "Instruments": 16,
+   "Audio Effects": 47,
+   "MIDI Effects": 15
+  },
+  "knows_note": 0,
+  "knows_draft_note": 0,
+  "knows_mentioned": 0,
+  "knows_none": 78,
+  "sees": 0,
+  "observation_unknown": 78,
+  "inserts": 10,
+  "devices_with_settable_parameters": 9,
+  "settable_parameters": 21,
+  "ableton_notes": 0
+ },
+ "devices": [
+  {
+   "device": "Analog",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Collision",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Drift",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Drum Rack",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Drum Sampler",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Drum Synth",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Electric",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "External Instrument",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Impulse",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Instrument Rack",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Meld",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Operator",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Sampler",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Simpler",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Tension",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Wavetable",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Align Delay",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Amp",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Audio Effect Rack",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Auto Filter",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Resonance (%)",
+    "Frequency (Hz)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Auto Pan-Tremolo",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Auto Shift",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Beat Repeat",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Cabinet",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Channel EQ",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Chorus-Ensemble",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Compressor",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Threshold (dB)",
+    "Ratio (ratio)",
+    "Attack (ms)",
+    "Release (ms)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Corpus",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Delay",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Drum Buss",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Drive (%)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Dynamic Tube",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "EQ Eight",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Frequency (Hz)",
+    "band gain (dB, on an existing tuned band)"
+   ]
+  },
+  {
+   "device": "EQ Three",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Echo",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Dry Wet (%)"
+   ]
+  },
+  {
+   "device": "Envelope Follower",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Erosion",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "External Audio Effect",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Filter Delay",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Gate",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Glue Compressor",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Attack (ms)",
+    "Ratio (ratio)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Grain Delay",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Hybrid Reverb",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "LFO",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Limiter",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Looper",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Multiband Dynamics",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": []
+  },
+  {
+   "device": "Overdrive",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Pedal",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Phaser-Flanger",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Redux",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Resonators",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Reverb",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Roar",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Drive (dB)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Saturator",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Drive (dB)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Shaper",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Shifter",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Spectral Resonator",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Spectral Time",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Spectrum",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Tuner",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Utility",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Vinyl Distortion",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Vocoder",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Arpeggiator",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "CC Control",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Chord",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Envelope MIDI",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Expression Control",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "MIDI Effect Rack",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "MIDI Monitor",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "MPE Control",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Note Echo",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Note Length",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Pitch",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Random",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Scale",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Shaper MIDI",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Velocity",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "installed": true,
+   "sees": null,
+   "observed": null,
+   "fake_tested": false,
+   "real_live_qualified": false,
+   "parameters": [],
+   "host_identity": null,
+   "limitations": [
+    "Installed catalog entry only; no current-set observation or control qualification."
+   ],
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  }
+ ],
+ "additional_inventory": {
+  "Packs": "unknown",
+  "Max for Live": "unknown",
+  "third_party_plugins": "unknown"
+ }
+}

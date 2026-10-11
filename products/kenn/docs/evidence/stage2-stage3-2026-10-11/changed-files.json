@@ -1,0 +1,309 @@
+{
+  "schema": "kenn.changed_files.v1",
+  "base_revision": "00f2ad604cd814a2bf6981b3a277dc188dec67a2",
+  "source_revision": "aecac1de223c39816127e8ce05a0459cbe7d9e97",
+  "source_file_count": 43,
+  "files": [
+    {
+      "path": "products/kenn/apps/backend/src/kenn/ableton_osc_bridge.py",
+      "behavior": "Transport: registered guarded target protocol, original object retention, nonce queries, capability negotiation and one setter.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/fake_live.py",
+      "behavior": "Core integration: observed metadata and semantics, guarded confirmation/Apply/readback/Undo, context clarification and legacy production refusals.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "behavior": "Core integration: observed metadata and semantics, guarded confirmation/Apply/readback/Undo, context clarification and legacy production refusals.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/live_command.py",
+      "behavior": "Core integration: observed metadata and semantics, guarded confirmation/Apply/readback/Undo, context clarification and legacy production refusals.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/live_control_planner.py",
+      "behavior": "Core integration: observed metadata and semantics, guarded confirmation/Apply/readback/Undo, context clarification and legacy production refusals.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/live_executor.py",
+      "behavior": "Core integration: observed metadata and semantics, guarded confirmation/Apply/readback/Undo, context clarification and legacy production refusals.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/live_intent_rules/device_rules.py",
+      "behavior": "Core integration: observed metadata and semantics, guarded confirmation/Apply/readback/Undo, context clarification and legacy production refusals.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/live_recipe.py",
+      "behavior": "Core integration: observed metadata and semantics, guarded confirmation/Apply/readback/Undo, context clarification and legacy production refusals.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/mcp/__init__.py",
+      "behavior": "Gateways: strict non-executable parameter candidates and inspection routed through shared policy and service.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/mcp/live_proposals.py",
+      "behavior": "Gateways: strict non-executable parameter candidates and inspection routed through shared policy and service.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/mcp_facade.py",
+      "behavior": "Gateways: strict non-executable parameter candidates and inspection routed through shared policy and service.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/parameter_contract.py",
+      "behavior": "Core integration: observed metadata and semantics, guarded confirmation/Apply/readback/Undo, context clarification and legacy production refusals.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/core/session_context.py",
+      "behavior": "Core integration: observed metadata and semantics, guarded confirmation/Apply/readback/Undo, context clarification and legacy production refusals.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/routes/daw_routes.py",
+      "behavior": "Gateways: strict non-executable parameter candidates and inspection routed through shared policy and service.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/routes/fastapi_app.py",
+      "behavior": "Gateways: strict non-executable parameter candidates and inspection routed through shared policy and service.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/server.py",
+      "behavior": "Gateways: strict non-executable parameter candidates and inspection routed through shared policy and service.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_captured_review_contract.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_chat_route_context.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_device_profile_files.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_live_command.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_live_control_safe_pipeline.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_mcp_dispatch_routing.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_measure_chat_latency.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_parameter_target_transport.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_parameter_targets.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/backend/src/kenn/tests/test_undo_walks_back.py",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/frontend/src/api/kenn.test.ts",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/frontend/src/api/kenn.ts",
+      "behavior": "Frontend: addressed targets, readable values/labels, verified/partial/unknown receipts and no blind resend.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/frontend/src/components/KennActionCard.vue",
+      "behavior": "Frontend: addressed targets, readable values/labels, verified/partial/unknown receipts and no blind resend.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/frontend/src/components/KennRecipeCard.vue",
+      "behavior": "Frontend: addressed targets, readable values/labels, verified/partial/unknown receipts and no blind resend.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/frontend/src/components/__tests__/KennActionCard.component.test.ts",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/frontend/src/composables/useKenn.test.ts",
+      "behavior": "Verification: authority, exact target, conversation/session, transport, frontend and review regressions.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/apps/frontend/src/composables/useKenn.ts",
+      "behavior": "Frontend: addressed targets, readable values/labels, verified/partial/unknown receipts and no blind resend.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/docs/evidence/KENN_STAGE2_STAGE3_INTEGRATION_2026-10-11.md",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/capture_synthetic_delivery.py",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/changed-files.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/conversation-examples.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/installed-catalog.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/installed-catalog.md",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/mutation-results.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/parameter-coverage.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/qualification-manifest.template.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/recipe-recheck.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/forms/reviewer-a.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/forms/reviewer-b.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/packet.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/progress.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/run_mutation_checks.py",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/synthetic-delivery-contracts.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/docs/evidence/stage2-stage3-2026-10-11/verification.json",
+      "behavior": "Evidence: reproducible fake coverage, exposed synthetic captures, blank review forms, exact commands and open qualification gates.",
+      "kind": "evidence"
+    },
+    {
+      "path": "products/kenn/integrations/ableton-osc/abletonosc/parameter_target.py",
+      "behavior": "Transport: registered guarded target protocol, original object retention, nonce queries, capability negotiation and one setter.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/integrations/ableton-osc/abletonosc/song.py",
+      "behavior": "Transport: registered guarded target protocol, original object retention, nonce queries, capability negotiation and one setter.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/tooling/scripts/adjudicate_human_review.py",
+      "behavior": "Qualification tools: offline blinding/adjudication, separate delivery/provenance, honest catalog and fake parameter/recipe checks.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/tooling/scripts/build_human_review_packet.py",
+      "behavior": "Qualification tools: offline blinding/adjudication, separate delivery/provenance, honest catalog and fake parameter/recipe checks.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/tooling/scripts/device_coverage.py",
+      "behavior": "Qualification tools: offline blinding/adjudication, separate delivery/provenance, honest catalog and fake parameter/recipe checks.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/tooling/scripts/export_human_review_forms.py",
+      "behavior": "Qualification tools: offline blinding/adjudication, separate delivery/provenance, honest catalog and fake parameter/recipe checks.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/tooling/scripts/measure_chat_latency.py",
+      "behavior": "Qualification tools: offline blinding/adjudication, separate delivery/provenance, honest catalog and fake parameter/recipe checks.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/tooling/scripts/qualify_parameter_targets.py",
+      "behavior": "Qualification tools: offline blinding/adjudication, separate delivery/provenance, honest catalog and fake parameter/recipe checks.",
+      "kind": "source_or_test"
+    },
+    {
+      "path": "products/kenn/tooling/scripts/recheck_recipes_fake.py",
+      "behavior": "Qualification tools: offline blinding/adjudication, separate delivery/provenance, honest catalog and fake parameter/recipe checks.",
+      "kind": "source_or_test"
+    }
+  ],
+  "excluded": "Temporary reused .venv symlink and ignored node_modules; no main-checkout changes authored here."
+}

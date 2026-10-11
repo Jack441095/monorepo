@@ -1,0 +1,118 @@
+{
+  "schema": "kenn.conversation_examples.v1",
+  "source_revision": "aecac1de223c39816127e8ce05a0459cbe7d9e97",
+  "evidence_kind": "executable fake-backed regression assertions; knowledge providers are synthetic",
+  "actual_model_qualification": false,
+  "examples": [
+    {
+      "family": "knowledge_to_apply",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_parameter_targets.py",
+      "tests": [
+        "test_five_turn_knowledge_to_apply_uses_registered_http_routes"
+      ],
+      "source_sha256": "a84fee8031eb43690c6a9ef499c1674cfc39273087da149135ae380a1deb441e",
+      "asserted_behavior": "Two synthetic knowledge replies, HTTP observation of raw 0.25, proposal of raw 0.75, one explicit verified fake Apply."
+    },
+    {
+      "family": "ambiguous_device_correction_revision",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+      "tests": [
+        "test_five_turn_duplicate_device_clarification_corrected_target_revision_and_apply"
+      ],
+      "source_sha256": "a7ac0a10d09878cc7918660973eb14f9e1f92a67303ecec295ee735b746afe12",
+      "asserted_behavior": "Offer actual device numbers 1 and 2; corrected second Compressor and revised value only change after explicit Apply."
+    },
+    {
+      "family": "relative_and_references",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+      "tests": [
+        "test_five_turn_other_compressor_that_one_and_relative_change_require_exact_selection",
+        "test_five_turn_make_it_slower_retains_parameter_but_requires_a_value"
+      ],
+      "source_sha256": "a7ac0a10d09878cc7918660973eb14f9e1f92a67303ecec295ee735b746afe12",
+      "asserted_behavior": "Other Compressor offers observed choices; that one cannot select; exact device 2 relative change verifies. Slower cannot reinterpret Threshold as a time control."
+    },
+    {
+      "family": "two_track_choices",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+      "tests": [
+        "test_five_turn_two_track_choices_and_correction_apply_only_the_selected_track",
+        "test_five_turn_other_compressor_lists_devices_from_the_selected_duplicate_track"
+      ],
+      "source_sha256": "a7ac0a10d09878cc7918660973eb14f9e1f92a67303ecec295ee735b746afe12",
+      "asserted_behavior": "Duplicate Vocal choices retain exact selected track position; corrections affect only selected track, and device choices come from its layout."
+    },
+    {
+      "family": "advice_command_read_only",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+      "tests": [
+        "test_five_turn_advice_command_read_only_topic_change_and_incomplete_request"
+      ],
+      "source_sha256": "a7ac0a10d09878cc7918660973eb14f9e1f92a67303ecec295ee735b746afe12",
+      "asserted_behavior": "Synthetic advice has no receipt; mute creates a proposal; show tracks writes nothing."
+    },
+    {
+      "family": "topics_incomplete",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+      "tests": [
+        "test_five_turn_advice_command_read_only_topic_change_and_incomplete_request"
+      ],
+      "source_sha256": "a7ac0a10d09878cc7918660973eb14f9e1f92a67303ecec295ee735b746afe12",
+      "asserted_behavior": "New reverb topic has no proposal; incomplete set it makes no change."
+    },
+    {
+      "family": "failed_jobs_unrun_analysis",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+      "tests": [
+        "test_five_turn_failed_job_and_unrun_analysis_use_the_real_analysis_guard"
+      ],
+      "source_sha256": "a7ac0a10d09878cc7918660973eb14f9e1f92a67303ecec295ee735b746afe12",
+      "asserted_behavior": "Failed provider is rejected at job-store boundary; five actual HTTP requests use the real no-analysis guard with no invented results."
+    },
+    {
+      "family": "cancel_restart_superseded",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+      "tests": [
+        "test_five_turn_cancel_restart_and_supersession_discard_late_answers"
+      ],
+      "source_sha256": "a7ac0a10d09878cc7918660973eb14f9e1f92a67303ecec295ee735b746afe12",
+      "asserted_behavior": "Late job expires after newer turn/clear; busy lock remains held until work exits; fresh job succeeds only for its requesting project."
+    },
+    {
+      "family": "project_isolation",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+      "tests": [
+        "test_five_turn_project_switch_does_not_share_targets_or_confirmations"
+      ],
+      "source_sha256": "a7ac0a10d09878cc7918660973eb14f9e1f92a67303ecec295ee735b746afe12",
+      "asserted_behavior": "Cross-project confirmation and post-clear confirmation both refuse without writes."
+    },
+    {
+      "family": "undo_manual_edit",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+      "tests": [
+        "test_five_turn_undo_verifies_restoration_or_refuses_an_intervening_manual_edit"
+      ],
+      "source_sha256": "a7ac0a10d09878cc7918660973eb14f9e1f92a67303ecec295ee735b746afe12",
+      "asserted_behavior": "Undo restores 0.25 after verified 0.75, or refuses after an independent 0.6 manual edit and preserves that value."
+    },
+    {
+      "family": "saved_preference_isolation",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_chat_route_context.py",
+      "tests": [
+        "test_five_turn_project_switch_keeps_saved_preferences_and_memory_with_their_owner"
+      ],
+      "source_sha256": "01696c4af9abd37e3a8c96a21c9de3d71b057e57fde8f9e545677fc3a3d97c1a",
+      "asserted_behavior": "Five A/B/A/B/A turns recover explicit saved preferences and memory only for their owner."
+    },
+    {
+      "family": "addressed_lifecycle",
+      "test_file": "products/kenn/apps/backend/src/kenn/tests/test_parameter_targets.py",
+      "tests": [
+        "test_five_turn_candidate_journey_preserves_exact_target_and_explicit_apply"
+      ],
+      "source_sha256": "a84fee8031eb43690c6a9ef499c1674cfc39273087da149135ae380a1deb441e",
+      "asserted_behavior": "Return 0, device_path [1], parameter 4: observe 0.25, refuse imaginary device, propose, revise +0.1 raw to 0.35, explicitly Apply/readback, confirm Undo to 0.25."
+    }
+  ]
+}
