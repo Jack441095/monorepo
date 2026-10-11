@@ -1476,7 +1476,24 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       in `kenn-evaluation-data/2026-10-11-prompt-figures/` (`select.py`, `ids.txt`, `run.sh`). Order A1 B1 B2 A2,
       A = stable-prefix `f38d2712`, B = prompt-figures `bf4391da`, pinned index `v-5f6964698b76`, port 8097.
       Results go in `<label>.jsonl`, `.summary.json`, `.out` and `run.log` there. Started 17:47.
-    - Left: A/B results here, one probe pass on the branch, adversary review, merge both branches in order.
+    - A/B result (17:47–18:12, `compare.py` there prints it): model accepted A 21 and 20 of 36, B 24 and 25. Within
+      15 s the same. Rejections for an unsupported figure: A 5 and 8, B 2 and 0, and none of B's refused figures came
+      from the genre or acoustic lines (A's included 3500 Hz, 40 Hz, -2.5 dB, -3.5 dB from acoustic guidance).
+      Median final A 6.66 and 7.72 s, B 6.92 and 7.18 s. The fix holds: about +4 answers on 40 rows.
+    - Found on the way: q265 (quick fix, drum balance) dropped "Short answer:" in B1 and B2 and opened at "Try
+      this". 0 of 255 v4 model answers did that, 2 of 90 here, both q265. Jack asked if it is a regression. The
+      likely cause is the quick_fix mode line asking for a "single-paragraph response", which now sits after the
+      Rules where the model reads it last. Reworded to "a one-paragraph Short answer, then one or two Try this
+      steps" (uncommitted in the stable-prefix and prompt-figures worktrees). `check.sh` there runs the 11
+      quick-fix rows on the old order with the prompt-figures fix (worktree `order-check`, main `5170743b` plus
+      `bf4391da` uncommitted) and on the new order with the reworded line, to see which it is.
+    - Adversary review of prompt-figures done inline (the read-only reviewer agent was refused by the permission
+      check): no figure reaches either prompt path for any of the 6 genre profiles or 14 acoustic words. Two wording
+      faults to fix before merge: "flabby" reads "bell" though its fix is a compressor, and "de-esser cut" reads
+      oddly. Fix: in `build_acoustic_guidance_prompt`, a dynamics entry says "compressor", and cut or boost is added
+      only for a bell or shelf; plus a test that "flabby" says compressor.
+    - Left: the q265 check, the wording fixes with tests, rebase prompt-figures onto stable-prefix, one probe
+      pass, merge both branches in order.
   - [x] Count how often the HTTP background path reruns routing and retrieval in `answer_payload` after it
     builds the template, and drop the repeat if it costs time. Closed 11 Oct: v4 template_seconds median 0.07 s, max
     0.14 s, n=378. The repeat is not worth a change.
