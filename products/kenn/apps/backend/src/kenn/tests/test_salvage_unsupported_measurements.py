@@ -231,8 +231,22 @@ def test_a_range_inside_a_spaced_dash_aside_is_not_taken_for_its_closing_dash():
     text = "Find the mud – like 100–300 Hz – before you cut."
     assert _excise_illustrative_figures(text, {"300hz"}) == "Find the mud before you cut."
     # Review of a4570f80, 11 Oct 2026: a spaced range closed the aside and this came out "Tame it 400 Hz zone."
-    for spaced_range in ("Tame it — like at 3 kHz or the 200 – 400 Hz zone.", "Tame it – like at 3 kHz or the 200 – 400 Hz zone."):
-        assert _excise_illustrative_figures(spaced_range, {"3khz"}) == spaced_range
+    # Review of 9f7f9904: a signed second number slipped the same guard ("Tame it -6 dBFS window – first.").
+    # With a real closing dash further on, the range stays inside the aside and goes with it.
+    for range_then_close in (
+        "Tame it — like at 3 kHz or the 200 — 400 Hz zone — first.",
+        "Tame it – like 3 kHz or the -18 – -6 dBFS window – first.",
+        "Tame it — like 3 kHz or the +2 — +4 dB lift — first.",
+    ):
+        assert _excise_illustrative_figures(range_then_close, {"3khz"}) == "Tame it first."
+    # With none, there is no aside at all.
+    no_close = "Tame it – like at 3 kHz or the 200 – 400 Hz zone."
+    assert _excise_illustrative_figures(no_close, {"3khz"}) == no_close
+
+
+def test_each_dash_closes_only_on_its_own_kind():
+    text = "Find the mud — like 300 Hz – before you cut."
+    assert _excise_illustrative_figures(text, {"300hz"}) == text
 
 
 def test_a_bracket_or_dash_without_an_example_marker_is_part_of_the_step_and_stays():
@@ -246,6 +260,20 @@ def test_a_bracket_or_dash_without_an_example_marker_is_part_of_the_step_and_sta
         assert _excise_illustrative_figures(step, figures) == step
 
 
+def test_an_example_that_states_a_limit_or_condition_is_still_part_of_the_step():
+    # Review of 9f7f9904, 11 Oct 2026: the marker let "(e.g., never past 10 dB)" go, and the step lost its limit.
+    for step, figures in (
+        ("Push the depth (e.g., never past 10 dB) so the pumping stays shallow.", {"10db"}),
+        ("Trim the peaks (say, under 2 dB) on the vocal bus.", {"2db"}),
+        ("Leave the limiter — for example only if peaks pass -1 dBTP — on the master.", {"-1dbtp"}),
+    ):
+        assert _excise_illustrative_figures(step, figures) == step
+    # A marked value with no limit word is the model's own example, and the step keeps its verb.
+    assert _excise_illustrative_figures("Set the threshold (e.g., -18 dB) and a 4:1 ratio.", {"-18db"}) == (
+        "Set the threshold and a 4:1 ratio."
+    )
+
+
 def test_a_long_bracket_is_a_clause_of_its_own_and_stays_for_the_sentence_drop():
     step = "Cut the mud (e.g., the build-up you hear around 300 Hz on most close-miked guitars) first."
     assert _excise_illustrative_figures(step, {"300hz"}) == step
@@ -256,6 +284,12 @@ def test_a_dash_aside_never_runs_on_into_the_next_sentence():
     # went with it, through the gate.
     text = "Put a compressor on the bass bus — like one at 2 kHz. Then key it from the kick — not the snare — via its input."
     assert _excise_illustrative_figures(text, {"2khz"}) == text
+    # Review of 9f7f9904: a clause end other than a full stop, or a full stop with no space after it, still spliced.
+    for joiner in ("; then", ": then", "… then", ".” Then", ".[#578a1b0b8faa] Then", " 2) Then"):
+        text = f"Put a compressor on the bus — like one at 2 kHz{joiner} key it from the kick — not the snare — via its input."
+        assert _excise_illustrative_figures(text, {"2khz"}) == text
+    # A decimal point is not a clause end.
+    assert _excise_illustrative_figures("Find it — like 2.5 kHz — first.", {"2.5khz"}) == "Find it first."
 
 
 def test_a_high_pass_keeps_its_instruction_without_the_frequency():
@@ -272,6 +306,9 @@ def test_a_high_pass_range_that_runs_on_into_its_clause_is_left_for_the_sentence
     # Review of a4570f80, 11 Oct 2026: "to 40 Hz" was read as the next clause and this came out "high-pass to 40 Hz".
     step = "Use a high-pass at 30 Hz to 40 Hz depending on the source."
     assert _excise_illustrative_figures(step, {"30hz", "40hz"}) == step
+    # Review of 9f7f9904: a hedged or signed number after "to" got the same treatment.
+    for step in ("Use a high-pass at 30 Hz to about 40 Hz depending on the source.", "Set the high-pass at 100 Hz to -12 dB per octave."):
+        assert "pass to" not in _excise_illustrative_figures(step, {"30hz", "40hz", "100hz"})
 
 
 def test_a_boost_or_cut_keeps_its_frequency_because_without_it_there_is_no_instruction():
