@@ -228,45 +228,17 @@ def _measurement_is_supported(measurement: str, allowed: set[str]) -> bool:
     return False
 
 
-def _matches_dbtp_ceiling(measurement: str, allowed: set[str]) -> bool:
-    """Whether a plain dB figure has the same size as a dBTP ceiling in allowed ("1 dB" against "-1 dBTP")."""
-    m = re.fullmatch(r"-?(\d+)(?:\.0)?db", measurement)
-    if not m:
-        return False
-    # Either sign: "1 dB of headroom" and "a ceiling of -1 dB" both mean the note's -1 dBTP.
-    return any(f"{sign}{m.group(1)}{dec}dbtp" in allowed for sign in ("", "-") for dec in ("", ".0"))
-
-
-# Words that make a plain dB figure a statement about true-peak headroom. Judged per clause: "Cut 1 dB on the vocal,
-# then keep the true peak at -1 dBTP" puts the cut and the ceiling in different clauses, and the cut must not borrow
-# the ceiling. A clause that holds both still passes; we accept that rather than parse the sentence.
-_HEADROOM_WORDS_RE = re.compile(r"headroom|true[\s-]?peak|ceiling", re.IGNORECASE)
-# A full stop only ends a clause when whitespace follows it, so "1.0 dB" stays in one piece.
-_CLAUSE_BREAK_RE = re.compile(r"[.;:!?](?=\s)|,\s|\n")
-
-
-def _headroom_figures(text: str) -> set[str]:
-    """The plain dB figures in text that sit in a clause about true-peak headroom or a ceiling."""
-    figures: set[str] = set()
-    for clause in _CLAUSE_BREAK_RE.split(text):
-        if _HEADROOM_WORDS_RE.search(clause):
-            figures |= {m for m in _measurements(clause) if m.endswith("db")}
-    return figures
-
-
-def _unsupported_measurements(
-    found: set[str], allowed: set[str], headroom: set[str] = frozenset()
-) -> set[str]:
+def _unsupported_measurements(found: set[str], allowed: set[str]) -> set[str]:
     """Measurements in found that are not permitted by allowed.
 
-    Only figures in `headroom` may lean on a dBTP ceiling (see _headroom_figures). Until 11 Oct 2026 every plain dB
-    figure could, so "cut 1 dB" passed whenever a note with a -1 dBTP ceiling was shown.
+    A plain dB figure never stands in for a dBTP one. From 10 Oct 2026 "1 dB" was accepted against a note's
+    -1 dBTP ceiling as the same headroom written the other way round, and any "cut 1 dB" on the vocal passed with
+    it. Narrowing that to headroom clauses still let an EQ move through ("cut 1 dB on the vocal and keep the true
+    peak at -1 dBTP", or a sign flip to +1 dB). Replaying all 18 runs of the 10 Oct qualification benches (v1 to
+    v3) without the equivalence changed no verdict, so it went altogether on 11 Oct. The prompt lists -1 dBTP as a
+    figure the model may use, and the model can write it that way.
     """
-    return {
-        m
-        for m in found
-        if not (_measurement_is_supported(m, allowed) or (m in headroom and _matches_dbtp_ceiling(m, allowed)))
-    }
+    return {m for m in found if not _measurement_is_supported(m, allowed)}
 
 
 def _range_interval_measurements(text: str) -> set[str]:
@@ -890,11 +862,7 @@ class StreamedAnswerGuard:
         # after the dB. Judging the window there cut two good answers on 2 Oct 2026 (the sources had -6 dBFS and
         # -0.3 dBTP). The carry keeps the text, so the next token's window sees the whole unit.
         judged = window[:-2] if window.lower().endswith("db") else window
-        found = _measurements(judged)
-        # Every dB figure may lean on a dBTP ceiling here. "Leave 1 dB" arrives before "of headroom", so judging
-        # the clause would cut a good answer mid-stream; the final gate judges it once the clause is whole. Being
-        # more lenient than the gate keeps the guard prefix-sound: it only ever stops what the gate would refuse.
-        leaked = _unsupported_measurements(found, self._allowed, headroom=found)
+        leaked = _unsupported_measurements(_measurements(judged), self._allowed)
         if leaked:
             return {
                 "warning": (
@@ -1318,7 +1286,6 @@ def generated_answer_validation(
         _unsupported_measurements(
             _measurements(answer),
             _accepted_measurements(question, shown, evidence_text),
-            headroom=_headroom_figures(answer),
         )
     )
     # The labels the model was actually given, so a citation is only fabricated if the filename was not on

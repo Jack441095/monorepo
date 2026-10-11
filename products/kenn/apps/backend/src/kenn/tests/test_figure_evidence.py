@@ -238,17 +238,14 @@ def test_make_answer_inner_check_takes_figures_from_typed_question_not_expanded_
     assert "200 ms" not in ans_refused
 
 
-def test_true_peak_headroom_in_db_is_supported_by_a_dbtp_ceiling_note(index):
-    # SHOWN sets a -1 dBTP ceiling. "1 dB of headroom" is the same instruction written the other way round.
-    assert _refused("Leave 1 dB of headroom so the encode does not clip.", [SHOWN]) == []
-    assert _refused("Keep 1.0 dB of true peak headroom.", [SHOWN]) == []
-    assert _refused("Set the limiter ceiling 1 dB below full scale.", [SHOWN]) == []
-    # A different headroom figure is still a figure the note does not give.
-    assert _refused("Leave 2 dB of headroom.", [SHOWN]) == ["2db"]
-
-
-def test_an_eq_move_never_borrows_a_dbtp_ceiling(index):
-    # 11 Oct 2026: the dB/dBTP equivalence ignored context, so any "1 dB" passed whenever a -1 dBTP note was shown.
+def test_a_plain_db_figure_never_borrows_a_dbtp_ceiling(index):
+    # 10 to 11 Oct 2026: "1 dB" passed against SHOWN's -1 dBTP ceiling, first anywhere and then in any clause that
+    # mentioned headroom, so an EQ move or a ceiling with its sign flipped got through with it.
     assert _refused("Cut 1 dB on the vocal bus before the limiter.", [SHOWN]) == ["1db"]
-    assert _refused("Cut 1 dB on the vocal, then keep the true peak at -1 dBTP.", [SHOWN]) == ["1db"]
+    assert _refused("Cut 1 dB on the vocal and keep the true peak at -1 dBTP.", [SHOWN]) == ["1db"]
+    assert _refused("Leave 1 dB of headroom. Cut 1 dB at the vocal bus.", [SHOWN]) == ["1db"]
+    assert _refused("Set the limiter ceiling to +1 dB.", [SHOWN]) == ["1db"]
+    assert _refused("Leave 1 dB of headroom so the encode does not clip.", [SHOWN]) == ["1db"]
+    # The ceiling as the note writes it is what the model is told to use.
+    assert _refused("Keep the true peak at -1 dBTP so the encode does not clip.", [SHOWN]) == []
 
