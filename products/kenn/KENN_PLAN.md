@@ -925,8 +925,35 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
     - The smoke test now undoes in its own session and checks that a different session gets a 409.
   - After the fix, the backend suite gives 4818 passed and 16 skipped. Frontend: vitest gives 80 passed, vue-tsc
     is clean and the vite build works.
-  - An outside adversary review of `git diff main draft/stage23-onto-main` is running. The merge waits for its
-    sign-off.
+  - The outside adversary review of `git diff main draft/stage23-onto-main` (11 Oct, run on FakeLiveBackend only)
+    found breaks, so the branch is **not merged**. What it proved:
+    - **Blocker:** every device-parameter Apply from the web UI is refused. `parameter_contract.py:74-83` hashes
+      the proposal into one digest before `confirmation._request_hash` can canonicalise numbers. The browser's
+      JSON sends `valid_range` `[0.0,1.0]` back as `[0,1]`, so the token never matches and nothing is written.
+      Recipe (`live_recipe.py:51`), Undo, compound-EQ and configuration cards share that executor and fail the same
+      way. A Python round trip passes, which is why the tests miss it. Fix: look up the proposal held on the server
+      by its token, or normalise the numbers before hashing.
+    - Card Undo fails after 300 s or 256 reads. `_propose_undo` (`live_action_service.py` ~3920) rereads with the
+      original proposal's `observation_token`. Each Apply makes about 3 reads, so a busy session hits the 256 cap.
+    - Chat "undo that" can write to a replacement device. The journal's `_safe_projection` drops
+      `target.observation_token` (its "token" filter), so the undo runs with no identity check. The card path
+      refuses the same case.
+    - A chat command naming a duplicated device ("set the compressor threshold on Drum Bus to -20 dB" with two
+      Compressors) or an overlapping name ("Compressor" plus "Glue Compressor") now falls through to the
+      knowledge answer. `device_rules.py:40-51` returns a missing device without an action. Main proposed for
+      device 1.
+    - The `measure_chat_latency.py` docstring lost the `KENN_LLM_CACHE=0` warning, the stream-against-payload
+      finding, the reason for capturing in flight and the worktree BM25 trap.
+  - Proven clean: no write happens without a consumed token. Replay, cross-session use and tampering are refused.
+    Lost acks and lost readbacks are handled. Out-of-range values refuse and are never clamped. The answer path is
+    unchanged.
+  - Not checked yet: the handler refuses quantized values that the fake accepts (`parameter_target.py:113`).
+    Whether the Remote Script's `is` identity check holds in real Live is also unknown, because the branch has no
+    real-Live qualification.
+  - Evidence doc line 15 is stale. Freshly prepared recipes, compound EQ and setup now run guarded; only cards in
+    the legacy format refuse.
+  - Next: fix the blocker and the three should-fix breaks on the draft, then send the diff back to the same
+    reviewer before merging.
 
 ### 4. Qualify listening, memory and creation
 
@@ -1727,9 +1754,28 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       held-out runs. The gate itself stays open on two things:
       1. Owner-graded correctness (8 Oct decision). The review sheets for grading are `cand-*.review.md` in the bench
          dir.
-      2. The adversary review of `draft/citation-repair` was not done before its merge. It is running now, after the
-         fact, and its result goes here. The same review was missed for `draft/audit-fixes` (`2377eed1`), which
-         also feeds these runs. Its "Review (inline)" note above is the builder's own read.
+      2. The adversary review of `draft/citation-repair` was not done before its merge. It ran after the merge
+         (11 Oct) and did not sign off. The same review was missed for `draft/audit-fixes` (`2377eed1`), which also
+         feeds these runs. Its "Review (inline)" note above is the builder's own read, and it is next for the same
+         reviewer.
+    - What the citation-repair review found:
+      - #1, medium: a tagged figure from the unshown rest of a whole note now ships, because the repair drops its
+        tag. Untagged figures already pass the same way. The planned call is to keep it and correct the comment at
+        `chat_grounding.py:982-984`; Jack can reverse that.
+      - #2, medium: dropping a tag can bypass the quality check. "4:1 [#2]. Then" becomes "4:1. Then", which
+        `_STEP_INLINE` counts as a numbered step.
+      - #3: dropping "#2" can clear an overlap warning, because "#2" counts as a word.
+      - #4, low: the log credits the repair even when the figure cut removed the repaired sentence.
+      - #5, low: a junk tag like `[#5-150ms]` is split by the range rewrite, so the tag indices shift. This fails
+        safe. The comments in `_measurement_spans` and the repair that say this cannot happen are wrong.
+      - #6, cosmetic: dropping a tag leaves "()" from "([#1])", keeps a no-break space before the tag, and strips the
+        wrong side at the start of a line.
+    - The planned fix for #2 and #3: repair only when the original's warnings are a wrong tag, an invented figure, or
+      both. A dev-only replay (held-out ids skipped, counts only) covered 26 answers with a wrong tag. The repair
+      kept 10, and none of those 10 had any other warning. Two answers had other warnings, and both were rejected
+      anyway. So the restriction loses no dev saves, and the v7 counts should stand without a re-bench.
+    - Fix branch: `draft/citation-repair-fixes`, worktree `workspace/worktrees/kenn/citation-repair-fixes`, from main
+      `328f80ec`. Nothing is edited there yet.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
