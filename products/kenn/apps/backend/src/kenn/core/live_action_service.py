@@ -19,7 +19,7 @@ from typing import Any
 
 from kenn.ableton_osc_bridge import AbletonOSCClient, live_client
 from kenn.core import volume_law
-from kenn.core.confirmation import consume_confirmation, issue_confirmation
+from kenn.core.confirmation import consume_confirmation, issue_confirmation, revoke_confirmation
 from kenn.core.idempotency_bounds import prune_if_needed
 from kenn.core.receipt_contract import StageTimer, classify_retry_safety, resolve_correlation_id
 from kenn.core.parameter_contract import (
@@ -2643,6 +2643,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
         session_id: str,
         source_receipt_id: str = "",
         observed_state: dict[str, Any] | None = None,
+        observed_parameter_infos: tuple[dict[str, Any], dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         """Create one confirmation-bound proposal for a two-parameter EQ edit."""
         _cleanup_memory()
@@ -2683,6 +2684,63 @@ class LiveActionService(Tier2Tier3ControlMixin):
         observed_name = str(device_entry.get("name", "")) if isinstance(device_entry, dict) else str(device_entry or "")
         if observed_name != str(device_name):
             return {"ok": False, "error": "Target EQ Eight identity changed while preparing the proposal."}
+        if getattr(self.client, "requires_guarded_parameter_targets", False):
+            from kenn.core.live_recipe import LiveRecipeService
+
+            band = str(eq_band).strip().upper()
+            if not re.fullmatch(r"[1-8][AB]", band) or (
+                frequency_parameter.get("name") != f"{band[0]} Frequency {band[-1]}"
+                or gain_parameter.get("name") != f"{band[0]} Gain {band[-1]}"
+            ):
+                # A nearby band or duplicate display name cannot stand in for the explicit two-control request.
+                return {"ok": False, "error": "Compound EQ requires the exact frequency and gain controls of one band."}
+            if frequency_range != [0.0, 1.0] or gain_range != [-15.0, 15.0]:
+                # The qualified frequency taper and native dB gain do not apply to a different host range.
+                return {"ok": False, "error": "EQ parameter ranges do not match the qualified Hz and native dB mappings."}
+            address = {"kind": "track", "index": track_index, "device_path": [device_index]}
+            infos = observed_parameter_infos or (
+                self.inspect_addressed_parameter(address, frequency_index), self.inspect_addressed_parameter(address, gain_index),
+            )
+            if not all(info.get("success") for info in infos):
+                # A positional inventory only supplies candidates; both authoritative observations must succeed.
+                return {"ok": False, "error": "Could not retain both exact EQ parameter observations."}
+            try:
+                checked = self.client.get_addressed_parameter(address, frequency_index, infos[0].get("observation_token"))
+            except (OSError, RuntimeError):
+                # A lost inspection connection gives us no same-device proof and no authority to prepare the pair.
+                return {"ok": False, "error": "Could not verify the retained EQ target; inspect it again."}
+            if not checked.get("success"):
+                # The second observation must not come from a replacement for the first observed device.
+                return {"ok": False, "error": "EQ target changed between its frequency and gain observations."}
+            children = []
+            for info, previous, desired, unit, requested in zip(
+                infos, (frequency_parameter, gain_parameter), (frequency_after_hz, gain_after), ("Hz", "dB"),
+                (frequency_after_value, gain_after), strict=True,
+            ):
+                result = self.propose_addressed_parameter_action(
+                    address=address, parameter_index=int(previous["index"]), value=desired, unit=unit,
+                    parameter_name=str(previous["name"]), device_name=device_name, session_id=session_id,
+                    observed_parameter_info=info,
+                )
+                if not result.get("ok"):
+                    return result
+                child = dict(result["proposal"])
+                revoke_confirmation(str(child["confirmation_token"]), session_id=session_id)
+                child.pop("confirmation_token", None)
+                child.pop("confirmation_meta", None)
+                child["action"] = "set_device_parameter"
+                guard = child.get("parameter_guard") or {}
+                if (
+                    not _values_match(child.get("before"), previous["value"])
+                    or child.get("valid_range") != [previous["min"], previous["max"]]
+                    or guard.get("quantized") is not False
+                    or child.get("track_name") != str(track.get("name", ""))
+                    or not _values_match(child.get("after"), requested)
+                ):
+                    # Relative gain was resolved from the earlier inspection. A later value must not rebase it silently.
+                    return {"ok": False, "error": "EQ parameters changed during inspection; prepare a fresh compound proposal."}
+                children.append(child)
+            return LiveRecipeService(self)._finish_proposal(children, reason=reason, session_id=session_id)
         proposal = {
             "schema": EQ_BAND_TUNING_GAIN_PROPOSAL_SCHEMA,
             "action_id": f"action-{uuid.uuid4().hex}",
@@ -3373,6 +3431,13 @@ class LiveActionService(Tier2Tier3ControlMixin):
         idempotency_key: str = "",
     ) -> dict[str, Any]:
         """Apply and verify an explicit EQ frequency-plus-gain edit."""
+        from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
+
+        if isinstance(proposal, dict) and proposal.get("schema") == RECIPE_SCHEMA:
+            # Newly prepared compound cards use the same retained-target executor and recovery as recipes.
+            return LiveRecipeService(self).execute_recipe(
+                proposal, confirm_token=confirm_token, session_id=session_id, idempotency_key=idempotency_key,
+            )
         _cleanup_memory()
         if not isinstance(proposal, dict) or proposal.get("schema") != EQ_BAND_TUNING_GAIN_PROPOSAL_SCHEMA:
             return {"ok": False, "error": "A valid KENN compound EQ proposal is required."}

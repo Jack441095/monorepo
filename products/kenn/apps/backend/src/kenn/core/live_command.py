@@ -44,6 +44,7 @@ from kenn.core.clip_duplication_service import ClipDuplicationActionService, PRO
 from kenn.core.clip_rename_service import ClipRenameActionService, PROPOSAL_SCHEMA as CLIP_RENAME_PROPOSAL_SCHEMA
 from kenn.core.live_intent import _NICKNAME_WORDS, parse_natural_recipe, parse_request
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
+from kenn.core.parameter_contract import indexed_parameter
 from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS, load_promotion_state
 from kenn.core.chat_live_router import needs_return_tracks
 from kenn.core.live_session_questions import answer_live_session_question
@@ -2497,6 +2498,22 @@ def _resolve_eq_band_tuning_gain(
     if frequency_parameter is None or gain_parameter is None:
         return {"ok": False, "clarification": f"EQ Eight band {band} is not exposed by Live; nothing changed."}
 
+    observed_parameter_infos = None
+    if getattr(service.client, "requires_guarded_parameter_targets", False):
+        address = {"kind": "track", "index": int(track["index"]), "device_path": [device_index]}
+        observed_parameter_infos = (
+            service.inspect_addressed_parameter(address, int(frequency_parameter["index"])),
+            service.inspect_addressed_parameter(address, int(gain_parameter["index"])),
+        )
+        if not all(info.get("success") for info in observed_parameter_infos):
+            # The inventory supplies sparse indices only; relative values must come from retained observations.
+            return {"ok": False, "clarification": "I could not retain both exact EQ controls; inspect again. Nothing changed."}
+        frequency_parameter = indexed_parameter(observed_parameter_infos[0].get("parameters", []), int(frequency_parameter["index"]))
+        gain_parameter = indexed_parameter(observed_parameter_infos[1].get("parameters", []), int(gain_parameter["index"]))
+        if frequency_parameter is None or gain_parameter is None:
+            # A truncated guarded response cannot define the before-values used in the producer's card.
+            return {"ok": False, "clarification": "Live returned incomplete EQ observations; nothing changed."}
+
     def frequency_hz(parameter: dict[str, Any]) -> float | None:
         display = str(parameter.get("value_display", ""))
         match = re.search(r"([-+]?\d+(?:\.\d+)?)\s*(khz|hz)\b", display, re.I)
@@ -2535,6 +2552,7 @@ def _resolve_eq_band_tuning_gain(
         gain_parameter=gain_parameter, gain_after=gain_after,
         reason=f"User command: {command}", session_id=session_id,
         observed_state=observed_state,
+        observed_parameter_infos=observed_parameter_infos,
     )
     return result
 
@@ -3797,6 +3815,8 @@ def _handle_command_impl(
     if action == "set_eq_band_tuning_gain":
         result = _resolve_eq_band_tuning_gain(live, intent, track, response["session_id"], clean_command, snapshot)
         if result.get("ok"):
+            if result["proposal"].get("schema") == RECIPE_SCHEMA:
+                return _recipe_response(response, result["proposal"])
             return _proposal_response(response, result["proposal"], kind="eq_band_tuning_gain")
         return _clarification(response, intent, result.get("clarification", result.get("error", "I could not create a compound EQ proposal.")))
     if action in TRACK_ACTIONS:

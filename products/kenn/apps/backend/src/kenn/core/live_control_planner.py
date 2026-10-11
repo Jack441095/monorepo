@@ -320,6 +320,16 @@ class LiveControlPlanner:
         min_val = float(target_param["min"])
         max_val = float(target_param["max"])
 
+        from kenn.core.device_units import find_profile
+
+        profile = find_profile(device_name, param_name, display_unit or unit)
+        if profile and profile.device_name == "EQ Eight" and profile.parameter_name == "Gain" and (
+            min_val != profile.raw_min or max_val != profile.raw_max
+        ):
+            # The native dB identity mapping must not label a different host range as dB. This shared
+            # planner also covers single controls, recipes and Undo, not only the compound EQ caller.
+            return {"ok": False, "error": "EQ gain bounds do not match the qualified native dB mapping."}
+
         # 2. Validate proposed value within bounds
         if not math.isfinite(proposed_value) or proposed_value < min_val or proposed_value > max_val:
             return {"ok": False, "error": f"Proposed value {proposed_value} is outside valid range [{min_val}, {max_val}] for '{param_name}'."}
