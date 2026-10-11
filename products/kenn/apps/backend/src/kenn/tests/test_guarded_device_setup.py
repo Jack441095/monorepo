@@ -11,6 +11,7 @@ from kenn.core.fake_live import FakeLiveBackend
 from kenn.core.live_action_service import LiveActionService, DEVICE_INSERTION_PROPOSAL_SCHEMA
 from kenn.core.live_command import handle_command
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
+from kenn.tests.test_parameter_targets import _as_a_browser_echoes_it
 
 
 class GuardedSetupBackend(FakeLiveBackend):
@@ -73,6 +74,8 @@ def plan(setup, kind="eq"):
 
 
 def apply(setup, card, session=None):
+    # Both setup confirmations and their Undo cards return through the web UI's number representation.
+    card = _as_a_browser_echoes_it(card)
     return handle_command("", session_id=session or setup[2], service=setup[1], proposal=card,
         confirm_token=card["confirmation_token"], allow_llm=False)
 

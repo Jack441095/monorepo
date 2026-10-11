@@ -38,6 +38,16 @@ def resolve_device_rules(
         else:
             device_candidates.append((device_index, str(device)))
     named = [(index, name) for index, name in device_candidates if name and name.lower() in lower]
+    spans = {name.lower(): [(found.start(), found.end()) for found in re.finditer(re.escape(name.lower()), lower)]
+             for _, name in named}
+    # "glue compressor threshold" contains "compressor" too. A name that only ever appears inside a longer matched
+    # name was not asked for, so a track holding Compressor and Glue Compressor reads as the Glue. Before 11 Oct
+    # both matched, so the request went to whichever came first in the chain, and once duplicates asked instead, it
+    # asked which of two different devices was meant. Two devices with the same name stay ambiguous: neither is longer.
+    named = [(index, name) for index, name in named
+             if any(not any(len(other) > len(name) and start <= at and end <= other_end
+                            for other, found in spans.items() for start, other_end in found)
+                    for at, end in spans[name.lower()])]
     number = re.search(r"\bdevice\s+(\d+)\b", lower)
     if number:
         # Displayed device numbers are one-based; they narrow the observed matches without inventing a device.
@@ -45,9 +55,20 @@ def resolve_device_rules(
     if len(named) > 1:
         # Duplicate names previously selected the first match, so a perfectly readable request hit the wrong copy.
         base["missing_fields"].append("device")
+        # Eight positions keep the question one readable line in chat. A track with more copies of one device than
+        # that is rare, and naming a device number from Live's chain still reaches any of them.
         base["device_choices"] = [{"index": index, "name": name, "number": index + 1} for index, name in named[:8]]
         choices = ", ".join(f'device {index + 1} "{name}"' for index, name in named[:8])
         base["ambiguity"].append(f"Which exact device on '{track.get('name', '')}': {choices}? Include its device number; nothing changed.")
+        # Chat hands a message to Live only when it reads a change in it, and this branch has no action, so "set the
+        # compressor threshold on Drum Bus to -20 dB" went to the notes on a track with two Compressors (11 Oct
+        # review). Parse it once more against the first copy alone: if that yields a change, the question is about
+        # Live. A question that only names the device ("what does the compressor do?") still yields none.
+        alone = resolve_device_rules({**base, "missing_fields": [], "ambiguity": []},
+                                     {**track, "devices": [track["devices"][named[0][0]]]},
+                                     lower, inspect_device_parameters_match)
+        if alone.get("action"):
+            base["missing_fields"].append("which_device")
         return base
     device = named[0] if named else None
     if device is None and re.search(r"\b(?:threshold|ratio|attack|release|frequency|gain|q)\b", lower):

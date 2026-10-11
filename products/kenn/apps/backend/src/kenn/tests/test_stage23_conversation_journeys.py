@@ -260,3 +260,35 @@ def test_five_turn_undo_verifies_restoration_or_refuses_an_intervening_manual_ed
     assert fifth["changed"] is not manual_edit
     assert len(backend.writes) == (1 if manual_edit else 2)
     assert backend.get_addressed_parameter(address, 4)["parameters"][0]["value"] == (0.6 if manual_edit else 0.25)
+
+
+
+def test_chat_asks_which_duplicate_device_instead_of_answering_from_the_notes(api, monkeypatch):
+    # 11 Oct review: /api/ableton/command asked which Compressor, but the chat pre-handler sent the same message on to
+    # the model. The chat stream's pre-handler lives on server.Handler; the FastAPI /api/ask has none.
+    import kenn.mixing_doctor as mixing_doctor
+    import kenn.server as server
+
+    fake = FakeLive()
+    fake.state["tracks"][2]["devices"].append({"index": 1, "name": "Compressor"})
+    service = LiveActionService(fake)
+    api(service)
+    # The router reads the cached snapshot and the gateway reads Live; both have to be the same double.
+    monkeypatch.setattr(mixing_doctor, "get_latest_session_state", fake.query_session_state)
+    monkeypatch.setattr(server, "handle_command",
+                        lambda text, **kwargs: live_command.handle_command(text, service=service, allow_llm=False, **kwargs))
+    handler = server.Handler.__new__(server.Handler)
+    reply = handler._maybe_handle_live_command_from_chat("set the compressor threshold on Vocal to -20 dB", "journey")
+    assert reply is not None and reply["route"] == "ableton_controller" and reply["proposal"] is None
+    assert 'device 1 "Compressor", device 2 "Compressor"' in reply["answer"] and fake.writes == []
+
+
+def test_repeating_a_change_onto_a_track_with_two_copies_asks_which_copy(api):
+    # 11 Oct: "same on Synth" answered "Synth doesn't have that device" when it held two Compressors.
+    fake = FakeLive()
+    fake.state["tracks"][3]["devices"] = [{"index": 0, "name": "Compressor"}, {"index": 1, "name": "Compressor"}]
+    client = api(LiveActionService(fake))
+    command(client, "set Compressor Threshold on Vocal to -18 dB")
+    repeat = command(client, "same on Synth")
+    assert repeat["status"] == "clarification_required" and "proposal" not in repeat
+    assert 'device 1 "Compressor", device 2 "Compressor"' in repeat["answer"] and fake.writes == []

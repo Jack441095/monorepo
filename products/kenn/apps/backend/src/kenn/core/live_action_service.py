@@ -3907,9 +3907,14 @@ class LiveActionService(Tier2Tier3ControlMixin):
             required = ("track_index", "device_index", "parameter_index")
             if any(field not in target for field in required):
                 return {"ok": False, "error": "Receipt has no exact device-parameter target for undo."}
+            observation = target.get("observation_token")
+            if address is not None and (not isinstance(observation, str) or not observation.strip()):
+                # Journals written before 12 Oct dropped this identity. A same-name copy can occupy the original
+                # address, so rediscovering from an old receipt would silently grant Undo to the replacement.
+                return {"ok": False, "error": "Receipt has no retained device identity; undo is refused."}
             try:
                 parameters = (
-                    self.client.get_addressed_parameter(address, int(target["parameter_index"]), target.get("observation_token"))
+                    self.client.get_addressed_parameter(address, int(target["parameter_index"]), observation)
                     if address is not None else self.client.get_device_parameters(int(target["track_index"]), int(target["device_index"]))
                 )
             except Exception as exc:

@@ -1,14 +1,47 @@
 #!/usr/bin/env python3
-"""Capture route-specific answer delivery, provenance and model-gate outcomes.
+"""Measure the local brain's answer latency and how often its answer is actually used.
 
-Local stream/payload and foreground/background HTTP runs stay separate. Missing
-native phases, displayed-answer timing, memory pressure and build identities are
-reported as unknown. Cache conditions record what this caller can actually clear;
-an HTTP caller cannot establish the server's cache state.
+    measure_chat_latency.py [--limit 30] [--cases PATH] [--surface stream|payload|foreground|background]
+                            [--endpoint URL] [--cache-condition cold|warm] [--receipt PATH]
 
-Use stubs while inference work is active. Real-model runs require the finished
-build and its existing local index; this script never builds an index or writes
-to Live. Offline review consumes the saved capture without rerunning inference.
+Stage 1's open item was blocked on recorded speed. The figures that block it were wrong, so this measures the real
+ones: the median and p95 of accepted answers, and the rate plus top reason for rejection, by asking real knowledge
+questions through KENN's own answer path against the local Ollama brain. It records delivery only: an accepted answer
+is not a correct one, and the time is the answer path's, not when the companion displayed it.
+
+**The surfaces are kept apart, and the difference matters.** `stream` is `answer_payload_stream`, what
+`kenn.core.chat` and `chat_cli` use. `payload` is the non-streaming `answer_payload` the browser companion calls.
+Both reach `make_answer()` and both can have the model write the answer, but only when `should_use_llm_rewrite()`
+clears the retrieval-confidence gate. Measured 1 Oct: on the streaming path the brain wrote 2 answers in 10; on the
+companion path it wrote none, and the ~20 s spent there is `post_answer_critique()` grading KENN's own template. So a
+companion-only measurement answers a different question than a streaming one, which is why the surface is a flag
+rather than a detail. `foreground` and `background` ask a running companion over HTTP (`--endpoint`) and are kept
+apart from the local two for the same reason.
+
+**Why it captures the verdict in flight.** The grounding verdict is never persisted: `save_reasoning_trace` is
+called without a metadata payload, so `generation_validation` -- which holds `attempted`, `accepted` and the warnings
+-- exists only in the dict `_answer_payload_stream_raw` yields, and `answer_payload` does not return it. The accepted
+rate cannot be read back from any store after the fact. That is a gap in its own right and it is why this script
+exists rather than a log query.
+
+**Run it with `KENN_LLM_CACHE=0`.** Two caches will otherwise serve a previous run's answer and report
+`attempted=True` for a question no model ever saw. `KENN_LLM_CACHE` (on by default, 512 entries, 24 h TTL in
+`llm_rewrite.py`) replays the model's response for an identical prompt; the semantic answer cache in
+`session_memory` replays whole answer events. `--cache-condition cold`, the default, drops only the semantic cache
+before every question: it cannot reach the response cache from here, so that one is the caller's job, and the
+receipt's `response_cache_hits` and `cache_settings` show whether it was done. Measured: with it on, all 10 questions
+reported `attempted=True` at a 0.08 s median with no model call at all. Over HTTP neither cache can be cleared, and
+the receipt says the server's cache state is unverified.
+
+Use stubs while other inference work is running. Missing native phases, memory pressure and build identities are
+reported as unknown rather than guessed; `--build-manifest` supplies the ones measured elsewhere, and
+`--review-capture` re-scores a saved capture offline without rerunning the model.
+
+Read-only against Live, and it never writes to one: `answer_payload` only reads the session snapshot. It never builds
+an index either.
+
+Needs the knowledge index. `apps/backend/src/kenn/data/` is git-ignored, so run this from the main checkout -- in a
+fresh worktree retrieval silently drops to BM25-only and every answer abstains.
 """
 
 from __future__ import annotations

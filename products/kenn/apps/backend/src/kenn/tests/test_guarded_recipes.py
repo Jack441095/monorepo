@@ -9,6 +9,7 @@ import pytest
 from kenn.core.fake_live import FakeLiveBackend
 from kenn.core.live_action_service import LiveActionService
 from kenn.core.live_recipe import LiveRecipeService
+from kenn.tests.test_parameter_targets import _as_a_browser_echoes_it
 
 
 class GuardedRecipeBackend(FakeLiveBackend):
@@ -59,6 +60,8 @@ def propose(guarded, steps=None):
 
 
 def execute(guarded, card):
+    # Apply and Undo echo the card through browser JSON, where integral floats lose their decimal point.
+    card = _as_a_browser_echoes_it(card)
     return guarded[1].execute_recipe(card, confirm_token=card["confirmation_token"], session_id=guarded[2])
 
 

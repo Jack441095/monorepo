@@ -174,6 +174,25 @@ def test_chat_undo_read_back_from_the_journal_refuses_a_same_name_replacement(ta
     assert len(backend.writes) == 1
 
 
+@pytest.mark.parametrize("identity", [None, "", "   "])
+def test_undo_refuses_old_receipts_without_retained_device_identity(target, identity):
+    # Receipts saved before 12 Oct lost observation_token in the journal; a matching name and value cannot
+    # distinguish the original from a Cmd-D replacement, so even an otherwise valid old receipt must refuse.
+    backend, service = target
+    receipt = apply(service, candidate(service)["proposal"])["receipt"]
+    receipt["target"].pop("observation_token")
+    if identity is not None:
+        receipt["target"]["observation_token"] = identity
+    bus = backend._addressed_buses[0]
+    bus["devices"][1] = copy.deepcopy(bus["devices"][1])
+
+    inverse = service.propose_undo(receipt, session_id="target-tests")
+
+    assert inverse["ok"] is False
+    assert "identity" in inverse["error"].lower()
+    assert len(backend.writes) == 1
+
+
 def test_cross_session_apply_undo_and_independent_edit_are_refused(target):
     backend, service = target
     proposal = candidate(service)["proposal"]
@@ -469,7 +488,8 @@ def test_five_turn_knowledge_to_apply_uses_registered_http_routes(target, tmp_pa
         "value": 0.75, "unit": "raw", "session_id": "target-tests",
     }).json()
     assert proposed["status"] == "confirmation_required" and backend.writes == []
-    proposal = proposed["proposal"]
+    # The response-to-request round trip must reproduce JSON.stringify's [0, 1], not Python's [0.0, 1.0].
+    proposal = _as_a_browser_echoes_it(proposed["proposal"])
     applied = client.post("/api/ableton/command", json={
         "command": "Apply that", "proposal": proposal, "confirm_token": proposal["confirmation_token"],
         "session_id": "target-tests", "deterministic_only": True,

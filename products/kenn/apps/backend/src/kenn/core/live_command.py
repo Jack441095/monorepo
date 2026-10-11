@@ -3167,6 +3167,7 @@ def _handle_command_impl(
                            for index, row in enumerate(track.get("devices", [])) if isinstance(row, dict)
                            and row.get("name") == context_resolution["requested_device"]][:8]
                 # A class reference cannot authorize another instance. Show actual positions and await an exact request.
+                # Eight, as in device_rules: one readable line in chat, and a device number still reaches the rest.
                 listed = ", ".join(f'device {row["number"]} "{row["name"]}"' for row in choices)
                 return _clarification(response, {"action": "correct_target", "device_choices": choices},
                                       f"Which exact device on '{last.get('last_track', '')}': {listed or 'none observed'}? Include its device number and value; nothing changed.")
@@ -3455,7 +3456,10 @@ def _handle_command_impl(
         # Re-parse either way: the mixer was just read, and an unresolved relative change needs its fader value.
         deterministic_intent = parse_request(clean_command, snapshot)
         repeated = (response.get("context_resolution") or {}).get("resolution") in {"follow_up", "correction"}
-        if repeated and "device" in (deterministic_intent.get("missing_fields") or []):
+        # Two copies of the device also leave "device" missing, and then the track does have it: the parse's own
+        # "which copy?" question is the right reply, not this one (11 Oct, a repeat onto a track with two Compressors).
+        if repeated and "device" in (deterministic_intent.get("missing_fields") or []) \
+                and not deterministic_intent.get("device_choices"):
             track_name = str((deterministic_intent.get("track") or {}).get("name") or "That track")
             return _clarification(
                 response, deterministic_intent,

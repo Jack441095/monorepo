@@ -11,6 +11,7 @@ from kenn.core.fake_live import FakeLiveBackend
 from kenn.core.live_action_service import LiveActionService
 from kenn.core.live_command import handle_command
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
+from kenn.tests.test_parameter_targets import _as_a_browser_echoes_it
 
 
 class GuardedEqBackend(FakeLiveBackend):
@@ -63,6 +64,8 @@ def plan(eq, **overrides):
 
 
 def apply(eq, card):
+    # Compound EQ and its recipe Undo share the web card's JSON round trip.
+    card = _as_a_browser_echoes_it(card)
     return eq[1].execute_eq_band_tuning_gain(card, confirm_token=card["confirmation_token"], session_id=eq[2])
 
 
