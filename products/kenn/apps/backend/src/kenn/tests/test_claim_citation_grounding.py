@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import re
 
+import pytest
+
 from kenn.core.chat_grounding import (
     _AMBIGUOUSLY_ATTRIBUTED,
     _CITATION_AGREES,
@@ -584,6 +586,24 @@ def test_an_ordinal_citation_resolves_to_the_indexed_shown_chunk() -> None:
     assert citations["verified"] == 1
     assert citations["unshown_citations"] == []
     assert result["accepted"] is True
+
+
+@pytest.mark.parametrize("alias", ["source1", "excerpt1", "chunk1", "ex1"])
+def test_a_named_ordinal_citation_resolves_like_a_bare_one(alias: str) -> None:
+    # 11 Oct 2026: the prefix was cut at six characters for every alias, so excerpt1 and chunk1 never resolved.
+    result = validate(_answer(f"Back the release off to 150 ms [#{alias}]."))
+
+    assert result["claim_citations"]["verified"] == 1
+    assert result["accepted"] is True
+
+
+def test_a_two_digit_ordinal_is_not_read_as_its_last_digit() -> None:
+    # 11 Oct 2026: chunk12 resolved to the second excerpt, which holds the 12%, so a citation to an excerpt that
+    # was never shown passed as verified. Only two excerpts are shown here.
+    result = validate(_answer("Duck the reverb send to 12% [#chunk12]."))
+
+    assert result["claim_citations"]["unshown_citations"] != []
+    assert result["accepted"] is False
 
 
 def test_an_ordinal_citation_to_an_excerpt_not_containing_the_number_is_rejected() -> None:

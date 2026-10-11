@@ -215,8 +215,7 @@ def _measurement_is_supported(measurement: str, allowed: set[str]) -> bool:
 
     Audio engineers write -14 LUFS or -14.0 LUFS interchangeably, and Live meters display decimal true peaks
     like -1.0 dBTP alongside integer bounds like -1 dBTP. Treating -14.0 LUFS as unsupported when the note
-    writes -14 LUFS is a formatting mismatch, not an invention. Similarly, true peak ceilings (-1 dBTP)
-    are routinely cited in mixing advice as 1 dB or 1.0 dB true peak headroom.
+    writes -14 LUFS is a formatting mismatch, not an invention.
     """
     if measurement in allowed:
         return True
@@ -226,29 +225,48 @@ def _measurement_is_supported(measurement: str, allowed: set[str]) -> bool:
     m_dec = re.sub(r"^(-?\d+)([a-z%]+)$", r"\1.0\2", measurement)
     if m_dec in allowed:
         return True
-    # True peak headroom / ceiling equivalence: answers citing 1 dB or 1.0 dB true peak margin against a -1 dBTP ceiling note
-    m_db = re.match(r"^(-?\d+(?:\.0)?)db$", measurement)
-    if m_db:
-        val = m_db.group(1).removesuffix(".0")
-        val_pos = val.lstrip("-")
-        if any(
-            target in allowed
-            for target in (
-                f"{val}dbtp",
-                f"{val}.0dbtp",
-                f"-{val_pos}dbtp",
-                f"-{val_pos}.0dbtp",
-                f"{val_pos}dbtp",
-                f"{val_pos}.0dbtp",
-            )
-        ):
-            return True
     return False
 
 
-def _unsupported_measurements(found: set[str], allowed: set[str]) -> set[str]:
-    """Measurements in found that are not permitted by allowed."""
-    return {m for m in found if not _measurement_is_supported(m, allowed)}
+def _matches_dbtp_ceiling(measurement: str, allowed: set[str]) -> bool:
+    """Whether a plain dB figure has the same size as a dBTP ceiling in allowed ("1 dB" against "-1 dBTP")."""
+    m = re.fullmatch(r"-?(\d+)(?:\.0)?db", measurement)
+    if not m:
+        return False
+    # Either sign: "1 dB of headroom" and "a ceiling of -1 dB" both mean the note's -1 dBTP.
+    return any(f"{sign}{m.group(1)}{dec}dbtp" in allowed for sign in ("", "-") for dec in ("", ".0"))
+
+
+# Words that make a plain dB figure a statement about true-peak headroom. Judged per clause: "Cut 1 dB on the vocal,
+# then keep the true peak at -1 dBTP" puts the cut and the ceiling in different clauses, and the cut must not borrow
+# the ceiling. A clause that holds both still passes; we accept that rather than parse the sentence.
+_HEADROOM_WORDS_RE = re.compile(r"headroom|true[\s-]?peak|ceiling", re.IGNORECASE)
+# A full stop only ends a clause when whitespace follows it, so "1.0 dB" stays in one piece.
+_CLAUSE_BREAK_RE = re.compile(r"[.;:!?](?=\s)|,\s|\n")
+
+
+def _headroom_figures(text: str) -> set[str]:
+    """The plain dB figures in text that sit in a clause about true-peak headroom or a ceiling."""
+    figures: set[str] = set()
+    for clause in _CLAUSE_BREAK_RE.split(text):
+        if _HEADROOM_WORDS_RE.search(clause):
+            figures |= {m for m in _measurements(clause) if m.endswith("db")}
+    return figures
+
+
+def _unsupported_measurements(
+    found: set[str], allowed: set[str], headroom: set[str] = frozenset()
+) -> set[str]:
+    """Measurements in found that are not permitted by allowed.
+
+    Only figures in `headroom` may lean on a dBTP ceiling (see _headroom_figures). Until 11 Oct 2026 every plain dB
+    figure could, so "cut 1 dB" passed whenever a note with a -1 dBTP ceiling was shown.
+    """
+    return {
+        m
+        for m in found
+        if not (_measurement_is_supported(m, allowed) or (m in headroom and _matches_dbtp_ceiling(m, allowed)))
+    }
 
 
 def _range_interval_measurements(text: str) -> set[str]:
@@ -427,6 +445,13 @@ def _attribution_class(holders: list[str]) -> str:
     return _AMBIGUOUSLY_ATTRIBUTED
 
 
+# The ask path retrieves 16 chunks and the context budget showed 4 of them when measured on 2 Oct 2026 (see
+# llm_rewrite.model_evidence), so two digits covers every real ordinal. Until 11 Oct 2026 the alias prefix was cut
+# at len("source") for every alias, which left "excerpt1" and "chunk1" unresolved and read "chunk12" as excerpt 2,
+# so a citation to an excerpt that was never shown could pass as verified.
+_ORDINAL_CITATION_RE = re.compile(r"(?:source|excerpt|chunk|ex)?(\d{1,2})")
+
+
 def _resolve_chunk_id(
     cited_id: str,
     bodies: dict[str, str],
@@ -439,7 +464,7 @@ def _resolve_chunk_id(
     This caused 14 rejections across 9 probe runs for 'cites an excerpt id that was never shown'.
     We resolve:
     1. Exact match against shown chunk IDs.
-    2. 1-based ordinal indices (e.g. '1', '2', '3' or 'source1', 'excerpt1').
+    2. 1-based ordinal indices ('1', 'source1', 'excerpt1', 'chunk1', 'ex1') that land on a shown excerpt.
     3. Unambiguous prefix of at least 6 hex characters matching exactly one shown chunk.
     4. Single-character substitution slip in a 12-char hex string matching exactly one shown chunk.
     """
@@ -448,23 +473,15 @@ def _resolve_chunk_id(
     if cited_id in bodies:
         return cited_id
 
-    # 1-based ordinal index or 'source1' / 'excerpt1' alias
-    raw_digits = ""
     lower = cited_id.lower()
-    if lower.isdigit():
-        raw_digits = lower
-    elif lower.startswith(("source", "excerpt", "chunk")) and lower[len("source"):].isdigit():
-        raw_digits = lower[len("source"):]
-    elif lower.startswith("ex") and lower[2:].isdigit():
-        raw_digits = lower[2:]
-
-    if raw_digits:
-        try:
-            idx = int(raw_digits) - 1
-            if 0 <= idx < len(shown):
-                return get_chunk_id(shown[idx][1])
-        except ValueError:
-            pass
+    ordinal = _ORDINAL_CITATION_RE.fullmatch(lower)
+    if ordinal:
+        idx = int(ordinal.group(1)) - 1
+        if 0 <= idx < len(shown):
+            return get_chunk_id(shown[idx][1])
+        # An ordinal past the end names an excerpt the model was never shown. One or two digits is too short to be
+        # a hex prefix below, so there is nothing else to try and the citation stays unresolved.
+        return None
 
     # Unambiguous hex prefix (at least 6 characters) or 12+ char string starting with a 12-char ID
     if len(cited_id) >= 6 and all(c in "0123456789abcdefABCDEF" for c in cited_id):
@@ -873,7 +890,11 @@ class StreamedAnswerGuard:
         # after the dB. Judging the window there cut two good answers on 2 Oct 2026 (the sources had -6 dBFS and
         # -0.3 dBTP). The carry keeps the text, so the next token's window sees the whole unit.
         judged = window[:-2] if window.lower().endswith("db") else window
-        leaked = _unsupported_measurements(_measurements(judged), self._allowed)
+        found = _measurements(judged)
+        # Every dB figure may lean on a dBTP ceiling here. "Leave 1 dB" arrives before "of headroom", so judging
+        # the clause would cut a good answer mid-stream; the final gate judges it once the clause is whole. Being
+        # more lenient than the gate keeps the guard prefix-sound: it only ever stops what the gate would refuse.
+        leaked = _unsupported_measurements(found, self._allowed, headroom=found)
         if leaked:
             return {
                 "warning": (
@@ -1297,6 +1318,7 @@ def generated_answer_validation(
         _unsupported_measurements(
             _measurements(answer),
             _accepted_measurements(question, shown, evidence_text),
+            headroom=_headroom_figures(answer),
         )
     )
     # The labels the model was actually given, so a citation is only fabricated if the filename was not on

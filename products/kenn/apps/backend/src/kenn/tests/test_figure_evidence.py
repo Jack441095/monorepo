@@ -238,16 +238,17 @@ def test_make_answer_inner_check_takes_figures_from_typed_question_not_expanded_
     assert "200 ms" not in ans_refused
 
 
-def test_true_peak_decibel_headroom_is_supported_by_dbtp_ceiling():
-    from kenn.core.chat_grounding import _measurement_is_supported
+def test_true_peak_headroom_in_db_is_supported_by_a_dbtp_ceiling_note(index):
+    # SHOWN sets a -1 dBTP ceiling. "1 dB of headroom" is the same instruction written the other way round.
+    assert _refused("Leave 1 dB of headroom so the encode does not clip.", [SHOWN]) == []
+    assert _refused("Keep 1.0 dB of true peak headroom.", [SHOWN]) == []
+    assert _refused("Set the limiter ceiling 1 dB below full scale.", [SHOWN]) == []
+    # A different headroom figure is still a figure the note does not give.
+    assert _refused("Leave 2 dB of headroom.", [SHOWN]) == ["2db"]
 
-    # Note specifies a -1 dBTP ceiling. Answers phrased as 1 dB or 1.0 dB true peak headroom are accepted.
-    allowed = {"-1dbtp", "-14lufs"}
-    assert _measurement_is_supported("1.0db", allowed) is True
-    assert _measurement_is_supported("1db", allowed) is True
-    assert _measurement_is_supported("-1db", allowed) is True
-    assert _measurement_is_supported("-1.0db", allowed) is True
-    # Unrelated figures remain refused
-    assert _measurement_is_supported("2db", allowed) is False
-    assert _measurement_is_supported("5db", allowed) is False
+
+def test_an_eq_move_never_borrows_a_dbtp_ceiling(index):
+    # 11 Oct 2026: the dB/dBTP equivalence ignored context, so any "1 dB" passed whenever a -1 dBTP note was shown.
+    assert _refused("Cut 1 dB on the vocal bus before the limiter.", [SHOWN]) == ["1db"]
+    assert _refused("Cut 1 dB on the vocal, then keep the true peak at -1 dBTP.", [SHOWN]) == ["1db"]
 

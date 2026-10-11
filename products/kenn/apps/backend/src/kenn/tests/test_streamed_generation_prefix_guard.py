@@ -471,6 +471,15 @@ def test_a_plain_db_the_sources_do_not_have_is_still_caught_once_the_unit_is_fin
     assert guard.check(" on the bus.") is not None
 
 
+def test_headroom_against_a_dbtp_ceiling_streams_before_the_word_headroom_arrives() -> None:
+    """The guard sees "1 dB" before "of headroom", so it leaves the dB/dBTP call to the final gate."""
+    guard = StreamedAnswerGuard({"-1dbtp"})
+
+    assert guard.check("Leave 1") is None
+    assert guard.check(" dB") is None
+    assert guard.check(" of headroom.") is None
+
+
 def test_the_guard_window_is_wide_enough_for_the_longest_match_it_has_to_catch() -> None:
     """The carry has to hold a whole match, or a rejection is lost in the seam between two tokens."""
     longest = "I have gone ahead and quantized the channel"
