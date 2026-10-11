@@ -1367,6 +1367,36 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     was shown nothing on aliasing although 31 chunks mention it (the synonym item above).
   - Held-out, counted only: 11–14 figure refusals a run (6–10 where the figure is the step), 4 abstains, 2–6
     citation, overlap or quality refusals, 3 not sent to the model.
+- [ ] Candidate qualification bench v4, 11 Oct 2026 (main `412fc628`, both merges above), the first with Live open.
+  Same harness as v3: `qwen3:4b-instruct-2507-q4_K_M`, fake Live backend (Live is open as load only), mains, pinned
+  index `v-5f6964698b76`, `KENN_LLM_CACHE=0`, model purged between runs. Started 16:07 with 2 GB of swap already in
+  use. Results in `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v4/`.
+  - Probe run 1: 35/44 within 15 s (bar 31), median final 6.62 s, 0 errors. Excision projected 37.
+- [ ] Next steps from the 2, 3 and 5 Oct research, read against the v3 misses on 11 Oct. Most of the research was
+  written while answers were late; v3 had none, so its speed work waits on v4's Live-open timings. What it says
+  about wrong and missing answers still holds. Since 8 Oct owner grades, not delivery, are the measure, so each
+  item is judged on grades as well as the gate.
+  - [ ] Note-first comparison first ([5 Oct research §7.1](docs/research/KENN_GLM_COMPREHENSIVE_RESEARCH_2026-10-05.md),
+    and "Review of 4 October" above). 6–10 held-out refusals a run are rows where the refused figure is the step
+    itself, which no excision can save, and a served note's figures are right by construction. Build the
+    ~40-question grading pack from the probe and the 225 non-held-out rows only: the note's own Short answer and
+    Try this beside the current model answer, graded 0/1/2 by Jack. Whether a note-served answer counts as a
+    "model answer" for the gate is Jack's call before anything is wired in.
+  - [ ] Reference-numbers note (open above), written from published conventions (streaming loudness targets,
+    -1 dBTP, the -18 dBFS gain-staging habit) and the probe's refused figures, never from held-out rows. The
+    5 Oct "allowed values" idea (§7.2) is already on main; this supplies the values the notes never print.
+  - [ ] Abstains: the same four probe rows abstain on every run. Land the synonym fix (open above) first. If
+    `live-sends-prepost`, `syn-resonance` and `psy-precedence` still abstain, trial the 2 Oct research's small
+    ONNX cross-encoder over the top 12
+    ([Experiment 2](docs/research/KENN_PRODUCT_AND_OPEN_SOURCE_RESEARCH_2026-10-02.md#experiment-2-test-whether-passage-reranking-improves-the-existing-retrieval)).
+    Its bar: 0.05 more recall@4 or 20% fewer retrieval-caused failures, inside 150 ms p95 and 250 MB. It adds
+    onnxruntime and a model file, so it needs Jack's OK.
+  - [ ] Speed, only if v4 shows late answers with Live open: in the 3 Oct order, MLX against Ollama on the same 4B
+    checkpoint, then a matched draft model for speculative decoding. MoE (DeepSeek-V2-Lite is ~8–9 GB resident,
+    per the 5 Oct corrections) and Kev-0.8B routing (torch, hundreds of ms on a Mac) stay parked.
+  - Product rather than gate (5 Oct stage 2): the producer's measured LUFS, true peak and crest as evidence the
+    model may cite, and the selected track's device chain in the prompt. That is what only KENN can do, but a
+    fake-Live bench cannot see it, so it needs its own owner-graded set.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
