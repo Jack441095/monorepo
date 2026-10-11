@@ -1193,6 +1193,77 @@ def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
     return trimmed
 
 
+# The three shapes below are every way a refused figure sat beside a step, rather than in it, across the 12 probe
+# runs of 10 Oct 2026. Each is cut phrase and all, so the step that held it stays. Anything else (a figure that is
+# the object of the step, "set the preamp so the input is at -18 dBFS") still costs its sentence: without the
+# figure that step says nothing.
+#
+# "apply a linear-phase EQ to the low-mid range (e.g., 100–300 Hz) to check..." The 60-character limit keeps us to
+# a short aside; a longer bracket is a clause of its own and goes with its sentence instead.
+_BRACKET_ASIDE_RE = re.compile(r"[ \t]*\(([^()\n]{1,60})\)")
+# "...exceeds a threshold—like a narrow resonance at 3500 Hz—without affecting other moments." An en dash only
+# counts with spaces round it, because unspaced it is the one inside "100–300 Hz".
+_DASH_OPEN = r"(?:[ \t]*—[ \t]*|[ \t]+–[ \t]+)"
+_DASH_EXAMPLE_RE = re.compile(
+    rf"{_DASH_OPEN}((?:(?:like|such as|for example|for instance|say)\b|e\.g\.)[^\n]{{1,80}}?){_DASH_OPEN}",
+    re.IGNORECASE,
+)
+# "apply a high-pass filter at around 100 Hz to reduce the effect" is still an instruction without the frequency,
+# because a high- or low-pass says what it does on its own. A cut, boost, bell or notch does not: "Boost at 5 kHz."
+# would come out as "Boost.", so those keep their figure and go to the sentence drop. Only a frequency introduced
+# by at/around/near is cut ("set it to 100 Hz" makes the figure the instruction), and the lookahead stops at the
+# next clause so "at 100 Hz by 3 dB", where the place and the amount go together, is left alone.
+_PLACED_FIGURE_RE = re.compile(
+    r"\b(?P<move>(?:high|low)[- ]?pass(?:[ \t]+filter)?|hpf|lpf)"
+    r"(?P<place>[ \t]+(?:at|around|near)[ \t]+(?:(?:around|about|roughly|approximately)[ \t]+)?"
+    r"(?:\d+(?:\.\d+)?[ \t]*(?:k?hz)?[ \t]*(?:[–-]|to)[ \t]*)?\d+(?:\.\d+)?[ \t]*k?hz)"
+    r"(?=[ \t]+(?:to|on|for|in|so|and|with|before|after|if|when|until)\b|[ \t]*[,.;:)\[]|[ \t]*$)",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+def _excise_illustrative_figures(answer: str, unsupported: set[str]) -> str:
+    """The answer with every aside or placement that holds an unsupported figure cut out; the rest untouched."""
+
+    def holds_a_refused_figure(phrase: str) -> bool:
+        return bool(_measurements(phrase) & unsupported)
+
+    def dash_aside(m: re.Match) -> str:
+        if not holds_a_refused_figure(m.group(1)):
+            return m.group(0)
+        # The two dashes stood between words, so one space has to stay, unless punctuation follows.
+        follows = m.string[m.end():m.end() + 1]
+        return "" if not follows or follows in ",.;:!?)" else " "
+
+    answer = _BRACKET_ASIDE_RE.sub(lambda m: "" if holds_a_refused_figure(m.group(1)) else m.group(0), answer)
+    answer = _DASH_EXAMPLE_RE.sub(dash_aside, answer)
+    return _PLACED_FIGURE_RE.sub(
+        lambda m: m.group("move") if holds_a_refused_figure(m.group("place")) else m.group(0), answer
+    )
+
+
+def salvage_unsupported_figures(answer: str, unsupported: list[str]) -> str:
+    """The answer without the figures the notes lack, or "" if that cannot be done and leave enough answer.
+
+    11 Oct 2026: replayed over the 12 probe runs of 10 Oct, drop_unsupported_sentences saved none of the 32
+    answers refused for a figure. 19 had too little left, and the other 13 lost a step or the Check line and fell
+    under the quality floor, often when the figure was only an example in brackets or a frequency on a filter move.
+    Those asides are cut first; a figure still standing after that takes its sentence with it, as before. The
+    caller must validate the result again; this only edits.
+    """
+    bad = set(unsupported)
+    excised = _excise_illustrative_figures(answer, bad)
+    left = sorted(_measurements(excised) & bad)
+    if not left:
+        # Every refused figure sat in an aside. When none was in the text at all (or `unsupported` was empty)
+        # nothing changed, and we hand back "" as drop_unsupported_sentences does, so the caller never re-judges
+        # an unchanged answer.
+        return excised if excised != answer else ""
+    # drop_unsupported_sentences measures its kept-share floor against the excised text, a few words shorter than
+    # the original. Each aside is at most 80 characters, so the floor moves by a word or two, not by a step.
+    return drop_unsupported_sentences(excised, left)
+
+
 _WHOLE_SENTENCE_RE = re.compile(r".*[.!?](?=\s|$)", re.DOTALL)
 # A cut right after "3." (or "Try this: 1.") leaves the marker looking like a finished sentence.
 _DANGLING_STEP_RE = re.compile(r"(?:(?<=[.!?\]:])[ \t]+|\n[ \t]*)\d{1,2}[.)]$")

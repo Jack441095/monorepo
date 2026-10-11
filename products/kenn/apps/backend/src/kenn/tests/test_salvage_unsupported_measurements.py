@@ -1,13 +1,19 @@
 """One invented number must not cost the whole model answer (4 Oct 2026: 9 to 12 of about 41 rejections a run).
 
-The sentence with the number goes; the gate then judges what is left, and a number the notes lack still cannot
-get through.
+An aside that only illustrates a step goes on its own; any other figure takes its sentence with it. The gate
+then judges what is left, and a number the notes lack still cannot get through.
 """
 
 from __future__ import annotations
 
 from kenn.core import chat_answer
-from kenn.core.chat_grounding import _measurements, drop_unsupported_sentences, generated_answer_validation
+from kenn.core.chat_grounding import (
+    _excise_illustrative_figures,
+    _measurements,
+    drop_unsupported_sentences,
+    generated_answer_validation,
+    salvage_unsupported_figures,
+)
 from kenn.tests.test_streamed_generation_prefix_guard import ACCEPTED_ANSWER, CHUNKS, QUERY
 
 # The model adds a 900 ms figure that the note does not have, in the middle of an otherwise good answer.
@@ -172,3 +178,106 @@ def test_the_dynamic_eq_answer_keeps_no_empty_step_and_counts_from_one():
     )
     trimmed = drop_unsupported_sentences(answer, ["3500hz", "-2.5db"])
     assert trimmed.endswith("Try this: 1. Set the threshold to catch only the harsh moments.")
+
+
+# The figures in these tests are the shapes refused across the 12 probe runs of 10 Oct 2026, where cutting the
+# whole sentence saved none of 32 answers: it took a step with it and the answer fell under the quality floor.
+# The frequencies in brackets and on the high-pass are not in the sidechain note.
+ILLUSTRATED = ACCEPTED_ANSWER.replace(
+    "1. In Live, put a compressor on the bass bus and send the kick to its sidechain input.",
+    "1. In Live, put a compressor on the bass bus (e.g., the 40–120 Hz body) and send the kick to its sidechain input.",
+).replace(
+    "2. Set the release to 150 ms so the bass recovers before the next kick.",
+    "2. Set the release to 150 ms so the bass recovers before the next kick, and add a high-pass filter at 30 Hz "
+    "to clear rumble.",
+)
+
+
+def test_the_illustrated_answer_is_refused_and_the_sentence_drop_cannot_save_it():
+    assert _validate(ILLUSTRATED)["unsupported_measurements"] == ["120hz", "30hz", "40hz"]
+    assert drop_unsupported_sentences(ILLUSTRATED, ["120hz", "30hz", "40hz"]) == ""
+
+
+def test_cutting_only_the_asides_keeps_every_step_and_passes_the_same_gate():
+    salvaged = salvage_unsupported_figures(ILLUSTRATED, ["120hz", "30hz", "40hz"])
+    assert "1. In Live, put a compressor on the bass bus and send the kick" in salvaged
+    assert "add a high-pass filter to clear rumble." in salvaged
+    assert "3. Set the ratio to 4:1" in salvaged
+    check = _validate(salvaged)
+    assert check["accepted"], check["warnings"]
+
+
+def test_an_example_in_brackets_goes_and_its_step_reads_on():
+    # eq-linear-vs-min-phase, v3 bench cand-run1.
+    text = "1. Solo each track and apply a linear-phase EQ to the low-mid range (e.g., 100–300 Hz) to check for smearing."
+    assert _excise_illustrative_figures(text, {"100hz", "300hz"}) == (
+        "1. Solo each track and apply a linear-phase EQ to the low-mid range to check for smearing."
+    )
+
+
+def test_an_example_between_dashes_goes_and_the_sentence_closes_up():
+    # dyn-dynamic-eq-vs-multiband, v3 bench cand-run1.
+    text = "It acts only when the signal exceeds a threshold—like a narrow resonance at 3500 Hz—without touching the rest."
+    assert _excise_illustrative_figures(text, {"3500hz"}) == (
+        "It acts only when the signal exceeds a threshold without touching the rest."
+    )
+    assert _excise_illustrative_figures("Catch the harsh band — say 3500 Hz —, then let go.", {"3500hz"}) == (
+        "Catch the harsh band, then let go."
+    )
+
+
+def test_a_range_inside_a_spaced_dash_aside_is_not_taken_for_its_closing_dash():
+    text = "Find the mud – like 100–300 Hz – before you cut."
+    assert _excise_illustrative_figures(text, {"300hz"}) == "Find the mud before you cut."
+
+
+def test_a_high_pass_keeps_its_instruction_without_the_frequency():
+    # rec-proximity, v3 bench cand-run2 and cand-run3; the second kept its citation.
+    assert _excise_illustrative_figures("Apply a high-pass filter at around 100 Hz to reduce the effect.", {"100hz"}) == (
+        "Apply a high-pass filter to reduce the effect."
+    )
+    assert _excise_illustrative_figures("Apply a high-pass filter at 100 Hz [#578a1b0b8faa].", {"100hz"}) == (
+        "Apply a high-pass filter [#578a1b0b8faa]."
+    )
+
+
+def test_a_boost_or_cut_keeps_its_frequency_because_without_it_there_is_no_instruction():
+    # "Boost at 5 kHz." would have come out as "Boost."; the sentence drop is the right outcome there.
+    assert _excise_illustrative_figures("Boost at 5 kHz.", {"5khz"}) == "Boost at 5 kHz."
+    assert _excise_illustrative_figures("Cut at 3 kHz by 2 dB.", {"3khz"}) == "Cut at 3 kHz by 2 dB."
+
+
+def test_a_figure_that_is_the_step_itself_still_takes_its_sentence():
+    # dig-gain-staging refused -18 dBFS on every probe run of 10 Oct: the note has no such figure, and no cut
+    # can leave "so the preamp output is at" saying anything.
+    step = "Set your track input gain so the preamp output is at -18 dBFS."
+    assert _excise_illustrative_figures(step, {"-18dbfs"}) == step
+    body = "Key the bass compressor from the kick and let the release recover before the next hit. " * 3
+    answer = f"Short answer: {body}\n{step} Then listen to the bass and kick together."
+    salvaged = salvage_unsupported_figures(answer, ["-18dbfs"])
+    assert "-18" not in salvaged and salvaged.endswith("Then listen to the bass and kick together.")
+
+
+def test_an_aside_with_only_supported_figures_or_none_is_left_alone():
+    text = "Set the release (150 ms) and the gain (a safe starting point) before the high-pass filter at 30 Hz."
+    assert _excise_illustrative_figures(text, {"900ms"}) == text
+
+
+def test_nothing_to_salvage_returns_nothing_rather_than_the_original():
+    assert salvage_unsupported_figures(ACCEPTED_ANSWER, []) == ""
+
+
+def test_make_answer_keeps_every_step_when_only_asides_held_the_invented_figures(monkeypatch):
+    monkeypatch.setattr(chat_answer, "load_chunks", lambda: list(CHUNKS))
+    monkeypatch.setattr(chat_answer, "search", lambda *a, **k: list(CHUNKS))
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *a, **k: True)
+    monkeypatch.setattr(chat_answer, "llm_enhance_answer", lambda *a, **k: ILLUSTRATED)
+    monkeypatch.setattr("kenn.llm.linter.lint_response", lambda answer, mode: answer)
+    logged = []
+    monkeypatch.setattr(chat_answer, "_log_generation_outcome", lambda accepted, validation, seconds: logged.append((accepted, validation)))
+
+    answer, enhanced = chat_answer.make_answer(QUERY, list(CHUNKS), route="production")
+
+    assert enhanced is True
+    assert "Hz" not in answer and "3. Set the ratio to 4:1" in answer
+    assert logged[-1][0] is True and logged[-1][1]["salvaged"] == ["120hz", "30hz", "40hz"]
