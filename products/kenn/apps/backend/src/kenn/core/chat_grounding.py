@@ -358,16 +358,16 @@ def _claim_citations(answer: str) -> list[dict]:
     text = _RANGE_RE.sub(r"\1\3 \2\3", answer)
     spans = _measurement_spans(text)
     citations = [(m.group(1), m.start()) for m in CLAIM_CITATION_RE.finditer(text)]
-    cited = [""] * len(spans)
+    cited = [-1] * len(spans)
     taken: set[int] = set()
     for index, (_key, start, end) in enumerate(spans):
         next_start = spans[index + 1][1] if index + 1 < len(spans) else len(text)
         found = _first_free_citation(citations, end, min(next_start, end + _CLAIM_LINK_WINDOW_CHARS), taken)
         if found >= 0:
             taken.add(found)
-        cited[index] = citations[found][0] if found >= 0 else ""
+        cited[index] = found
     for index, (_key, start, _end) in enumerate(spans):
-        if cited[index]:
+        if cited[index] >= 0:
             continue
         previous_end = spans[index - 1][2] if index else 0
         found = _first_free_citation(
@@ -375,10 +375,18 @@ def _claim_citations(answer: str) -> list[dict]:
         )
         if found >= 0:
             taken.add(found)
-        cited[index] = citations[found][0] if found >= 0 else ""
+        cited[index] = found
     return [
-        {"value": key, "cited": bool(cited_id), "cited_chunk": cited_id}
-        for (key, _start, _end), cited_id in zip(spans, cited)
+        {
+            "value": key,
+            "cited": found >= 0,
+            "cited_chunk": citations[found][0] if found >= 0 else "",
+            # Which [#...] in the answer this claim used, counting from 0 in the order written, or -1 for none.
+            # repair_misattributed_citations() edits the tag by this count. The count is the same on the answer as
+            # written as on the range-rewritten text it was taken from, for the reason _measurement_spans() gives.
+            "citation_index": found,
+        }
+        for (key, _start, _end), found in zip(spans, cited)
     ]
 
 
@@ -505,8 +513,13 @@ def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) ->
     evidence, so no existing warning could fire on it.
     """
     bodies: dict[str, str] = {}
-    for _score, chunk, body in shown:
-        bodies.setdefault(get_chunk_id(chunk), body)
+    # The number each excerpt carried in the prompt. model_evidence() numbers them by their place in `shown`, from 1,
+    # and this is the same list, so a tag repaired to one of these points where the model was looking.
+    ordinals: dict[str, int] = {}
+    for ordinal, (_score, chunk, body) in enumerate(shown, start=1):
+        chunk_id = get_chunk_id(chunk)
+        bodies.setdefault(chunk_id, body)
+        ordinals.setdefault(chunk_id, ordinal)
     # One regex pass per shown body rather than one per claim. The derived pass has to look at every body anyway,
     # and the citation check used to rescan a whole body for each cited claim, so this costs less than it did
     # before on any answer with more than one claim.
@@ -518,6 +531,7 @@ def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) ->
         holders = [cid for cid in bodies if value in body_measurements[cid]]
         claim["attribution"] = _attribution_class(holders)
         claim["attributed_chunks"] = holders
+        claim["attributed_ordinals"] = [ordinals[cid] for cid in holders]
         resolved_id = _resolve_chunk_id(cited_id, bodies, shown)
         if resolved_id:
             claim["cited_chunk"] = resolved_id
@@ -1372,6 +1386,50 @@ def salvage_unsupported_figures(answer: str, unsupported: list[str]) -> str:
     # the model wrote (49 of 100 words in one review case on 11 Oct). We accept that: what went first was examples,
     # the floor still guards the steps, and the gate judges the result again.
     return drop_unsupported_sentences(excised, left)
+
+
+def repair_misattributed_citations(answer: str, misattributed: list[dict]) -> str:
+    """The answer with each wrong excerpt tag pointed at an excerpt that holds its figure, or "" if no tag was wrong.
+
+    `misattributed` is the "fabricated_attributions" list verify_claim_citations() made from this same text. The
+    tag moves to the first excerpt, in prompt order, whose body holds the figure. A figure no shown body holds
+    loses its tag instead: the aggregate check passed it from the question, a note's title or the middle of a
+    quoted range, so there is no excerpt to point at. Only tags change, never a figure, so the measurement check
+    still decides every number that ships; the caller must validate the result again.
+
+    11 Oct 2026: on the v6 development bench this warning alone cost 2 of 72 held-out answers, one short of the
+    51 the gate needs. The rule was rejecting the model for trying to cite: the same answer with no tag passes,
+    because an uncited figure does not warn (see verify_claim_citations). A tag pointed at the right excerpt is
+    worth more to the reader than either, and when the model has carried a figure over from another context (a
+    broadcast -23 LUFS offered for a film mix, in one development answer), the repaired tag names the excerpt it
+    really came from. Replayed over the 25 development answers from 10-11 Oct rejected with this warning, the
+    repair saved 9, moving 5 tags and dropping 4.
+    """
+    targets = {claim["citation_index"]: claim["attributed_ordinals"] for claim in misattributed}
+    if not targets:
+        # Nothing was misattributed. "" rather than the answer, as salvage_unsupported_figures() does, so the
+        # caller never re-judges an unchanged answer.
+        return ""
+    pieces: list[str] = []
+    kept_to = 0
+    # The citation_index was counted on the range-rewritten text and is used here on the answer as written. Both
+    # scans find the same tags in the same order, because the rewrite cannot reach inside a tag.
+    for index, match in enumerate(CLAIM_CITATION_RE.finditer(answer)):
+        if index not in targets:
+            continue
+        holders = targets[index]
+        if holders:
+            # Only the id inside the brackets changes, so a tag keeps whatever spacing the model gave it.
+            pieces += [answer[kept_to:match.start(1)], str(holders[0])]
+            kept_to = match.end(1)
+            continue
+        # All 407 tags in the 10-11 Oct development answers followed a space, so the space goes with the tag and
+        # "150 ms [#2]." closes up to "150 ms." rather than leaving "150 ms .".
+        start = match.start() - 1 if answer[match.start() - 1:match.start()] == " " else match.start()
+        pieces.append(answer[kept_to:start])
+        kept_to = match.end()
+    pieces.append(answer[kept_to:])
+    return "".join(pieces)
 
 
 _WHOLE_SENTENCE_RE = re.compile(r".*[.!?](?=\s|$)", re.DOTALL)
