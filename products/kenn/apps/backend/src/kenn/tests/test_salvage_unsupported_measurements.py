@@ -271,12 +271,21 @@ def test_an_example_that_states_a_limit_or_condition_is_still_part_of_the_step()
         ("Push the depth (say, don't go to 10 dB) so the pumping stays shallow.", {"10db"}),
         ("Cut the mud (e.g., if boomy, 300 Hz) before the boost.", {"300hz"}),
         ("Boost the presence (e.g., no higher than 2 dB) for clarity.", {"2db"}),
+        ("Boost the presence (e.g., no louder 2 dB) for clarity.", {"2db"}),
         ("Boost the presence (e.g., within 2 dB) for clarity.", {"2db"}),
         ("Boost the presence (e.g., ≤ 2 dB) for clarity.", {"2db"}),
         ("Boost the presence (e.g., cap it at 2 dB) for clarity.", {"2db"}),
         ("Boost the presence (e.g., as much as 2 dB) for clarity.", {"2db"}),
         ("Boost the presence (e.g., a ceiling of 2 dB) for clarity.", {"2db"}),
         ("Boost the presence (e.g., stop at 2 dB) for clarity.", {"2db"}),
+        # Fourth review: a qualifier with a second figure after it ends on a figure again, and the bound words below
+        # were missing.
+        ("Cut the mud (e.g., 3 dB or less around 300 Hz) first.", {"3db", "300hz"}),
+        ("Cut the mud (e.g., 2 dB tops at 3 kHz) first.", {"2db", "3khz"}),
+        ("Push the depth (e.g., no greater than 10 dB) so it stays shallow.", {"10db"}),
+        ("Push the depth (e.g., limit it to 10 dB) so it stays shallow.", {"10db"}),
+        ("Push the depth (e.g., keep it to 10 dB) so it stays shallow.", {"10db"}),
+        ("Push the depth (e.g., hold it at 10 dB) so it stays shallow.", {"10db"}),
     ):
         assert _excise_illustrative_figures(step, figures) == step
     # A marked value with no limit word is the model's own example, and the step keeps its verb.
@@ -293,6 +302,28 @@ def test_an_example_ends_on_its_figure_or_it_is_more_than_an_example():
     # The same review: a qualifier after the figure makes it a limit, whatever words it uses.
     for step in ("Push the depth (e.g., 10 dB or less) so it stays shallow.", "Push the depth (say, 10 dB tops) so it stays shallow."):
         assert _excise_illustrative_figures(step, {"10db"}) == step
+    # Ending on the figure catches the qualifiers no word list has thought of yet.
+    step = "Lift the air (e.g., 10 kHz and up) on the vocal."
+    assert _excise_illustrative_figures(step, {"10khz"}) == step
+
+
+def test_an_example_holds_no_comma_but_the_one_after_its_marker():
+    # Fourth review of b7db65ba, 11 Oct 2026: the run-on ended on a figure of its own, so ending on a figure let it
+    # through, and the first shipped as "put a compressor on the bass bus not the snare — via its sidechain input."
+    for step, figures in (
+        (
+            "Put a compressor on the bass bus — like one at 2 kHz, then key it from the kick at 6 dB — not the snare"
+            " — via its sidechain input.",
+            {"2khz", "6db"},
+        ),
+        ("Push the depth (say, 10 dB or less, ideally 6 dB) so the pumping stays shallow.", {"10db", "6db"}),
+        ("Cut the mud (e.g., 300 Hz, keeping the cut to 3 dB) first.", {"300hz", "3db"}),
+        # No limit word at all: only the comma says the bracket holds a second step.
+        ("Cut the mud (e.g., 300 Hz, then lift the presence at 3 kHz) first.", {"300hz", "3khz"}),
+    ):
+        assert _excise_illustrative_figures(step, figures) == step
+    # The marker's own comma is fine.
+    assert _excise_illustrative_figures("Tame it — say, 3500 Hz — without the rest.", {"3500hz"}) == "Tame it without the rest."
 
 
 def test_an_example_that_the_word_before_it_needs_stays():
@@ -301,6 +332,10 @@ def test_an_example_that_the_word_before_it_needs_stays():
         ("Keep the depth under (e.g., 10 dB) so the pumping stays shallow.", {"10db"}),
         ("Set the threshold to (e.g., -18 dB) on the bus.", {"-18db"}),
         ("Boost no more than — like 2 dB — at the top.", {"2db"}),
+        # Fourth review: garbled rather than wrong, "Aim for roughly on the master".
+        ("Aim for roughly (e.g., -14 LUFS) on the master.", {"-14lufs"}),
+        ("Aim for -14 LUFS or (e.g., -16 LUFS) for streaming.", {"-16lufs"}),
+        ("Feed the reverb into (e.g., 2 kHz) a high shelf.", {"2khz"}),
     ):
         assert _excise_illustrative_figures(step, figures) == step
 
@@ -360,8 +395,24 @@ def test_a_high_pass_figure_with_a_limit_after_it_keeps_its_figure():
         "Set the high-pass at 100 Hz, but no higher.",
         "Set the high-pass at 100 Hz and no higher.",
         "Set the high-pass at 100 Hz, or lower for a thin source.",
+        # An alternative figure the notes do have is not a bound, but "Set the high-pass, or 120 Hz" does not read.
+        "Set the high-pass at 100 Hz, or 120 Hz for a thin source.",
+        # Fourth review: the first shipped as "Set the high-pass, max.", and the rest left their bound dangling.
+        "Set the high-pass at 100 Hz, max.",
+        "Set the high-pass at 100 Hz; no higher.",
+        "Set the high-pass at 100 Hz. No higher.",
+        "Set the high-pass at 100 Hz, at most.",
+        "Set the high-pass at 100 Hz, tops.",
+        "Set the high-pass at 100 Hz, though no higher.",
+        "Set the high-pass at 100 Hz, nothing higher.",
+        # A decimal point is not the end of the sentence the bound is in.
+        "Set the high-pass at 100 Hz on a 1.5 s reverb, no higher.",
     ):
         assert _excise_illustrative_figures(step, {"100hz"}) == step
+    # That check has a short list of its own, so a later clause about something else does not block the cut.
+    assert _excise_illustrative_figures("Use a high-pass at 100 Hz to keep the low end clean.", {"100hz"}) == (
+        "Use a high-pass to keep the low end clean."
+    )
 
 
 def test_a_boost_or_cut_keeps_its_frequency_because_without_it_there_is_no_instruction():
