@@ -301,3 +301,47 @@ def test_make_answer_names_why_the_model_wrote_nothing(tmp_path, monkeypatch):
     assert chat_answer.last_generation_outcome() == "generation returned no answer: structure check"
     (row,) = _read(log)
     assert row["route"] == "generation:generation returned no answer: structure check"
+
+
+def _seconds_logged_for_a_model_call_lasting(seconds: float, model_answer: str, monkeypatch) -> list[tuple[bool, float]]:
+    """Run the real make_answer() with a stub model that takes `seconds` on a fake clock; return what it logged."""
+    import time
+
+    from kenn.tests.test_streamed_generation_prefix_guard import CHUNKS, QUERY
+
+    # A fake clock, so the answer is "6 s" exactly and not however long the stub happens to take on this machine.
+    # make_answer() imports time inside the function, so patching the module attribute reaches it.
+    clock = [1000.0]
+    monkeypatch.setattr(time, "perf_counter", lambda: clock[0])
+
+    def model(*args, **kwargs):
+        clock[0] += seconds
+        return model_answer
+
+    monkeypatch.setattr(chat_answer, "load_chunks", lambda: list(CHUNKS))
+    monkeypatch.setattr(chat_answer, "search", lambda *a, **k: list(CHUNKS))
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *a, **k: True)
+    monkeypatch.setattr(chat_answer, "llm_enhance_answer", model)
+    monkeypatch.setattr("kenn.llm.linter.lint_response", lambda answer, mode: answer)
+    logged = []
+    monkeypatch.setattr(
+        chat_answer, "_log_generation_outcome", lambda accepted, validation, s: logged.append((accepted, s))
+    )
+
+    _, enhanced = chat_answer.make_answer(QUERY, list(CHUNKS), route="production")
+
+    assert enhanced is True
+    return logged
+
+
+def test_an_accepted_answer_is_logged_in_seconds_not_milliseconds(monkeypatch):
+    # Regression, 11 Oct 2026: both accepted paths passed milliseconds, so a 6 s answer was logged as 6000 s.
+    from kenn.tests.test_streamed_generation_prefix_guard import ACCEPTED_ANSWER
+
+    assert _seconds_logged_for_a_model_call_lasting(6.0, ACCEPTED_ANSWER, monkeypatch) == [(True, pytest.approx(6.0))]
+
+
+def test_an_answer_kept_after_its_invented_figure_is_cut_is_logged_in_seconds_too(monkeypatch):
+    from kenn.tests.test_salvage_unsupported_measurements import INVENTED_IN_A_STEP
+
+    assert _seconds_logged_for_a_model_call_lasting(6.0, INVENTED_IN_A_STEP, monkeypatch) == [(True, pytest.approx(6.0))]

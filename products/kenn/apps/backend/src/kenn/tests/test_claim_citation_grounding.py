@@ -23,6 +23,7 @@ from kenn.core.chat_grounding import (
     _CITATION_CITES_UNSHOWN_ID,
     _CITATION_MISATTRIBUTES,
     _FABRICATED_ATTRIBUTION,
+    _ORDINAL_CITATION_RE,
     _UNATTRIBUTED,
     _UNIQUELY_ATTRIBUTED,
     _UNSHOWN_CITATION,
@@ -148,15 +149,31 @@ def _answer(body: str) -> str:
     return f"Short answer: {body}\n\nTry this:\n1. Do the first thing.\n2. Do the second thing.\n\nCheck: Compare in context.\n"
 
 
-# The chunk id was not in the prompt before this phase, so a prompt asking for a citation would have been asking
-# for something the model cannot produce. These three assertions are the reason the excerpt tag carries an id.
-def test_the_excerpt_tag_carries_the_chunk_id_the_rules_block_asks_the_model_to_cite() -> None:
+# No id was in the prompt before 2 Oct 2026, so a prompt asking for a citation was asking for something the model
+# could not produce. Since 11 Oct the id is the excerpt's place in the prompt, not the chunk's 12-hex id.
+def test_each_excerpt_tag_carries_its_place_in_the_prompt_for_the_model_to_cite() -> None:
     block = build_raw_context_block(RESULTS, lambda chunk: f"{chunk['title']} ({chunk['source']})")
 
-    assert f'id="{SIDECHAIN_ID}"' in block
-    assert f'id="{CLEANING_ID}"' in block
-    # The id the model can read has to be the id the gate recomputes, or the check compares two different things.
-    assert get_chunk_id(SIDECHAIN_NOTE) == SIDECHAIN_ID
+    assert '<source_excerpt id="1" label="Sidechain Bass To Kick' in block
+    assert '<source_excerpt id="2" label="Vocal Cleanup Chain' in block
+    assert SIDECHAIN_ID not in block and CLEANING_ID not in block
+
+
+def test_the_number_on_an_excerpt_names_the_chunk_the_gate_checks_a_citation_against() -> None:
+    """The prompt prints the numbers and the gate maps them back; if the two lists ever differ, a right citation
+    gets checked against the wrong body. Both sides come from model_evidence(), and this holds them to it."""
+    messages, prompt_shown = _build_synthesis_messages(
+        QUERY, "Short answer: set the release to 150 ms.", RESULTS, None, "",
+        lambda chunk: f"{chunk['title']} ({chunk['source']})", lambda _history: [],
+    )
+    gate_shown = _shown_for(RESULTS)
+
+    assert [get_chunk_id(chunk) for _, chunk, _ in prompt_shown] == [get_chunk_id(c) for _, c, _ in gate_shown]
+    for number, (_score, chunk, _body) in enumerate(prompt_shown, start=1):
+        assert f'<source_excerpt id="{number}" label="{chunk["title"]}' in messages[-1]["content"]
+    citations = verify_claim_citations("Release at 150 ms [#1], and duck the send to 12% [#2].", gate_shown)
+    assert [claim["cited_chunk"] for claim in citations["claims"]] == [SIDECHAIN_ID, CLEANING_ID]
+    assert citations["verified"] == 2
 
 
 def test_both_prompts_ask_for_the_citation_and_the_abstain_in_the_same_words() -> None:
@@ -166,10 +183,12 @@ def test_both_prompts_ask_for_the_citation_and_the_abstain_in_the_same_words() -
         assert "Tag every number you state with the id of the excerpt" in prompt
         assert "Insufficient context:" in prompt
         assert "Use only numbers that are printed in an excerpt" in prompt
-        # The example has to be a real 12-hex id, or the model is shown a shape the gate will not parse.
-        example = re.search(r"\[#([0-9a-f]{12})\]", prompt)
+        # The example has to be an excerpt number the gate maps back, or the model is shown a shape it will not
+        # parse. It is "2", so a model that copies the example verbatim is not handed the top excerpt for free.
+        example = re.search(r"\[#(\d{1,2})\]", prompt)
         assert example, prompt
         assert CLAIM_CITATION_RE.search(example.group(0)), example.group(0)
+        assert _ORDINAL_CITATION_RE.fullmatch(example.group(1))
 
 
 def test_a_capped_answer_is_told_to_finish_inside_the_cap() -> None:
@@ -209,8 +228,8 @@ def test_the_answer_prompt_reaches_the_model_with_the_ids_in_it() -> None:
     )
     user_message = messages[-1]["content"]
 
-    assert f'id="{SIDECHAIN_ID}"' in user_message
-    assert f'id="{CLEANING_ID}"' in user_message
+    assert 'id="1"' in user_message
+    assert 'id="2"' in user_message
     # The body still holds the figure, so the id did not come out of the budget the measurements live in.
     assert "150 ms" in user_message
     assert len(shown) == len(RESULTS)
@@ -603,6 +622,14 @@ def test_a_two_digit_ordinal_is_not_read_as_its_last_digit() -> None:
     result = validate(_answer("Duck the reverb send to 12% [#chunk12]."))
 
     assert result["claim_citations"]["unshown_citations"] != []
+    assert result["accepted"] is False
+
+
+def test_an_ordinal_past_the_last_excerpt_shown_is_rejected_as_never_shown() -> None:
+    # Two excerpts are shown, so [#3] names nothing. It must not wrap round or fall back to a hex prefix.
+    result = validate(_answer("Back the release off to 150 ms [#3]."))
+
+    assert len(result["claim_citations"]["unshown_citations"]) == 1
     assert result["accepted"] is False
 
 

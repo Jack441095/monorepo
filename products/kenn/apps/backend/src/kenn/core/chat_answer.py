@@ -1086,7 +1086,9 @@ def make_answer(
         if validation["accepted"]:
             _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
             print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced)", file=_sys.stderr, flush=True)
-            _log_generation_outcome(True, validation, _ma_llm_ms)
+            # _log_generation_outcome() takes seconds. Until 11 Oct 2026 both accepted paths handed it these
+            # milliseconds and it multiplied by 1000 again, so a 6 s answer reached the route log as 6000 s.
+            _log_generation_outcome(True, validation, _ma_llm_ms / 1000.0)
             return enhanced, True
         # One invented number used to cost the whole answer. Cut the figure (or, failing that, its sentence) and
         # let the gate judge what is left; it is the same gate, so a number the notes lack still cannot get through.
@@ -1104,7 +1106,9 @@ def make_answer(
             if retry["accepted"]:
                 _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
                 print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced, unsupported figures removed)", file=_sys.stderr, flush=True)
-                _log_generation_outcome(True, {**retry, "salvaged": validation["unsupported_measurements"]}, _ma_llm_ms)
+                _log_generation_outcome(
+                    True, {**retry, "salvaged": validation["unsupported_measurements"]}, _ma_llm_ms / 1000.0
+                )
                 return candidate, True
         # Measured 1 Oct on the owner's M3: 26 of 30 background swaps were rejected, and nothing recorded why.
         # Track D's standing question is "how often does the model's answer land", and a rejection rate with no
