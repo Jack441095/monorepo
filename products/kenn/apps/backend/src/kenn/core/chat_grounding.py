@@ -328,9 +328,11 @@ def _measurement_spans(text: str) -> list[tuple[str, int, int]]:
     range rewrite is the same one _measurements() applies, so "200-400 Hz" is claimed at both endpoints rather
     than once as "-400 Hz".
 
-    The rewrite changes offsets, so the citation scan runs on this same rewritten string. A citation is a short
-    bracketed hash with no hyphen and no unit inside the closing bracket, so neither regex can match inside one
-    and the rewrite cannot slide a citation out from under its number.
+    The rewrite changes offsets, so the citation scan runs on this same rewritten string and the two sets of
+    offsets agree. The rewrite can still reach into a tag: a junk id holding a range, such as "[#5-150ms]", comes
+    out as "[#5ms 150ms]", which is no longer a tag, and its two figures become claims here. That fails safe, since
+    both must still pass the measurement check, but every later tag's index is then one short of its place in the
+    answer as written. repair_misattributed_citations() checks for that before it uses an index from here.
     """
     return [
         ("".join(m.group(0).lower().split()), m.start(), m.end())
@@ -980,8 +982,11 @@ def _shown_note_text(shown: list[tuple[float, dict, str]]) -> str:
 #
 # Only the measurement check widens. Overlap and product checks still read evidence_text alone, and the query is
 # still kept out of overlap (see the comment in generated_answer_validation). verify_claim_citations still reads the
-# excerpts only: a whole-note figure tagged with an excerpt id is still a misattribution, because the model cannot
-# have read it in that excerpt. So is a question figure tagged that way, so the widening helps untagged claims only.
+# excerpts only, so a whole-note or question figure tagged with an excerpt id is still named a misattribution: the
+# model cannot have read it in that excerpt. Since 11 Oct that no longer costs the answer. No excerpt holds the
+# figure, so repair_misattributed_citations() drops the tag and the answer ships as its untagged copy would. The
+# review of that change named this as a further widening (11 Oct). We kept it, because it is the widening untagged
+# claims already had, and a tag no excerpt backs tells the reader less than no tag.
 def _accepted_measurements(
     question: str, shown: list[tuple[float, dict, str]], evidence_text: str
 ) -> set[str]:
@@ -1388,14 +1393,27 @@ def salvage_unsupported_figures(answer: str, unsupported: list[str]) -> str:
     return drop_unsupported_sentences(excised, left)
 
 
+# Spaces and tabs, and the no-break and thin spaces typeset text carries, but never a line break: a dropped tag
+# must not join two lines or two steps.
+_HORIZONTAL_SPACE_RE = re.compile(r"[^\S\r\n]*")
+_TRAILING_HORIZONTAL_SPACE_RE = re.compile(r"[^\S\r\n]+$")
+
+
 def repair_misattributed_citations(answer: str, misattributed: list[dict]) -> str:
     """The answer with each wrong excerpt tag pointed at an excerpt that holds its figure, or "" if no tag was wrong.
 
     `misattributed` is the "fabricated_attributions" list verify_claim_citations() made from this same text. The
     tag moves to the first excerpt, in prompt order, whose body holds the figure. A figure no shown body holds
-    loses its tag instead: the aggregate check passed it from the question, a note's title or the middle of a
-    quoted range, so there is no excerpt to point at. Only tags change, never a figure, so the measurement check
-    still decides every number that ships; the caller must validate the result again.
+    loses its tag instead. The aggregate check took it from somewhere no excerpt covers (the question, a note's
+    title, or the part of a whole note the excerpt left out; see _accepted_measurements), so there is no excerpt
+    to point at. Two figures land there although their tag was right, because the aggregate check accepts them
+    and the body match is exact: one inside a note's range ("5 dB" against "3-6 dB"), and a decimal written the
+    other way ("-14.0 LUFS" against "-14 LUFS"). Those lose a good tag and ship as the untagged answer would; we
+    have not widened the body match for them.
+
+    Only tags change, never a figure, so the measurement check still decides every number that ships. The caller
+    must validate the result again, and should call this only when a wrong tag (with or without an invented
+    figure) is all the gate found. Dropping a tag edits the prose that the quality and overlap checks read.
 
     11 Oct 2026: on the v6 development bench this warning alone cost 2 of 72 held-out answers, one short of the
     51 the gate needs. The rule was rejecting the model for trying to cite: the same answer with no tag passes,
@@ -1410,26 +1428,41 @@ def repair_misattributed_citations(answer: str, misattributed: list[dict]) -> st
         # Nothing was misattributed. "" rather than the answer, as salvage_unsupported_figures() does, so the
         # caller never re-judges an unchanged answer.
         return ""
-    pieces: list[str] = []
+    # citation_index was counted on the range-rewritten text and is used here on the answer as written. The rewrite
+    # always leaves a space between a range's endpoints and a tag id holds none, so it can break a tag (see
+    # _measurement_spans) but never make one. Equal counts therefore mean both scans found the same tags in the
+    # same order. When they differ we repair nothing and the answer stays rejected, rather than edit the wrong tag.
+    rewritten = _RANGE_RE.sub(r"\1\3 \2\3", answer)
+    if len(CLAIM_CITATION_RE.findall(rewritten)) != len(CLAIM_CITATION_RE.findall(answer)):
+        return ""
+    repaired = ""
     kept_to = 0
-    # The citation_index was counted on the range-rewritten text and is used here on the answer as written. Both
-    # scans find the same tags in the same order, because the rewrite cannot reach inside a tag.
     for index, match in enumerate(CLAIM_CITATION_RE.finditer(answer)):
         if index not in targets:
             continue
         holders = targets[index]
         if holders:
             # Only the id inside the brackets changes, so a tag keeps whatever spacing the model gave it.
-            pieces += [answer[kept_to:match.start(1)], str(holders[0])]
+            repaired += answer[kept_to:match.start(1)] + str(holders[0])
             kept_to = match.end(1)
             continue
-        # All 407 tags in the 10-11 Oct development answers followed a space, so the space goes with the tag and
-        # "150 ms [#2]." closes up to "150 ms." rather than leaving "150 ms .".
-        start = match.start() - 1 if answer[match.start() - 1:match.start()] == " " else match.start()
-        pieces.append(answer[kept_to:start])
-        kept_to = match.end()
-    pieces.append(answer[kept_to:])
-    return "".join(pieces)
+        start, end = match.start(), match.end()
+        # A bracketed tag takes its brackets with it, or "150 ms ([#2])." would read "150 ms ().".
+        if answer[start - 1:start] == "(" and answer[end:end + 1] == ")":
+            start, end = start - 1, end + 1
+        repaired += answer[kept_to:start]
+        # The tag goes with the space on one side of it, never both and never a line break. A space after it goes
+        # first, so "150 ms [#2] then" reads "150 ms then" and a tag opening a list item leaves "- Set", not "-Set".
+        # With punctuation or a line end after it, the space before goes instead, and "150 ms [#2]." closes up to
+        # "150 ms.". That trim runs on everything kept so far, so two dropped tags in a row close up as well. It
+        # takes any horizontal space, not only ASCII, since a no-break space before a tag would leave "150 ms ." too.
+        after = _HORIZONTAL_SPACE_RE.match(answer, end).end()
+        if after > end:
+            end = after
+        else:
+            repaired = _TRAILING_HORIZONTAL_SPACE_RE.sub("", repaired)
+        kept_to = end
+    return repaired + answer[kept_to:]
 
 
 _WHOLE_SENTENCE_RE = re.compile(r".*[.!?](?=\s|$)", re.DOTALL)
