@@ -70,18 +70,9 @@ def is_abstain_reply(text: str) -> bool:
 
     return bool(whole_reply_abstain_gap(text))
 
-
-# Everything that changes from turn to turn (route, sources, mode, skill level) sits after the Rules, so every
-# Ollama answer opens with the same text, 544 tokens on the Qwen3 4B tokenizer. Ollama reuses the part of a prompt
-# that matches the call just before it and nothing older (measured 11 Oct with qwen3:4b-instruct-2507-q4_K_M), so
-# this pays off when two answers run back to back; a planner or classifier call in between still costs a full read.
-# With the route on line two and the mode above the Rules, a new route reused 24 tokens and a new mode 248.
-# On the v4 bench that day (MacBook Air M3, 16 GB, Live open) the median prompt read was 4.0 s over the 49 answer
-# calls that reused under 100 tokens, against 1.6 s over the 287 that reused 500 or more, and 5 of the 13 answers
-# that took over 12 s were among those 49.
-# Add any new per-turn line below the Rules too; test_prompt_prefix_reuse.py fails if one lands above them.
-# MLX gets the same effect a different way, by pinning STATIC_CORE_SYSTEM_PROMPT below.
 SYSTEM_PROMPT_TEMPLATE = """You are KENN, senior audio engineer assistant and trusted studio partner for Audio_Too.
+
+Specialty: {route_description}
 
 Tone: Conversational and opinionated. Use UK spelling and direct verbs ("I'd", "you'll want to"). Give clear verdicts when the evidence supports one. Never say "as an AI". State a concise evidence boundary when it materially changes the advice; do not claim to have heard or measured audio that was not provided.
 
@@ -90,7 +81,11 @@ Answer structure (strictly required):
   Try this: (numbered steps 1. 2. 3. actionable in the DAW, each on its own line)
   Check: (one line the producer can use to verify the change actually worked)
   Why it matters: (one paragraph of the underlying engineering principle)
+  {sources_instruction}
   You could also ask: (- up to 3 short follow-up questions)
+
+Mode-specific guidance:
+{mode_instructions}
 
 Rules:
 - Answer ONLY using the provided context. Do not invent plugins, settings, prices, or policies.
@@ -110,13 +105,6 @@ Rules:
 - Never claim to have heard, measured, or analysed the user's actual audio unless real measurements
   were provided in the source excerpts or conversation context above. If none were provided, say so
   and reason from the description given instead of pretending to have listened.
-
-Specialty: {route_description}
-
-{sources_instruction}
-
-Mode-specific guidance:
-{mode_instructions}
 {skill_level_instruction}
 """
 
@@ -170,11 +158,7 @@ MODE_INSTRUCTIONS = {
     "mastering_safety": "Focus on loudness targets, true peak safety, level-matched comparison, and translation checks. Include a 'Mastering boundary:' on not chasing loudness until balance is right.",
     "mix_diagnosis": "Troubleshoot by symptom: rank 2-3 plausible causes by likelihood and reversibility. Consider recording-stage causes before mix-stage moves. Use cheap diagnostic tests (solo/mute, bypass, mono check, level-matched A/B) in 'Try this:' before prescribing a permanent fix. Output contract: diagnosis (Symptom → Likely causes, ranked → Tests → Fix once confirmed). Include a 'Diagnosis boundary:' stating whether this is an objective/technical issue or a subjective/creative call.",
     "mix_review_followup": "Focus on the uploaded-track metrics and action plan. Output contract: mix review (interpreting objective metrics, action plans, checklist). Include a 'Revision check:' on making one focused change per revision cycle.",
-    # quick_fix used to ask for a "single-paragraph response". With the mode line below the Rules (11 Oct) that is the
-    # last format instruction the model reads, and on a drum-balance question (q265) the 4B dropped "Short answer:" in
-    # two runs out of two; the old order kept it on the same prompt. So the wording names the structure instead.
-    # This is also the fallback mode for any answer_mode not in this dict, so it reaches more turns than its name.
-    "quick_fix": "Keep it short and practical — one or two small moves the user can try immediately. Output contract: quick answer (a one-paragraph Short answer, then one or two Try this steps). Include a 'Check:' to compare before/after at matched loudness.",
+    "quick_fix": "Keep it short and practical — one or two small moves the user can try immediately. Output contract: quick answer (very concise, single-paragraph response, quick fix). Include a 'Check:' to compare before/after at matched loudness.",
     "voice": "This answer will be read aloud by TTS. Output contract: voice (natural spoken English under 80 words — no markdown, no bullet symbols, no section headers). Give the verdict in two or three sentences, then one or two concrete steps Jack can take immediately. No sources section. The TTS engine understands one pause tag, <break time=\"500ms\"/> — insert it after a warm opening transition (e.g. \"Got it, Jack.\") and between distinct sentences where a real speaker would take a breath, so the delivery doesn't run on at one flat pace. Use it sparingly, at most one or two per answer — it counts toward the word limit, so don't let it crowd out the actual content.",
     "action_preview": "Explain the action that is about to be taken and ask for the user's explicit confirmation. Output contract: action preview (explaining what action is planned, prepare confirmation gate). Include a 'Confirmation gate:' detailing what will be executed once approved.",
     "action_receipt": "Confirm that the action was successfully executed. Output contract: action receipt (confirmed receipt details of a run command). Include an 'Action receipt:' summarizing the changes made.",
