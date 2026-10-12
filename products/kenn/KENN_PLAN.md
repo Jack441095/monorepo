@@ -1165,6 +1165,17 @@ and beta/release qualification remain separately open.
   bypass mutation fails 6 regressions; reinstating note truncation fails all
   6 regressions at 501 and 4,096 notes. Both fresh reviewers rechecked the fixes
   and found no remaining material issue. They do not replace the original reviewer.
+- Exact additional Stage files since `65c6dc46`, relative to `products/kenn/`:
+  backend `apps/backend/src/kenn/core/{live_action_service,live_receipt_journal,live_recipe}.py`,
+  `routes/daw_command_handler.py`, and `tests/{test_clip_rename_service,test_demo_script_gate,
+  test_guarded_recipes,test_midi_clip_service,test_parameter_targets,test_subjective_translation}.py`
+  under the same `apps/backend/src/kenn/` prefix; frontend `apps/frontend/src/api/kenn.ts`,
+  `src/components/KennRecipeCard.vue`, `src/components/__tests__/KennRecipeCard.component.test.ts`
+  and `e2e/demo_path.e2e.ts` under `apps/frontend/`; `tooling/scripts/{demo_script_gate,
+  measure_chat_latency}.py` and `docs/runbooks/KENN_INVESTOR_DEMO.md`. Main's five
+  documentation files are this plan, that demo runbook, `KENN_INVESTOR_FAQ.md`,
+  `KENN_REPOSITORY_SYNC.md` in the same runbooks directory, and
+  `docs/evidence/KENN_INVESTOR_DEMO_REHEARSAL_LOG.md`.
 - Recipe cards now show the guarded device/parameter path, observed track/device/
   chain positions, and mapped display values (`69c24c79`, `2e75337d`). Browser
   inspection caught long targets squeezed to single-character lines; `8564659a`
@@ -1203,12 +1214,16 @@ and beta/release qualification remain separately open.
   Owner answer grading, current real-Live transactions, ten consecutive rehearsals
   and backup capture/playback remain outstanding. Wednesday's meeting time is
   still unknown.
-- Git handoff keeps the three fix/candidate branches separate from main. Only
-  bounded demo/sync documentation lands on main. Export each committed KENN tree
-  to the same `kenn-app` branch with the guarded exporter, verify remote heads and
-  exact trees, and use ordinary fast-forwards. The old sharing-main tree is an
-  exact approved export; repair its short-hash provenance as described in the
-  [sync runbook](docs/runbooks/KENN_REPOSITORY_SYNC.md). Sync regressions: **24 passed**.
+- Git handoff published all four branches with origin upstreams, keeping the three
+  fix/candidate drafts separate from main. Main received only bounded demo/sync
+  documentation. The guarded exporter verified each source marker and exact tree
+  in `kenn-app`, using ordinary fast-forwards without attribution trailers.
+  Initial verified exports: main `2836dec8` → `9b8f6cc9`, citation `8f6eba45` →
+  `cee0480b`, Stage `8564659a` → `0a94f1ca`, candidate `37ff0ae0` → `207b2e55`.
+  The approved old sharing-main tree was preserved by the metadata-only provenance
+  repair `952fcfaf`, described in the [sync runbook](docs/runbooks/KENN_REPOSITORY_SYNC.md).
+  Sync regressions: **24 passed**. Documentation added after this initial export
+  follows the same exporter and remote checks.
   Preserve unrelated backend/Nite Submit edits and the local video deletion.
   Test logs, mutation output and the browser screenshot remain outside git under
   `/tmp/kenn-investor-review-20261012/`.

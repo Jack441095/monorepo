@@ -33,14 +33,15 @@ edits or rewritten source history. Import colleagues' changes explicitly into
 the monorepo and review the reconciliation before resuming sync.
 
 The 3 October initial reconciliation requirement was superseded by the approved
-5 and 8 October exports recorded in `KENN_PLAN.md`. On 12 October,
-`kenn-app/main` at `541f29c6` still exactly matches the committed KENN tree from
-monorepo `53bad4db`; its old commit message has only a short source hash. The
-guarded exporter requires the full source marker. The prepared metadata-only
-commit `952fcfaf` has the same tree and `541f29c6` as its parent, and records the
-full original source hash. Recheck the remote tip and tree before publishing
-that ordinary fast-forward, then resume the guarded exporter. This repairs
-provenance without importing independent destination edits or landing draft code.
+5 and 8 October exports recorded in `KENN_PLAN.md`. Before the 12 October handoff,
+`kenn-app/main` at `541f29c6` exactly matched the committed KENN tree from monorepo
+`53bad4db`; its old commit message used only a short source hash. The
+guarded exporter requires the full source marker. Metadata-only commit `952fcfaf`
+preserved that tree and parent, and recorded the full original source hash.
+After checking the remote tip, tree and source ancestry, the handoff published
+that ordinary fast-forward and resumed the guarded exporter. No further baseline
+repair is required. Main and all three draft exports passed exact-tree and full
+source-marker verification; independent destination edits were not imported.
 
 For this investor handoff, main exports only already-landed code and demo
 documentation. The citation fix, Stage 2/3 fix and combined candidate are exported
