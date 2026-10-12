@@ -95,8 +95,8 @@ are spoken to the audience; never type them into the chat.
 
 ### Act 2 — KENN controls Live safely
 
-6. Ask: `Set Compressor Output to 3 dB on track 7.` Explain that this is an
-   exact, profile-backed vocal gain control. Review the proposal, confirm it,
+6. Ask: `Set Compressor Threshold to -4 dB on track 7.` Explain that this is an
+   exact, profile-backed vocal compression control. Review the proposal, confirm it,
    and point out the verified readback.
 7. Ask: `Pan the Synth hard left.` Review and confirm the exact proposal.
 8. Ask: `Focus EQ Eight on track 5.` Review and confirm the device-focus proposal (Bass, EQ Eight).
@@ -127,11 +127,11 @@ are spoken to the audience; never type them into the chat.
     is bound to this exact action and current state, then click **Dismiss**.
     (Synth is already hard left after step 7, so a hard-left prompt would show a
     no-op L100 → L100 card.)
-18. Do not type anything. Scroll to the step-6 card (Output 0 → 3 dB, "Readback
+18. Do not type anything. Scroll to the step-6 card (Threshold 0 → -4 dB, "Readback
     Verified") and the step-11 history, and narrate them aloud.
 19. Click **Undo on the step-6 Compressor card** (not step 9: step 10 already
     reverted that one and KENN will refuse it as stale). Expect "Restored to
-    Original State" and Lead Vocal Compressor Output back at 0 dB in Live.
+    Original State" and Lead Vocal Compressor Threshold back at 0 dB in Live.
 
 ### Act 5 — The path forward
 

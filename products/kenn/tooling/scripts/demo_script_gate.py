@@ -120,14 +120,15 @@ def _duplicates(body: dict[str, Any]) -> None:
         raise ValueError("demo fixture contains duplicate track names")
 
 
-def _vocal_output(body: dict[str, Any]) -> None:
+def _vocal_threshold(body: dict[str, Any]) -> None:
     _require_proposal(
         body,
         operation="set_device_parameter",
         track_name="Lead Vocal",
         device_name="Compressor",
-        parameter="Output",
-        after=3.0,
+        parameter="Threshold",
+        # The measured Compressor table maps raw 0.75 to -4 dB; Output has no qualified profile.
+        after=0.75,
     )
 
 
@@ -215,7 +216,7 @@ SCRIPT_STEPS: tuple[tuple[int, str, Callable[[dict[str, Any]], None]], ...] = (
     (3, "What's selected?", _selected_track),
     (4, "Describe this session.", _overview),
     (5, "Any duplicate track names?", _duplicates),
-    (6, "Set Compressor Output to 3 dB on track 7.", _vocal_output),
+    (6, "Set Compressor Threshold to -4 dB on track 7.", _vocal_threshold),
     (7, "Pan the Synth hard left.", _synth_pan),
     (8, "Focus EQ Eight on track 5.", _bass_focus),
     (9, "Boost amplitude by 3 dB at 200 Hz on track 5 band 2A.", _bass_eq),
