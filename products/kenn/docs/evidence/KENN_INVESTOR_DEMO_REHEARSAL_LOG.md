@@ -9,7 +9,31 @@ Reset point: `.runtime/investor-demo-audio/KENN_Live12_Demo_RESET Project/`
 
 UI: **http://127.0.0.1:8090/**. KENN's panel must read "Live connected" with 8 tracks before step 1.
 
-## Runs
+## October 14 candidate
+
+Status: awaiting independent recheck and supervised real-Live qualification.
+Tuesday 13 October, 20:00 London time is the owner-supervised slot. September
+rows below do not count toward this candidate's ten consecutive runs. Record
+the final source commit, served frontend digest, running AbletonOSC digest,
+model/index identities and verified reset-set hash before the first run.
+Any changed build or unexpected failure restarts the consecutive count.
+
+| Run | Date | Start | End | Minutes | Steps passed /20 | Failure / restoration | Recovery seconds | Display / audio checked | Pass |
+|-----|------|-------|-----|---------|------------------|-----------------------|------------------|-------------------------|------|
+| 1 | | | | | | | | | [ ] |
+| 2 | | | | | | | | | [ ] |
+| 3 | | | | | | | | | [ ] |
+| 4 | | | | | | | | | [ ] |
+| 5 | | | | | | | | | [ ] |
+| 6 | | | | | | | | | [ ] |
+| 7 | | | | | | | | | [ ] |
+| 8 | | | | | | | | | [ ] |
+| 9 | | | | | | | | | [ ] |
+| 10 | | | | | | | | | [ ] |
+
+Backup recording: pending capture and playback verification on this candidate.
+
+## September runs (historical)
 
 | # | Date | Start | End | Mins | Steps passed /20 | Failed step + cause | Recovery drill | Projector | Pass |
 |---|------|-------|-----|------|------------------|---------------------|----------------|-----------|------|
@@ -38,7 +62,7 @@ continue from step 8. Note the seconds from restart to usable.
 
 - [ ] 1 Live set + KENN connected status shown
 - [ ] 2 Track count · [ ] 3 Selected (Drum Bus) · [ ] 4 Describe · [ ] 5 Duplicates
-- [ ] 6 Compressor Output +3 dB on track 7, confirmed, readback shown
+- [ ] 6 Compressor Threshold -4 dB on track 7, confirmed, readback shown
 - [ ] 7 Synth hard left, confirmed
 - [ ] 8 Focus EQ Eight on track 5, confirmed
 - [ ] 9 +3 dB at 200 Hz, band 2A, confirmed

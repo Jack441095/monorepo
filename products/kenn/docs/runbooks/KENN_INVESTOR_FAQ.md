@@ -134,12 +134,14 @@ qualified behavior from roadmap work.
 
 20. **What evidence says the demo is reliable?**
 
-    The backend currently passes 1,393 tests, and the 13 automatable scripted
-    prompt contracts passed 10 consecutive real-companion runs under the
-    650 ms response budget. That is supporting evidence, not the final claim:
-    the complete UI/audio/mutation demo still needs 10 consecutive 20-step
-    rehearsals, cold-boot preflight, recovery timing, reset verification, and
-    projector review on the disposable session.
+    The combined October candidate passes 4,875 backend tests with fake Live.
+    September's 13 automatable prompt contracts passed ten real-companion runs
+    under the 650 ms budget, but those results do not qualify the current build.
+    Its browser checks and pending gates are recorded in KENN_PLAN.md. Before
+    presenting it live, the current UI/audio/mutation path must pass ten
+    consecutive complete 20-step rehearsals, including recovery, reset and
+    display/audio checks on the disposable session. Software tests alone do
+    not establish that result.
 
 ## Operator boundary
 

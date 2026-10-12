@@ -1065,7 +1065,7 @@ is a target; an unresolved failure keeps the corresponding item open.
 
 - [ ] **D1 — Review the fixes, Monday 12 Oct.** The original outside reviewer
   rechecks citation repair `8f6eba45` and the full Stage 2/3 integration ending at
-  `65c6dc46`, including `adb0d4c4` and `b0056599`. Codex fixes any reported break,
+  `8564659a`, including `adb0d4c4` and `b0056599`. Codex fixes any reported break,
   adds a regression and gets the changed behavior rechecked. Review the overdue
   audit-fixes merge `2377eed1` as well, since it feeds the answer path. Merge the
   citation fix first, then Stage 2/3, only after the required sign-offs. Exit:
@@ -1079,8 +1079,8 @@ is a target; an unresolved failure keeps the corresponding item open.
   Use the full companion described in the runbook. Keep the existing models and
   dependencies; native plug-in packaging is outside this web-UI demo. Exit: green
   checks and one identified build to use for every subsequent receipt.
-- [ ] **D3 — Prove the current Live path, Tuesday 13 Oct, first supervised slot.**
-  Jack schedules and supervises the session on a verified disposable copy of the
+- [ ] **D3 — Prove the current Live path, Tuesday 13 Oct at 20:00 London time.**
+  Jack confirmed the 20:00 supervised slot. Use a verified disposable copy of the
   demo set. Codex checks or deploys the candidate Remote Script in that window;
   restart/reload and verify its digest before collecting results. Revalidate the
   rights-clear generated audio, track/device topology, saved reset point and
@@ -1143,10 +1143,75 @@ is a target; an unresolved failure keeps the corresponding item open.
 
 Owners: Codex handles build preparation, fixes, checks and evidence; the outside
 reviewer provides independent sign-off; Jack supervises all Live mutations,
-grades the demo answers and rehearses/presents. Wednesday's meeting time and the
-Tuesday supervised slot still need to be set. Nothing in this plan schedules or
+grades the demo answers and rehearses/presents. Tuesday's supervised slot is
+20:00 London time; Wednesday's meeting time remains unconfirmed. Nothing here
 authorizes an unattended Live run. R1–R4, broader answer grading, device coverage
 and beta/release qualification remain separately open.
+
+12 Oct preparation receipt (fake Live only; D1–D6 remain open):
+
+- Combined draft `draft/investor-candidate-2026-10-14` at code/build commit
+  `35c014b6` includes citation `8f6eba45` and Stage `8564659a`. Backend code is
+  identical to full-suite commit `be866b7d`: **4,875 passed, 16 skipped, 5 existing
+  dependency/vendor warnings** in 115.05 s. This includes the preflight and script
+  gate tests. Frontend **83 tests in 9 files passed** and `npm run build` passed
+  with the installed arm64 Node runtime. No dependencies or CI were changed.
+- Fresh spec review caught forged/unrecorded Undo receipts reaching dispatch,
+  clip snapshots being discarded by the journal, and MIDI snapshots losing notes
+  beyond 500. Commits `de688c7f`, `e2faa757`, `3384e530` and `545cae3e` authenticate
+  the server-owned receipt before choosing an inverse action, retain clip state,
+  and preserve all 4,096 permitted MIDI notes. A late-note tamper is refused;
+  honest create/update Undo restores the complete observed state. The authorization
+  bypass mutation fails 6 regressions; reinstating note truncation fails all
+  6 regressions at 501 and 4,096 notes. Both fresh reviewers rechecked the fixes
+  and found no remaining material issue. They do not replace the original reviewer.
+- Recipe cards now show the guarded device/parameter path, observed track/device/
+  chain positions, and mapped display values (`69c24c79`, `2e75337d`). Browser
+  inspection caught long targets squeezed to single-character lines; `8564659a`
+  gives each target the available row width. The reviewed investor control is now
+  Compressor Threshold 0 → -4 dB (`baa13112`), matching the supported parameter
+  contract. The capture-export description is corrected (`6a565bbb`).
+- Through the actual browser JSON path, the fake companion verified Threshold
+  Apply/readback/card Undo, a fresh chat `Undo that` proposal and Apply, and a
+  compound EQ recipe (200 → 300 Hz and 0 → -3 dB) with one exact Undo. The guarded
+  fake harness shares the fixture's device parameter storage and requires guarded
+  targets; it does not model real Live's object identity. The final rebuilt UI
+  displays both EQ targets readably and reports "Observed before-state restored."
+  Setup-card coverage is from automated fake tests. Chrome is absent, so the
+  Playwright E2E runner could not launch its 9 cases; manual in-app browser checks
+  above passed. The optional SLO classification cache reports 503 on the clean
+  candidate and is outside the scripted demonstration.
+- Served frontend `index.html` SHA-256:
+  `f684c27c63dbadf5636f17b5cbefc19721d9ee0908b3043a8feda914af1f9c49`.
+  Runtime: macOS 27.0.1 arm64, 16 GB RAM; Live 12.4.6 build
+  `2026-09-10_0de5c8fa9a` was only inspected. The candidate uses index
+  `v-5f6964698b76`; the local main index differs, so do not inherit it silently.
+  The fake browser run disables model inference. The intended model is
+  `qwen3:4b-instruct-2507-q4_K_M`, digest
+  `0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0`;
+  it still needs candidate answer checks with Live open.
+- Read-only asset preparation verified all 10 generated audio hashes and identical
+  rehearsal/reset set SHA-256
+  `b4294f42eab5020f14e15d65fead1921b9d13e891718b7ea7307b7f62f3631ef`.
+  The plan-only Remote Script bundle digest is
+  `a4bbe3cce88050ab91aa9da777dc75044faadd560768577229ec3a918ea7f92b`.
+  It has not been installed or loaded; Tuesday requires deployment/restart and
+  a running digest check. No real OSC writes, model benchmarks or sealed rows ran.
+- The original reviewer resume attempt stopped at its session quota (reset
+  12 Oct 02:50 London). No original recheck or code merge is claimed. The updated
+  review prompt pins both fix heads and retains the audit-fixes review request.
+  Owner answer grading, current real-Live transactions, ten consecutive rehearsals
+  and backup capture/playback remain outstanding. Wednesday's meeting time is
+  still unknown.
+- Git handoff keeps the three fix/candidate branches separate from main. Only
+  bounded demo/sync documentation lands on main. Export each committed KENN tree
+  to the same `kenn-app` branch with the guarded exporter, verify remote heads and
+  exact trees, and use ordinary fast-forwards. The old sharing-main tree is an
+  exact approved export; repair its short-hash provenance as described in the
+  [sync runbook](docs/runbooks/KENN_REPOSITORY_SYNC.md). Sync regressions: **24 passed**.
+  Preserve unrelated backend/Nite Submit edits and the local video deletion.
+  Test logs, mutation output and the browser screenshot remain outside git under
+  `/tmp/kenn-investor-review-20261012/`.
 
 ## Acceptance targets and measurement rules
 
