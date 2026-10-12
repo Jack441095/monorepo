@@ -139,6 +139,8 @@ def test_vocal_cut_through_recipe_undo_formulation(mock_session_snapshot):
 
     from kenn.core.live_recipe import LiveRecipeService
     service = MagicMock()
+    # This test isolates reverse-step formulation; receipt ownership is covered by the real HTTP Undo tests.
+    service.authenticate_undo_receipt.side_effect = lambda receipt, session_id: (receipt, "")
     service.propose_track_action.side_effect = lambda action, track_index, track_name, value, session_id: {
         "ok": True,
         "proposal": {"action": action, "track_index": track_index, "track_name": track_name, "after": value},

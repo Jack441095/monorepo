@@ -91,7 +91,9 @@ def _safe_projection(value: Any, *, key: str = "", nested: bool = False) -> Any:
             )
         }
     if isinstance(value, list):
-        return [_safe_projection(item, key=key, nested=True) for item in value[:MAX_RECEIPTS]]
+        # 500 caps journal rows, not receipt state. MIDI validates at most 4096 notes before a write;
+        # truncating those notes here loses the rest on Undo and hides tampering after note 500.
+        return [_safe_projection(item, key=key, nested=True) for item in value]
     if value is None or isinstance(value, (bool, int, float, str)):
         return value
     return str(value)
