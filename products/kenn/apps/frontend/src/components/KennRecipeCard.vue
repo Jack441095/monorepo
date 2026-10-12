@@ -66,7 +66,7 @@ function rawValue(value: unknown): string | null {
 
 function transition(step: KennActionStep): string {
   // A chooser's retained labels carry its meaning; sparse raw positions are not physical values.
-  if (step.after_label) return `${step.before_label ?? rawValue(step.before) ?? 'value to be confirmed'} → ${step.after_label}`
+  if (step.after_label) return `${step.before_label || rawValue(step.before) || 'value to be confirmed'} → ${step.after_label}`
   // Device/setup children carry mapped display strings; mixer children carry dB values.
   if (step.before_display && step.after_display) return `${step.before_display} → ${step.after_display}`
   const before = formatDb(step.before_db) ?? rawValue(step.before)

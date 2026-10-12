@@ -120,11 +120,13 @@ describe('KennRecipeCard', () => {
       before_label: 'Peak', after_label: 'RMS', before_display: '2 raw', after_display: '7 raw' }
     const inverse = { ...choice, before: 7, after: 2, before_label: 'RMS', after_label: 'Peak',
       before_display: '7 raw', after_display: '2 raw' }
+    // An unlabeled current value still needs an inspectable before-state rather than an empty transition.
+    const unlabeled = { ...choice, before: 4, before_label: '' }
     for (const cardStatus of ['pending', 'applied'] as const) {
-      for (const [step, expected] of [[choice, 'Peak → RMS'], [inverse, 'RMS → Peak']] as const) {
+      for (const [step, expected] of [[choice, 'Peak → RMS'], [inverse, 'RMS → Peak'], [unlabeled, '4 raw → RMS']] as const) {
         const text = mount(KennRecipeCard, { props: { proposal: { ...recipe, steps: [step] }, cardStatus } }).text()
         expect(text).toContain(expected)
-        expect(text).not.toContain('raw →')
+        if (step.before_label) expect(text).not.toContain('raw →')
       }
     }
   })
