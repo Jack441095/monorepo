@@ -15,39 +15,47 @@ It checks the exact exported tree, blocks private paths, audio, model weights,
 runtime files and common credential formats, and uses ordinary fast-forward
 pushes. It never deletes destination branches or rewrites their history.
 
-Activation is pending: GitHub rejected a repository deploy key because deploy
-keys are disabled for this repository. No organization policy was changed and
-no broad personal token is reused. Jack must provision a fine-grained token
+The 3 October setup could not activate automatic sync: GitHub rejected a repository
+deploy key because deploy keys are disabled for this repository. No organization
+policy was changed and no broad personal token was reused. If the Actions secret
+is still absent, Jack must provision a fine-grained token
 with only `kenn-app` selected, **Contents: read and write** and **Workflows:
 read and write**, then store it as the monorepo Actions secret
 `KENN_APP_SYNC_TOKEN`. Workflow access is needed because the exported KENN
 folder already contains its own `.github/workflows/` files. The token is never
 saved in a remote URL or the checkout. Until that secret exists, automatic
-sharing sync stops with an explicit missing-credential error.
+sharing sync stops with an explicit missing-credential error. The 12 October
+handoff uses manual SSH export; it does not verify or change that secret or CI.
 
 New feature branches preserve destination `main` as their parent. Existing
 branches require matching source markers and stop on independent destination
 edits or rewritten source history. Import colleagues' changes explicitly into
 the monorepo and review the reconciliation before resuming sync.
 
-`kenn-app/main` needs a reviewed baseline because the existing split histories
-do not share a commit ancestor. A later review step must prepare a reconciliation branch
-from committed monorepo `main`, not from unfinished feature work. Neither
-`main` is changed by preparing the PR. Merge that PR using **Create a merge
-commit**, preserving the source marker in its ancestry. Squash/rebase without
-that marker blocks future sync. A bounded monorepo automation PR also needs to be
-prepared, reviewed and merged before expecting automatic sync from monorepo
-`main`. Neither review PR has been created by this cleanup.
+The 3 October initial reconciliation requirement was superseded by the approved
+5 and 8 October exports recorded in `KENN_PLAN.md`. On 12 October,
+`kenn-app/main` at `541f29c6` still exactly matches the committed KENN tree from
+monorepo `53bad4db`; its old commit message has only a short source hash. The
+guarded exporter requires the full source marker. The prepared metadata-only
+commit `952fcfaf` has the same tree and `541f29c6` as its parent, and records the
+full original source hash. Recheck the remote tip and tree before publishing
+that ordinary fast-forward, then resume the guarded exporter. This repairs
+provenance without importing independent destination edits or landing draft code.
+
+For this investor handoff, main exports only already-landed code and demo
+documentation. The citation fix, Stage 2/3 fix and combined candidate are exported
+to their own matching draft branches. They require the original outside review
+before any code merge to main.
 
 From the monorepo root, manual equivalents are:
 
 ```bash
 products/kenn/tooling/scripts/sync_kenn_app.sh \
-  --branch fix/review-critical-2026-10-02 --bootstrap --push
+  --source-ref draft/investor-candidate-2026-10-14 \
+  --branch draft/investor-candidate-2026-10-14 --bootstrap --push
 
 products/kenn/tooling/scripts/sync_kenn_app.sh \
-  --source-ref origin/main --branch main \
-  --destination-branch sync/reconcile-main-2026-10-03 --reconcile --push
+  --source-ref main --branch main --push
 ```
 
 Omit `--push` to prepare an object without publishing it. Automation ignores

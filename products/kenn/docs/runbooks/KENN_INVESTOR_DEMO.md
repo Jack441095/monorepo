@@ -10,10 +10,19 @@ requests into the live demo.
 
 ## Qualification status
 
-The checked-in topology fixture, full preflight, and a bounded two-step Live
-recipe are qualified. The complete script below is **not yet qualified**. Do
-not claim a ten-run investor-demo pass until the audio fixture, projector run,
-recovery drill, and all twenty steps have passed ten consecutive rehearsals.
+The Wednesday 14 October candidate is **not yet qualified with real Live**.
+The topology fixture, preflight and bounded recipe have September evidence;
+that evidence does not qualify the new Stage 2/3 control path. Follow D1–D6 in
+[KENN_PLAN.md](../../KENN_PLAN.md) and start a new candidate section in the
+rehearsal log. Do not claim a ten-run investor-demo pass until the current
+build, audio fixture, projector run, recovery drill and all twenty steps have
+passed ten consecutive rehearsals.
+
+Tuesday's owner-supervised session starts at 20:00 London time. The candidate
+adds `abletonosc/parameter_target.py`, which is outside AbletonOSC's hot-reload
+list. Deploy it in that session and restart Live before qualification; verify
+the running bundle hash afterwards. Do not count a hot reload alone as loading
+the new module.
 
 The checked-in `assets/demo/KENN_Live12_Demo.als` is a topology reset point,
 not a finished musical production. The repository now includes a deterministic
@@ -21,7 +30,7 @@ generator for the original `Neon Proof` demo composition, but the complete
 script remains unqualified until its stems are imported into a disposable Live
 copy and the full run passes the rehearsal gate.
 
-### Release gate checklist (updated 2026-09-23)
+### Historical release gate checklist (2026-09-23)
 
 - [x] Stems rendered, hash-bound manifest written
 - [x] Disposable rehearsal copy opened in Live (not the tracked fixture)
@@ -75,7 +84,8 @@ copy and the full run passes the rehearsal gate.
    cache used by steps 12–13.
 7. Run it again with `--allow-mutations` only on the disposable copy.
 8. Confirm 11/11 checks pass, then reset and reselect Drum Bus before rehearsing.
-9. Run `python3 tooling/scripts/demo_script_gate.py --runs 10`. This exercises
+9. Run `python3 tooling/scripts/demo_script_gate.py --route ask --runs 10 --json`.
+   This uses the chat endpoint reached by the web UI and exercises
    the 13 non-mutating scripted prompt contracts and latency budgets. It cannot
    confirm proposals or qualify the seven manual UI/mutation/presentation steps,
    so a pass is supporting evidence rather than a complete rehearsal.
@@ -95,8 +105,8 @@ are spoken to the audience; never type them into the chat.
 
 ### Act 2 — KENN controls Live safely
 
-6. Ask: `Set Compressor Output to 3 dB on track 7.` Explain that this is an
-   exact, profile-backed vocal gain control. Review the proposal, confirm it,
+6. Ask: `Set Compressor Threshold to -4 dB on track 7.` Explain that this is an
+   exact, profile-backed vocal compression control. Review the proposal, confirm it,
    and point out the verified readback.
 7. Ask: `Pan the Synth hard left.` Review and confirm the exact proposal.
 8. Ask: `Focus EQ Eight on track 5.` Review and confirm the device-focus proposal (Bass, EQ Eight).
@@ -127,11 +137,11 @@ are spoken to the audience; never type them into the chat.
     is bound to this exact action and current state, then click **Dismiss**.
     (Synth is already hard left after step 7, so a hard-left prompt would show a
     no-op L100 → L100 card.)
-18. Do not type anything. Scroll to the step-6 card (Output 0 → 3 dB, "Readback
+18. Do not type anything. Scroll to the step-6 card (Threshold 0 → -4 dB, "Readback
     Verified") and the step-11 history, and narrate them aloud.
 19. Click **Undo on the step-6 Compressor card** (not step 9: step 10 already
     reverted that one and KENN will refuse it as stale). Expect "Restored to
-    Original State" and Lead Vocal Compressor Output back at 0 dB in Live.
+    Original State" and Lead Vocal Compressor Threshold back at 0 dB in Live.
 
 ### Act 5 — The path forward
 
