@@ -283,3 +283,34 @@ def test_make_answer_does_not_repair_quality_lost_when_an_invented_step_is_cut(m
 
     assert enhanced is False
     assert logged[-1][0] is False
+
+
+@pytest.mark.parametrize("tag", [" [#2]", " ([#2])", "[#2]", "\u00a0[#2]"])
+def test_capping_after_a_tag_keeps_the_same_two_steps_when_repaired(monkeypatch, tag):
+    # 12 Oct review: cutting the repaired and tagged text separately paired a one-step answer with a two-step
+    # twin. Choose the ending before editing tags, so the quality guard judges exactly the steps that ship.
+    written = CUT_LOSES_A_STEP.replace("2. Set the", "2. Set the release to 300 ms" + tag)
+    expected = _repaired(written, _check_with_question_figure)
+    assert _check_with_question_figure(written)["warnings"] == [MISATTRIBUTED]
+
+    answer, enhanced, logged = _make_answer_returning(
+        monkeypatch, written, chunks=RESULTS, query=SIDECHAIN_QUERY, answer_mode="mix_diagnosis",
+        question="My release is at 300 ms. " + SIDECHAIN_QUERY,
+    )
+
+    assert enhanced is True
+    assert answer == expected
+    assert "2. Set the release to 300 ms" in answer
+    assert logged[-1][1]["repaired_citations"] == ["300ms", "300ms"]
+
+
+def test_repair_credit_counts_only_the_tagged_occurrences_in_the_shipped_ending(monkeypatch):
+    # The cap can drop a second tagged 6 dB while the first survives; matching values alone credited both.
+    written = ACCEPTED_ANSWER.replace("the depth to 6 dB so", WRONG_TAG).replace(
+        "\n\nSources:", " One more 6 dB [#2] and then\n\nSources:"
+    )
+    answer, enhanced, logged = _make_answer_returning(monkeypatch, written)
+
+    assert enhanced is True
+    assert RIGHT_TAG in answer and "One more" not in answer
+    assert logged[-1][1]["repaired_citations"] == ["6db"]
