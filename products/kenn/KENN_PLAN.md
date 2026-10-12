@@ -901,8 +901,8 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   Test typed MCP proposals through the actual HTTP gateway and validate native
   Apply/Undo outcomes and receipts before displaying success. Resolve the unused
   planner dB conversion path; keep direct C++ writes off pending parity qualification.
-- [ ] **Stage 2/3 guarded parameter control, 11 Oct: integration in progress.** This is Jack's branch
-  `codex/kenn-stage2-stage3-integration` (`18c15c38..db4d027c`, 6 commits). It adds inspect → proposal → explicit
+- [ ] **Stage 2/3 guarded parameter control: implementation reviewed, 12 Oct.** This is Jack's branch
+  `codex/kenn-stage2-stage3-integration`, reviewed through `945b4373`. It adds inspect → proposal → explicit
   Apply → readback → Undo for any device parameter, holds retained target references in the AbletonOSC handler, and
   adds two routes: `/api/ableton/parameter/inspect` and `/api/ableton/parameter/proposal`. It touches L1, L3, L4 and
   L5 and C1–C5. Claims and evidence:
@@ -984,8 +984,15 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
       legacy-receipt identity regression also failed before its guard was added.
     - Independent standards review found no issues. The fresh spec reviewer found the legacy-receipt bypass above;
       after the fix, its recheck found no unresolved issue. All execution used fake Live; no model inference ran.
-  - Next: the original outside reviewer rechecks the full integration diff before any merge. Owner grading and
-    real-Live identity/quantized-value qualification remain open.
+  - Fresh independent Standards and Spec reviews pass through `945b4373`. Rechecks cover exact card targets,
+    chooser labels and refusal of unsupported templates-only HTTP measurements, including an empty-label
+    fallback. All six injected regression faults were detected. Jack removed the requirement to wait for the
+    original reviewer on 12 Oct; the recorded independent reviews satisfy the code merge check.
+  - Final fake verification: **4884 backend tests passed, 16 skipped**; **86 frontend tests passed**;
+    frontend type check and production build passed; **21 demo checks passed**. Fresh synthetic parameter
+    coverage remains **25 devices, 92 parameters, 184 fake writes, zero Live writes**. Exact source/check
+    identities are in the linked evidence receipt. Owner grading and real-Live identity/quantized-value
+    qualification remain open.
 
 ### 4. Qualify listening, memory and creation
 
@@ -1065,13 +1072,15 @@ on the exact candidate. The final milestone is the full scripted presentation,
 recovery, display/audio checks and a verified backup recording. The schedule below
 is a target; an unresolved failure keeps the corresponding item open.
 
-- [ ] **D1 — Review the fixes, Monday 12 Oct.** The original outside reviewer
-  rechecks citation repair `67921916` and the full Stage 2/3 integration ending at
-  `8564659a`, including `adb0d4c4` and `b0056599`. Codex fixes any reported break,
-  adds a regression and gets the changed behavior rechecked. Review the overdue
-  audit-fixes merge `2377eed1` as well, since it feeds the answer path. Merge the
-  citation fix first, then Stage 2/3, only after the required sign-offs. Exit:
-  recorded review verdicts with no unresolved demo or safety blocker.
+- [x] **D1 — Review the fixes, Monday 12 Oct.** Fresh independent Standards and
+  Spec reviews covered citation repair `67921916`, the Stage 2/3 integration and
+  audit-fixes merge `2377eed1`. Card target positions, chooser transitions and the
+  templates-only HTTP measurement contract were fixed in `53fffa4c`; the empty
+  chooser-label fallback was fixed in `945b4373`. Rechecks found no remaining
+  actionable implementation blocker, and all six injected regression faults
+  were detected. Jack removed the original-reviewer requirement on 12 Oct.
+  Citation repair precedes Stage 2/3 in the candidate ancestry. These code reviews
+  permit landing; owner grading and supervised Live qualification remain open.
 - [ ] **D2 — Assemble and check one candidate, Monday 12 Oct.** Codex uses a clean
   checkout containing the approved changes, preserving unrelated working edits.
   Run the full backend suite with fake Live, frontend tests and frontend build;
@@ -1150,14 +1159,14 @@ is a target; an unresolved failure keeps the corresponding item open.
   same demonstrated sequence and describe it as a recording; do not improvise
   mutations. Exit: live showing only with D1–D5 and room preflight passed.
 
-Owners: Codex handles build preparation, fixes, checks and evidence; the outside
-reviewer provides independent sign-off; Jack supervises all Live mutations,
+Owners: Codex handles build preparation, fixes, checks and evidence; independent
+reviewers provide code sign-off; Jack supervises all Live mutations,
 grades the demo answers and rehearses/presents. Tuesday's supervised slot is
 20:00 London time; Wednesday's meeting time remains unconfirmed. Nothing here
 authorizes an unattended Live run. R1–R4, broader answer grading, device coverage
 and beta/release qualification remain separately open.
 
-12 Oct preparation receipt (fake Live only; D1–D6 remain open):
+Earlier 12 Oct preparation receipt (fake Live only; D1–D6 were open at capture):
 
 - Combined draft `draft/investor-candidate-2026-10-14` at code/build commit
   `43a8c1bb` includes citation `67921916` and Stage `8564659a`. The full backend
@@ -1232,13 +1241,13 @@ and beta/release qualification remain separately open.
   reviewers with the original findings as their checklist. The audit reviewer
   reported no P1 and passed 153 scoped tests. The citation reviewer found a new
   P1 at the cap boundary: independently cutting repaired and tagged text paired
-  different steps and hid a quality refusal. The Stage reviewer was interrupted
-  by the weekly quota before a final verdict; reset is 14 Oct at 06:00 London.
-  Neither a completed original recheck nor a code merge on main is claimed.
+  different steps and hid a quality refusal. The Stage review did not produce a
+  final verdict in that attempt. At that point, neither a completed original
+  recheck nor a code merge on main was claimed.
   Citation commit `67921916` fixes that finding. Its independent standards and
   spec rechecks found no remaining material issue; the spec review exercised
-  the supplied cap cases and 84 additional actual ending variants. The original
-  outside-review merge gate remains open.
+  the supplied cap cases and 84 additional actual ending variants. Jack's later
+  12 Oct decision accepts the fresh independent reviews recorded under D1.
   Owner answer grading, current real-Live transactions, ten consecutive rehearsals
   and backup capture/playback remain outstanding. Wednesday's meeting time is
   still unknown.
@@ -2048,8 +2057,8 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
         Standards and spec rechecks of `67921916` found no remaining material issue. The spec review passed
         69 focused tests and checked the supplied cap cases, 56 punctuation/tail variants, 84 additional
         actual ending variants and three duplicate-credit cases. No inference or real-Live writes ran.
-      - Next: the original outside reviewer rechecks before merge. Owner grading and the separate audit-fixes
-        adversary review remain open; these fixes do not close the answer gate.
+      - The fresh independent code rechecks are recorded under D1; Jack removed the original-reviewer
+        requirement on 12 Oct. Owner grading remains open; these fixes do not close the answer gate.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 

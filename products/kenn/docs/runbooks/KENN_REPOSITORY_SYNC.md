@@ -43,10 +43,12 @@ that ordinary fast-forward and resumed the guarded exporter. No further baseline
 repair is required. Main and all three draft exports passed exact-tree and full
 source-marker verification; independent destination edits were not imported.
 
-For this investor handoff, main exports only already-landed code and demo
-documentation. The citation fix, Stage 2/3 fix and combined candidate are exported
-to their own matching draft branches. They require the original outside review
-before any code merge to main.
+The initial investor handoff exported the citation fix, Stage 2/3 fix and combined
+candidate to their own matching draft branches. On 12 October, Jack removed the
+requirement to wait for the original reviewer and accepted the fresh independent
+Standards and Spec rechecks recorded under D1 in `KENN_PLAN.md`. Reviewed code may
+now land on main and export from that committed source. Owner grading and
+supervised Live qualification remain open.
 
 From the monorepo root, manual equivalents are:
 

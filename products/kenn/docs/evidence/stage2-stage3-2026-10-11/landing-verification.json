@@ -1,0 +1,209 @@
+{
+  "schema": "kenn.stage23.landing_verification.v1",
+  "date": "2026-10-12",
+  "base_revision": "26e340b8ef43f16e0729d0da287b07c1e2f64321",
+  "verified_source_revision": "945b43734336da88c791cc3fb56a88d8c8b21a27",
+  "source_changed_files": [
+    "products/kenn/apps/backend/src/kenn/ableton_osc_bridge.py",
+    "products/kenn/apps/backend/src/kenn/core/chat_answer.py",
+    "products/kenn/apps/backend/src/kenn/core/chat_grounding.py",
+    "products/kenn/apps/backend/src/kenn/core/chat_live_router.py",
+    "products/kenn/apps/backend/src/kenn/core/device_units.py",
+    "products/kenn/apps/backend/src/kenn/core/fake_live.py",
+    "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+    "products/kenn/apps/backend/src/kenn/core/live_backend.py",
+    "products/kenn/apps/backend/src/kenn/core/live_command.py",
+    "products/kenn/apps/backend/src/kenn/core/live_control_planner.py",
+    "products/kenn/apps/backend/src/kenn/core/live_executor.py",
+    "products/kenn/apps/backend/src/kenn/core/live_intent_rules/device_rules.py",
+    "products/kenn/apps/backend/src/kenn/core/live_receipt_journal.py",
+    "products/kenn/apps/backend/src/kenn/core/live_recipe.py",
+    "products/kenn/apps/backend/src/kenn/core/mcp/__init__.py",
+    "products/kenn/apps/backend/src/kenn/core/mcp/live_proposals.py",
+    "products/kenn/apps/backend/src/kenn/core/mcp_facade.py",
+    "products/kenn/apps/backend/src/kenn/core/parameter_contract.py",
+    "products/kenn/apps/backend/src/kenn/core/session_context.py",
+    "products/kenn/apps/backend/src/kenn/routes/daw_command_handler.py",
+    "products/kenn/apps/backend/src/kenn/routes/daw_routes.py",
+    "products/kenn/apps/backend/src/kenn/routes/fastapi_app.py",
+    "products/kenn/apps/backend/src/kenn/server.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_captured_review_contract.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_chat_live_router.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_chat_route_context.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_citation_repair.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_clip_rename_service.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_demo_script_gate.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_device_profile_files.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_guarded_device_setup.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_guarded_eq_workflows.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_guarded_recipes.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_live_backend.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_live_command.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_live_control_safe_pipeline.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_mcp_dispatch_routing.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_measure_chat_latency.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_midi_clip_service.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_parameter_target_transport.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_parameter_targets.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_server_smoke.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_stage23_conversation_journeys.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_subjective_translation.py",
+    "products/kenn/apps/backend/src/kenn/tests/test_undo_walks_back.py",
+    "products/kenn/apps/frontend/e2e/demo_path.e2e.ts",
+    "products/kenn/apps/frontend/src/api/kenn.test.ts",
+    "products/kenn/apps/frontend/src/api/kenn.ts",
+    "products/kenn/apps/frontend/src/components/KennActionCard.vue",
+    "products/kenn/apps/frontend/src/components/KennRecipeCard.vue",
+    "products/kenn/apps/frontend/src/components/__tests__/KennActionCard.component.test.ts",
+    "products/kenn/apps/frontend/src/components/__tests__/KennRecipeCard.component.test.ts",
+    "products/kenn/apps/frontend/src/composables/useKenn.test.ts",
+    "products/kenn/apps/frontend/src/composables/useKenn.ts",
+    "products/kenn/apps/frontend/src/utils/formatActionTarget.ts",
+    "products/kenn/docs/evidence/KENN_STAGE2_STAGE3_INTEGRATION_2026-10-11.md",
+    "products/kenn/docs/evidence/guarded-workflows-2026-10-11/compound-eq.md",
+    "products/kenn/docs/evidence/guarded-workflows-2026-10-11/device-setup.md",
+    "products/kenn/docs/evidence/guarded-workflows-2026-10-11/eq-mutations.json",
+    "products/kenn/docs/evidence/guarded-workflows-2026-10-11/recipe-mutations.json",
+    "products/kenn/docs/evidence/guarded-workflows-2026-10-11/recipes.md",
+    "products/kenn/docs/evidence/guarded-workflows-2026-10-11/run_eq_mutations.py",
+    "products/kenn/docs/evidence/guarded-workflows-2026-10-11/run_recipe_mutations.py",
+    "products/kenn/docs/evidence/guarded-workflows-2026-10-11/run_setup_mutations.py",
+    "products/kenn/docs/evidence/guarded-workflows-2026-10-11/setup-mutations.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/capture_synthetic_delivery.py",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/changed-files.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/conversation-examples.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/installed-catalog.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/installed-catalog.md",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/mutation-results.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/parameter-coverage.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/qualification-manifest.template.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/recipe-recheck.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/forms/reviewer-a.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/forms/reviewer-b.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/packet.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/review/progress.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/run_mutation_checks.py",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/synthetic-delivery-contracts.json",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/verification.json",
+    "products/kenn/integrations/ableton-osc/abletonosc/parameter_target.py",
+    "products/kenn/integrations/ableton-osc/abletonosc/song.py",
+    "products/kenn/tooling/scripts/adjudicate_human_review.py",
+    "products/kenn/tooling/scripts/build_captured_review_packet.py",
+    "products/kenn/tooling/scripts/demo_script_gate.py",
+    "products/kenn/tooling/scripts/device_coverage.py",
+    "products/kenn/tooling/scripts/export_human_review_forms.py",
+    "products/kenn/tooling/scripts/measure_chat_latency.py",
+    "products/kenn/tooling/scripts/qualify_parameter_targets.py",
+    "products/kenn/tooling/scripts/recheck_recipes_fake.py"
+  ],
+  "receipt_update_files": [
+    "products/kenn/KENN_PLAN.md",
+    "products/kenn/docs/evidence/KENN_STAGE2_STAGE3_INTEGRATION_2026-10-11.md",
+    "products/kenn/docs/runbooks/KENN_REPOSITORY_SYNC.md",
+    "products/kenn/docs/evidence/stage2-stage3-2026-10-11/landing-verification.json"
+  ],
+  "review": {
+    "standards": "pass; no remaining material documented-rule violation or actionable smell",
+    "spec": "pass; all actionable implementation findings resolved",
+    "original_reviewer_requirement": "removed by Jack on 12 October 2026; fresh independent reviews accepted"
+  },
+  "runtime": {
+    "backend": "existing Python virtual environment with FakeLiveBackend, existing ONNX artifact and retrieval index linked read-only",
+    "frontend": "existing arm64 Node runtime and dependencies; system x64 Node incompatible with installed native modules",
+    "index": "v-5f6964698b76"
+  },
+  "capture_directory": "kenn-evaluation-data/2026-10-12-stage23-landing/ (outside Git)",
+  "verification": [
+    {
+      "capture": "backend-full-final.log",
+      "sha256": "305350a9795f3cc45617661613cae99d18ab34b0525630558eb1677092c879f9",
+      "cwd": "products/kenn/apps/backend/src",
+      "command": "KENN_LIVE_BACKEND=fake python -m pytest -q -p no:randomly kenn/tests",
+      "source_revision": "53fffa4c9081b5c8b1177ecb99e89887f4eac62b",
+      "result": "4884 passed, 16 skipped, 5 warnings"
+    },
+    {
+      "capture": "frontend-tests.log",
+      "sha256": "74ce8ca0ee143b45c33b32bfc68803821555eccd24e659b45f6ce79629af7503",
+      "cwd": "products/kenn/apps/frontend",
+      "command": "node node_modules/vitest/vitest.mjs run --maxWorkers=1",
+      "source_revision": "945b43734336da88c791cc3fb56a88d8c8b21a27",
+      "result": "86 passed"
+    },
+    {
+      "capture": "frontend-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cwd": "products/kenn/apps/frontend",
+      "command": "node node_modules/vue-tsc/bin/vue-tsc.js -b",
+      "source_revision": "945b43734336da88c791cc3fb56a88d8c8b21a27",
+      "result": "passed"
+    },
+    {
+      "capture": "frontend-build.log",
+      "sha256": "21ba720c598988d13928fee4cd80eeb3f4b54a8118d11d1bc33de74913989666",
+      "cwd": "products/kenn/apps/frontend",
+      "command": "node node_modules/vite/bin/vite.js build",
+      "source_revision": "945b43734336da88c791cc3fb56a88d8c8b21a27",
+      "result": "passed"
+    },
+    {
+      "capture": "demo-checks.log",
+      "sha256": "5b659ff4aec67a30b01248b8729fe2d4d43bafdf7e75345eba783dab5a173ac0",
+      "cwd": "products/kenn/apps/backend/src",
+      "command": "KENN_LIVE_BACKEND=fake python -m pytest -q -p no:randomly kenn/tests/test_demo_preflight.py kenn/tests/test_demo_script_gate.py",
+      "source_revision": "945b43734336da88c791cc3fb56a88d8c8b21a27",
+      "result": "21 passed"
+    },
+    {
+      "capture": "parameter-coverage-final.json",
+      "sha256": "5c70800671cc61c3b0394d976bbd48fd0e628c1beea281c556e9491243027fdf",
+      "cwd": "products/kenn/apps/backend/src",
+      "command": "KENN_LIVE_BACKEND=fake python ../../../tooling/scripts/qualify_parameter_targets.py --output EXTERNAL_CAPTURE",
+      "source_revision": "945b43734336da88c791cc3fb56a88d8c8b21a27",
+      "result": "25 devices, 92 parameters, 184 fake writes, 0 Live writes"
+    }
+  ],
+  "mutation_checks": [
+    {
+      "mutation": "single_target_position",
+      "exit_code": 1,
+      "detected": true
+    },
+    {
+      "mutation": "parameter_position",
+      "exit_code": 1,
+      "detected": true
+    },
+    {
+      "mutation": "recipe_choice_labels",
+      "exit_code": 1,
+      "detected": true
+    },
+    {
+      "mutation": "http_templates_guard",
+      "exit_code": 1,
+      "detected": true
+    },
+    {
+      "mutation": "cli_templates_guard",
+      "exit_code": 1,
+      "detected": true
+    },
+    {
+      "mutation": "empty_choice_label",
+      "exit_code": 1,
+      "detected": true
+    }
+  ],
+  "mutation_capture_sha256": "8749d4969a27e79f0eb1fbc77f8cbd0eae1049a53defade33cbcb347c1468389",
+  "live_writes": 0,
+  "model_inference_runs": 0,
+  "index_rebuilds": 0,
+  "remaining_gates": [
+    "Owner correctness grading",
+    "Independent blind evaluation and action accuracy",
+    "Planner promotion",
+    "Supervised current-candidate Live control and recipe qualification",
+    "Demo deployment identity, rehearsals and playback"
+  ]
+}
