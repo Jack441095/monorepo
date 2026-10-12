@@ -1,0 +1,57 @@
+{
+  "schema": "kenn.regression_mutations.v1",
+  "synthetic_only": true,
+  "live_writes": 0,
+  "checks": [
+    {
+      "guard": "same_band",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_eq_workflows.py::test_compound_eq_refuses_an_observed_gain_from_another_band",
+      "replacement": "if False and (\n                frequency_parameter.get(\"name\")",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "f834fb5aaf4c3a14f7595deefc74bb22e06920d1c17cc4c73efd24bf8128cee3"
+    },
+    {
+      "guard": "native_gain_bounds_shared",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_control_planner.py",
+      "test": "kenn/tests/test_guarded_eq_workflows.py::test_single_eq_gain_cards_refuse_the_same_unqualified_host_range",
+      "replacement": "if False and (",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "921b0ccc71faccdf10267c6fb8dc4fc4c636a967113ad5e236522e62652d4878"
+    },
+    {
+      "guard": "relative_gain_before_state",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_eq_workflows.py::test_compound_eq_does_not_rebase_gain_when_it_moves_during_planning",
+      "replacement": "False",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "f834fb5aaf4c3a14f7595deefc74bb22e06920d1c17cc4c73efd24bf8128cee3"
+    },
+    {
+      "guard": "same_device_across_observations",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_eq_workflows.py::test_compound_eq_refuses_replacement_between_its_two_guarded_observations",
+      "replacement": "if False:",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "f834fb5aaf4c3a14f7595deefc74bb22e06920d1c17cc4c73efd24bf8128cee3"
+    },
+    {
+      "guard": "retained_observations_after_check",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_action_service.py",
+      "test": "kenn/tests/test_guarded_eq_workflows.py::test_compound_eq_proposal_never_rediscovers_after_validating_its_original_observation",
+      "replacement": "                    observed_parameter_info=None,",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "f834fb5aaf4c3a14f7595deefc74bb22e06920d1c17cc4c73efd24bf8128cee3"
+    }
+  ]
+}

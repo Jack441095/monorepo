@@ -10,7 +10,7 @@ import { formatDb } from '../utils/formatLevel'
 const props = withDefaults(
   defineProps<{
     proposal: KennActionProposal
-    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
+    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'unknown' | 'failed' | 'partial' | 'error'
     receipt?: KennActionReceipt
     errorMessage?: string
     // False on a card that is itself an undo. Its receipt reverses the change before it, so "undoing" it would
@@ -84,9 +84,16 @@ function transition(step: KennActionStep): string {
       </li>
     </ol>
 
-    <p v-if="cardStatus !== 'applied' && steps.length" class="kenn-recipe-card__note">
+    <p v-if="(cardStatus === 'pending' || cardStatus === 'requires_confirmation' || cardStatus === 'dismissing' || cardStatus === 'rejected') && steps.length" class="kenn-recipe-card__note">
       Nothing has changed yet.
     </p>
+    <p v-if="cardStatus === 'partial'" class="kenn-recipe-card__note">Partially applied. Inspect Live before preparing another change.</p>
+    <p v-if="cardStatus === 'failed'" class="kenn-recipe-card__note">Action failed. Review the receipt before preparing a fresh proposal.</p>
+    <p v-if="cardStatus === 'unknown'" class="kenn-recipe-card__note">
+      Outcome unknown. Inspect Live before preparing another change.
+    </p>
+    <p v-if="cardStatus === 'applied'" class="kenn-recipe-card__note">Readback verified.</p>
+    <p v-if="cardStatus === 'undone'" class="kenn-recipe-card__note">Observed before-state restored.</p>
 
     <div class="kenn-recipe-card__actions">
       <button v-if="cardStatus === 'dismissing'" class="kenn-recipe-card__btn" disabled>

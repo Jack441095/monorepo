@@ -129,7 +129,7 @@ def test_fastapi_clear_discards_a_late_answer_but_keeps_the_model_busy(id_key):
     assert answer_upgrades.get(job, session_id="song-a") == {"status": "expired"}
 
 
-def test_route_preferences_and_memory_stay_in_the_requesting_project(tmp_path, monkeypatch):
+def test_five_turn_project_switch_keeps_saved_preferences_and_memory_with_their_owner(tmp_path, monkeypatch):
     monkeypatch.setattr(chat_answer, "_critique_and_save_trace", lambda **kwargs: None)
     terms = {"total_docs": 0, "avg_len": 1.0, "lengths": [], "idf": {}, "postings": {}}
     for module in (chat_retrieval, chat_answer):
@@ -143,14 +143,18 @@ def test_route_preferences_and_memory_stay_in_the_requesting_project(tmp_path, m
     )
     history = [{"role": "user", "content": "The vocal feels dull."}]
     responses = {}
-    for session_id in ("song-a", "song-b"):
+    counts = {"song-a": 0, "song-b": 0}
+    # Returning to a project must recover its own explicit preference without copying the intervening project's memory.
+    for number, session_id in enumerate(("song-a", "song-b", "song-a", "song-b", "song-a")):
         status, result = chat_routes.handle_ask({
             "question": "How should I EQ my vocal track?", "session_id": session_id,
             "history": history, "session_context": {"mix_goal": "vocal clarity"},
-        }, request_id=f"test-{session_id}", allow_llm=False)
+        }, request_id=f"test-{session_id}-{number}", allow_llm=False)
         assert status == 200
         responses[session_id] = result
-        assert session_memory.load_session(session_id)["turn_count"] == 1
+        counts[session_id] += 1
+        assert session_memory.load_session(session_id)["turn_count"] == counts[session_id]
+        assert bool(result["applied_preferences"]) is (session_id == "song-a")
     assert responses["song-a"]["applied_preferences"][0]["value"] == "vocals bright"
     assert responses["song-b"]["applied_preferences"] == []
     assert history == [{"role": "user", "content": "The vocal feels dull."}]

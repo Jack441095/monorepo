@@ -29,10 +29,10 @@ _HOW_TO = re.compile(
     r"it\s+(?:sounding|getting|becoming))\b|\bi\s+(?:want|'d\s+like|would\s+like)\b[^.?!]*\bbut\b",
     re.I,
 )
-# Missing fields that still mean the parser found a Live change: the cached snapshot lacks the current fader level, or
-# a send was named without an amount.
+# Missing fields that still mean the parser found a Live change: the cached snapshot lacks the current fader level, a
+# send was named without an amount, or the change named a device the track holds more than one of.
 LIVE_WITHOUT_ACTION = frozenset({"current_volume", "send_amount", "negated", "deferred", "device_action",
-                                 "return_track_action", "single_action"})
+                                 "return_track_action", "single_action", "which_device"})
 
 
 # "Can I ..." / "Could we ..." asks whether something is possible. "Can you ..." is the polite way to ask KENN to do it

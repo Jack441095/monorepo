@@ -49,6 +49,8 @@ HANDLERS: dict[str, Handler] = {
     "live_parameter_profile": live_reads.live_parameter_profile,
     "compare_live_devices": live_reads.compare_live_devices,
     "create_live_proposal": live_proposals.create_live_proposal,
+    "inspect_parameter": live_proposals.inspect_parameter,
+    "create_parameter_proposal": live_proposals.create_parameter_proposal,
     "create_live_recipe_proposal": live_proposals.create_live_recipe_proposal,
     "create_mix_review_recipe_proposal": live_proposals.create_mix_review_recipe_proposal,
     "apply_live_proposal": live_confirmation.apply_live_proposal,

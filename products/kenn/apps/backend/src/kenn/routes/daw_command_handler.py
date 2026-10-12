@@ -273,17 +273,19 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
         source_evidence=source_evidence,
         allow_llm=not deterministic_only,
     )
-    if isinstance(result.get("proposal"), dict):
-        prop = result["proposal"]
-        tok = str(prop.get("confirmation_token", "")).strip()
-        if tok:
-            pending_proposals[tok] = prop
+    # The separately approved configuration card must be resolvable by token-only clients too.
+    for field in ("proposal", "next_proposal"):
+        if isinstance(result.get(field), dict):
+            prop = result[field]
+            tok = str(prop.get("confirmation_token", "")).strip()
+            if tok:
+                pending_proposals[tok] = prop
     status = 200
     if result.get("status") == "invalid":
         status = 400
     elif result.get("status") == "requires_confirmation":
         status = 200
-    elif result.get("status") == "failed":
+    elif result.get("status") in {"failed", "unknown"}:
         status = 409
     if isinstance(result.get("receipt"), dict):
         record_receipt(result["receipt"], session_id=session_id)

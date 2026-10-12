@@ -1,0 +1,42 @@
+{
+  "by_family": {
+    "analysis-honesty": {
+      "clarify": 0,
+      "correct": 0,
+      "denominator": 1,
+      "disagreements": 0,
+      "partial": 0,
+      "score_disagreements": 0,
+      "unreviewed": 1,
+      "wrong": 0
+    },
+    "knowledge-boundary": {
+      "clarify": 0,
+      "correct": 0,
+      "denominator": 2,
+      "disagreements": 0,
+      "partial": 0,
+      "score_disagreements": 0,
+      "unreviewed": 2,
+      "wrong": 0
+    },
+    "target-binding": {
+      "clarify": 0,
+      "correct": 0,
+      "denominator": 2,
+      "disagreements": 0,
+      "partial": 0,
+      "score_disagreements": 0,
+      "unreviewed": 2,
+      "wrong": 0
+    }
+  },
+  "clarify": 0,
+  "correct": 0,
+  "denominator": 5,
+  "disagreements": 0,
+  "partial": 0,
+  "score_disagreements": 0,
+  "unreviewed": 5,
+  "wrong": 0
+}

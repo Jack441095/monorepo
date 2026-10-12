@@ -34,7 +34,7 @@ from kenn.routes.chat_routes import (
     handle_delete_episode,
     handle_clear_memory,
 )
-from kenn.routes.daw_routes import handle_confirmation_revoke, handle_live_command, handle_session_card, handle_osc_undo
+from kenn.routes.daw_routes import handle_confirmation_revoke, handle_live_command, handle_parameter_inspection, handle_parameter_proposal, handle_session_card, handle_osc_undo
 from kenn.routes.mix_review_routes import (
     handle_mix_review_status,
     handle_mix_review_report_json,
@@ -239,6 +239,18 @@ async def ableton_command_endpoint(req: CommandRequest):
 @app.post("/api/ableton/confirmation/revoke")
 async def confirmation_revoke_endpoint(req: ConfirmationRevokeRequest):
     status, result = handle_confirmation_revoke(req.model_dump())
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/ableton/parameter/inspect")
+def parameter_inspection(payload: dict):
+    status, result = handle_parameter_inspection(payload)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/ableton/parameter/proposal")
+async def parameter_proposal_endpoint(payload: dict[str, Any]):
+    status, result = handle_parameter_proposal(payload)
     return JSONResponse(status_code=status, content=result)
 
 

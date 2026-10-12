@@ -22,6 +22,7 @@ from kenn.plugin_actions import ActionProposal, BatchActionProposal, SCHEMA, BAT
 from kenn.core.track_classifier import analyze_session_arrangement, classify_track_name
 from kenn.core.device_units import display_to_raw, normalize_unit
 from kenn.core.live_intent import parse_request
+from kenn.core.parameter_contract import indexed_parameter, validate_parameter, parameter_guard, device_confirmation_text
 
 logger = logging.getLogger(__name__)
 _PROPOSALS_BY_TOKEN: Dict[str, Dict[str, Any]] = {}
@@ -281,6 +282,8 @@ class LiveControlPlanner:
         unit: str = "",
         track_name: str = "",
         observed_parameter_info: Dict[str, Any] | None = None,
+        target_address: Dict[str, Any] | None = None,
+        display_unit: str = "",
     ) -> Dict[str, Any]:
         """Query current parameter state from Live, construct an ActionProposal, and issue an HMAC token."""
         # The command gateway may pass the exact parameter block it just read
@@ -301,23 +304,31 @@ class LiveControlPlanner:
         device_name = params_info.get("device_name", f"Device {device_index}")
         parameters = params_info.get("parameters", [])
 
-        target_param = next(
-            (item for item in parameters if isinstance(item, dict) and int(item.get("index", -1)) == parameter_index),
-            None,
-        )
-        if target_param is None and 0 <= parameter_index < len(parameters):
-            # Backward compatibility for older bridge responses that omitted
-            # original Live indices and returned a dense parameter list.
-            target_param = parameters[parameter_index]
+        target_param = indexed_parameter(parameters, parameter_index)
         if target_param is None:
             return {
                 "ok": False,
                 "error": f"Parameter index {parameter_index} out of range for device '{device_name}'",
             }
-        param_name = parameter_name or target_param.get("name", f"Parameter {parameter_index}")
-        current_val = float(target_param.get("value", 0.0))
-        min_val = float(target_param.get("min", 0.0))
-        max_val = float(target_param.get("max", 1.0))
+        if parameter_name and parameter_name != target_param.get("name"):
+            return {"ok": False, "error": "The requested parameter name differs from Live's observation."}
+        refusal = validate_parameter(target_param, proposed_value, device_name=device_name if target_address is None else "")
+        if refusal:
+            return {"ok": False, "error": refusal}
+        param_name = target_param["name"]
+        current_val = float(target_param["value"])
+        min_val = float(target_param["min"])
+        max_val = float(target_param["max"])
+
+        from kenn.core.device_units import find_profile
+
+        profile = find_profile(device_name, param_name, display_unit or unit)
+        if profile and profile.device_name == "EQ Eight" and profile.parameter_name == "Gain" and (
+            min_val != profile.raw_min or max_val != profile.raw_max
+        ):
+            # The native dB identity mapping must not label a different host range as dB. This shared
+            # planner also covers single controls, recipes and Undo, not only the compound EQ caller.
+            return {"ok": False, "error": "EQ gain bounds do not match the qualified native dB mapping."}
 
         # 2. Validate proposed value within bounds
         if not math.isfinite(proposed_value) or proposed_value < min_val or proposed_value > max_val:
@@ -354,20 +365,53 @@ class LiveControlPlanner:
         )
 
         proposal_payload = proposal.payload()
+        proposal_payload["parameter_guard"] = parameter_guard(target_param)
+        if target_param.get("value_display"):
+            proposal_payload["before_display"] = str(target_param["value_display"])
+        if unit == "choice" or display_unit == "choice" or target_param.get("choices"):
+            from kenn.core.device_units import find_choice
+
+            qualified = find_choice(device_name, param_name)
+            observed_choices = target_param.get("choices")
+            options = [(row["raw"], row["label"]) for row in observed_choices] if observed_choices else (qualified.options if qualified else ())
+            # Labels are part of the producer's approval, so resolve them before minting the token.
+            proposal_payload["before_label"] = next((str(label) for raw, label in options if raw == current_val), "")
+            proposal_payload["after_label"] = next((str(label) for raw, label in options if raw == clamped_val), "")
+        if target_address is not None:
+            proposal_payload["target_address"] = target_address
+            proposal_payload["topology"] = params_info["topology"]
+            proposal_payload["observation_token"] = params_info["observation_token"]
+            proposal_payload["target_label"] = params_info["target_label"]
+        proposal_payload["limitations"] = params_info.get("limitations", [
+            "Position and observed names are not persistent host IDs.",
+            "Legacy reads do not expose all enabled, automation or macro metadata.",
+        ])
         # AbletonOSC's bulk parameter response is intentionally raw and fast.
         # Add one targeted UI-value read to an exact proposal when the bridge
         # supports it, so the confirmation card can distinguish e.g. Glue
         # Attack raw=3 from Live's displayed value=1. Missing optional
         # metadata never blocks the safe raw-value path.
         value_string_reader = getattr(self.osc_client, "get_device_parameter_value_string", None)
-        if callable(value_string_reader):
+        if callable(value_string_reader) and target_address is None:
             try:
                 display = value_string_reader(track_index, device_index, parameter_index)
             except Exception:
+                # Display metadata is optional; verified raw bounds still govern the proposal.
                 display = None
             if isinstance(display, dict) and display.get("success") and display.get("value_string") not in (None, ""):
                 proposal_payload["before_display"] = str(display["value_string"])
                 proposal_payload["display_metadata"] = "AbletonOSC value_string"
+        # Display values participate in approval. Resolve the qualified proposed value before issuing a token,
+        # so command and Undo cards cannot invalidate their own confirmation by adding units afterward.
+        from kenn.core.device_units import display_text
+
+        # Undo restores raw exactly; its original unit still lets the card show the qualified physical value.
+        shown_unit = display_unit or unit
+        shown = display_text(device_name, param_name, shown_unit, clamped_val)
+        if shown:
+            proposal_payload["after_display"] = shown
+            if not proposal_payload.get("before_display"):
+                proposal_payload["before_display"] = display_text(device_name, param_name, shown_unit, current_val)
         fingerprint = _state_fingerprint(
             track_index=track_index,
             device_index=device_index,
@@ -377,7 +421,7 @@ class LiveControlPlanner:
         )
         proposal_payload["session_fingerprint"] = fingerprint
         proposal_payload["session_version"] = fingerprint
-        req_text = f"set_device_parameter:{track_index}:{device_index}:{parameter_index}:{clamped_val}"
+        req_text = device_confirmation_text(proposal_payload)
 
         # 4. Issue HMAC confirmation token
         confirm_token, confirm_meta = issue_confirmation(

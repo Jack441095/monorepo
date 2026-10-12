@@ -71,6 +71,8 @@ class ReadOnlyMCPBackend:
     """
 
     backend_name = "mcp-read-only"
+    # Services can refuse before dispatch rather than classify an intentionally disabled method as a lost write.
+    read_only = True
 
     def __init__(self, call_tool: MCPToolCaller):
         self._call_tool = call_tool

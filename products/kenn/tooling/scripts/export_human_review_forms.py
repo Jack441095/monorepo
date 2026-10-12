@@ -29,6 +29,11 @@ def build_form(packet: dict[str, Any], *, reviewer_slot: str, packet_sha256: str
     cases = packet.get("cases")
     if not criteria or not isinstance(cases, list) or not cases:
         raise ValueError("packet must contain a non-empty criteria list and cases list")
+    if reviewer_slot not in {"a", "b"} or len(set(criteria)) != len(criteria):
+        raise ValueError("reviewer slot or criteria are invalid")
+    ids = [case.get("case_id") for case in cases if isinstance(case, dict)]
+    if len(ids) != len(cases) or len(set(ids)) != len(ids):
+        raise ValueError("packet contains duplicate or invalid case IDs")
     rows = []
     for case in cases:
         if not isinstance(case, dict) or not str(case.get("case_id") or "").strip():
@@ -48,6 +53,8 @@ def build_form(packet: dict[str, Any], *, reviewer_slot: str, packet_sha256: str
         "reviewer_id": "",
         "independent_review_confirmed": False,
         "packet_sha256": packet_sha256,
+        "packet_id": packet.get("packet_id"),
+        "packet_content_sha256": hashlib.sha256(json.dumps(packet, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
         "case_count": len(rows),
         "criteria": criteria,
         "scoring_scale": packet.get("scoring_scale", {}),

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { getAnswerUpgrade, parseAdviceFindings, revokeKennConfirmation, summarizeAdviceAnswer } from './kenn'
+import { confirmKennAction, getAnswerUpgrade, parseAdviceFindings, revokeKennConfirmation, summarizeAdviceAnswer } from './kenn'
 
 describe('getAnswerUpgrade', () => {
   it('polls with the originating chat identifier', async () => {
@@ -132,5 +132,44 @@ describe('parseAdviceFindings', () => {
 
   it('omits unsupported payload data instead of rendering raw JSON', () => {
     expect(parseAdviceFindings({ orchestration: { debug: { findings: [{ error: 'secret' }] } } })).toEqual([])
+  })
+})
+
+
+describe('confirmKennAction', () => {
+  it('returns the fresh configuration card alongside the verified insertion receipt', async () => {
+    // Setup has two confirmations; dropping this payload used to leave the inserted device without a visible next card.
+    const next = { action: 'recipe', confirmation_token: 'configure-token', steps: [{ action: 'set_device_parameter' }] }
+    vi.stubGlobal('fetch', vi.fn(async (_url: unknown, options?: RequestInit) => options?.method === 'POST'
+      ? new Response(JSON.stringify({ status: 'applied', answer: 'Device inserted and verified.',
+        receipt: { receipt_id: 'insert-1', action: 'insert_device', status: 'applied', verified: true },
+        next_proposal: next, next_proposal_answer: 'Inspect the controls and Apply separately.' }))
+      : new Response(JSON.stringify({ authenticated: true, csrf_token: 'test' }))))
+    try {
+      const result = await confirmKennAction({ proposal: { action: 'insert_device' }, confirmToken: 'insert-token', sessionId: 'owner' })
+      expect(result).toMatchObject({ ok: true, status: 'applied', receipt: { receipt_id: 'insert-1', verified: true },
+        nextProposal: next, nextProposalAnswer: 'Inspect the controls and Apply separately.' })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('preserves addressed payloads and an uncertain receipt on HTTP 409', async () => {
+    const proposal = { action: 'set_device_parameter', operation: 'set_device_parameter', before: 0.25, after: 0.75,
+      target_address: { kind: 'return' as const, index: 0, device_path: [1, 0, 2] },
+      observation_token: 'observed', topology: 'bound-topology' }
+    const fetchMock = vi.fn(async (_url: unknown, options?: RequestInit) => options?.method === 'POST'
+      ? new Response(JSON.stringify({ ok: false, status: 'failed', error: 'No readback',
+        receipt: { status: 'unknown', verified: false, retry_safe: 'requires_inspection' } }), { status: 409 })
+      : new Response(JSON.stringify({ authenticated: true, csrf_token: 'test' })))
+    vi.stubGlobal('fetch', fetchMock)
+    try {
+      const result = await confirmKennAction({ proposal, confirmToken: 'held', sessionId: 'owner' })
+      expect(result).toMatchObject({ ok: false, status: 'unknown', receipt: { verified: false } })
+      const call = fetchMock.mock.calls.find(([, options]) => options?.method === 'POST')!
+      expect(JSON.parse(String(call[1]?.body))).toMatchObject({ proposal, session_id: 'owner', confirm_token: 'held' })
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 })

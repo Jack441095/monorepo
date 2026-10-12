@@ -16,6 +16,7 @@ from typing import Any
 
 from kenn.core.confirmation import consume_confirmation, issue_confirmation, revoke_confirmation
 from kenn.core.idempotency_bounds import IdempotencyTrackingSet, prune_if_needed
+from kenn.core.parameter_contract import device_confirmation_text, indexed_parameter
 from kenn.core.live_action_service import (
     LiveActionService,
     SUPPORTED_TRACK_ACTIONS,
@@ -45,6 +46,10 @@ def _recipe_text(recipe: dict[str, Any]) -> str:
     """Return the stable token text for the exact recipe contents."""
     steps = []
     for step in recipe.get("steps", []):
+        if step.get("action") == "set_device_parameter":
+            # A recipe approves the retained object and its readable values, not just its old position.
+            steps.append({"action": "set_device_parameter", "confirmation": device_confirmation_text(step)})
+            continue
         steps.append({
             key: step.get(key)
             for key in (
@@ -152,6 +157,35 @@ class LiveRecipeService:
         self.service = service or LiveActionService()
         self.client = self.service.client
 
+    def _propose_step(self, spec: dict[str, Any], *, reason: str, session_id: str) -> dict[str, Any]:
+        """Use existing action planners for both forward steps and receipt-bound inverses."""
+        action = str(spec.get("action", ""))
+        if action in SUPPORTED_TRACK_ACTIONS:
+            return self.service.propose_track_action(
+                action, track_index=int(spec["track_index"]), track_name=str(spec.get("track_name", "")),
+                value=spec.get("value"), session_id=session_id,
+            )
+        if action in SUPPORTED_TRANSPORT_ACTIONS:
+            return self.service.propose_transport_action(action, session_id=session_id)
+        if action == "set_send":
+            return self.service.propose_send_action(
+                track_index=int(spec["track_index"]), track_name=str(spec.get("track_name", "")),
+                return_track_index=int(spec["return_track_index"]), return_track_name=str(spec.get("return_track_name", "")),
+                value=spec.get("value"), session_id=session_id,
+            )
+        if spec.get("address") is not None:
+            return self.service.propose_addressed_parameter_action(
+                address=spec["address"], parameter_index=spec["parameter_index"], value=spec["value"],
+                unit=str(spec.get("unit", "raw")), parameter_name=str(spec.get("parameter", spec.get("parameter_name", ""))),
+                device_name=str(spec.get("device_name", "")), session_id=session_id,
+            )
+        return self.service.propose_device_action(
+            track_index=int(spec["track_index"]), device_index=int(spec["device_index"]),
+            parameter_index=int(spec["parameter_index"]), proposed_value=float(spec["value"]),
+            reason=reason, session_id=session_id, parameter_name=str(spec.get("parameter", spec.get("parameter_name", ""))),
+            unit=str(spec.get("unit", "")), track_name=str(spec.get("track_name", "")),
+        )
+
     def propose_recipe(
         self,
         steps: list[dict[str, Any]],
@@ -171,37 +205,7 @@ class LiveRecipeService:
             if action not in RECIPE_ACTIONS:
                 return {"ok": False, "error": f"Recipe step {position} uses unsupported action '{action}'."}
             try:
-                if action in SUPPORTED_TRACK_ACTIONS:
-                    result = self.service.propose_track_action(
-                        action,
-                        track_index=int(spec["track_index"]),
-                        track_name=str(spec.get("track_name", "")),
-                        value=spec.get("value"),
-                        session_id=session_id,
-                    )
-                elif action in SUPPORTED_TRANSPORT_ACTIONS:
-                    result = self.service.propose_transport_action(action, session_id=session_id)
-                elif action == "set_send":
-                    result = self.service.propose_send_action(
-                        track_index=int(spec["track_index"]),
-                        track_name=str(spec.get("track_name", "")),
-                        return_track_index=int(spec["return_track_index"]),
-                        return_track_name=str(spec.get("return_track_name", "")),
-                        value=spec.get("value"),
-                        session_id=session_id,
-                    )
-                else:
-                    result = self.service.propose_device_action(
-                        track_index=int(spec["track_index"]),
-                        device_index=int(spec["device_index"]),
-                        parameter_index=int(spec["parameter_index"]),
-                        proposed_value=float(spec["value"]),
-                        reason=reason,
-                        session_id=session_id,
-                        parameter_name=str(spec.get("parameter", spec.get("parameter_name", ""))),
-                        unit=str(spec.get("unit", "")),
-                        track_name=str(spec.get("track_name", "")),
-                    )
+                result = self._propose_step(spec, reason=reason, session_id=session_id)
             except (KeyError, TypeError, ValueError) as exc:
                 return {"ok": False, "error": f"Recipe step {position} is missing an exact typed field: {exc}."}
             if not result.get("ok"):
@@ -222,6 +226,13 @@ class LiveRecipeService:
             child.pop("confirmation_meta", None)
             child_steps.append(child)
 
+        return self._finish_proposal(child_steps, reason=reason, session_id=session_id, source_evidence=source_evidence)
+
+    def _finish_proposal(
+        self, child_steps: list[dict[str, Any]], *, reason: str, session_id: str,
+        source_evidence: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Bind the already observed children to one visible recipe confirmation."""
         recipe = {
             "schema": RECIPE_SCHEMA,
             "action_id": f"recipe-{uuid.uuid4().hex}",
@@ -249,9 +260,35 @@ class LiveRecipeService:
         recipe["confirmation_meta"] = meta
         return {"ok": True, "proposal": recipe}
 
-    def _apply_step(self, step: dict[str, Any]) -> tuple[bool, dict[str, Any], str]:
+    def _execute_parameter_step(self, step: dict[str, Any], *, session_id: str) -> dict[str, Any]:
+        """Delegate a recipe-approved child to the single parameter write authority."""
+        # The parent token was consumed before this call. Give the existing executor an internal,
+        # exact child token; rediscovery here would silently approve a replacement or a changed value.
+        child = dict(step)
+        revoke_confirmation(str(child.get("confirmation_token") or ""), session_id=session_id)
+        token, meta = issue_confirmation(
+            session_id=session_id, service_id="ableton_control", text=device_confirmation_text(child), ttl_seconds=300,
+        )
+        child.update(confirmation_token=token, confirmation_meta=meta)
+        try:
+            return self.service.execute_device_action(child, confirm_token=token, session_id=session_id)
+        finally:
+            # Validation may return before consuming the child; never leave a hidden pending approval.
+            revoke_confirmation(token, session_id=session_id)
+
+    def _apply_step(self, step: dict[str, Any], *, session_id: str = "") -> tuple[bool, dict[str, Any], str]:
         """Apply one step after fresh identity checks and verify its readback."""
         action = str(step.get("action", ""))
+        if action == "set_device_parameter" and (step.get("target_address") is not None or getattr(self.client, "requires_guarded_parameter_targets", False)):
+            if step.get("target_address") is None or not session_id:
+                # Old cards and direct callers cannot acquire retained-object authority after a reconnect.
+                return False, {}, "Device recipe step requires a guarded parameter target and confirmed session."
+            result = self._execute_parameter_step(step, session_id=session_id)
+            receipt = result.get("receipt") or {}
+            if receipt.get("write_attempted") is False:
+                # A stale target refused before the setter needs no compensating write.
+                receipt = {}
+            return bool(result.get("ok")), receipt, str(result.get("error", ""))
         if action in SUPPORTED_TRACK_ACTIONS:
             state = self.service.snapshot()
             track = _exact_track(state, int(step["track_index"]), str(step.get("track_name", "")))
@@ -419,12 +456,35 @@ class LiveRecipeService:
         failure = readback_error or write_error or "device readback did not verify"
         return verified, receipt, "" if verified else failure
 
-    def _restore_step(self, receipt: dict[str, Any]) -> bool:
+    def _restore_step(self, receipt: dict[str, Any], *, session_id: str = "") -> bool:
         target = receipt.get("target") or {}
         action = str(receipt.get("action", ""))
+        if action == "set_device_parameter" and (target.get("target_address") is not None or getattr(self.client, "requires_guarded_parameter_targets", False)):
+            if target.get("target_address") is None or not session_id:
+                # Positional recovery cannot identify the original object, even when names still match.
+                return False
+            try:
+                if receipt.get("restore", {}).get("restored"):
+                    # Earlier recovery is not a fresh precondition: a later step may have replaced the target.
+                    info = self.client.get_addressed_parameter(target["target_address"], int(target["parameter_index"]), target.get("observation_token"))
+                    parameter = indexed_parameter(info.get("parameters", []), int(target["parameter_index"])) if info.get("success") else None
+                    return parameter is not None and _values_match(parameter.get("value"), receipt["before"])
+                inverse = self.service.propose_undo(receipt, session_id=session_id)
+                if not inverse.get("ok"):
+                    # Unknown writes and manual edits stay unresolved; rollback must not guess a post-state.
+                    return False
+                return bool(self._execute_parameter_step(inverse["proposal"], session_id=session_id).get("ok"))
+            except Exception:
+                # Recovery may lose its own observation; report partial state instead of resending a setter.
+                return False
         try:
             if action in SUPPORTED_TRACK_ACTIONS:
                 field = SUPPORTED_TRACK_ACTIONS[action][0]
+                post_name = str(receipt.get("readback", "")) if action == "rename_track" else str(target.get("track_name", ""))
+                current = _exact_track(self.service.snapshot(), int(target["track_index"]), post_name)
+                if current is None or receipt.get("readback") is None or not _values_match(current.get(field), receipt["readback"]):
+                    # Recovery must preserve a producer edit or renamed target made after the step's readback.
+                    return False
                 writers = {
                     "set_volume": lambda: self.client.set_track_volume(int(target["track_index"]), float(receipt["before"])),
                     "set_pan": lambda: self.client.set_track_pan(int(target["track_index"]), float(receipt["before"])),
@@ -441,6 +501,10 @@ class LiveRecipeService:
                 restored = _exact_track(self.service.snapshot(), int(target["track_index"]), restore_name)
                 return restored is not None and _values_match(restored.get(field), receipt["before"])
             if action in SUPPORTED_TRANSPORT_ACTIONS:
+                current = self.service.snapshot().get("is_playing")
+                if receipt.get("readback") is None or current != receipt["readback"]:
+                    # A manual transport change is newer than this recipe's observed post-state.
+                    return False
                 try:
                     self.client.start_playback() if bool(receipt["before"]) else self.client.stop_playback()
                 except Exception:
@@ -465,6 +529,10 @@ class LiveRecipeService:
                         str(target.get("return_track_name", "")),
                     )
                     if return_error or return_track is None:
+                        return False
+                    current = self.client.get_track_send(int(target["track_index"]), int(target["return_track_index"]))
+                    if receipt.get("readback") is None or not _values_match(current, receipt["readback"]):
+                        # Matching source/return names do not authorize overwriting a later send edit.
                         return False
                     self.client.set_track_send(int(target["track_index"]), int(target["return_track_index"]), float(receipt["before"]))
                     restored = self.client.get_track_send(int(target["track_index"]), int(target["return_track_index"]))
@@ -495,6 +563,11 @@ class LiveRecipeService:
         steps = recipe.get("steps")
         if not isinstance(steps, list) or not 1 <= len(steps) <= MAX_RECIPE_STEPS:
             return {"ok": False, "error": f"Recipes must contain between 1 and {MAX_RECIPE_STEPS} steps."}
+        if getattr(self.client, "requires_guarded_parameter_targets", False) and any(
+            isinstance(step, dict) and step.get("action") == "set_device_parameter" and not step.get("target_address") for step in steps
+        ):
+            # Refuse old cards before any mixer step; only newly observed children can use guarded execution.
+            return {"ok": False, "error": "Device recipes require guarded parameter targets; prepare a fresh recipe."}
         if not recipe.get("requires_confirmation") or str(recipe.get("confirmation_token", "")) != str(confirm_token):
             return {"ok": False, "error": "Confirmation is required for this exact recipe."}
         key = str(idempotency_key or recipe.get("action_id") or "").strip()
@@ -504,7 +577,14 @@ class LiveRecipeService:
             if key in _USED_IDEMPOTENCY_KEYS or key in _IN_FLIGHT_IDEMPOTENCY_KEYS:
                 return {"ok": False, "error": "This recipe was already executed or is already in progress.", "idempotency_key": key}
             _IN_FLIGHT_IDEMPOTENCY_KEYS.add(key)
-        if not consume_confirmation(confirm_token, session_id=session_id, service_id="ableton_recipe", text=_recipe_text(recipe)):
+        try:
+            confirmation_text = _recipe_text(recipe)
+        except (TypeError, ValueError):
+            # Malformed card data grants no authority; release the key so the original valid card can still Apply.
+            with _LOCK:
+                _IN_FLIGHT_IDEMPOTENCY_KEYS.discard(key)
+            return {"ok": False, "error": "Recipe confirmation contains invalid parameter metadata."}
+        if not consume_confirmation(confirm_token, session_id=session_id, service_id="ableton_recipe", text=confirmation_text):
             with _LOCK:
                 _IN_FLIGHT_IDEMPOTENCY_KEYS.discard(key)
             return {"ok": False, "error": "Invalid, expired, mismatched, or already-used recipe confirmation token."}
@@ -513,7 +593,7 @@ class LiveRecipeService:
         failure = ""
         for position, step in enumerate(steps, start=1):
             try:
-                verified, receipt, failure = self._apply_step(step)
+                verified, receipt, failure = self._apply_step(step, session_id=session_id)
             except Exception as exc:
                 verified, receipt, failure = False, {}, f"step raised {type(exc).__name__}: {exc}"
             if receipt:
@@ -525,7 +605,7 @@ class LiveRecipeService:
         rollback_results = []
         if failure:
             for receipt in reversed(applied):
-                rollback_results.append(self._restore_step(receipt))
+                rollback_results.append(self._restore_step(receipt, session_id=session_id))
             rolled_back = all(rollback_results) and len(rollback_results) == len(applied)
             with _LOCK:
                 _mark_used(key)
@@ -540,6 +620,7 @@ class LiveRecipeService:
                 "status": status,
                 "verified": False,
                 "timestamp": time.time(),
+                "session_id": session_id,
                 "step_count": len(applied),
                 "step_receipts": applied,
                 "rolled_back": rolled_back,
@@ -569,6 +650,7 @@ class LiveRecipeService:
             "status": "applied",
             "verified": True,
             "timestamp": time.time(),
+            "session_id": session_id,
             "step_count": len(applied),
             "step_receipts": applied,
             # Earlier versions also journalled an "audition trim" dB estimate (raw fader
@@ -588,26 +670,33 @@ class LiveRecipeService:
             return {"ok": False, "error": "A verified KENN recipe receipt is required for undo."}
         if receipt.get("status") != "applied" or not receipt.get("verified"):
             return {"ok": False, "error": "Only a verified applied recipe can be undone."}
+        if receipt.get("session_id") and receipt["session_id"] != session_id:
+            # A matching topology in another project cannot inherit the original recipe's Undo authority.
+            return {"ok": False, "error": "This recipe receipt belongs to another project/session."}
         step_receipts = receipt.get("step_receipts")
-        if not isinstance(step_receipts, list) or not step_receipts:
+        if not isinstance(step_receipts, list) or not 1 <= len(step_receipts) <= MAX_RECIPE_STEPS:
             return {"ok": False, "error": "Recipe receipt has no exact steps for undo."}
-        inverse_steps: list[dict[str, Any]] = []
+        inverse_children: list[dict[str, Any]] = []
+        reason = f"Restore verified KENN recipe {receipt.get('receipt_id', '')}."
         for item in reversed(step_receipts):
             action = str(item.get("action", ""))
             target = item.get("target") or {}
             if action in SUPPORTED_TRACK_ACTIONS:
-                inverse_steps.append({
+                spec = {
                     "action": action,
                     "track_index": target.get("track_index"),
                     "track_name": target.get("track_name", ""),
                     "value": item.get("before"),
-                })
+                }
             elif action in SUPPORTED_TRANSPORT_ACTIONS:
-                inverse_steps.append({
+                spec = {
                     "action": "transport_play" if bool(item.get("before")) else "transport_stop",
-                })
+                }
             elif action == "set_device_parameter":
-                inverse_steps.append({
+                if target.get("target_address") is None and getattr(self.client, "requires_guarded_parameter_targets", False):
+                    # Upgrading an old positional receipt would bind a fresh object, not the one we changed.
+                    return {"ok": False, "error": "Recipe receipt has no guarded parameter target for Undo."}
+                spec = {
                     "action": action,
                     "track_index": target.get("track_index"),
                     "track_name": target.get("track_name", ""),
@@ -617,9 +706,9 @@ class LiveRecipeService:
                     "parameter": target.get("parameter", ""),
                     "value": item.get("before"),
                     "unit": "",
-                })
+                }
             elif action == "set_send":
-                inverse_steps.append({
+                spec = {
                     "action": action,
                     "track_index": target.get("track_index"),
                     "track_name": target.get("track_name", ""),
@@ -627,29 +716,32 @@ class LiveRecipeService:
                     "return_track_name": target.get("return_track_name", ""),
                     "value": item.get("before"),
                     "unit": "normalized",
-                })
+                }
             else:
                 return {"ok": False, "error": f"Recipe step '{action}' is not undoable."}
-        result = self.propose_recipe(
-            inverse_steps,
-            reason=f"Restore verified KENN recipe {receipt.get('receipt_id', '')}.",
-            session_id=session_id,
-            source_evidence=receipt.get("source_evidence"),
-        )
-        if not result.get("ok"):
-            return result
-        # Each child's "before" is what Live holds right now, read while proposing. If that is no longer what the
-        # recipe verified it wrote, someone moved the control since, and restoring "before" would throw their
-        # change away. Single-action undo refuses this as stale; recipe undo skipped the check until 9 Oct 2026.
-        # The children come back in inverse_steps order, which is reversed(step_receipts), so they pair up. strict,
-        # so that if propose_recipe ever drops a no-op child the pairing fails loudly instead of skipping the check.
-        for child, item in zip(result["proposal"]["steps"], reversed(step_receipts), strict=True):
+            try:
+                result = (
+                    self.service.propose_undo(item, session_id=session_id)
+                    if action == "set_device_parameter" and target.get("target_address") is not None
+                    else self._propose_step(spec, reason=reason, session_id=session_id)
+                )
+            except (KeyError, TypeError, ValueError) as exc:
+                # A truncated receipt cannot define an inverse; leave current state untouched.
+                return {"ok": False, "error": f"Recipe receipt has invalid fields for Undo: {exc}."}
+            if not result.get("ok"):
+                return result
+            child = dict(result["proposal"])
+            child["action"] = child.get("action") or child.get("operation")
+            revoke_confirmation(str(child.get("confirmation_token") or ""), session_id=session_id)
+            child.pop("confirmation_token", None)
+            child.pop("confirmation_meta", None)
+            # Restoring a control moved by hand would discard the producer's new value. Guarded children
+            # additionally retain the receipt's original object, including through Undo card preparation.
             if not _values_match(child.get("before"), item.get("readback")):
-                # The recipe token was issued a moment ago; retire it so the refused undo cannot still be applied.
-                revoke_confirmation(str(result["proposal"].get("confirmation_token") or ""), session_id=session_id)
                 return {"ok": False, "error": f"{_moved_control(item.get('target') or {})} changed since the recipe "
                                               f"was applied, so undoing it now would overwrite that change; undo is stale."}
-        return result
+            inverse_children.append(child)
+        return self._finish_proposal(inverse_children, reason=reason, session_id=session_id, source_evidence=receipt.get("source_evidence"))
 
 
 def _moved_control(target: dict[str, Any]) -> str:

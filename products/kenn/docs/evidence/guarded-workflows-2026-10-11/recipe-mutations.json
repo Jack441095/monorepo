@@ -1,0 +1,67 @@
+{
+  "schema": "kenn.regression_mutations.v1",
+  "synthetic_only": true,
+  "live_writes": 0,
+  "checks": [
+    {
+      "guard": "parent_target_binding",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_recipe.py",
+      "test": "kenn/tests/test_guarded_recipes.py::test_recipe_confirmation_binds_guarded_target_semantics_and_readable_values",
+      "replacement": "\"confirmation\": \"omitted\"",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "96dce2cd09078cd1dab425e801081bb143773be294cc8a712ea3a7ee705906d0"
+    },
+    {
+      "guard": "original_object",
+      "source": "products/kenn/apps/backend/src/kenn/core/fake_live.py",
+      "test": "kenn/tests/test_guarded_recipes.py::test_replaced_parameter_refuses_before_any_device_write_and_restores_prior_mixer_step",
+      "replacement": "False",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "29793c1ea49d57cfcb546b25f28cc2e983588e30123d252b733f65c44d100cc8"
+    },
+    {
+      "guard": "undo_retained_observation",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_recipe.py",
+      "test": "kenn/tests/test_guarded_recipes.py::test_guarded_recipe_undo_card_cannot_rebind_after_its_original_object_is_checked",
+      "replacement": "self._propose_step(spec, reason=reason, session_id=session_id) if self.service.propose_undo(item, session_id=session_id).get(\"ok\") else {\"ok\": False}",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "96dce2cd09078cd1dab425e801081bb143773be294cc8a712ea3a7ee705906d0"
+    },
+    {
+      "guard": "undo_project_isolation",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_recipe.py",
+      "test": "kenn/tests/test_guarded_recipes.py::test_mixer_only_recipe_undo_cannot_cross_project_sessions",
+      "replacement": "if False:",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "96dce2cd09078cd1dab425e801081bb143773be294cc8a712ea3a7ee705906d0"
+    },
+    {
+      "guard": "mixer_recovery_post_state",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_recipe.py",
+      "test": "kenn/tests/test_guarded_recipes.py::test_mixed_recipe_rollback_preserves_manual_mixer_transport_and_target_changes",
+      "replacement": "if False:",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "96dce2cd09078cd1dab425e801081bb143773be294cc8a712ea3a7ee705906d0"
+    },
+    {
+      "guard": "transport_recovery_post_state",
+      "source": "products/kenn/apps/backend/src/kenn/core/live_recipe.py",
+      "test": "kenn/tests/test_guarded_recipes.py::test_mixed_recipe_rollback_preserves_manual_mixer_transport_and_target_changes",
+      "replacement": "if False:",
+      "exit_code": 1,
+      "caught": true,
+      "source_restored": true,
+      "restored_sha256": "96dce2cd09078cd1dab425e801081bb143773be294cc8a712ea3a7ee705906d0"
+    }
+  ]
+}

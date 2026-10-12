@@ -30,6 +30,9 @@ export type KennActionStep = {
   operation?: string
   track_index?: number
   track_name?: string
+  target_label?: string
+  target_address?: { kind: 'track' | 'return' | 'master'; index: number; device_path: number[] }
+  limitations?: string[]
   parameter?: string
   device_name?: string
   before?: unknown
@@ -50,6 +53,9 @@ export type KennActionProposal = {
   target?: string
   track_index?: number
   track_name?: string
+  target_label?: string
+  target_address?: { kind: 'track' | 'return' | 'master'; index: number; device_path: number[] }
+  limitations?: string[]
   parameter?: string
   device_name?: string
   device_index?: number
@@ -59,6 +65,8 @@ export type KennActionProposal = {
   after_db?: number | '-inf' | null
   before_display?: string
   after_display?: string
+  before_label?: string
+  after_label?: string
   unit?: string
   reason?: string
   confirmation_token?: string
@@ -373,7 +381,8 @@ export async function confirmKennAction(params: {
   proposal: KennActionProposal
   confirmToken: string
   sessionId: string
-}): Promise<{ ok: boolean; status: string; answer?: string; receipt?: KennActionReceipt; error?: string }> {
+}): Promise<{ ok: boolean; status: string; answer?: string; receipt?: KennActionReceipt; error?: string;
+  nextProposal?: KennActionProposal; nextProposalAnswer?: string }> {
   await ensureAuthSession()
   const base = getApiBase()
   const res = await fetch(`${base}${API_PATHS.kenn.command}`, {
@@ -397,17 +406,21 @@ export async function confirmKennAction(params: {
       error: undefined,
     }
   }
-  if (!res.ok && data.error) {
-    throw new ApiError(String(data.error), res.status)
-  }
   const execution = (data.execution && typeof data.execution === 'object') ? (data.execution as Record<string, unknown>) : {}
   const receipt = (data.receipt || execution.receipt) as KennActionReceipt | undefined
+  // A 409 can carry an uncertain-write receipt. Preserve it so the card cannot invite another Apply.
+  if (!res.ok && data.error && !receipt) {
+    throw new ApiError(String(data.error), res.status)
+  }
   return {
-    ok: Boolean(data.status === 'applied' || data.ok || execution.ok),
-    status: String(data.status || 'applied'),
+    ok: Boolean(data.status === 'applied' || data.ok || execution.ok) && receipt?.verified !== false,
+    status: String(receipt?.status || data.status || 'failed'),
     answer: String(data.answer || execution.answer || ''),
     receipt,
     error: data.error ? String(data.error) : undefined,
+    // A verified insertion may return a separately confirmed card built from the new device's actual controls.
+    nextProposal: data.next_proposal as KennActionProposal | undefined,
+    nextProposalAnswer: data.next_proposal_answer ? String(data.next_proposal_answer) : undefined,
   }
 }
 

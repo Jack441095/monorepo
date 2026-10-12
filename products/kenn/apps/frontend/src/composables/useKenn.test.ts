@@ -65,6 +65,37 @@ describe('useKenn investor-facing failure states', () => {
     expect(mockedConfirm).not.toHaveBeenCalled()
   })
 
+  it.each(['receipt', 'network'] as const)('keeps an uncertain %s write from being sent twice', async (failure) => {
+    // A lost acknowledgement may follow a real write, so the same card cannot offer retry.
+    kenn.messages.value = [{ id: 'uncertain', role: 'assistant', actionStatus: 'pending',
+      proposal: { action: 'set_device_parameter', confirmation_token: 'held-token' } }]
+    if (failure === 'receipt') {
+      mockedConfirm.mockResolvedValueOnce({ ok: false, status: 'unknown', receipt: {
+        receipt_id: 'unknown-1', action: 'set_device_parameter', status: 'unknown', verified: false,
+      } })
+    } else {
+      mockedConfirm.mockRejectedValueOnce(new Error('Request timed out'))
+    }
+    await kenn.applyMessageProposal('uncertain')
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'unknown' })
+    await kenn.applyMessageProposal('uncertain')
+    expect(mockedConfirm).toHaveBeenCalledTimes(1)
+    expect(mockedUndo).not.toHaveBeenCalled()
+  })
+
+  it.each(['failed_verification', 'partial_recovery'] as const)('retires a consumed %s proposal without inviting Apply again', async (status) => {
+    kenn.messages.value = [{ id: 'failed', role: 'assistant', actionStatus: 'pending',
+      proposal: { action: 'set_device_parameter', confirmation_token: 'held-token' } }]
+    mockedConfirm.mockResolvedValueOnce({ ok: false, status, receipt: {
+      receipt_id: 'failed-1', action: 'set_device_parameter', status, verified: false,
+    } })
+    await kenn.applyMessageProposal('failed')
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: status.includes('partial') ? 'partial' : 'failed' })
+    await kenn.applyMessageProposal('failed')
+    expect(mockedConfirm).toHaveBeenCalledTimes(1)
+    expect(mockedUndo).not.toHaveBeenCalled()
+  })
+
   it('does not report a dismissed proposal as a Live action', async () => {
     kenn.messages.value = [{
       id: 'dismissed-proposal',
@@ -78,6 +109,42 @@ describe('useKenn investor-facing failure states', () => {
 
     expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'rejected' })
     expect(kenn.lastActionAt.value).toBeNull()
+  })
+
+  it('keeps the insertion receipt and waits for a separate Apply on the fresh configuration card', async () => {
+    // The first Apply grants insertion only; rendering the next card must not also send its controls.
+    kenn.messages.value = [{ id: 'insert', role: 'assistant', actionStatus: 'pending',
+      proposal: { action: 'insert_device', confirmation_token: 'insert-token' } }]
+    const insertionReceipt = { receipt_id: 'insert-1', action: 'insert_device', status: 'applied', verified: true }
+    const next = { action: 'recipe', confirmation_token: 'configure-token', steps: [{ action: 'set_device_parameter' }] }
+    mockedConfirm.mockResolvedValueOnce({ ok: true, status: 'applied', answer: 'Device inserted and verified.',
+      receipt: insertionReceipt, nextProposal: next, nextProposalAnswer: 'Parameters have not changed. Apply separately.' })
+    await kenn.applyMessageProposal('insert')
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'applied', receipt: insertionReceipt, text: 'Device inserted and verified.' })
+    expect(kenn.messages.value[1]).toMatchObject({ actionStatus: 'pending', proposal: next, text: 'Parameters have not changed. Apply separately.' })
+    expect(mockedConfirm).toHaveBeenCalledTimes(1)
+    await kenn.applyMessageProposal('insert')
+    expect(mockedConfirm).toHaveBeenCalledTimes(1)
+
+    mockedConfirm.mockResolvedValueOnce({ ok: true, status: 'applied', receipt: {
+      receipt_id: 'configure-1', action: 'recipe', status: 'applied', verified: true,
+    } })
+    await kenn.applyMessageProposal(kenn.messages.value[1].id)
+    expect(mockedConfirm).toHaveBeenLastCalledWith(expect.objectContaining({ proposal: next, confirmToken: 'configure-token' }))
+    expect(kenn.messages.value[0]).toMatchObject({ receipt: insertionReceipt, actionStatus: 'applied' })
+    expect(kenn.messages.value[1]).toMatchObject({ receipt: { receipt_id: 'configure-1' }, actionStatus: 'applied' })
+  })
+
+  it('shows a follow-up inspection failure without offering insertion again', async () => {
+    kenn.messages.value = [{ id: 'insert', role: 'assistant', actionStatus: 'pending',
+      proposal: { action: 'insert_device', confirmation_token: 'insert-token' } }]
+    mockedConfirm.mockResolvedValueOnce({ ok: true, status: 'applied', answer: 'Device inserted. Configuration inspection failed.',
+      receipt: { receipt_id: 'insert-1', action: 'insert_device', status: 'applied', verified: true } })
+    await kenn.applyMessageProposal('insert')
+    await kenn.applyMessageProposal('insert')
+    expect(mockedConfirm).toHaveBeenCalledTimes(1)
+    expect(kenn.messages.value).toHaveLength(1)
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'applied', text: 'Device inserted. Configuration inspection failed.' })
   })
 })
 

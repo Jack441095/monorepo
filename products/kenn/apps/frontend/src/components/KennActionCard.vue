@@ -7,7 +7,7 @@
           {{ formattedActionName }}
         </span>
         <span class="kenn-action-card__target-badge">
-          {{ proposal.track_name || `Track ${proposal.track_index != null ? proposal.track_index + 1 : ''}` }}
+          {{ proposal.target_label || proposal.track_name || `Track ${proposal.track_index != null ? proposal.track_index + 1 : ''}` }}
         </span>
       </div>
       <span class="kenn-action-card__status-tag" :class="`kenn-action-card__status-tag--${cardStatus}`">
@@ -71,6 +71,9 @@
 
       <p v-if="proposal.reason" class="kenn-action-card__reason">
         {{ proposal.reason }}
+      </p>
+      <p v-for="limitation in proposal.limitations || []" :key="limitation" class="kenn-action-card__reason">
+        {{ limitation }}
       </p>
       <p v-if="errorMessage && cardStatus !== 'undo_refused'" class="kenn-action-card__error">
         {{ errorMessage }}
@@ -161,7 +164,7 @@ import { formatDb } from '../utils/formatLevel'
 const props = withDefaults(
   defineProps<{
     proposal: KennActionProposal
-    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
+    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'unknown' | 'failed' | 'partial' | 'error'
     receipt?: KennActionReceipt
     errorMessage?: string
     // False on a card that is itself an undo. Its receipt reverses the change before it, so "undoing" it would
@@ -247,6 +250,7 @@ const formattedBefore = computed(() => {
     return String(props.proposal.device_name || 'Device')
   }
   // Device controls: Live's own display ("0.00 dB") when KENN has both ends of the change in display units.
+  if (props.proposal.after_label) return props.proposal.before_label || formatVal(props.proposal.before, props.proposal.parameter)
   if (props.proposal.before_display && props.proposal.after_display) return props.proposal.before_display
   return formatDb(props.proposal.before_db) ?? formatVal(props.proposal.before, props.proposal.parameter)
 })
@@ -258,6 +262,7 @@ const formattedAfter = computed(() => {
   if (props.proposal.action === 'remove_device') {
     return '(Removed)'
   }
+  if (props.proposal.after_label) return props.proposal.after_label
   if (props.proposal.before_display && props.proposal.after_display) return props.proposal.after_display
   return formatDb(props.proposal.after_db) ?? formatVal(props.proposal.after, props.proposal.parameter)
 })
@@ -281,6 +286,12 @@ const statusLabel = computed(() => {
       return 'Live 12 Synced'
     case 'rejected':
       return 'Dismissed'
+    case 'failed':
+      return 'Failed — Prepare a Fresh Proposal'
+    case 'partial':
+      return 'Partially Applied — Inspect Live'
+    case 'unknown':
+      return 'Outcome Unknown — Inspect Live'
     case 'error':
       return 'Failed'
     default:

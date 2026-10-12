@@ -109,6 +109,11 @@ EVIDENCE_BACKED_PROFILES = (
     DeviceUnitProfile("Glue Compressor", "Dry/Wet", "%", 0.0, 1.0, 0.0, 100.0),
     DeviceUnitProfile("Compressor", "Dry/Wet", "%", 0.0, 1.0, 0.0, 100.0),
     DeviceUnitProfile("EQ Eight", "Frequency", "hz", 0.09006341340106347, 0.9876159632964067, 20.0, 20000.0, mapping="log"),
+    # EQ Eight band gain already uses dB as its raw unit. The September 2026 Live receipts
+    # record exact 0, 1 and 3 dB readbacks and restore (KENN_INVESTOR_DEMO_LIVE_QUALIFICATION_2026-09-23.md
+    # and docs/research/results/qual-glm-2026-09-21-raw/eq8-execute.json). This is a native-unit
+    # identity conversion; compound planning also requires Live's inspected -15..15 dB bounds.
+    DeviceUnitProfile("EQ Eight", "Gain", "db", -15.0, 15.0, -15.0, 15.0),
 )
 
 

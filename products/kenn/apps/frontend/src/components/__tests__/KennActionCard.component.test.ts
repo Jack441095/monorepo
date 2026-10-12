@@ -36,3 +36,35 @@ describe('KennActionCard on an applied undo', () => {
     expect(undoCard.text()).toContain('Readback Verified')
   })
 })
+
+
+describe('addressed parameters', () => {
+  const proposal = { action: 'set_device_parameter', operation: 'set_device_parameter', parameter: 'Drive', before: 0.25, after: 0.75,
+    unit: 'value', target_label: 'Return A / Instrument Rack / Bass / Filter / Drive',
+    limitations: ['Raw mapping only; physical units are unqualified.'] }
+
+  it('shows the exact path and limitations while a suggestion awaits Apply', () => {
+    const wrapper = mount(KennActionCard, { props: { proposal, cardStatus: 'pending' } })
+    expect(wrapper.text()).toContain(proposal.target_label)
+    expect(wrapper.text()).toContain(proposal.limitations[0])
+    expect(wrapper.text()).toContain('Ready to Apply')
+    expect(wrapper.text()).not.toContain('Readback Verified')
+  })
+
+  it('offers no Apply or Undo when a write outcome is unknown', () => {
+    const wrapper = mount(KennActionCard, { props: { proposal, cardStatus: 'unknown' } })
+    expect(wrapper.text()).toContain('Outcome Unknown')
+    expect(wrapper.find('.kenn-action-card__btn--apply').exists()).toBe(false)
+    expect(wrapper.find('.kenn-action-card__btn--undo').exists()).toBe(false)
+  })
+
+  it('shows qualified choice labels and physical units instead of their raw positions', () => {
+    // Sparse choices and normalized time controls must display the value the producer approved.
+    const choice = mount(KennActionCard, { props: { proposal: { ...proposal, before: 2, after: 7, before_label: 'A', after_label: 'B' } } })
+    expect(choice.find('.kenn-action-card__val-before').text()).toBe('A')
+    expect(choice.find('.kenn-action-card__val-after').text()).toBe('B')
+    const time = mount(KennActionCard, { props: { proposal: { ...proposal, before_display: '5 ms', after_display: '10 ms' } } })
+    expect(time.find('.kenn-action-card__val-before').text()).toBe('5 ms')
+    expect(time.find('.kenn-action-card__val-after').text()).toBe('10 ms')
+  })
+})

@@ -716,6 +716,7 @@ def _live_conversation(session_id: str) -> dict[str, Any]:
             state = {
                 "exchanges": deque(maxlen=MAX_LIVE_EXCHANGES),
                 "last_track": "",
+                "last_track_index": None,
                 "last_device": "",
                 "last_parameter": "",
                 "last_command": "",
@@ -748,6 +749,10 @@ def preprocess_live_command(command: str, *, session_id: str) -> tuple[str, dict
     original = " ".join(str(command or "").split())
     state = _live_conversation(session_id)
     lower = original.casefold()
+    if state["last_device"] and re.fullmatch(r"(?:no[,\s]+)?(?:the\s+)?other\s+" + re.escape(str(state["last_device"]).casefold()) + r"[.!?]*", lower):
+        # Naming the device class still leaves duplicate instances ambiguous; the gateway offers observed numbers.
+        return original, {"resolution": "correction_requires_clarification", "original": original,
+                          "requested_device": str(state["last_device"])}
     if lower in {"again", "do it again", "same again"} and state["last_command"]:
         return str(state["last_command"]), {"resolution": "repeat_last_action", "original": original}
     # "adjust that" means "change the amount of what we just proposed", and it cannot become a command on its own --
@@ -817,7 +822,7 @@ def preprocess_live_command(command: str, *, session_id: str) -> tuple[str, dict
                 }
 
     resolved = original
-    directional = re.search(r"\b(?P<direction>louder|softer|quieter)\b", resolved, re.I)
+    directional = re.search(r"\b(?P<direction>louder|softer|quieter|slower|faster)\b", resolved, re.I)
     context_entities = {
         "parameter": str(state["last_parameter"]),
         "device": str(state["last_device"]),
@@ -829,7 +834,7 @@ def preprocess_live_command(command: str, *, session_id: str) -> tuple[str, dict
     ]
     uses_pronoun = bool(re.search(r"\b(?:it|that)\b", resolved, re.I))
     is_bare_direction = bool(re.fullmatch(
-        r"(?:make\s+)?(?:it\s+|that\s+)?(?:louder|softer|quieter)(?:\s+by\s+[-+]?\d+(?:\.\d+)?\s*(?:db|%)?)?[.!]?",
+        r"(?:make\s+)?(?:it\s+|that\s+)?(?:louder|softer|quieter|slower|faster)(?:\s+by\s+[-+]?\d+(?:\.\d+)?\s*(?:db|%|ms)?)?[.!]?",
         resolved,
         re.I,
     ))
@@ -931,6 +936,9 @@ def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any
                 state["track_choice"] = None
         if track_name:
             state["last_track"] = track_name[:128]
+            # Names can repeat. Preserve the selected position for later read-only choices, then recheck name and position.
+            track_index = proposal.get("track_index", receipt_target.get("track_index", track.get("index")))
+            state["last_track_index"] = track_index if type(track_index) is int else None
         if device_name:
             if device_name != state["last_device"] and not parameter_name:
                 state["last_parameter"] = ""

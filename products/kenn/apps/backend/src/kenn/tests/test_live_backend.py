@@ -102,6 +102,7 @@ def test_read_only_mcp_backend_enters_kenn_proposal_path_but_cannot_apply() -> N
     )
     assert applied["status"] == "failed"
     assert "read-only" in applied["answer"]
+    assert applied["receipt"]["write_attempted"] is False
     assert not any(name.startswith("set_") for name, _ in calls)
 
 

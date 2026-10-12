@@ -268,3 +268,36 @@ def test_the_chat_hands_the_drum_rack_question_to_the_notes_and_keeps_the_send_c
     # None means the pre-handler declined, so the message goes on to the knowledge answer.
     assert handler._maybe_handle_live_command_from_chat(question, "drum-rack-return-question") is None
     assert server._chat_wants_live("add a reverb send to the drums") is True
+
+
+def _drum_bus_holding(demo: dict, *names: str) -> dict:
+    bus = next(track for track in demo["tracks"] if track["name"] == "Drum Bus")
+    bus["devices"] = [{"index": index, "name": name} for index, name in enumerate(names)]
+    return demo
+
+
+def test_a_change_to_a_duplicated_device_reaches_live_to_ask_which_copy(demo) -> None:
+    # 11 Oct review: two Compressors on the bus left the parse with no action, so chat sent this to the notes.
+    from kenn.core.live_intent import parse_request
+
+    snapshot = _drum_bus_holding(demo, "Compressor", "Compressor")
+    request_text = "set the compressor threshold on Drum Bus to -20 dB"
+    intent = parse_request(request_text, snapshot)
+    assert intent.get("action") is None and [row["number"] for row in intent["device_choices"]] == [1, 2]
+    assert wants_live_change(request_text, snapshot)
+
+
+def test_a_question_that_only_names_a_duplicated_device_stays_with_the_notes(demo) -> None:
+    # Guards the fix above: asking which copy is only right when the message would have changed the device.
+    assert not wants_live_change("what does the compressor on Drum Bus do?",
+                                 _drum_bus_holding(demo, "Compressor", "Compressor"))
+
+
+def test_glue_compressor_is_not_also_a_request_for_the_compressor(demo) -> None:
+    # 11 Oct review: "glue compressor" contains "compressor", so a bus holding both asked which one was meant.
+    from kenn.core.live_intent import parse_request
+
+    snapshot = _drum_bus_holding(demo, "Compressor", "Glue Compressor")
+    intent = parse_request("set the glue compressor threshold on Drum Bus to -20 dB", snapshot)
+    assert intent["action"] == "set_device_parameter" and intent["device"] == {"index": 1, "name": "Glue Compressor"}
+    assert parse_request("set the compressor threshold on Drum Bus to -20 dB", snapshot)["device"]["index"] == 0

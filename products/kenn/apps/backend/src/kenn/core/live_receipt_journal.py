@@ -65,6 +65,13 @@ _RECEIPT_FIELDS = frozenset(
 )
 
 
+# Named like a secret but not one. An observation token only names the Live objects a read saw, and the Remote Script
+# marks it used once a write spends it, so it authorises nothing. Chat "undo that" reads its receipt from here, and
+# until 11 Oct the "token" filter dropped it: Undo then ran with no identity check and wrote to a same-name
+# replacement device.
+_NOT_SECRET = frozenset({"observation_token"})
+
+
 def _safe_projection(value: Any, *, key: str = "", nested: bool = False) -> Any:
     """Project JSON values while excluding secrets and free-form evidence."""
     if isinstance(value, dict):
@@ -73,7 +80,10 @@ def _safe_projection(value: Any, *, key: str = "", nested: bool = False) -> Any:
             str(name): _safe_projection(item, key=str(name), nested=True)
             for name, item in value.items()
             if (allowed is None or str(name) in allowed)
-            and not any(secret in str(name).lower() for secret in ("token", "secret", "nonce", "signature", "password"))
+            and (
+                str(name) in _NOT_SECRET
+                or not any(secret in str(name).lower() for secret in ("token", "secret", "nonce", "signature", "password"))
+            )
         }
     if isinstance(value, list):
         return [_safe_projection(item, key=key, nested=True) for item in value[:MAX_RECEIPTS]]

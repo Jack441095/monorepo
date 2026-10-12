@@ -1,0 +1,242 @@
+{
+  "schema": "kenn.recipe_fake_recheck.v1",
+  "evidence_kind": "synthetic",
+  "live_writes": 0,
+  "model_run": false,
+  "total": 15,
+  "passed": 15,
+  "recipes": [
+    {
+      "recipe": "room_for_kick",
+      "request": "Make room for the kick",
+      "passed": true,
+      "steps": [
+        "set_volume Bass"
+      ],
+      "applied_receipt": "receipt-bd5e857643254b18bf97037454a76c4d",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-c7ea8509e7884e67ac38ee893a68401d",
+      "restored_to_baseline": true,
+      "fake_writes": 2,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "space",
+      "request": "Give the vocal some space",
+      "passed": true,
+      "steps": [
+        "set_send Lead Vocal A-Reverb",
+        "set_send Lead Vocal B-Delay"
+      ],
+      "applied_receipt": "receipt-560a55bbd55e4120872b36f59d8ec3b2",
+      "changed_mixer": false,
+      "undo_receipt": "receipt-9a1edf31b4b54fdd9e8ada02020645eb",
+      "restored_to_baseline": true,
+      "fake_writes": 4,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "forward",
+      "request": "Bring the drums forward",
+      "passed": true,
+      "steps": [
+        "set_volume Drum Bus"
+      ],
+      "applied_receipt": "receipt-7a78fb315f9e4017b15b3e3a15d2688d",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-b3989f1bfc224636a9e1c67956e0f167",
+      "restored_to_baseline": true,
+      "fake_writes": 2,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "push_back",
+      "request": "Push the synth back",
+      "passed": true,
+      "steps": [
+        "set_volume Synth",
+        "set_send Synth A-Reverb"
+      ],
+      "applied_receipt": "receipt-188486968d9b49b1b62d4d4adc903214",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-d39f6d45d40a491a8b2c6d9c85be74ba",
+      "restored_to_baseline": true,
+      "fake_writes": 4,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "behind",
+      "request": "Put the synth behind the vocal",
+      "passed": true,
+      "steps": [
+        "set_volume Synth",
+        "set_send Synth A-Reverb"
+      ],
+      "applied_receipt": "receipt-7f95cb59ac0b4ac9805e4ad9af33b3df",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-05dd4c54aeb345bc8c5f023aa665a837",
+      "restored_to_baseline": true,
+      "fake_writes": 4,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "dry_up",
+      "request": "Dry up the vocal",
+      "passed": true,
+      "steps": [
+        "set_send Lead Vocal A-Reverb",
+        "set_send Lead Vocal B-Delay"
+      ],
+      "applied_receipt": "receipt-376b651edf654eef8b11a4469dd46dd6",
+      "changed_mixer": false,
+      "undo_receipt": "receipt-9bcc99ccfd214e04a9b8643893e55ab9",
+      "restored_to_baseline": true,
+      "fake_writes": 8,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "tighten_drum_bus",
+      "request": "Tighten the drum bus",
+      "passed": true,
+      "steps": [
+        "set_device_parameter Drum Bus"
+      ],
+      "applied_receipt": "receipt-813ecd29698c4601bf148dc06f21df35",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-d238aecede4f4c43bacc98382fa9b751",
+      "restored_to_baseline": true,
+      "fake_writes": 2,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "vocal_peaks",
+      "request": "Tame the vocal peaks",
+      "passed": true,
+      "steps": [
+        "set_device_parameter Lead Vocal"
+      ],
+      "applied_receipt": "receipt-88ab9165745c43b4976e92ecde35ae06",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-3e10a1ad097d44919c854c31999979ec",
+      "restored_to_baseline": true,
+      "fake_writes": 2,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "mono_low_end",
+      "request": "Make the low end mono",
+      "passed": true,
+      "steps": [
+        "set_pan Bass"
+      ],
+      "applied_receipt": "receipt-f2363da6c9a340c4a6290867832cf0f6",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-19265bc09dd345f08806ce1636b0fd7a",
+      "restored_to_baseline": true,
+      "fake_writes": 4,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "rhythm_section",
+      "request": "Solo the rhythm section",
+      "passed": true,
+      "steps": [
+        "set_solo Kick",
+        "set_solo Snare / Clap",
+        "set_solo Bass"
+      ],
+      "applied_receipt": "receipt-bf6488038f7d414ca243cc09ff609866",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-29e6383fde14488b869708b85e89f402",
+      "restored_to_baseline": true,
+      "fake_writes": 6,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "snare_crack",
+      "request": "Make the snare crack",
+      "passed": true,
+      "steps": [
+        "set_volume Snare / Clap",
+        "set_send Snare / Clap A-Reverb"
+      ],
+      "applied_receipt": "receipt-3f50deaa9e3a4438ad2f54228c496d1d",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-2ca142986c324c4ba7e44ea18fe2e44f",
+      "restored_to_baseline": true,
+      "fake_writes": 4,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "clear_solos",
+      "request": "Clear the solos",
+      "passed": true,
+      "steps": [
+        "set_solo Kick",
+        "set_solo Snare / Clap",
+        "set_solo Bass"
+      ],
+      "applied_receipt": "receipt-411aecdcfb1d476990913d1bcd0e7921",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-ebf2c75a967c4a3ba5731362e8d571d7",
+      "restored_to_baseline": true,
+      "fake_writes": 12,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "vocal_cut_through",
+      "request": "Make the vocal cut through",
+      "passed": true,
+      "steps": [
+        "set_volume Synth"
+      ],
+      "applied_receipt": "receipt-e36e61716fdd45d0b9cacc1d2f2d699e",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-ac6b473b53894a168adf668650a382e2",
+      "restored_to_baseline": true,
+      "fake_writes": 2,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "glue_drum_bus",
+      "request": "Glue the drum bus",
+      "passed": true,
+      "steps": [],
+      "applied_receipt": "receipt-f48a0d83e4b14dd28d61dc97cabd5ba9",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-3f64a4de483347198d14b962f4042602",
+      "restored_to_baseline": true,
+      "fake_writes": 2,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    },
+    {
+      "recipe": "fix_low_end_mud",
+      "request": "Fix the low-end mud",
+      "passed": true,
+      "steps": [
+        "set_volume Synth"
+      ],
+      "applied_receipt": "receipt-2273e850e359465f888d7a808b94fe9e",
+      "changed_mixer": true,
+      "undo_receipt": "receipt-7c830321e78145a39eccc6e6c90d1156",
+      "restored_to_baseline": true,
+      "fake_writes": 4,
+      "real_live_qualified": false,
+      "fixture_provenance": "investor demo plus recorded device_zoo_wave1 insertion templates"
+    }
+  ]
+}

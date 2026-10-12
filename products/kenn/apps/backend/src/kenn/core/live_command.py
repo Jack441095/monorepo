@@ -44,6 +44,7 @@ from kenn.core.clip_duplication_service import ClipDuplicationActionService, PRO
 from kenn.core.clip_rename_service import ClipRenameActionService, PROPOSAL_SCHEMA as CLIP_RENAME_PROPOSAL_SCHEMA
 from kenn.core.live_intent import _NICKNAME_WORDS, parse_natural_recipe, parse_request
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
+from kenn.core.parameter_contract import indexed_parameter
 from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS, load_promotion_state
 from kenn.core.chat_live_router import needs_return_tracks
 from kenn.core.live_session_questions import answer_live_session_question
@@ -1041,7 +1042,21 @@ def _llm_planner_snapshot(
             "Every write still requires KENN proposal, confirmation, stale-state, readback, and undo gates.",
         ],
     }
-    for device in [item for item in (track.get("devices") or []) if isinstance(item, dict)][:64]:
+    devices = [item for item in (track.get("devices") or []) if isinstance(item, dict)]
+    requested_device = deterministic_intent.get("device")
+    if isinstance(requested_device, dict):
+        matches = [item for item in devices if item.get("index") == requested_device.get("index")]
+        if matches:
+            devices = matches
+    if isinstance(requested_device, str):
+        matches = [item for item in devices if str(item.get("name", "")).casefold() == requested_device.casefold()]
+        if matches:
+            devices = matches
+    # Four devices and 32 controls per device bound planning context. Omitted controls require a new inspection,
+    # never a model guess, and this evidence remains separate from Apply's fresh preconditions.
+    if len(devices) > 4:
+        planner["limitations"].append("Only four matching devices are shown; clarify the target before planning others.")
+    for device in devices[:4]:
         try:
             device_index = int(device.get("index"))
             info = service.client.get_device_parameters(track_index, device_index)
@@ -1050,12 +1065,22 @@ def _llm_planner_snapshot(
         if not isinstance(info, dict) or not info.get("success"):
             continue
         parameters = []
-        for parameter in (info.get("parameters") or [])[:128]:
+        observed = info.get("parameters") or []
+        hint = deterministic_intent.get("parameter")
+        if isinstance(hint, dict):
+            hint = hint.get("name")
+        if isinstance(hint, str) and hint:
+            matching = [row for row in observed if isinstance(row, dict) and hint.casefold() in str(row.get("name", "")).casefold()]
+            if matching:
+                observed = matching
+        if len(observed) > 32:
+            planner["limitations"].append(f"Only 32 controls on {info.get('device_name', '')} are shown; request a specific parameter.")
+        for parameter in observed[:32]:
             if not isinstance(parameter, dict) or not str(parameter.get("name", "")).strip():
                 continue
             parameters.append({
                 key: parameter[key]
-                for key in ("index", "name", "value", "min", "max", "value_display", "readable", "quantized")
+                for key in ("index", "name", "value", "min", "max", "value_display", "readable", "quantized", "choices", "is_enabled", "state", "automation_state", "macro_controlled")
                 if key in parameter
             })
         planner["entries"].append({
@@ -1483,6 +1508,9 @@ def _values_match_bpm(before: Any, after: Any) -> bool:
 
 
 def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, kind: str) -> dict[str, Any]:
+    if kind == "device_setup" and proposal.get("schema") == "kenn.ableton_device_insertion_proposal.v1":
+        # Production setup starts with insertion; the future controls have no inspected before-values yet.
+        kind = "device_insertion"
     _update_lifecycle(
         response,
         "proposal_ready",
@@ -1565,6 +1593,11 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
             if isinstance(follow_up_notes, list) and any(str(note).strip() for note in follow_up_notes)
             else ""
         )
+        if "configuration_specs" in proposal:
+            controls = ", ".join(
+                f"{item['name']} to {item['display_value']:g} {item['unit']}" for item in proposal["configuration_specs"]
+            )
+            follow_up_text += f" Then I will inspect {controls} and show a separate configuration card. This Apply only inserts the device."
         response.update({
             "status": "confirmation_required",
             "answer": f"I can append {proposal.get('device_name', 'the device')} to '{target}'. Current devices: {before_devices}. After confirmation: {after_devices}. Nothing has changed. Confirm this exact proposal to apply it.{follow_up_text}",
@@ -2109,10 +2142,6 @@ def _resolve_device_parameter(
             if conversion_error:
                 return {"ok": False, "clarification": conversion_error}
             requested_value = float(converted_value)
-        elif unit.lower() == "db" and relative_profile is None:
-            # Legacy raw==dB passthrough for unmapped parameters (e.g. EQ
-            # band gains whose raw values already read in dB).
-            requested_value = current + requested_value
         else:
             converted_delta, conversion_error = display_to_raw(
                 device_name=device_name,
@@ -2124,7 +2153,9 @@ def _resolve_device_parameter(
             if conversion_error:
                 return {"ok": False, "clarification": conversion_error}
             requested_value = current + float(converted_delta)
-    elif unit in {"%", "ms", "ratio"}:
+    else:
+        # Every physical unit needs an established raw conversion, including dB and Hz.
+        # display_to_raw also handles explicitly raw requests without inventing a mapping.
         converted_value, conversion_error = display_to_raw(
             device_name=device_name,
             parameter_name=str(parameter.get("name", "")),
@@ -2134,25 +2165,6 @@ def _resolve_device_parameter(
         if conversion_error:
             return {"ok": False, "clarification": conversion_error}
         requested_value = float(converted_value)
-    else:
-        # Absolute display-unit values (dB, Hz) convert through an
-        # evidence-backed profile when one exists. Without a profile the
-        # legacy raw passthrough applies and Live's own range check decides.
-        profile = find_profile(
-            device_name=device_name,
-            parameter_name=str(parameter.get("name", "")),
-            unit=unit,
-        )
-        if profile is not None:
-            converted_value, conversion_error = display_to_raw(
-                device_name=device_name,
-                parameter_name=str(parameter.get("name", "")),
-                value=requested_value,
-                unit=unit,
-            )
-            if conversion_error:
-                return {"ok": False, "clarification": conversion_error}
-            requested_value = float(converted_value)
     result = service.propose_device_action(
         track_index=int(track["index"]),
         device_index=int(device_index),
@@ -2166,10 +2178,6 @@ def _resolve_device_parameter(
         observed_state=observed_state,
         observed_parameter_info=info,
     )
-    if result.get("ok") and isinstance(result.get("proposal"), dict):
-        after_display = display_text(device_name, str(parameter.get("name", "")), unit, result["proposal"].get("after"))
-        if after_display:
-            result["proposal"]["after_display"] = after_display
     return result
 
 
@@ -2191,8 +2199,15 @@ def _resolve_device_choice(
     name = str(parameter.get("name", ""))
     choice = device_units.find_choice(device_name, name)
     label = str(intent.get("choice_label") or "")
-    raw = next((option for option, text in (choice.options if choice else ()) if text.casefold() == label.casefold()), None)
-    if choice is None or raw is None:
+    observed = parameter.get("choices")
+    try:
+        options = [(float(row["raw"]), row["label"]) for row in observed] if observed else (choice.options if choice else ())
+    except (KeyError, TypeError, ValueError):
+        # A partial option table cannot authorize a label by guessing its position.
+        return {"ok": False, "clarification": "Live returned incomplete chooser options; inspect again."}
+    matches = [option for option, text in options if str(text).casefold() == label.casefold()]
+    raw = matches[0] if len(matches) == 1 else None
+    if raw is None:
         return {"ok": False, "clarification": f"I don't have Live's options for {name} on {device_name} checked yet, so I won't guess a value."}
     try:
         current = float(parameter["value"])
@@ -2201,7 +2216,7 @@ def _resolve_device_choice(
         return {"ok": False, "clarification": "Live returned an unreadable value for that control, so I will not create a proposal."}
     if not low <= raw <= high:
         return {"ok": False, "clarification": f"{label} isn't in the range Live reports for {name}; nothing changed."}
-    before_label = device_units.choice_label(choice, current)
+    before_label = next((str(text) for option, text in options if option == current), "")
     if before_label and before_label.casefold() == label.casefold():
         return {"ok": False, "clarification": f"{name} on {device_name} is already {before_label}; nothing to change."}
     result = service.propose_device_action(
@@ -2209,8 +2224,7 @@ def _resolve_device_choice(
         proposed_value=float(raw), reason=f"User command: {command}", session_id=session_id, parameter_name=name,
         unit="choice", track_name=str(track.get("name", "")), observed_state=observed_state, observed_parameter_info=info,
     )
-    if result.get("ok") and isinstance(result.get("proposal"), dict):
-        result["proposal"].update({"before_label": before_label, "after_label": label})
+    # The planner binds observed labels before minting confirmation; changing them here would invalidate it.
     return result
 
 
@@ -2492,6 +2506,22 @@ def _resolve_eq_band_tuning_gain(
     if frequency_parameter is None or gain_parameter is None:
         return {"ok": False, "clarification": f"EQ Eight band {band} is not exposed by Live; nothing changed."}
 
+    observed_parameter_infos = None
+    if getattr(service.client, "requires_guarded_parameter_targets", False):
+        address = {"kind": "track", "index": int(track["index"]), "device_path": [device_index]}
+        observed_parameter_infos = (
+            service.inspect_addressed_parameter(address, int(frequency_parameter["index"])),
+            service.inspect_addressed_parameter(address, int(gain_parameter["index"])),
+        )
+        if not all(info.get("success") for info in observed_parameter_infos):
+            # The inventory supplies sparse indices only; relative values must come from retained observations.
+            return {"ok": False, "clarification": "I could not retain both exact EQ controls; inspect again. Nothing changed."}
+        frequency_parameter = indexed_parameter(observed_parameter_infos[0].get("parameters", []), int(frequency_parameter["index"]))
+        gain_parameter = indexed_parameter(observed_parameter_infos[1].get("parameters", []), int(gain_parameter["index"]))
+        if frequency_parameter is None or gain_parameter is None:
+            # A truncated guarded response cannot define the before-values used in the producer's card.
+            return {"ok": False, "clarification": "Live returned incomplete EQ observations; nothing changed."}
+
     def frequency_hz(parameter: dict[str, Any]) -> float | None:
         display = str(parameter.get("value_display", ""))
         match = re.search(r"([-+]?\d+(?:\.\d+)?)\s*(khz|hz)\b", display, re.I)
@@ -2530,6 +2560,7 @@ def _resolve_eq_band_tuning_gain(
         gain_parameter=gain_parameter, gain_after=gain_after,
         reason=f"User command: {command}", session_id=session_id,
         observed_state=observed_state,
+        observed_parameter_infos=observed_parameter_infos,
     )
     return result
 
@@ -3120,6 +3151,26 @@ def _handle_command_impl(
             )
         if context_resolution.get("resolution") == "correction_requires_clarification":
             correction_snapshot = _command_snapshot(live, include_mixer=True)
+            if context_resolution.get("requested_device"):
+                from kenn.core.session_context import live_conversation_context
+
+                last = live_conversation_context(response["session_id"])
+                matching_tracks = [row for row in correction_snapshot.get("tracks", [])
+                                   if row.get("name") == last.get("last_track") and
+                                   (last.get("last_track_index") is None or row.get("index") == last["last_track_index"])]
+                if len(matching_tracks) != 1:
+                    # A renamed, moved or duplicate track cannot inherit the remembered device choices.
+                    return _clarification(response, {"action": "correct_target", "missing_fields": ["which_track"]},
+                                          "Which exact track and device number? Name both and the value; the previous track identity is no longer unique. Nothing changed.")
+                track = matching_tracks[0]
+                choices = [{"index": index, "number": index + 1, "name": row.get("name")}
+                           for index, row in enumerate(track.get("devices", [])) if isinstance(row, dict)
+                           and row.get("name") == context_resolution["requested_device"]][:8]
+                # A class reference cannot authorize another instance. Show actual positions and await an exact request.
+                # Eight, as in device_rules: one readable line in chat, and a device number still reaches the rest.
+                listed = ", ".join(f'device {row["number"]} "{row["name"]}"' for row in choices)
+                return _clarification(response, {"action": "correct_target", "device_choices": choices},
+                                      f"Which exact device on '{last.get('last_track', '')}': {listed or 'none observed'}? Include its device number and value; nothing changed.")
             other = _resolve_other_target(response["session_id"], correction_snapshot)
             if other:
                 from kenn.core.session_context import live_conversation_context
@@ -3282,20 +3333,32 @@ def _handle_command_impl(
                 response["receipt"] = result["receipt"]
             return response
 
+        # An uncertain receipt cannot become a no-change claim at the gateway boundary.
+        outcome_unknown = (result.get("receipt") or {}).get("status") == "unknown"
         response.update({
-            "status": "applied" if result.get("ok") else "failed",
-            "changed": bool(result.get("ok")),
+            "status": "applied" if result.get("ok") else ("unknown" if outcome_unknown else "failed"),
+            "changed": None if outcome_unknown else bool(result.get("ok")),
             "answer": "Live change applied and verified." if result.get("ok") else result.get("error", "Live change failed."),
             "execution": result,
         })
         _update_lifecycle(
             response,
-            "verified" if result.get("ok") else "failed",
+            "verified" if result.get("ok") else ("unknown" if outcome_unknown else "failed"),
             execution_elapsed_ms=round(max(0.0, time.monotonic() - execution_started) * 1000.0, 1),
             verification="readback_verified" if result.get("ok") else "not_verified",
         )
         if result.get("receipt"):
             response["receipt"] = result["receipt"]
+        if result.get("ok") and result.get("configuration_proposal"):
+            next_card = _recipe_response({}, result["configuration_proposal"])
+            response["answer"] = f"{proposal.get('device_name', 'Device')} inserted and verified. Review the freshly inspected configuration card and Apply it separately."
+            response["next_proposal"] = next_card["proposal"]
+            response["next_proposal_answer"] = next_card["answer"].replace(
+                "Nothing has changed yet.", "The device is inserted; its parameters have not been changed."
+            )
+        elif result.get("ok") and result.get("configuration_error"):
+            # The first action succeeded even when no second card can be prepared; report that state without inviting insertion again.
+            response["answer"] = f"{proposal.get('device_name', 'Device')} inserted and verified. Its parameters were not changed. {result['configuration_error']}"
         return response
 
     if recipe_steps is not None:
@@ -3393,7 +3456,10 @@ def _handle_command_impl(
         # Re-parse either way: the mixer was just read, and an unresolved relative change needs its fader value.
         deterministic_intent = parse_request(clean_command, snapshot)
         repeated = (response.get("context_resolution") or {}).get("resolution") in {"follow_up", "correction"}
-        if repeated and "device" in (deterministic_intent.get("missing_fields") or []):
+        # Two copies of the device also leave "device" missing, and then the track does have it: the parse's own
+        # "which copy?" question is the right reply, not this one (11 Oct, a repeat onto a track with two Compressors).
+        if repeated and "device" in (deterministic_intent.get("missing_fields") or []) \
+                and not deterministic_intent.get("device_choices"):
             track_name = str((deterministic_intent.get("track") or {}).get("name") or "That track")
             return _clarification(
                 response, deterministic_intent,
@@ -3773,6 +3839,8 @@ def _handle_command_impl(
     if action == "set_eq_band_tuning_gain":
         result = _resolve_eq_band_tuning_gain(live, intent, track, response["session_id"], clean_command, snapshot)
         if result.get("ok"):
+            if result["proposal"].get("schema") == RECIPE_SCHEMA:
+                return _recipe_response(response, result["proposal"])
             return _proposal_response(response, result["proposal"], kind="eq_band_tuning_gain")
         return _clarification(response, intent, result.get("clarification", result.get("error", "I could not create a compound EQ proposal.")))
     if action in TRACK_ACTIONS:
@@ -3918,7 +3986,12 @@ def handle_command(
         # "Nothing was changed" and drop the receipt, telling the producer their set was untouched at
         # the moment we had just written to it. `result` being set proves the write already happened.
         applied_change = result if result is not None and result.get("changed") else None
-        if isinstance(exc, TimeoutError) or "timed out" in message or "timeout" in message:
+        uncertain_change = result if result is not None and (result.get("receipt") or {}).get("status") == "unknown" else None
+        if uncertain_change is not None:
+            # Logging cannot turn an unobserved write into a no-change claim or discard its consumed-action receipt.
+            answer = "The Live outcome is unknown, and the session log could not be completed. Inspect Live before preparing another proposal."
+            error_code = "unknown_but_unlogged"
+        elif isinstance(exc, TimeoutError) or "timed out" in message or "timeout" in message:
             answer = "Ableton Live isn't responding — check the connection and try again."
             error_code = "ableton_timeout"
         elif applied_change is not None:
@@ -3932,8 +4005,8 @@ def handle_command(
             error_code = "command_failed_safely"
         response = _base_response(_clean_text(command, 4000), _clean_text(session_id, 128))
         response.update({
-            "status": "failed",
-            "changed": applied_change is not None,
+            "status": "unknown" if uncertain_change is not None else "failed",
+            "changed": None if uncertain_change is not None else applied_change is not None,
             "confirmation_required": False,
             "answer": answer,
             "error_code": error_code,
@@ -3944,9 +4017,11 @@ def handle_command(
         })
         if applied_change is not None and applied_change.get("receipt"):
             response["receipt"] = applied_change["receipt"]
-        _update_lifecycle(response, "failed", verification="not_verified")
+        elif uncertain_change is not None:
+            response["receipt"] = uncertain_change["receipt"]
+        _update_lifecycle(response, "unknown" if uncertain_change is not None else "failed", verification="not_verified")
         logging.getLogger("kenn.core.live_command").warning(
-            "handle_command failed after the Live write completed; reporting the change as applied",
+            "handle_command failed; retaining any observed or uncertain Live write receipt",
             exc_info=True,
         )
         return response

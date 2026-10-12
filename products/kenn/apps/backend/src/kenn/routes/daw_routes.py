@@ -64,6 +64,43 @@ def handle_live_command(
     return reply.status, reply.body
 
 
+def handle_parameter_inspection(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Expose current raw metadata through the same policy as the proposal gateway."""
+    from kenn.core.action_policy import action_allowed, action_denied_message
+    from kenn.core.live_action_service import LiveActionService
+
+    if not action_allowed("daw_control"):
+        return 403, {"ok": False, "error": action_denied_message("daw_control")}
+    if not isinstance(payload, dict) or set(payload) != {"address", "parameter_index"}:
+        return 400, {"ok": False, "error": "Supply address and parameter_index only."}
+    result = LiveActionService().inspect_addressed_parameter(**payload)
+    return (200 if result.get("success") else 409), {**result, "ok": bool(result.get("success")), "changed": False}
+
+
+def handle_parameter_proposal(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Resolve a typed candidate without granting it execution or confirmation authority."""
+    from kenn.core.action_policy import action_allowed, action_denied_message
+    from kenn.core.live_action_service import LiveActionService
+
+    if not action_allowed("daw_control"):
+        return 403, {"ok": False, "error": action_denied_message("daw_control")}
+    required = {"session_id", "address", "parameter_index", "parameter_name", "device_name", "value", "unit"}
+    if not isinstance(payload, dict) or not required <= payload.keys() or payload.keys() - required - {"relative"}:
+        return 400, {"ok": False, "error": "Supply exactly the typed parameter candidate fields."}
+    for key in ("session_id", "parameter_name", "device_name", "unit"):
+        value = payload[key]
+        if not isinstance(value, str) or not value or value != value.strip() or len(value) > 128:
+            return 400, {"ok": False, "error": f"An exact {key} is required."}
+    if type(payload.get("relative", False)) is not bool or isinstance(payload["value"], bool):
+        return 400, {"ok": False, "error": "relative must be boolean and value must be a number or choice label."}
+    result = LiveActionService().propose_addressed_parameter_action(
+        **{key: payload[key] for key in required}, relative=payload.get("relative", False),
+    )
+    if result.get("ok"):
+        result.update({"changed": False, "status": "confirmation_required", "requires_confirmation": True})
+    return (200 if result.get("ok") else 409), result
+
+
 def handle_session_card() -> tuple[int, dict[str, Any]]:
     """Return live Ableton session topology from resilient MixingDoctor cache."""
     try:

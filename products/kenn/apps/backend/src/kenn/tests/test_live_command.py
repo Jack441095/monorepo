@@ -2114,13 +2114,13 @@ def test_eq_band_gain_confirmation_is_idempotent_and_undoable() -> None:
     assert "already executed" in replay["answer"]
     assert len(fake.writes) == 1
 
-    undo = service.propose_undo(applied["receipt"], session_id="command-eq-lifecycle-undo")
+    undo = service.propose_undo(applied["receipt"], session_id="command-eq-lifecycle")
     assert undo["ok"] is True
     undo_proposal = undo["proposal"]
     undone = service.execute_device_action(
         undo_proposal,
         confirm_token=undo_proposal["confirmation_token"],
-        session_id="command-eq-lifecycle-undo",
+        session_id="command-eq-lifecycle",
         idempotency_key=undo_proposal["id"],
     )
     assert undone["ok"] is True
@@ -2156,13 +2156,13 @@ def test_eq_band_boost_applies_positive_gain_and_undoes() -> None:
     assert applied["receipt"]["verified"] is True
     assert fake.eq_gain == 3.0
 
-    undo = service.propose_undo(applied["receipt"], session_id="command-eq-boost-undo")
+    undo = service.propose_undo(applied["receipt"], session_id="command-eq-boost")
     assert undo["ok"] is True
     undo_proposal = undo["proposal"]
     undone = service.execute_device_action(
         undo_proposal,
         confirm_token=undo_proposal["confirmation_token"],
-        session_id="command-eq-boost-undo",
+        session_id="command-eq-boost",
         idempotency_key=undo_proposal["id"],
     )
     assert undone["ok"] is True
@@ -2198,13 +2198,13 @@ def test_compressor_threshold_display_db_converts_to_measured_raw() -> None:
     assert fake.threshold == 0.4
     assert fake.writes == [("threshold", 2, 0, 0, 0.4)]
 
-    undo = service.propose_undo(applied["receipt"], session_id="command-threshold-display-undo")
+    undo = service.propose_undo(applied["receipt"], session_id="command-threshold-display")
     assert undo["ok"] is True
     undo_proposal = undo["proposal"]
     undone = service.execute_device_action(
         undo_proposal,
         confirm_token=undo_proposal["confirmation_token"],
-        session_id="command-threshold-display-undo",
+        session_id="command-threshold-display",
         idempotency_key=undo_proposal["id"],
     )
     assert undone["ok"] is True
@@ -2758,11 +2758,11 @@ def test_natural_send_recipe_applies_and_undoes_with_exact_return_identity() -> 
     assert fake.sends[(1, 0)] == 0.35
     assert fake.state["tracks"][1]["muted"] is True
 
-    undo = LiveRecipeService(_service(fake)).propose_undo(applied["receipt"], session_id="natural-send-recipe-undo")
+    undo = LiveRecipeService(_service(fake)).propose_undo(applied["receipt"], session_id="natural-send-recipe")
     assert undo["ok"] is True
     undone = handle_command(
         command,
-        session_id="natural-send-recipe-undo",
+        session_id="natural-send-recipe",
         service=_service(fake),
         proposal=undo["proposal"],
         confirm_token=undo["proposal"]["confirmation_token"],
@@ -2857,13 +2857,13 @@ def test_recipe_executes_each_step_and_returns_verified_receipt() -> None:
     assert fake.state["tracks"][0]["volume"] == 0.4
     assert fake.eq_gain == -3.0
 
-    undo_proposed = recipes.propose_undo(result["receipt"], session_id="recipe-undo")
+    undo_proposed = recipes.propose_undo(result["receipt"], session_id="recipe-apply")
     assert undo_proposed["ok"] is True
     assert undo_proposed["proposal"]["step_count"] == 2
     undone = recipes.execute_recipe(
         undo_proposed["proposal"],
         confirm_token=undo_proposed["proposal"]["confirmation_token"],
-        session_id="recipe-undo",
+        session_id="recipe-apply",
         idempotency_key=undo_proposed["proposal"]["action_id"],
     )
     assert undone["ok"] is True
