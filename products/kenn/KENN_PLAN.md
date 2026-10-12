@@ -952,8 +952,40 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
     real-Live qualification.
   - Evidence doc line 15 is stale. Freshly prepared recipes, compound EQ and setup now run guarded; only cards in
     the legacy format refuse.
-  - Next: fix the blocker and the three should-fix breaks on the draft, then send the diff back to the same
-    reviewer before merging.
+  - Fixes finished and verified on the draft, 12 Oct: `adb0d4c4`, `b0056599`, `65c6dc46`. **Not merged.**
+    - The proposal digest normalises equal JSON numbers before hashing. Apply and Undo accept the browser's
+      `[0,1]` echo of `[0.0,1.0]`; booleans remain distinct, and token replay, session and tamper checks still pass.
+    - Used observations retain device identity for the last 256 writes, independently of 300 s or 256 later reads.
+      They remain spent and cannot authorise a second setter. Older writes and a restarted Remote Script refuse
+      Undo when their retained identity is no longer available.
+    - The journal keeps the spent observation reference. Chat Undo refuses a same-name replacement, and also
+      refuses old addressed receipts whose previous journal projection omitted that reference.
+    - Actual changes naming duplicate devices ask which one; knowledge questions still reach the notes. A longer
+      name such as Glue Compressor resolves without also matching Compressor. Repeat/correction paths preserve
+      the duplicate-device question.
+    - The stale evidence paragraph is corrected and the benchmark docstring's cache, capture and surface notes
+      are restored.
+    - Files changed since `43e416d2` under `apps/backend/src/kenn/`: `core/chat_live_router.py`, `core/fake_live.py`,
+      `core/live_action_service.py`, `core/live_command.py`, `core/live_intent_rules/device_rules.py`,
+      `core/live_receipt_journal.py`, `core/parameter_contract.py`; under `tests/`: `test_chat_live_router.py`,
+      `test_guarded_device_setup.py`, `test_guarded_eq_workflows.py`, `test_guarded_recipes.py`,
+      `test_parameter_target_transport.py`, `test_parameter_targets.py`, `test_stage23_conversation_journeys.py`;
+      `integrations/ableton-osc/abletonosc/parameter_target.py`, the linked evidence doc and
+      `tooling/scripts/measure_chat_latency.py`.
+    - Verification from the draft's `apps/backend`: `KENN_LIVE_BACKEND=fake python -m pytest src/kenn/tests -q`
+      gives **4832 passed, 16 skipped**, with 5 existing dependency/vendor warnings. The seven affected test files
+      give **238 passed**. Frontend `npm test` gives **80 passed** and `npm run build` passes with the installed
+      arm64 Node runtime; the default x64 runtime could not load the existing arm64 dependencies.
+    - HTTP, recipe, compound-EQ and setup tests now echo cards with the browser's number representation. A separate
+      real `JSON.stringify(JSON.parse(...))` check passed Apply, Undo and recipe, and matched the test helper on
+      every card checked. No browser or real-Live qualification is claimed.
+    - Removing number normalisation makes 9 regressions fail; losing the original write observation makes 2 fail;
+      dropping it from the journal makes 1 fail; removing the duplicate-device chat flag makes 2 fail. The missing
+      legacy-receipt identity regression also failed before its guard was added.
+    - Independent standards review found no issues. The fresh spec reviewer found the legacy-receipt bypass above;
+      after the fix, its recheck found no unresolved issue. All execution used fake Live; no model inference ran.
+  - Next: the original outside reviewer rechecks the full integration diff before any merge. Owner grading and
+    real-Live identity/quantized-value qualification remain open.
 
 ### 4. Qualify listening, memory and creation
 
@@ -1775,7 +1807,31 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       kept 10, and none of those 10 had any other warning. Two answers had other warnings, and both were rejected
       anyway. So the restriction loses no dev saves, and the v7 counts should stand without a re-bench.
     - Fix branch: `draft/citation-repair-fixes`, worktree `workspace/worktrees/kenn/citation-repair-fixes`, from main
-      `328f80ec`. Nothing is edited there yet.
+      `328f80ec`. Finished 12 Oct as `17c0f772` and `8f6eba45`. **Not merged.**
+      - Repair requires only measurement/misattribution warnings on the original and on each corresponding
+        unrepaired ending after the same figure cut. This blocks both the shortened-ending bypass and the further
+        case where cutting an invented second step leaves one real step that tag removal would hide.
+      - Dropped tags preserve word separation and the multiset of measured figures. If a repair changes a figure,
+        it returns no repair. Parentheses, no-break spaces and line starts are cleaned without gluing words;
+        malformed range tags fail safely when their rewritten offsets cannot be trusted.
+      - Logging credits only repaired figures that survive the cut. The whole-note measurement policy is retained
+        and its comment now describes the actual boundary.
+      - Exact files: `apps/backend/src/kenn/core/chat_answer.py`, `apps/backend/src/kenn/core/chat_grounding.py`,
+        and `apps/backend/src/kenn/tests/test_citation_repair.py`.
+      - Verification from the draft's `apps/backend`: `KENN_LIVE_BACKEND=fake python -m pytest src/kenn/tests -q`
+        gives **4659 passed, 16 skipped**, with 5 existing dependency/vendor warnings. Scoped citation repair,
+        claim citation and unsupported-figure salvage tests give **106 passed**. Guard and spacing mutations fail
+        their regressions; the additional cut-step case failed before its fix.
+      - Offline replay against main `baac3308`: **137 distinct non-held-out rejected texts**, frozen model text and
+        route through `answer_payload`, optional critique disabled. Held-out files and ids, including suffixed
+        variants, were excluded. Main and the fix each keep **25**, with **0 lost accepts, 0 lost repair rescues,
+        and 0 changed accepted texts**. All 10 main-credited rescues still ship; the corrected log credits 9 because
+        one repaired figure was cut away. Script and aggregate counts are outside git under
+        `kenn-evaluation-data/2026-10-12-citation-repair-fix-replay/`.
+      - Independent standards review found no issues. The fresh spec reviewer found the further cut-step bypass;
+        its recheck passed after the fix and found no unresolved issue. No inference or real-Live writes ran.
+      - Next: the original outside reviewer rechecks before merge. Owner grading and the separate audit-fixes
+        adversary review remain open; these fixes do not close the answer gate.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
