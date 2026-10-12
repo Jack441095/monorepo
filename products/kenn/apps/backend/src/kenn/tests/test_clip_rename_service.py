@@ -1,5 +1,7 @@
 from copy import deepcopy
 
+import pytest
+
 from kenn.core.clip_rename_service import ClipRenameActionService, PROPOSAL_SCHEMA, RECEIPT_SCHEMA
 
 
@@ -83,3 +85,41 @@ def test_clip_rename_undo_rechecks_track_identity():
     assert result["ok"] is False
     assert "changed" in result["error"]
     assert fake.writes == [(0, 0, "Verse")]
+
+
+@pytest.mark.parametrize("altered_field", [None, "before_clip", "after_clip"])
+def test_http_clip_undo_retains_recorded_names_and_refuses_edited_clip_state(tmp_path, monkeypatch, altered_field):
+    # Mandatory Undo authentication must preserve the original clip state and reject invented restore names.
+    from kenn.core import live_receipt_journal as journal
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.routes import daw_command_handler
+
+    monkeypatch.setattr(journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
+    fake = FakeClipRenameLive()
+    fake.requires_guarded_parameter_targets = True
+    rename = ClipRenameActionService(fake)
+    proposal = _proposal(rename)
+    receipt = rename.execute(proposal, confirm_token=proposal["confirmation_token"], session_id="rename")["receipt"]
+    assert journal.record_receipt(receipt, session_id="rename")
+    if altered_field:
+        receipt[altered_field]["clip_name"] = "Invented name"
+    monkeypatch.setattr(daw_command_handler, "_get_live_action_service", lambda: lambda: LiveActionService(fake))
+    monkeypatch.setattr(daw_command_handler, "ClipRenameActionService", lambda: rename)
+
+    class Reply:
+        def send_json(self, status, body):
+            self.status, self.body = status, body
+
+    reply = Reply()
+    daw_command_handler.handle_osc_undo(reply, {"session_id": "rename", "receipt": receipt})
+    if altered_field:
+        assert reply.status == 409, reply.body
+        assert "Receipt identity or values changed" in reply.body["error"]
+        assert "proposal" not in reply.body
+        assert fake.writes == [(0, 0, "Verse")]
+    else:
+        assert reply.status == 200, reply.body
+        inverse = reply.body["proposal"]
+        assert rename.execute_undo(inverse, confirm_token=inverse["confirmation_token"], session_id="rename")["ok"]
+        assert fake.clip["clip_name"] == "Clip 1"
+        assert fake.writes == [(0, 0, "Verse"), (0, 0, "Clip 1")]
