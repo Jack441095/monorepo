@@ -55,21 +55,37 @@ describe('KennRecipeCard', () => {
       ...recipe,
       steps: [
         { action: 'set_device_parameter', track_name: 'Bus', device_name: 'EQ Eight', parameter: '2 Frequency A',
-          target_label: 'Bus / EQ Eight (device 2) / 2 Frequency A',
+          target_label: 'Bus / EQ Eight / 2 Frequency A',
+          target_address: { kind: 'track', index: 0, device_path: [1] },
           before: 0.2, after: 0.4, before_display: '250 Hz', after_display: '1000 Hz', unit: 'hz' },
         { action: 'set_device_parameter', track_name: 'Bus', device_name: 'EQ Eight', parameter: '2 Gain A',
-          target_label: 'Bus / EQ Eight (device 2) / 2 Gain A',
+          target_label: 'Bus / EQ Eight / 2 Gain A',
+          target_address: { kind: 'track', index: 0, device_path: [1] },
           before: 0.5, after: 0.6, before_display: '0 dB', after_display: '3 dB', unit: 'db' },
       ],
     }
     for (const cardStatus of ['pending', 'applied'] as const) {
       const rows = mount(KennRecipeCard, { props: { proposal: eq, cardStatus } }).findAll('li')
-      expect(rows[0].text()).toContain('EQ Eight (device 2) / 2 Frequency A')
+      expect(rows[0].text()).toContain('Bus / EQ Eight / 2 Frequency A')
+      expect(rows[0].text()).toContain('Track 1, device 2')
       expect(rows[0].text()).toContain('250 Hz → 1000 Hz')
-      expect(rows[1].text()).toContain('EQ Eight (device 2) / 2 Gain A')
+      expect(rows[1].text()).toContain('Bus / EQ Eight / 2 Gain A')
+      expect(rows[1].text()).toContain('Track 1, device 2')
       expect(rows[1].text()).toContain('0 dB → 3 dB')
       expect(rows.map(row => row.text()).join(' ')).not.toContain('value to be confirmed')
     }
+  })
+
+  it('distinguishes duplicate devices and rack chains with the same observed names', () => {
+    // Live labels contain names only; the address supplies the position that disambiguates each target.
+    const duplicate: KennActionProposal = { ...recipe, steps: [0, 1].map(chain => ({
+      action: 'set_device_parameter', target_label: 'Return A / Rack / Bass / EQ Eight / Gain',
+      target_address: { kind: 'return', index: 0, device_path: [1, chain, 0] },
+      parameter: 'Gain', before: 0.5, after: 0.6,
+    })) }
+    const rows = mount(KennRecipeCard, { props: { proposal: duplicate } }).findAll('li')
+    expect(rows[0].text()).toContain('Return 1, device 2 / chain 1 / device 1')
+    expect(rows[1].text()).toContain('Return 1, device 2 / chain 2 / device 1')
   })
 
   it('labels device values as raw when the proposal has no mapped displays', () => {

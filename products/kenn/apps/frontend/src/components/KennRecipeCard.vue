@@ -57,10 +57,14 @@ function stepLabel(action: string): string {
 }
 
 function targetLabel(step: KennActionStep): string {
-  // Guarded labels retain the observed bus, rack path and duplicate-device position.
-  if (step.target_label) return step.target_label
   const track = step.track_name ?? `Track ${(step.track_index ?? 0) + 1}`
-  return step.device_name ? `${track} / ${step.device_name}` : track
+  const label = step.target_label ?? (step.device_name ? `${track} / ${step.device_name}` : track)
+  const address = step.target_address
+  if (!address) return label // Mixer children have no device or rack path to disambiguate.
+  // Live's name-only label cannot distinguish duplicate devices or chains; show the observed one-based positions too.
+  const bus = address.kind === 'master' ? 'Master' : `${address.kind === 'return' ? 'Return' : 'Track'} ${address.index + 1}`
+  const path = address.device_path.map((index, depth) => `${depth % 2 === 0 ? 'device' : 'chain'} ${index + 1}`).join(' / ')
+  return `${label} (${bus}, ${path})`
 }
 
 function rawValue(value: unknown): string | null {
