@@ -1126,15 +1126,17 @@ def make_answer(
             salvage_unsupported_figures(enhanced, validation["unsupported_measurements"])
             if repaired and unsupported else enhanced
         )
-        # An excised answer keeps the capped ending it came with, so it gets the same two tries as the first
-        # pass: the whole-sentence ending, then the text as written. A sentence-dropped answer is already cut
-        # to a whole sentence, and the pair collapses to one key so the gate does not judge it twice.
-        endings = {}
-        if fixed:
-            endings[end_on_a_whole_sentence(fixed)] = end_on_a_whole_sentence(unrepaired)
-            endings.setdefault(fixed, unrepaired)
-        for candidate, twin in endings.items():
-            if repaired and (not twin or set(_check(twin)["warnings"]) - {unsupported_warning, misattributed_warning}):
+        # Choose each ending before editing tags. A cap after "300 ms [#2]" looks complete to the sentence
+        # cutter, while "300 ms" does not. Cutting both versions separately paired different steps and let a
+        # two-step twin authorize a one-step answer (12 Oct review). Repairing the chosen twin keeps their
+        # sentence boundary identical, including when the word-share floor keeps the capped text as written.
+        ending_source = unrepaired if repaired else fixed
+        endings = dict.fromkeys((end_on_a_whole_sentence(ending_source), ending_source)) if fixed else {}
+        for twin in endings:
+            twin_validation = _check(twin) if repaired else None
+            if repaired and (
+                not twin or set(twin_validation["warnings"]) - {unsupported_warning, misattributed_warning}
+            ):
                 # other_faults above read the text as written, and the cut ending can be refused for more. One
                 # answer ending "ratio of 4:1 [#2]. Then listen to the bass against the kick. 2. Set the" was
                 # refused for the tag alone, because the dangling "2. Set the" counted as a step. Its cut lost
@@ -1143,15 +1145,15 @@ def make_answer(
                 # fault the repair could hide; an empty twin means the cut found no usable answer either. The
                 # figure cut alone (repaired == "") edits no tag and is not held.
                 continue
+            ending_attributions = twin_validation["claim_citations"]["fabricated_attributions"] if repaired else []
+            candidate = (repair_misattributed_citations(twin, ending_attributions) or twin) if repaired else twin
             retry = _check(candidate)
             if retry["accepted"]:
                 _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
-                # The repair is credited only with tags whose figure still ships. The figure cut or the
-                # whole-sentence ending can take a repaired sentence with it, and then the cut alone saved the
-                # answer (review, 11 Oct). A figure written twice still counts if one copy survives, which can
-                # over-credit; we accept that rather than track each tag through the cut.
+                # Count attributions in this ending, after its figure and sentence cuts. Matching values from
+                # the original credited both copies of 6 dB when the cap dropped the second (12 Oct review).
                 shipped = {claim["value"] for claim in retry["claim_citations"]["claims"]}
-                repaired_values = [claim["value"] for claim in misattributed if claim["value"] in shipped]
+                repaired_values = [claim["value"] for claim in ending_attributions if claim["value"] in shipped]
                 fixes = ", ".join(
                     label
                     for label, applied in (
