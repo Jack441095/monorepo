@@ -8,6 +8,7 @@ in reverse order when a later step fails.
 
 from __future__ import annotations
 
+import copy
 import json
 import time
 import uuid
@@ -23,7 +24,9 @@ from kenn.core.live_action_service import (
     SUPPORTED_TRANSPORT_ACTIONS,
     _find_return_track,
     _values_match,
+    _recorded_parameter_undo_receipt,
 )
+from kenn.core.actions import _RECEIPTS
 
 
 RECIPE_SCHEMA = "kenn.ableton_recipe_proposal.v1"
@@ -662,10 +665,16 @@ class LiveRecipeService:
         }
         if isinstance(recipe.get("source_evidence"), dict):
             receipt["source_evidence"] = recipe["source_evidence"]
+        # Retain the parent too: an edited card must not drop a guarded step and substitute a mixer restore.
+        _RECEIPTS[receipt["receipt_id"]] = copy.deepcopy(receipt)
         return {"ok": True, "status": "applied", "receipt": receipt}
 
     def propose_undo(self, receipt: dict[str, Any], *, session_id: str) -> dict[str, Any]:
         """Create a fresh recipe proposal that reverses a verified recipe."""
+        if isinstance(receipt, dict):
+            receipt, error = _recorded_parameter_undo_receipt(receipt, session_id=session_id)
+            if error:
+                return {"ok": False, "error": error}
         if not isinstance(receipt, dict) or receipt.get("schema") != RECIPE_RECEIPT_SCHEMA:
             return {"ok": False, "error": "A verified KENN recipe receipt is required for undo."}
         if receipt.get("status") != "applied" or not receipt.get("verified"):

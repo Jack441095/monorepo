@@ -101,6 +101,43 @@ def _journal_row(receipt: dict[str, Any], session_id: str) -> dict[str, Any]:
     }
 
 
+def receipt_projection(receipt: dict[str, Any]) -> dict[str, Any]:
+    """Return the receipt fields retained by the journal for browser comparison."""
+    return _safe_projection(receipt)
+
+
+def find_receipt(receipt_id: str) -> dict[str, Any] | None:
+    """Find a recorded receipt and its server-owned session, including after restart."""
+    if not receipt_id:
+        # A missing ID supplies no authority to restore a value from a client receipt.
+        return None
+    try:
+        with _JOURNAL_LOCK:
+            if not JOURNAL_PATH.is_file():
+                # Persistence is optional; the action service also retains receipts in memory.
+                return None
+            lines = JOURNAL_PATH.read_text(encoding="utf-8").splitlines()[-MAX_RECEIPTS:]
+        for line in reversed(lines):
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                # An interrupted or old malformed row cannot establish Undo ownership.
+                continue
+            receipt = row.get("receipt") if isinstance(row, dict) else None
+            if isinstance(receipt, dict) and receipt.get("receipt_id") == receipt_id:
+                return row
+            if isinstance(receipt, dict) and isinstance(receipt.get("step_receipts"), list):
+                for child in receipt["step_receipts"]:
+                    if isinstance(child, dict) and child.get("receipt_id") == receipt_id:
+                        # Recipes journal their children inside the parent. Each child inherits the recorded
+                        # owner's authority after a companion restart, never a client-supplied session field.
+                        return {**row, "receipt": child}
+    except (OSError, TypeError, ValueError):
+        # Without a readable server record, callers must refuse rather than trust the browser.
+        return None
+    return None
+
+
 def record_receipt(receipt: dict[str, Any], *, session_id: str = "") -> bool:
     """Persist one non-secret receipt projection, keeping the newest records."""
     if not isinstance(receipt, dict) or not receipt.get("receipt_id"):
@@ -160,4 +197,4 @@ def list_receipts(*, session_id: str = "", limit: int = 50) -> list[dict[str, An
         return []
 
 
-__all__ = ["JOURNAL_PATH", "MAX_RECEIPTS", "record_receipt", "list_receipts"]
+__all__ = ["JOURNAL_PATH", "MAX_RECEIPTS", "record_receipt", "list_receipts", "find_receipt", "receipt_projection"]

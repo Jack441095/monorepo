@@ -8,6 +8,7 @@ readback verification, and receipts.  It never guesses a missing index.
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import math
@@ -25,7 +26,7 @@ from kenn.core.receipt_contract import StageTimer, classify_retry_safety, resolv
 from kenn.core.parameter_contract import (
     device_confirmation_text, indexed_parameter, parameter_guard, target_address, validate_parameter,
 )
-from kenn.core.live_receipt_journal import list_receipts
+from kenn.core.live_receipt_journal import find_receipt, list_receipts, receipt_projection
 from kenn.core.midi_clip_service import (
     MidiClipActionService,
     PROPOSAL_SCHEMA as MIDI_CLIP_PROPOSAL_SCHEMA,
@@ -415,6 +416,43 @@ def _receipt_supports_undo(receipt: dict[str, Any]) -> bool:
 
 # Set once any snapshot in this process reads a connected Live (see snapshot()).
 _LIVE_SEEN_CONNECTED = False
+
+
+def _has_guarded_receipt(receipt: Any) -> bool:
+    """Identify parameter receipts and recipes that retain exact Live object identities."""
+    if not isinstance(receipt, dict):
+        # Malformed or absent records cannot supply a guarded identity.
+        return False
+    target = receipt.get("target")
+    if isinstance(target, dict) and target.get("target_address") is not None:
+        return True
+    steps = receipt.get("step_receipts")
+    return isinstance(steps, list) and any(
+        isinstance(step, dict) and isinstance(step.get("target"), dict)
+        and step["target"].get("target_address") is not None for step in steps
+    )
+
+
+def _recorded_parameter_undo_receipt(receipt: dict[str, Any], *, session_id: str) -> tuple[dict[str, Any], str]:
+    """Authenticate guarded Undo ownership and values against a server record."""
+    receipt_id = str(receipt.get("receipt_id") or "")
+    stored = _RECEIPTS.get(receipt_id)
+    owner = stored.get("session_id") if isinstance(stored, dict) else None
+    if stored is None:
+        row = find_receipt(receipt_id)
+        stored = row.get("receipt") if row is not None else None
+        owner = row.get("session_id") if row is not None else None
+    if not (_has_guarded_receipt(receipt) or _has_guarded_receipt(stored)):
+        # Positional legacy actions keep their existing Undo contract; guarded parameters cannot downgrade into it.
+        return receipt, ""
+    if not isinstance(stored, dict) or owner != session_id:
+        return receipt, "No recorded device receipt belongs to this project/session."
+    # Browser and chat journal expose different projections. Neither gets to choose the owner or restore value.
+    # Compare before dispatch so changing schema, action, or removing all guarded recipe steps cannot bypass this.
+    if (receipt.get("session_id", owner) != owner
+            or receipt_projection(receipt) != receipt_projection(stored)):
+        return receipt, "Receipt identity or values changed since KENN recorded it; undo is refused."
+    return copy.deepcopy(stored), ""
 
 
 class LiveActionService(Tier2Tier3ControlMixin):
@@ -3530,7 +3568,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 "restore_value": before,
             },
         }
-        _RECEIPTS[receipt["receipt_id"]] = receipt
+        # Keep our own copy: the returned card receipt must not be able to rewrite Undo ownership or before-state.
+        _RECEIPTS[receipt["receipt_id"]] = copy.deepcopy(receipt)
         if not verified:
             error = "Live device write was sent but read-back verification failed."
             if write_error:
@@ -3712,6 +3751,9 @@ class LiveActionService(Tier2Tier3ControlMixin):
     def _propose_undo(self, receipt: dict[str, Any], *, session_id: str) -> dict[str, Any]:
         if not isinstance(receipt, dict):
             return {"ok": False, "error": "A valid KENN Ableton receipt is required for undo."}
+        receipt, error = _recorded_parameter_undo_receipt(receipt, session_id=session_id)
+        if error:
+            return {"ok": False, "error": error}
         # Recipe receipts use a distinct schema but still belong to this
         # service boundary. Dispatch before the single-action schema check so
         # the HTTP undo route can prepare the fresh inverse recipe.
