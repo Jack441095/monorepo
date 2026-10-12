@@ -34,9 +34,12 @@ export type KennActionStep = {
   target_address?: { kind: 'track' | 'return' | 'master'; index: number; device_path: number[] }
   limitations?: string[]
   parameter?: string
+  parameter_index?: number
   device_name?: string
   before?: unknown
   after?: unknown
+  before_label?: string
+  after_label?: string
   before_display?: string
   after_display?: string
   before_db?: number | '-inf' | null
@@ -59,6 +62,7 @@ export type KennActionProposal = {
   target_address?: { kind: 'track' | 'return' | 'master'; index: number; device_path: number[] }
   limitations?: string[]
   parameter?: string
+  parameter_index?: number
   device_name?: string
   device_index?: number
   before?: unknown

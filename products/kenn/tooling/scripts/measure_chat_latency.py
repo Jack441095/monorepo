@@ -344,6 +344,9 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
 
     if surface not in {"stream", "payload", "foreground", "background"} or cache_condition not in {"cold", "warm"}:
         raise ValueError("Unknown delivery surface or cache condition")
+    if not allow_llm and surface in {"foreground", "background"}:
+        # The HTTP companion has no per-request model switch, so this combination would mislabel a model run.
+        raise ValueError("Templates-only measurement requires the payload or stream surface")
     identities = [str(case.get("id") or case.get("case_id") or "") for case in cases]
     if not identities or any(not item for item in identities) or len(set(identities)) != len(identities):
         raise ValueError("Cases require unique IDs")
@@ -562,6 +565,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.surface in {"foreground", "background"} and not args.endpoint:
         parser.error("HTTP delivery requires --endpoint")
+    if args.templates_only and args.surface in {"foreground", "background"}:
+        parser.error("--templates-only requires --surface payload or stream; HTTP cannot disable the model per request")
     if args.timeout <= 0:
         parser.error("--timeout must be positive")
 

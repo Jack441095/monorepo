@@ -7,7 +7,7 @@
           {{ formattedActionName }}
         </span>
         <span class="kenn-action-card__target-badge">
-          {{ proposal.target_label || proposal.track_name || `Track ${proposal.track_index != null ? proposal.track_index + 1 : ''}` }}
+          {{ formatActionTarget(proposal) }}
         </span>
       </div>
       <span class="kenn-action-card__status-tag" :class="`kenn-action-card__status-tag--${cardStatus}`">
@@ -160,6 +160,7 @@
 import { computed } from 'vue'
 import type { KennActionProposal, KennActionReceipt } from '../api/kenn'
 import { formatDb } from '../utils/formatLevel'
+import { formatActionTarget } from '../utils/formatActionTarget'
 
 const props = withDefaults(
   defineProps<{

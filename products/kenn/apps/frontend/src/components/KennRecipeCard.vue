@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { KennActionProposal, KennActionReceipt, KennActionStep } from '../api/kenn'
 import { formatDb } from '../utils/formatLevel'
+import { formatActionTarget } from '../utils/formatActionTarget'
 
 // A recipe proposal is several changes in one plan -- "turn the hats down 3 dB and the kick up 2 dB". The single
 // KennActionCard reads track_name off the proposal, and a recipe carries no track of its own, so before this existed
@@ -56,17 +57,6 @@ function stepLabel(action: string): string {
   }
 }
 
-function targetLabel(step: KennActionStep): string {
-  const track = step.track_name ?? `Track ${(step.track_index ?? 0) + 1}`
-  const label = step.target_label ?? (step.device_name ? `${track} / ${step.device_name}` : track)
-  const address = step.target_address
-  if (!address) return label // Mixer children have no device or rack path to disambiguate.
-  // Live's name-only label cannot distinguish duplicate devices or chains; show the observed one-based positions too.
-  const bus = address.kind === 'master' ? 'Master' : `${address.kind === 'return' ? 'Return' : 'Track'} ${address.index + 1}`
-  const path = address.device_path.map((index, depth) => `${depth % 2 === 0 ? 'device' : 'chain'} ${index + 1}`).join(' / ')
-  return `${label} (${bus}, ${path})`
-}
-
 function rawValue(value: unknown): string | null {
   // Raw parameter values must not inherit the requested display unit without a measured mapping.
   if (typeof value === 'number' && Number.isFinite(value)) return `${value} raw`
@@ -75,6 +65,8 @@ function rawValue(value: unknown): string | null {
 }
 
 function transition(step: KennActionStep): string {
+  // A chooser's retained labels carry its meaning; sparse raw positions are not physical values.
+  if (step.after_label) return `${step.before_label ?? rawValue(step.before) ?? 'value to be confirmed'} → ${step.after_label}`
   // Device/setup children carry mapped display strings; mixer children carry dB values.
   if (step.before_display && step.after_display) return `${step.before_display} → ${step.after_display}`
   const before = formatDb(step.before_db) ?? rawValue(step.before)
@@ -94,7 +86,7 @@ function transition(step: KennActionStep): string {
     <ol class="kenn-recipe-card__steps">
       <li v-for="(step, index) in steps" :key="step.action_id ?? index" class="kenn-recipe-card__step">
         <span class="kenn-recipe-card__index">{{ index + 1 }}</span>
-        <span class="kenn-recipe-card__track">{{ targetLabel(step) }}</span>
+        <span class="kenn-recipe-card__track">{{ formatActionTarget(step) }}</span>
         <span class="kenn-recipe-card__action">{{ step.parameter ?? stepLabel(step.action) }}</span>
         <span class="kenn-recipe-card__transition">{{ transition(step) }}</span>
       </li>

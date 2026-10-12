@@ -88,6 +88,18 @@ describe('KennRecipeCard', () => {
     expect(rows[1].text()).toContain('Return 1, device 2 / chain 2 / device 1')
   })
 
+  it('distinguishes duplicate parameter names on the same device', () => {
+    // Max for Live and plug-ins can expose two controls with the same name on one device.
+    const duplicate: KennActionProposal = { ...recipe, steps: [2, 7].map(parameter_index => ({
+      action: 'set_device_parameter', target_label: 'Master / Compressor / Mode',
+      target_address: { kind: 'master', index: 0, device_path: [1] },
+      parameter_index, parameter: 'Mode', before: 0, after: 1,
+    })) }
+    const rows = mount(KennRecipeCard, { props: { proposal: duplicate } }).findAll('li')
+    expect(rows[0].text()).toContain('Master, device 2 / parameter 3')
+    expect(rows[1].text()).toContain('Master, device 2 / parameter 8')
+  })
+
   it('labels device values as raw when the proposal has no mapped displays', () => {
     // A requested unit is not proof that raw 0.25 means 0.25 dB.
     const raw: KennActionProposal = { ...recipe, steps: [
@@ -99,6 +111,22 @@ describe('KennRecipeCard', () => {
     expect(text).toContain('Output')
     expect(text).toContain('0 raw → 0.25 raw')
     expect(text).not.toContain('0.25 dB')
+  })
+
+  it('shows retained sparse choice labels for the plan and its inverse before and after Apply', () => {
+    // The recipe card discarded the same Peak/RMS labels that the single-control card already displayed.
+    const choice = { action: 'set_device_parameter', parameter: 'Mode',
+      target_label: 'Bus / Compressor / Mode', before: 2, after: 7,
+      before_label: 'Peak', after_label: 'RMS', before_display: '2 raw', after_display: '7 raw' }
+    const inverse = { ...choice, before: 7, after: 2, before_label: 'RMS', after_label: 'Peak',
+      before_display: '7 raw', after_display: '2 raw' }
+    for (const cardStatus of ['pending', 'applied'] as const) {
+      for (const [step, expected] of [[choice, 'Peak → RMS'], [inverse, 'RMS → Peak']] as const) {
+        const text = mount(KennRecipeCard, { props: { proposal: { ...recipe, steps: [step] }, cardStatus } }).text()
+        expect(text).toContain(expected)
+        expect(text).not.toContain('raw →')
+      }
+    }
   })
 
   it('never renders the bare "Track " label the single-action card produced', () => {

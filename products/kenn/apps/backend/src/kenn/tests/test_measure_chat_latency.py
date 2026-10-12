@@ -32,6 +32,30 @@ def tool():
     return _load()
 
 
+@pytest.mark.parametrize("surface", ["foreground", "background"])
+def test_templates_only_http_measurement_is_refused_before_contacting_the_companion(tool, monkeypatch, surface):
+    # HTTP ignored allow_llm=False and could start inference while claiming the template floor.
+    requests = []
+    def ask(*args, **kwargs):
+        requests.append(kwargs)
+        return {}, 0, None
+    monkeypatch.setattr(tool, "_ask_http", ask)
+    with pytest.raises(ValueError, match="Templates-only measurement requires"):
+        tool.measure([{"id": "fixture", "question": "Synthetic"}], allow_llm=False,
+                     surface=surface, endpoint="http://127.0.0.1:1")
+    assert requests == []
+
+
+@pytest.mark.parametrize("surface", ["foreground", "background"])
+def test_templates_only_http_cli_explains_the_supported_surfaces(tool, monkeypatch, capsys, surface):
+    monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--templates-only", "--surface", surface,
+                                     "--endpoint", "http://127.0.0.1:1"])
+    with pytest.raises(SystemExit) as error:
+        tool.main()
+    assert error.value.code == 2
+    assert "--templates-only requires --surface payload or stream" in capsys.readouterr().err
+
+
 def test_all_delivery_outcomes_stay_in_the_eligible_denominator_with_unknown_paint_time(tool, monkeypatch):
     # Accepted-only latency used to hide busy and timed-out requests from the product gate.
     outcomes = iter(("accepted", "rejected", "busy", "timeout", "not_attempted"))

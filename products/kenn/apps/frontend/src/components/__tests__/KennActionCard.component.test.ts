@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import KennActionCard from '../KennActionCard.vue'
+import type { KennActionProposal } from '../../api/kenn'
 
 describe('KennActionCard dismissal', () => {
   const proposal = { action: 'set_mute', track_name: 'Bass', confirmation_token: 'held-token', before: false, after: true }
@@ -42,6 +43,36 @@ describe('addressed parameters', () => {
   const proposal = { action: 'set_device_parameter', operation: 'set_device_parameter', parameter: 'Drive', before: 0.25, after: 0.75,
     unit: 'value', target_label: 'Return A / Instrument Rack / Bass / Filter / Drive',
     limitations: ['Raw mapping only; physical units are unqualified.'] }
+
+  it('distinguishes identically named buses, devices, chains and parameters before and after Apply', () => {
+    // Name-only single-control cards hid which retained target the producer was approving.
+    const targets: KennActionProposal['target_address'][] = [
+      { kind: 'track', index: 0, device_path: [1, 0, 2] },
+      { kind: 'track', index: 1, device_path: [1, 0, 2] },
+      { kind: 'return', index: 0, device_path: [1, 0, 2] },
+      { kind: 'return', index: 0, device_path: [1, 1, 2] },
+      { kind: 'master', index: 0, device_path: [2] },
+      { kind: 'master', index: 0, device_path: [2] },
+    ]
+    const positions = [
+      'Track 1, device 2 / chain 1 / device 3 / parameter 1',
+      'Track 2, device 2 / chain 1 / device 3 / parameter 2',
+      'Return 1, device 2 / chain 1 / device 3 / parameter 3',
+      'Return 1, device 2 / chain 2 / device 3 / parameter 4',
+      'Master, device 3 / parameter 5',
+      'Master, device 3 / parameter 6',
+    ]
+    for (const cardStatus of ['pending', 'applied'] as const) {
+      const labels = targets.map((target_address, parameter_index) => mount(KennActionCard, {
+        props: { proposal: { ...proposal, target_address, parameter_index }, cardStatus },
+      }).find('.kenn-action-card__target-badge').text())
+      labels.forEach((label, index) => {
+        expect(label).toContain(proposal.target_label)
+        expect(label).toContain(positions[index])
+      })
+      expect(new Set(labels).size).toBe(targets.length)
+    }
+  })
 
   it('shows the exact path and limitations while a suggestion awaits Apply', () => {
     const wrapper = mount(KennActionCard, { props: { proposal, cardStatus: 'pending' } })
