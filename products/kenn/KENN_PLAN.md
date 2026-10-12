@@ -1064,7 +1064,7 @@ recovery, display/audio checks and a verified backup recording. The schedule bel
 is a target; an unresolved failure keeps the corresponding item open.
 
 - [ ] **D1 — Review the fixes, Monday 12 Oct.** The original outside reviewer
-  rechecks citation repair `8f6eba45` and the full Stage 2/3 integration ending at
+  rechecks citation repair `67921916` and the full Stage 2/3 integration ending at
   `8564659a`, including `adb0d4c4` and `b0056599`. Codex fixes any reported break,
   adds a regression and gets the changed behavior rechecked. Review the overdue
   audit-fixes merge `2377eed1` as well, since it feeds the answer path. Merge the
@@ -1151,11 +1151,12 @@ and beta/release qualification remain separately open.
 12 Oct preparation receipt (fake Live only; D1–D6 remain open):
 
 - Combined draft `draft/investor-candidate-2026-10-14` at code/build commit
-  `35c014b6` includes citation `8f6eba45` and Stage `8564659a`. Backend code is
-  identical to full-suite commit `be866b7d`: **4,875 passed, 16 skipped, 5 existing
-  dependency/vendor warnings** in 115.05 s. This includes the preflight and script
-  gate tests. Frontend **83 tests in 9 files passed** and `npm run build` passed
-  with the installed arm64 Node runtime. No dependencies or CI were changed.
+  `43a8c1bb` includes citation `67921916` and Stage `8564659a`. The full backend
+  suite gives **4,880 passed, 16 skipped, 5 existing dependency/vendor warnings**
+  in 117.32 s. This includes the preflight and script gate tests. Frontend code
+  is unchanged from `35c014b6`, where **83 tests in 9 files passed** and
+  `npm run build` passed with the installed arm64 Node runtime. No dependencies
+  or CI were changed.
 - Fresh spec review caught forged/unrecorded Undo receipts reaching dispatch,
   clip snapshots being discarded by the journal, and MIDI snapshots losing notes
   beyond 500. Commits `de688c7f`, `e2faa757`, `3384e530` and `545cae3e` authenticate
@@ -1188,7 +1189,16 @@ and beta/release qualification remain separately open.
   fake harness shares the fixture's device parameter storage and requires guarded
   targets; it does not model real Live's object identity. The final rebuilt UI
   displays both EQ targets readably and reports "Observed before-state restored."
-  Setup-card coverage is from automated fake tests. Chrome is absent, so the
+  The 12 Oct 08:29 browser setup check on candidate `4b3c9734` also passed:
+  insert EQ Eight on FX Print, inspect a separate three-control card, Apply
+  200 → 5,000 Hz and 0 → +3 dB, Undo those controls, then Undo insertion.
+  Readback verified both stages; the final fake state records exactly one
+  insertion, three guarded writes, three guarded restorations and one removal,
+  with FX Print empty again. The first synthetic fixture lacked permission
+  metadata in its insertion template: configuration correctly refused, and
+  insertion Undo passed. Correcting only that scratch fixture allowed the full
+  flow. This covers browser serialization, not real-Live qualification.
+  Chrome is absent, so the
   Playwright E2E runner could not launch its 9 cases; manual in-app browser checks
   above passed. The optional SLO classification cache reports 503 on the clean
   candidate and is outside the scripted demonstration.
@@ -1208,9 +1218,18 @@ and beta/release qualification remain separately open.
   `a4bbe3cce88050ab91aa9da777dc75044faadd560768577229ec3a918ea7f92b`.
   It has not been installed or loaded; Tuesday requires deployment/restart and
   a running digest check. No real OSC writes, model benchmarks or sealed rows ran.
-- The original reviewer resume attempt stopped at its session quota (reset
-  12 Oct 02:50 London). No original recheck or code merge is claimed. The updated
-  review prompt pins both fix heads and retains the audit-fixes review request.
+- The outside review ran again in a read-only fork at 08:25 London on 12 Oct.
+  Its original sub-reviewers could not resume in that fork, so it used fresh
+  reviewers with the original findings as their checklist. The audit reviewer
+  reported no P1 and passed 153 scoped tests. The citation reviewer found a new
+  P1 at the cap boundary: independently cutting repaired and tagged text paired
+  different steps and hid a quality refusal. The Stage reviewer was interrupted
+  by the weekly quota before a final verdict; reset is 14 Oct at 06:00 London.
+  Neither a completed original recheck nor a code merge on main is claimed.
+  Citation commit `67921916` fixes that finding. Its independent standards and
+  spec rechecks found no remaining material issue; the spec review exercised
+  the supplied cap cases and 84 additional actual ending variants. The original
+  outside-review merge gate remains open.
   Owner answer grading, current real-Live transactions, ten consecutive rehearsals
   and backup capture/playback remain outstanding. Wednesday's meeting time is
   still unknown.
@@ -1223,7 +1242,8 @@ and beta/release qualification remain separately open.
   The approved old sharing-main tree was preserved by the metadata-only provenance
   repair `952fcfaf`, described in the [sync runbook](docs/runbooks/KENN_REPOSITORY_SYNC.md).
   Sync regressions: **24 passed**. Documentation added after this initial export
-  follows the same exporter and remote checks.
+  follows the same exporter and remote checks. Citation `67921916` now exports
+  to `3f79be92`; the current candidate and this receipt follow in the same handoff.
   Preserve unrelated backend/Nite Submit edits and the local video deletion.
   Test logs, mutation output and the browser screenshot remain outside git under
   `/tmp/kenn-investor-review-20261012/`.
@@ -1985,10 +2005,14 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       kept 10, and none of those 10 had any other warning. Two answers had other warnings, and both were rejected
       anyway. So the restriction loses no dev saves, and the v7 counts should stand without a re-bench.
     - Fix branch: `draft/citation-repair-fixes`, worktree `workspace/worktrees/kenn/citation-repair-fixes`, from main
-      `328f80ec`. Finished 12 Oct as `17c0f772` and `8f6eba45`. **Not merged.**
+      `328f80ec`. Commits `17c0f772`, `8f6eba45` and `67921916` on 12 Oct. **Not merged.**
       - Repair requires only measurement/misattribution warnings on the original and on each corresponding
         unrepaired ending after the same figure cut. This blocks both the shortened-ending bypass and the further
         case where cutting an invented second step leaves one real step that tag removal would hide.
+        The outside recheck then found that a cap immediately after a tag could make the two sentence cuts
+        diverge. `67921916` chooses the unrepaired ending first and repairs that exact ending; four cap/tag
+        variants now retain their two real steps. Repair credit counts tagged occurrences in that ending,
+        so cutting one of two equal figures no longer credits both.
       - Dropped tags preserve word separation and the multiset of measured figures. If a repair changes a figure,
         it returns no repair. Parentheses, no-break spaces and line starts are cleaned without gluing words;
         malformed range tags fail safely when their rewritten offsets cannot be trusted.
@@ -1997,17 +2021,24 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       - Exact files: `apps/backend/src/kenn/core/chat_answer.py`, `apps/backend/src/kenn/core/chat_grounding.py`,
         and `apps/backend/src/kenn/tests/test_citation_repair.py`.
       - Verification from the draft's `apps/backend`: `KENN_LIVE_BACKEND=fake python -m pytest src/kenn/tests -q`
-        gives **4659 passed, 16 skipped**, with 5 existing dependency/vendor warnings. Scoped citation repair,
-        claim citation and unsupported-figure salvage tests give **106 passed**. Guard and spacing mutations fail
-        their regressions; the additional cut-step case failed before its fix.
+        gives **4664 passed, 16 skipped**, with 5 existing dependency/vendor warnings, after `67921916`.
+        Scoped citation repair, claim citation, unsupported-figure salvage and capped-generation tests give
+        **127 passed**. Guard and spacing mutations fail their regressions; the additional cut-step case failed
+        before its fix. Reverting the new ending boundary fails four regressions; reverting occurrence-based
+        credit fails one. All five new cases failed before the fix.
       - Offline replay against main `baac3308`: **137 distinct non-held-out rejected texts**, frozen model text and
         route through `answer_payload`, optional critique disabled. Held-out files and ids, including suffixed
         variants, were excluded. Main and the fix each keep **25**, with **0 lost accepts, 0 lost repair rescues,
-        and 0 changed accepted texts**. All 10 main-credited rescues still ship; the corrected log credits 9 because
-        one repaired figure was cut away. Script and aggregate counts are outside git under
+        and 1 changed accepted text** after `67921916`: a valid citation remains on an accepted high-pass step.
+        All 10 main-credited rescues still ship; the corrected log credits 9 because one repaired figure was cut
+        away. Comparing against the previous fix also keeps all 25 accepted answers and all 9 credited rescues.
+        Script and aggregate counts are outside git under
         `kenn-evaluation-data/2026-10-12-citation-repair-fix-replay/`.
-      - Independent standards review found no issues. The fresh spec reviewer found the further cut-step bypass;
-        its recheck passed after the fix and found no unresolved issue. No inference or real-Live writes ran.
+      - Earlier independent standards review found no issues. The fresh spec reviewer found the figure-cut
+        bypass and passed `8f6eba45`; the outside reviewer then found the cap/tag boundary bypass above.
+        Standards and spec rechecks of `67921916` found no remaining material issue. The spec review passed
+        69 focused tests and checked the supplied cap cases, 56 punctuation/tail variants, 84 additional
+        actual ending variants and three duplicate-credit cases. No inference or real-Live writes ran.
       - Next: the original outside reviewer rechecks before merge. Owner grading and the separate audit-fixes
         adversary review remain open; these fixes do not close the answer gate.
 
