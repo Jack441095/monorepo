@@ -24,7 +24,6 @@ from kenn.core.live_action_service import (
     SUPPORTED_TRANSPORT_ACTIONS,
     _find_return_track,
     _values_match,
-    _recorded_parameter_undo_receipt,
 )
 from kenn.core.actions import _RECEIPTS
 
@@ -672,7 +671,7 @@ class LiveRecipeService:
     def propose_undo(self, receipt: dict[str, Any], *, session_id: str) -> dict[str, Any]:
         """Create a fresh recipe proposal that reverses a verified recipe."""
         if isinstance(receipt, dict):
-            receipt, error = _recorded_parameter_undo_receipt(receipt, session_id=session_id)
+            receipt, error = self.service.authenticate_undo_receipt(receipt, session_id=session_id)
             if error:
                 return {"ok": False, "error": error}
         if not isinstance(receipt, dict) or receipt.get("schema") != RECIPE_RECEIPT_SCHEMA:

@@ -122,6 +122,22 @@ def test_recipe_undo_recovers_recorded_children_from_the_journal(guarded):
     assert len(backend.writes) == 2
 
 
+def test_guarded_backend_refuses_unknown_receipts_stripped_to_positional_targets(guarded):
+    # An invented ID and removed address must not turn a guarded child into a trusted legacy restore.
+    backend, recipes, session = guarded
+    receipt = _as_a_browser_echoes_it(execute(guarded, propose(guarded))["receipt"]["step_receipts"][0])
+    receipt["receipt_id"] = "unknown-stripped-receipt"
+    receipt.pop("session_id")
+    for field in ("target_address", "observation_token", "topology", "target_label"):
+        receipt["target"].pop(field, None)
+
+    inverse = recipes.service.propose_undo(receipt, session_id="other-project")
+
+    assert inverse["ok"] is False, inverse
+    assert "proposal" not in inverse
+    assert len(backend.writes) == 1
+
+
 @pytest.mark.parametrize("field,value", [("target_address", {"kind": "master", "index": 0, "device_path": [1]}),
                                         ("observation_token", "replacement"), ("topology", "replacement"),
                                         ("parameter_guard", {}), ("after_display", "invented display"),
