@@ -89,6 +89,55 @@ def test_existing_flat_recipe_spec_is_upgraded_to_a_guarded_parameter(guarded):
     assert execute(guarded, card)["receipt"]["verified"]
 
 
+def test_recipe_undo_cannot_rewrite_ownership_or_drop_its_guarded_steps(guarded):
+    # Editing the parent used to evade session checks by changing its owner or replacing all device children.
+    backend, recipes, session = guarded
+    receipt = execute(guarded, propose(guarded))["receipt"]
+    echoed = _as_a_browser_echoes_it(receipt)
+    echoed["session_id"] = "another-project"
+    assert not recipes.propose_undo(echoed, session_id="another-project")["ok"]
+    echoed["session_id"] = session
+    echoed["step_receipts"] = [{"action": "set_volume", "target": {"track_index": 0, "track_name": "Bus"},
+                               "before": 0.1, "readback": 0.4}]
+    assert not recipes.propose_undo(echoed, session_id=session)["ok"]
+    assert len(backend.writes) == 1
+
+
+def test_recipe_undo_recovers_recorded_children_from_the_journal(guarded):
+    # Only the parent is journalled; children must retain the same recorded owner when memory is cleared.
+    from kenn.core.actions import _RECEIPTS
+    from kenn.core import live_receipt_journal as journal
+
+    backend, recipes, session = guarded
+    receipt = execute(guarded, propose(guarded))["receipt"]
+    assert journal.record_receipt(receipt, session_id=session)
+    _RECEIPTS.pop(receipt["receipt_id"])
+    for child in receipt["step_receipts"]:
+        _RECEIPTS.pop(child["receipt_id"])
+    echoed = journal.list_receipts(session_id=session)[0]["receipt"]
+    assert not recipes.propose_undo(echoed, session_id="another-project")["ok"]
+    inverse = recipes.propose_undo(echoed, session_id=session)
+    assert inverse["ok"], inverse
+    assert execute(guarded, inverse["proposal"])["receipt"]["verified"]
+    assert len(backend.writes) == 2
+
+
+def test_guarded_backend_refuses_unknown_receipts_stripped_to_positional_targets(guarded):
+    # An invented ID and removed address must not turn a guarded child into a trusted legacy restore.
+    backend, recipes, session = guarded
+    receipt = _as_a_browser_echoes_it(execute(guarded, propose(guarded))["receipt"]["step_receipts"][0])
+    receipt["receipt_id"] = "unknown-stripped-receipt"
+    receipt.pop("session_id")
+    for field in ("target_address", "observation_token", "topology", "target_label"):
+        receipt["target"].pop(field, None)
+
+    inverse = recipes.service.propose_undo(receipt, session_id="other-project")
+
+    assert inverse["ok"] is False, inverse
+    assert "proposal" not in inverse
+    assert len(backend.writes) == 1
+
+
 @pytest.mark.parametrize("field,value", [("target_address", {"kind": "master", "index": 0, "device_path": [1]}),
                                         ("observation_token", "replacement"), ("topology", "replacement"),
                                         ("parameter_guard", {}), ("after_display", "invented display"),

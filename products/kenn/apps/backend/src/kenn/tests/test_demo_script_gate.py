@@ -5,6 +5,27 @@ from __future__ import annotations
 from scripts.demo_script_gate import DemoScriptGate, MANUAL_STEPS, SCRIPT_STEPS, run_gate
 
 
+def test_demo_device_command_reaches_a_confirmable_proposal_on_the_real_fake_fixture(tmp_path, monkeypatch):
+    # Stub-only gate tests missed that Stage 2/3 refused the unqualified Output dB command.
+    from kenn.core import live_receipt_journal
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.core.live_command import handle_command
+    from kenn.tests.test_parameter_targets import _as_a_browser_echoes_it
+
+    monkeypatch.setattr(live_receipt_journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
+    backend = FakeLiveBackend()
+    service = LiveActionService(backend)
+    _, command, validate = next(step for step in SCRIPT_STEPS if step[0] == 6)
+    result = handle_command(command, session_id="demo-device-roundtrip", service=service, allow_llm=False)
+    validate(result)
+    assert backend.writes == []
+    card = _as_a_browser_echoes_it(result["proposal"])
+    applied = service.execute_device_action(card, confirm_token=card["confirmation_token"], session_id="demo-device-roundtrip")
+    assert applied["receipt"]["verified"]
+    assert backend.get_device_parameters(6, 0)["parameters"][1]["value"] == 0.75
+
+
 class FakeGate(DemoScriptGate):
     def __init__(
         self,
@@ -80,9 +101,9 @@ class FakeGate(DemoScriptGate):
             },
         }
         proposals = {
-            "Set Compressor Output to 3 dB on track 7.": {
+            "Set Compressor Threshold to -4 dB on track 7.": {
                 "operation": "set_device_parameter", "track_name": "Lead Vocal", "device_name": "Compressor",
-                "parameter": "Output", "after": 3.0,
+                "parameter": "Threshold", "after": 0.75,
             },
             "Pan the Synth hard left.": {
                 "operation": "set_pan", "track_name": "Synth", "parameter": "pan", "after": -1.0,

@@ -8,6 +8,7 @@ readback verification, and receipts.  It never guesses a missing index.
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import math
@@ -25,7 +26,7 @@ from kenn.core.receipt_contract import StageTimer, classify_retry_safety, resolv
 from kenn.core.parameter_contract import (
     device_confirmation_text, indexed_parameter, parameter_guard, target_address, validate_parameter,
 )
-from kenn.core.live_receipt_journal import list_receipts
+from kenn.core.live_receipt_journal import find_receipt, list_receipts, receipt_projection
 from kenn.core.midi_clip_service import (
     MidiClipActionService,
     PROPOSAL_SCHEMA as MIDI_CLIP_PROPOSAL_SCHEMA,
@@ -417,9 +418,64 @@ def _receipt_supports_undo(receipt: dict[str, Any]) -> bool:
 _LIVE_SEEN_CONNECTED = False
 
 
+def _remember_owned_receipt(receipt: dict[str, Any], session_id: str) -> None:
+    """Keep an independent receipt and its confirmed owner for Undo authentication."""
+    # Mixer and insertion receipts also need owners: production refuses every unknown receipt, including schema downgrades.
+    stored = copy.deepcopy(receipt)
+    stored["session_id"] = session_id
+    _RECEIPTS[receipt["receipt_id"]] = stored
+
+
+def _has_guarded_receipt(receipt: Any) -> bool:
+    """Identify parameter receipts and recipes that retain exact Live object identities."""
+    if not isinstance(receipt, dict):
+        # Malformed or absent records cannot supply a guarded identity.
+        return False
+    target = receipt.get("target")
+    if isinstance(target, dict) and target.get("target_address") is not None:
+        return True
+    steps = receipt.get("step_receipts")
+    return isinstance(steps, list) and any(
+        isinstance(step, dict) and isinstance(step.get("target"), dict)
+        and step["target"].get("target_address") is not None for step in steps
+    )
+
+
+def _recorded_parameter_undo_receipt(
+    receipt: dict[str, Any], *, session_id: str, require_record: bool = False,
+) -> tuple[dict[str, Any], str]:
+    """Authenticate guarded or production Undo ownership and values against a server record."""
+    receipt_id = str(receipt.get("receipt_id") or "")
+    stored = _RECEIPTS.get(receipt_id)
+    owner = stored.get("session_id") if isinstance(stored, dict) else None
+    if stored is None or owner is None:
+        # Older mixer/clip caches omit the owner; the journal row is still authoritative for HTTP and chat Undo.
+        row = find_receipt(receipt_id)
+        if row is not None:
+            stored, owner = row.get("receipt"), row.get("session_id")
+    if not (require_record or _has_guarded_receipt(receipt) or _has_guarded_receipt(stored)):
+        # Legacy test bridges retain their positional contract. Production requires records even after fields are removed.
+        return receipt, ""
+    if not isinstance(stored, dict) or owner != session_id:
+        return receipt, "No recorded KENN receipt belongs to this project/session."
+    # Browser and chat journal expose different projections. Neither gets to choose the owner or restore value.
+    # Compare before dispatch so changing schema, action, or removing all guarded recipe steps cannot bypass this.
+    if (receipt.get("session_id", owner) != owner
+            or receipt_projection(receipt) != receipt_projection(stored)):
+        return receipt, "Receipt identity or values changed since KENN recorded it; undo is refused."
+    return copy.deepcopy(stored), ""
+
+
 class LiveActionService(Tier2Tier3ControlMixin):
     def __init__(self, client: AbletonOSCClient | Any = None):
         self.client = client or live_client
+
+    def authenticate_undo_receipt(self, receipt: dict[str, Any], *, session_id: str) -> tuple[dict[str, Any], str]:
+        """Resolve an Undo receipt before any action or HTTP schema dispatch."""
+        return _recorded_parameter_undo_receipt(
+            receipt, session_id=session_id,
+            require_record=bool(getattr(self.client, "requires_guarded_parameter_targets", False)),
+        )
 
     # One retry before reporting offline: after hours idle, Live's first OSC
     # reply can miss the read window while it wakes (seen 2026-09-24).
@@ -2310,7 +2366,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             }
             if not write_started:
                 receipt["write_attempted"] = False
-            _RECEIPTS[receipt["receipt_id"]] = receipt
+            _remember_owned_receipt(receipt, session_id)
             return {"ok": False, "status": status, "error": error, "receipt": receipt}
 
         try:
@@ -2444,7 +2500,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 "expected_devices": after_devices,
             },
         }
-        _RECEIPTS[receipt["receipt_id"]] = receipt
+        _remember_owned_receipt(receipt, session_id)
         return {"ok": True, "receipt": receipt}
 
     def _complete_multi_parameter_device_setup(
@@ -3134,7 +3190,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             },
         }
         receipt["undo_payload"]["source_receipt_id"] = receipt["receipt_id"]
-        _RECEIPTS[receipt["receipt_id"]] = receipt
+        _remember_owned_receipt(receipt, session_id)
         if not verified:
             return {"ok": False, "error": error_message, "receipt": receipt}
         response = {"ok": True, "receipt": receipt}
@@ -3270,7 +3326,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "write_exchange": write_exchange,
             "readback_exchange": readback_exchange,
         }
-        _RECEIPTS[receipt["receipt_id"]] = receipt
+        _remember_owned_receipt(receipt, session_id)
         if not verified:
             return {"ok": False, "error": "Live device removal was sent but read-back verification failed.", "receipt": receipt}
         return {"ok": True, "receipt": receipt}
@@ -3368,7 +3424,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             if write_started:
                 # A failed observation after sending cannot prove whether Live accepted the packet.
                 receipt.update({"status": "unknown", "retry_safe": "requires_inspection"})
-            _RECEIPTS[receipt["receipt_id"]] = receipt
+            _remember_owned_receipt(receipt, session_id)
             return {"ok": False, "error": error, "receipt": receipt}
 
         address = proposal.get("target_address")
@@ -3530,7 +3586,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 "restore_value": before,
             },
         }
-        _RECEIPTS[receipt["receipt_id"]] = receipt
+        _remember_owned_receipt(receipt, session_id)
         if not verified:
             error = "Live device write was sent but read-back verification failed."
             if write_error:
@@ -3623,7 +3679,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 },
                 "before": proposal.get("before"), "requested": proposal.get("after"), "readback": readback,
             })
-            _RECEIPTS[receipt["receipt_id"]] = receipt
+            _remember_owned_receipt(receipt, session_id)
             return {"ok": False, "error": error, "receipt": receipt}
 
         try:
@@ -3693,7 +3749,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 "gain_parameter_index": gain_index, "gain_parameter": str(proposal.get("gain_parameter", "")), "gain_restore_value": gain_before,
             },
         }
-        _RECEIPTS[receipt["receipt_id"]] = receipt
+        _remember_owned_receipt(receipt, session_id)
         if not verified:
             return {"ok": False, "error": "Live compound EQ write was sent but read-back verification failed.", "receipt": receipt}
         return {"ok": True, "receipt": receipt}
@@ -3712,6 +3768,9 @@ class LiveActionService(Tier2Tier3ControlMixin):
     def _propose_undo(self, receipt: dict[str, Any], *, session_id: str) -> dict[str, Any]:
         if not isinstance(receipt, dict):
             return {"ok": False, "error": "A valid KENN Ableton receipt is required for undo."}
+        receipt, error = self.authenticate_undo_receipt(receipt, session_id=session_id)
+        if error:
+            return {"ok": False, "error": error}
         # Recipe receipts use a distinct schema but still belong to this
         # service boundary. Dispatch before the single-action schema check so
         # the HTTP undo route can prepare the fresh inverse recipe.
@@ -4210,7 +4269,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
         except Exception as exc:
             _finish_idempotency_key(key)
             receipt = _failed_receipt(proposal, key, f"Live snapshot failed before execution: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms(), before_write=True)
-            _RECEIPTS[receipt["receipt_id"]] = receipt
+            _remember_owned_receipt(receipt, session_id)
             return {"ok": False, "error": receipt["error"], "receipt": receipt}
         timer.mark("snapshot")
         if state.get("status") in {"offline", "dispatched"}:
@@ -4328,7 +4387,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             except Exception as exc:
                 _finish_idempotency_key(key)
                 receipt = _failed_receipt(proposal, key, f"Could not read clip-slot state before write: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms(), before_write=True)
-                _RECEIPTS[receipt["receipt_id"]] = receipt
+                _remember_owned_receipt(receipt, session_id)
                 return {"ok": False, "error": receipt["error"], "receipt": receipt}
             if not fresh_playback.get("success") or not (fresh_playback.get("is_playing") or fresh_playback.get("is_triggered")):
                 _finish_idempotency_key(key)
@@ -4350,7 +4409,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             except Exception as exc:
                 _finish_idempotency_key(key)
                 receipt = _failed_receipt(proposal, key, f"Could not read the exact return-track identity: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms(), before_write=True)
-                _RECEIPTS[receipt["receipt_id"]] = receipt
+                _remember_owned_receipt(receipt, session_id)
                 return {"ok": False, "error": receipt["error"], "receipt": receipt}
             fresh_return, return_error = _find_return_track(fresh_return_tracks, int(proposal["return_track_index"]), str(proposal.get("return_track_name", "")))
             if return_error or fresh_return is None:
@@ -4361,7 +4420,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             except Exception as exc:
                 _finish_idempotency_key(key)
                 receipt = _failed_receipt(proposal, key, f"Could not read the current send value: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms(), before_write=True)
-                _RECEIPTS[receipt["receipt_id"]] = receipt
+                _remember_owned_receipt(receipt, session_id)
                 return {"ok": False, "error": receipt["error"], "receipt": receipt}
             if current_send is None or not _values_match(round(float(current_send), 6), proposal.get("before")):
                 _finish_idempotency_key(key)
@@ -4383,7 +4442,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             except Exception as exc:
                 _finish_idempotency_key(key)
                 receipt = _failed_receipt(proposal, key, f"Could not read locator state before write: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms(), before_write=True)
-                _RECEIPTS[receipt["receipt_id"]] = receipt
+                _remember_owned_receipt(receipt, session_id)
                 return {"ok": False, "error": receipt["error"], "receipt": receipt}
             if current_time is None or not locators_available:
                 _finish_idempotency_key(key)
@@ -4485,7 +4544,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             receipt["write_acknowledgement"] = "not_confirmed" if write_error else ("confirmed" if write_ok else "not_confirmed")
             if write_error:
                 receipt["write_error"] = write_error
-            _RECEIPTS[receipt["receipt_id"]] = receipt
+            _remember_owned_receipt(receipt, session_id)
             return {"ok": False, "error": receipt["error"], "receipt": receipt}
         timer.mark("readback")
         readback_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
@@ -4569,7 +4628,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             receipt["write_acknowledgement"] = "not_confirmed" if write_error else ("confirmed" if write_ok else "not_confirmed")
             if write_error:
                 receipt["write_error"] = write_error
-            _RECEIPTS[receipt["receipt_id"]] = receipt
+            _remember_owned_receipt(receipt, session_id)
             return {"ok": False, "error": receipt["error"], "receipt": receipt}
         readback_matches = _values_match(readback, proposal.get("after"))
         state_change_expected = not _values_match(proposal.get("before"), proposal.get("after"))
@@ -4613,7 +4672,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             ),
             "stage_timings_ms": timer.as_ms(),
         }
-        _RECEIPTS[receipt["receipt_id"]] = receipt
+        _remember_owned_receipt(receipt, session_id)
         if not verified:
             error = "Live write was sent but readback verification failed."
             if write_error:
@@ -4851,7 +4910,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "stage_timings_ms": timer.as_ms(),
             "undo": {"available": True},
         }
-        _RECEIPTS[receipt["receipt_id"]] = receipt
+        _remember_owned_receipt(receipt, session_id)
         return {"ok": True, "receipt": receipt}
 
     def propose_undo_gain_staging(self, receipt: dict[str, Any], *, session_id: str) -> dict[str, Any]:

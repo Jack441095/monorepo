@@ -205,6 +205,99 @@ def test_cross_session_apply_undo_and_independent_edit_are_refused(target):
     assert len(backend.writes) == 1
 
 
+@pytest.mark.parametrize("owner", [None, "other-project"])
+def test_http_undo_cannot_rewrite_the_session_that_applied_the_receipt(target, tmp_path, monkeypatch, owner):
+    # 12 Oct review: deleting or replacing client receipt.session_id minted an inverse in another project.
+    from kenn.core import live_receipt_journal as journal
+    from kenn.routes import daw_command_handler
+
+    monkeypatch.setattr(journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
+    backend, service = target
+    receipt = apply(service, candidate(service)["proposal"])["receipt"]
+    assert journal.record_receipt(receipt, session_id="target-tests")
+    echoed = _as_a_browser_echoes_it(receipt)
+    echoed.pop("session_id")
+    if owner is not None:
+        echoed["session_id"] = owner
+    monkeypatch.setattr(daw_command_handler, "_get_live_action_service", lambda: lambda: service)
+
+    class Reply:
+        def send_json(self, status, body):
+            self.status, self.body = status, body
+
+    reply = Reply()
+    daw_command_handler.handle_osc_undo(reply, {"session_id": "other-project", "receipt": echoed})
+
+    assert reply.status == 409, reply.body
+    assert "proposal" not in reply.body
+    assert len(backend.writes) == 1
+
+
+@pytest.mark.parametrize("field,value", [("before", 0.1), ("action", "set_volume"), ("schema", "invented")])
+def test_undo_refuses_changed_receipt_values_and_dispatch_fields(target, field, value):
+    # Undo must derive its target and restore value from KENN's receipt, never an edited browser object.
+    backend, service = target
+    echoed = _as_a_browser_echoes_it(apply(service, candidate(service)["proposal"])["receipt"])
+    echoed[field] = value
+    inverse = service.propose_undo(echoed, session_id="target-tests")
+    assert inverse["ok"] is False, inverse
+    assert "proposal" not in inverse
+    assert len(backend.writes) == 1
+
+
+def test_guarded_undo_uses_journal_ownership_when_memory_receipt_is_gone(target, tmp_path, monkeypatch):
+    # The journal drops receipt.session_id, so ownership must come from the server row after a restart.
+    from kenn.core import live_receipt_journal as journal
+    from kenn.core.actions import _RECEIPTS
+
+    monkeypatch.setattr(journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
+    backend, service = target
+    receipt = apply(service, candidate(service)["proposal"])["receipt"]
+    assert journal.record_receipt(receipt, session_id="target-tests")
+    _RECEIPTS.pop(receipt["receipt_id"])
+    echoed = journal.list_receipts(session_id="target-tests")[0]["receipt"]
+    assert not service.propose_undo(echoed, session_id="other-project")["ok"]
+    echoed["before"] = 0.1
+    assert not service.propose_undo(echoed, session_id="target-tests")["ok"]
+    echoed["before"] = 0.25
+    inverse = service.propose_undo(echoed, session_id="target-tests")
+    assert inverse["ok"], inverse
+    assert apply(service, inverse["proposal"])["receipt"]["verified"]
+    assert len(backend.writes) == 2
+
+
+@pytest.mark.parametrize("schema,service_name", [
+    ("MIDI_CLIP_RECEIPT_SCHEMA", "MidiClipActionService"),
+    ("CLIP_DUPLICATION_RECEIPT_SCHEMA", "ClipDuplicationActionService"),
+    ("CLIP_RENAME_RECEIPT_SCHEMA", "ClipRenameActionService"),
+    ("CLIP_AUDITION_RECEIPT_SCHEMA", "ClipAuditionActionService"),
+    ("SAMPLE_IMPORT_RECEIPT_SCHEMA", "SampleImportService"),
+])
+def test_http_undo_authenticates_before_dispatching_an_edited_receipt_schema(target, monkeypatch, schema, service_name):
+    # Clip/MIDI dispatch used to precede authentication, letting an edited device receipt mint another inverse.
+    from kenn.routes import daw_command_handler
+
+    backend, service = target
+    receipt = _as_a_browser_echoes_it(apply(service, candidate(service)["proposal"])["receipt"])
+    receipt["schema"] = getattr(daw_command_handler, schema)
+    dispatched = []
+    monkeypatch.setattr(daw_command_handler, "_get_live_action_service", lambda: lambda: service)
+    monkeypatch.setattr(daw_command_handler, service_name, lambda: SimpleNamespace(
+        propose_undo=lambda *_args, **_kwargs: dispatched.append(True) or {"ok": True, "proposal": {"action": "rename_clip"}}))
+
+    class Reply:
+        def send_json(self, status, body):
+            self.status, self.body = status, body
+
+    reply = Reply()
+    daw_command_handler.handle_osc_undo(reply, {"session_id": "other-project", "receipt": receipt})
+
+    assert reply.status == 409, reply.body
+    assert "proposal" not in reply.body
+    assert dispatched == []
+    assert len(backend.writes) == 1
+
+
 def test_undo_cannot_rebind_to_a_replacement_after_its_identity_checked_read(target, monkeypatch):
     # Rediscovering after receipt validation used to give an identical replacement its own Undo token.
     backend, service = target

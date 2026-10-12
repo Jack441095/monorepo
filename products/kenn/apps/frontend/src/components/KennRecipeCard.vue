@@ -56,15 +56,31 @@ function stepLabel(action: string): string {
   }
 }
 
-// before_db/after_db are the numbers a producer can act on ("-14.0 dB -> -17.0 dB"). Fall back to the raw values when
-// the backend could not produce a dB figure, because a step with no before/after shown is worse than a plain one.
+function targetLabel(step: KennActionStep): string {
+  const track = step.track_name ?? `Track ${(step.track_index ?? 0) + 1}`
+  const label = step.target_label ?? (step.device_name ? `${track} / ${step.device_name}` : track)
+  const address = step.target_address
+  if (!address) return label // Mixer children have no device or rack path to disambiguate.
+  // Live's name-only label cannot distinguish duplicate devices or chains; show the observed one-based positions too.
+  const bus = address.kind === 'master' ? 'Master' : `${address.kind === 'return' ? 'Return' : 'Track'} ${address.index + 1}`
+  const path = address.device_path.map((index, depth) => `${depth % 2 === 0 ? 'device' : 'chain'} ${index + 1}`).join(' / ')
+  return `${label} (${bus}, ${path})`
+}
+
+function rawValue(value: unknown): string | null {
+  // Raw parameter values must not inherit the requested display unit without a measured mapping.
+  if (typeof value === 'number' && Number.isFinite(value)) return `${value} raw`
+  if (typeof value === 'boolean') return value ? 'On' : 'Off'
+  return typeof value === 'string' ? value : null
+}
+
 function transition(step: KennActionStep): string {
-  const unit = step.unit === 'normalized' ? '' : step.unit ? ` ${step.unit}` : ''
-  const { before_db: before, after_db: after } = step
-  if (before === null || before === undefined || after === null || after === undefined) {
-    return 'value to be confirmed'
-  }
-  return `${formatDb(before)} → ${formatDb(after)}${unit}`
+  // Device/setup children carry mapped display strings; mixer children carry dB values.
+  if (step.before_display && step.after_display) return `${step.before_display} → ${step.after_display}`
+  const before = formatDb(step.before_db) ?? rawValue(step.before)
+  const after = formatDb(step.after_db) ?? rawValue(step.after)
+  // Missing observations remain explicit instead of inventing a reviewable value.
+  return before === null || after === null ? 'value to be confirmed' : `${before} → ${after}`
 }
 </script>
 
@@ -78,8 +94,8 @@ function transition(step: KennActionStep): string {
     <ol class="kenn-recipe-card__steps">
       <li v-for="(step, index) in steps" :key="step.action_id ?? index" class="kenn-recipe-card__step">
         <span class="kenn-recipe-card__index">{{ index + 1 }}</span>
-        <span class="kenn-recipe-card__track">{{ step.track_name ?? `Track ${(step.track_index ?? 0) + 1}` }}</span>
-        <span class="kenn-recipe-card__action">{{ stepLabel(step.action) }}</span>
+        <span class="kenn-recipe-card__track">{{ targetLabel(step) }}</span>
+        <span class="kenn-recipe-card__action">{{ step.parameter ?? stepLabel(step.action) }}</span>
         <span class="kenn-recipe-card__transition">{{ transition(step) }}</span>
       </li>
     </ol>

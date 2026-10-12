@@ -301,6 +301,11 @@ def handle_osc_undo(handler: Any, payload: dict) -> None:
         handler.send_json(400, {"ok": False, "error": "session_id and a verified receipt are required for undo."})
         return
     if "proposal" not in payload:
+        # Authenticate before choosing clip/MIDI services; an edited schema cannot downgrade a guarded receipt.
+        receipt, error = service.authenticate_undo_receipt(receipt, session_id=session_id)
+        if error:
+            handler.send_json(409, {"ok": False, "error": error})
+            return
         if receipt.get("schema") == MIDI_CLIP_RECEIPT_SCHEMA:
             result = MidiClipActionService().propose_undo(receipt, session_id=session_id)
         elif receipt.get("schema") == CLIP_DUPLICATION_RECEIPT_SCHEMA:

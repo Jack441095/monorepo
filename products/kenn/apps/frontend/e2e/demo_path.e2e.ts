@@ -12,7 +12,7 @@ test('session questions answer from the Live snapshot', async ({ page }) => {
 
 test('Apply shows verified readback and receipt Undo restores it', async ({ page }) => {
   await openKenn(page)
-  const reply = await ask(page, 'Set Compressor Output to 3 dB on track 7.')
+  const reply = await ask(page, 'Set Compressor Threshold to -4 dB on track 7.')
   await reply.getByRole('button', { name: 'Apply to Live 12' }).click()
   await expect(reply).toContainText('Readback Verified')
   await reply.getByRole('button', { name: 'Undo' }).click()
