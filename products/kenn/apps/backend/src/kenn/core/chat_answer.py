@@ -1097,30 +1097,65 @@ def make_answer(
         # fail on whichever was fixed second. Replaying the 10-11 Oct development runs, 15 of the 25 answers
         # rejected with a wrong tag also held an invented figure; none of those 15 survived the cut, and the 9
         # answers the repair saved all came from the other 10.
-        misattributed = validation["claim_citations"]["fabricated_attributions"]
+        #
+        # It runs only when a wrong tag and an invented figure are all the gate found. Dropping a tag edits prose
+        # that other checks read: "4:1 [#2]. Then" closes up to "4:1. Then", which the quality check counts as a
+        # numbered step, and "#2" is a word to the overlap check. So an answer refused for quality, structure or
+        # overlap could pass once a tag went, with the fault it was refused for untouched (review, 11 Oct). Of the
+        # 26 development answers in the October captures with a wrong tag, the repair saved 10 and none of those
+        # had any other warning, so on what we have measured the restriction costs nothing.
+        unsupported_warning = "generated answer introduced unsupported measurements"
+        misattributed_warning = "generated answer attributes a measurement to an excerpt that does not contain it"
+        other_faults = set(validation["warnings"]) - {unsupported_warning, misattributed_warning}
+        misattributed = [] if other_faults else validation["claim_citations"]["fabricated_attributions"]
         repaired = repair_misattributed_citations(enhanced, misattributed)
         # One invented number used to cost the whole answer. Cut the figure (or, failing that, its sentence) and
         # let the gate judge what is left; it is the same gate, so a number the notes lack still cannot get through.
         # When the cut cannot leave enough answer there is nothing to retry, since a repaired tag alone would still
         # fail on the figure.
-        unsupported = "generated answer introduced unsupported measurements" in validation["warnings"]
+        unsupported = unsupported_warning in validation["warnings"]
         fixed = (
             salvage_unsupported_figures(repaired or enhanced, validation["unsupported_measurements"])
             if unsupported
             else repaired
         )
+        # The figure cut can remove a real step too. Comparing with the original verdict would let a dropped tag
+        # hide that new quality fault: "4:1 [#2]. Then" becomes "4:1. Then", a false numbered step (12 Oct recheck).
+        # Apply the same figure cut to the original, so each repaired ending is judged against its unrepaired twin.
+        unrepaired = (
+            salvage_unsupported_figures(enhanced, validation["unsupported_measurements"])
+            if repaired and unsupported else enhanced
+        )
         # An excised answer keeps the capped ending it came with, so it gets the same two tries as the first
         # pass: the whole-sentence ending, then the text as written. A sentence-dropped answer is already cut
-        # to a whole sentence, and dict.fromkeys collapses the pair so the gate does not judge it twice.
-        endings = dict.fromkeys((end_on_a_whole_sentence(fixed), fixed)) if fixed else {}
-        for candidate in endings:
+        # to a whole sentence, and the pair collapses to one key so the gate does not judge it twice.
+        endings = {}
+        if fixed:
+            endings[end_on_a_whole_sentence(fixed)] = end_on_a_whole_sentence(unrepaired)
+            endings.setdefault(fixed, unrepaired)
+        for candidate, twin in endings.items():
+            if repaired and (not twin or set(_check(twin)["warnings"]) - {unsupported_warning, misattributed_warning}):
+                # other_faults above read the text as written, and the cut ending can be refused for more. One
+                # answer ending "ratio of 4:1 [#2]. Then listen to the bass against the kick. 2. Set the" was
+                # refused for the tag alone, because the dangling "2. Set the" counted as a step. Its cut lost
+                # that step and failed on quality too, then the dropped tag made "4:1. Then" a step and the cut
+                # shipped with one real step (review, 11 Oct). So a repaired ending ships only if its twin has no
+                # fault the repair could hide; an empty twin means the cut found no usable answer either. The
+                # figure cut alone (repaired == "") edits no tag and is not held.
+                continue
             retry = _check(candidate)
             if retry["accepted"]:
                 _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
+                # The repair is credited only with tags whose figure still ships. The figure cut or the
+                # whole-sentence ending can take a repaired sentence with it, and then the cut alone saved the
+                # answer (review, 11 Oct). A figure written twice still counts if one copy survives, which can
+                # over-credit; we accept that rather than track each tag through the cut.
+                shipped = {claim["value"] for claim in retry["claim_citations"]["claims"]}
+                repaired_values = [claim["value"] for claim in misattributed if claim["value"] in shipped]
                 fixes = ", ".join(
                     label
                     for label, applied in (
-                        ("citations repaired", repaired),
+                        ("citations repaired", repaired_values),
                         ("unsupported figures removed", unsupported),
                     )
                     if applied
@@ -1132,7 +1167,7 @@ def make_answer(
                     {
                         **retry,
                         "salvaged": validation["unsupported_measurements"],
-                        "repaired_citations": [claim["value"] for claim in misattributed],
+                        "repaired_citations": repaired_values,
                     },
                     _ma_llm_ms / 1000.0,
                 )
