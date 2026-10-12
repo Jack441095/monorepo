@@ -37,6 +37,8 @@ export type KennActionStep = {
   device_name?: string
   before?: unknown
   after?: unknown
+  before_display?: string
+  after_display?: string
   before_db?: number | '-inf' | null
   after_db?: number | '-inf' | null
   unit?: string
