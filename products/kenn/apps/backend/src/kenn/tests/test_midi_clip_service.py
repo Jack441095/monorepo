@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+import pytest
+
 from kenn.core.midi_clip_service import CREATE_PROPOSAL_SCHEMA, MidiClipActionService, RECEIPT_SCHEMA, UPDATE_PROPOSAL_SCHEMA
 
 
@@ -410,3 +412,72 @@ def test_midi_clip_update_can_clear_notes_and_restore_them() -> None:
     )
     assert restored["ok"] is True
     assert fake.get_midi_clip_state(1, 0)["notes"] == original
+
+
+@pytest.mark.parametrize("note_count", [501, 4096])
+@pytest.mark.parametrize("operation", ["create", "update", "tampered_update"])
+def test_http_midi_undo_keeps_every_note_and_rejects_edits_after_note_500(tmp_path, monkeypatch, note_count, operation):
+    # The journal's 500-row bound once truncated clip state, losing notes on Undo and hiding edits after note 500.
+    from kenn.core import live_receipt_journal as journal
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.routes import daw_command_handler
+
+    monkeypatch.setattr(journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
+    fake = FakeMidiLive()
+    fake.requires_guarded_parameter_targets = True
+    midi = MidiClipActionService(fake)
+    original = [
+        {"pitch": 60, "start_time": index / 4, "duration": 0.1, "velocity": 100, "mute": False}
+        for index in range(note_count)
+    ]
+    length = note_count / 4 + 1
+    owner = f"midi-journal-{operation}-{note_count}"
+    if operation == "create":
+        proposed = midi.propose_create(
+            track_index=1, track_name="Bass MIDI", clip_slot_index=0, length=length,
+            notes=original, session_id=owner,
+        )
+        execute = midi.execute_create
+    else:
+        fake.clips[(1, 0)] = {"has_clip": True, "is_midi_clip": True, "length": length, "notes": original}
+        proposed = midi.propose_update(
+            track_index=1, track_name="Bass MIDI", clip_slot_index=0,
+            notes=_notes(), session_id=owner,
+        )
+        execute = midi.execute_update
+    assert proposed["ok"], proposed
+    proposal = proposed["proposal"]
+    applied = execute(proposal, confirm_token=proposal["confirmation_token"], session_id=owner)
+    assert applied["ok"], applied
+    receipt = applied["receipt"]
+    assert journal.record_receipt(receipt, session_id=owner)
+    writes_before_undo = deepcopy(fake.writes)
+    if operation == "tampered_update":
+        receipt["undo_payload"]["restore_notes"][-1]["velocity"] = 1
+    monkeypatch.setattr(daw_command_handler, "_get_live_action_service", lambda: lambda: LiveActionService(fake))
+    monkeypatch.setattr(daw_command_handler, "MidiClipActionService", lambda: midi)
+    monkeypatch.setattr(daw_command_handler, "action_allowed", lambda _: True)
+
+    class Reply:
+        def send_json(self, status, body):
+            self.status, self.body = status, body
+
+    reply = Reply()
+    daw_command_handler.handle_osc_undo(reply, {"session_id": owner, "receipt": receipt})
+    if operation == "tampered_update":
+        assert reply.status == 409, reply.body
+        assert "Receipt identity or values changed" in reply.body["error"]
+        assert fake.writes == writes_before_undo
+        return
+    assert reply.status == 200, reply.body
+    inverse = reply.body["proposal"]
+    daw_command_handler.handle_osc_undo(reply, {
+        "session_id": owner, "receipt": receipt, "proposal": inverse, "confirm_token": inverse["confirmation_token"],
+        "idempotency_key": inverse["action_id"],
+    })
+    assert reply.status == 200, reply.body
+    assert reply.body["receipt"]["verified"] is True
+    if operation == "create":
+        assert (1, 0) not in fake.clips
+    else:
+        assert fake.get_midi_clip_state(1, 0)["notes"] == original
