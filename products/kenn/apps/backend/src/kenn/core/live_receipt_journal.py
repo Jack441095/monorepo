@@ -61,6 +61,11 @@ _RECEIPT_FIELDS = frozenset(
         "gain_requested_value",
         "requested_devices",
         "readback_devices",
+        # HTTP Undo now uses this server record. Clip names and identities must survive, rather than trusting card fields.
+        "before_clip",
+        "after_clip",
+        "source_clip",
+        "clip_identity",
     }
 )
 
