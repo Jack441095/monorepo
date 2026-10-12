@@ -1,6 +1,6 @@
 # KENN plan
 
-Updated 11 October 2026. This is KENN's sole product roadmap, architecture direction,
+Updated 12 October 2026. This is KENN's sole product roadmap, architecture direction,
 work queue and progress checklist. Start here, then read the named source, tests and
 evidence for the task. `AGENTS.md` governs repository work. Dated reports describe
 their recorded commit and environment; they do not authorize work or prove today's
@@ -1049,6 +1049,104 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   exact release source and artifacts; preserve profile-specific requirements. Required
   failed, pending or unmeasured gates prevent a qualified release. Optional current-Live
   probing is not a substitute for captured qualification evidence.
+
+### Investor demo — Wednesday 14 October 2026
+
+Agreed 12 Oct: demonstrate KENN's web UI on the owner's Mac controlling Ableton
+Live. Target a repeatable 8–12 minute presentation using the existing
+[20-step operator script](docs/runbooks/KENN_INVESTOR_DEMO.md). Its ten consecutive
+full-rehearsal requirement remains in force. Historical September receipts and
+the current fake tests do not qualify the October candidate.
+
+The first milestone is a browser-driven real-Live Apply/readback/Undo round trip
+on the exact candidate. The final milestone is the full scripted presentation,
+recovery, display/audio checks and a verified backup recording. The schedule below
+is a target; an unresolved failure keeps the corresponding item open.
+
+- [ ] **D1 — Review the fixes, Monday 12 Oct.** The original outside reviewer
+  rechecks citation repair `8f6eba45` and the full Stage 2/3 integration ending at
+  `65c6dc46`, including `adb0d4c4` and `b0056599`. Codex fixes any reported break,
+  adds a regression and gets the changed behavior rechecked. Review the overdue
+  audit-fixes merge `2377eed1` as well, since it feeds the answer path. Merge the
+  citation fix first, then Stage 2/3, only after the required sign-offs. Exit:
+  recorded review verdicts with no unresolved demo or safety blocker.
+- [ ] **D2 — Assemble and check one candidate, Monday 12 Oct.** Codex uses a clean
+  checkout containing the approved changes, preserving unrelated working edits.
+  Run the full backend suite with fake Live, frontend tests and frontend build;
+  run the scoped `test_demo_preflight.py` and `test_demo_script_gate.py` checks.
+  Record the source commit, served frontend build, AbletonOSC source/deployment
+  digest, model and index identities, Live version and Mac/runtime configuration.
+  Use the full companion described in the runbook. Keep the existing models and
+  dependencies; native plug-in packaging is outside this web-UI demo. Exit: green
+  checks and one identified build to use for every subsequent receipt.
+- [ ] **D3 — Prove the current Live path, Tuesday 13 Oct, first supervised slot.**
+  Jack schedules and supervises the session on a verified disposable copy of the
+  demo set. Codex checks or deploys the candidate Remote Script in that window;
+  restart/reload and verify its digest before collecting results. Revalidate the
+  rights-clear generated audio, track/device topology, saved reset point and
+  actual listening output. Run read-only preflight, then the runbook's explicitly
+  mutating preflight on the disposable copy. Through the actual browser UI:
+
+  - Apply a named Compressor control, show Live's changed value and verified
+    readback, then restore it with both card Undo and a fresh chat `Undo that`
+    journey. Record before/after/restored values and the audible A/B.
+  - Repeat card Undo after more than 300 s and after 256 intervening reads.
+    Check duplicate-device clarification and refusal to undo onto a same-name
+    replacement device on a separate disposable copy; restore the canonical
+    demo set afterwards. These checks qualify the Remote Script's actual device
+    identity behavior rather than assuming fake parity.
+  - Check the scripted EQ control and one bounded recipe through browser Apply,
+    per-control readback and exact Undo. Verify any quantized control proposed
+    for the presentation against real Live; a fake-only pass cannot qualify it.
+    Compound-EQ insertion and setup cards enter the presentation only if their
+    own real-Live transactions also pass and the operator script is updated
+    before full rehearsals.
+
+  Exit: every intended operation restores its original values, identity refusals
+  leave replacements untouched, no unauthorized writes and no uncertain readback.
+  Stop on a failure, inspect the receipt and Live state, fix and recheck before
+  presentation rehearsals.
+- [ ] **D4 — Check answers and the narrative, Tuesday 13 Oct.** Codex captures the
+  exact scripted questions with Live open on the candidate. Jack grades their
+  correctness, usefulness and displayed evidence, reviews the
+  [investor FAQ](docs/runbooks/KENN_INVESTOR_FAQ.md), and agrees the claims he will
+  make. Show the audible control change, the inspected proposal and exact Undo.
+  Label WAV analysis with its actual capture source and distinguish demonstrated
+  behavior from roadmap items. Run the script gate through the same chat endpoint
+  used by the UI: `tooling/scripts/demo_script_gate.py --route ask --runs 10 --json`.
+  Record actual command and answer times. Preserve the existing script timing budgets;
+  do not turn the 15 s answer benchmark into an "instant response" claim. Exit:
+  no incorrect or unsupported answer in the script and a usable presentation pace.
+  This bounded owner check does not close the wider held-out grading gate.
+- [ ] **D5 — Rehearse and freeze, Tuesday 13 Oct.** Reserve at least 2–3 hours with
+  Jack for ten consecutive complete runs: each 20/20 steps, 8–12 minutes, no raw
+  errors, wrong targets or failed/stale readbacks. Include the planned recovery
+  drill in at least one run and use the actual projector/large display and audio
+  output in at least one. Reopen the verified reset set between runs. Start a new
+  candidate section in the existing
+  [rehearsal log](docs/evidence/KENN_INVESTOR_DEMO_REHEARSAL_LOG.md), recording the
+  build, times, failures, restoration and recovery outcomes; do not carry forward
+  September passes. An unexpected failure resets the consecutive count. A code,
+  model, index or script change requires qualification of the new candidate.
+  Record one successful web-UI/Live run with intelligible narration, readable
+  cards and audible before/after; play the recording back to verify it. Keep raw
+  captures and local set/audio artifacts outside git. Exit: ten passes, checked
+  backup recording and a frozen candidate by Tuesday evening.
+- [ ] **D6 — Room preflight and showing, Wednesday 14 Oct.** Jack and Codex verify
+  the frozen build, mains power, loaded local model/index, disposable reset set,
+  selected starting device, connection, projector and audio. Run read-only
+  preflight and check the backup recording plays before the audience arrives.
+  Jack presents only the rehearsed commands and handles questions using the
+  reviewed FAQ. If preflight fails, use a previously verified recording of the
+  same demonstrated sequence and describe it as a recording; do not improvise
+  mutations. Exit: live showing only with D1–D5 and room preflight passed.
+
+Owners: Codex handles build preparation, fixes, checks and evidence; the outside
+reviewer provides independent sign-off; Jack supervises all Live mutations,
+grades the demo answers and rehearses/presents. Wednesday's meeting time and the
+Tuesday supervised slot still need to be set. Nothing in this plan schedules or
+authorizes an unattended Live run. R1–R4, broader answer grading, device coverage
+and beta/release qualification remain separately open.
 
 ## Acceptance targets and measurement rules
 
