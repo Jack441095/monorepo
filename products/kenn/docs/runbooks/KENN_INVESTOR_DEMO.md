@@ -4,6 +4,10 @@ This is the canonical operator script for the investor demo. It preserves
 KENN's proposal, confirmation, readback, receipt, and exact-undo boundary.
 Do not improvise mutation commands during a live showing.
 
+Jack requested a five-minute maximum walkthrough on 12 October. Use the timed
+showcase below for the audience and backup recording. The full twenty-step
+sequence remains the internal qualification exercise.
+
 Review `KENN_INVESTOR_FAQ.md` before the showing and use its shipped-versus-
 roadmap answers for audience discussion. Do not type off-script mutation
 requests into the live demo.
@@ -90,7 +94,41 @@ copy and the full run passes the rehearsal gate.
    confirm proposals or qualify the seven manual UI/mutation/presentation steps,
    so a pass is supporting evidence rather than a complete rehearsal.
 
-## Twenty-step script
+## Five-minute Ableton showcase
+
+Run this after the current fixes, review and supervised Live qualification are
+finished. Use the same qualified candidate, generated audio, disposable reset
+set and connected web UI. Warm the analysis through preflight before starting
+the clock. Target **4 min 45 s**, leaving 15 s of margin; stop at **5 min**.
+The clock includes responses, navigation, listening and Undo. Take questions
+afterwards. Use the existing presentation timing budgets without promising an
+instant answer.
+
+| Time | Action | Visible or audible proof |
+|------|--------|--------------------------|
+| 0:00–0:30 | Show Live and KENN's connected panel. Ask `Describe this session.` | The answer identifies the loaded demo session. |
+| 0:30–1:40 | Play the demo and show Lead Vocal's Compressor on track 7. Ask `Set Compressor Threshold to -4 dB on track 7.` Inspect the proposal and click Apply. | Live shows 0 → -4 dB, the card reports verified readback, and the audience hears the change. |
+| 1:40–2:15 | Click Undo on that Compressor card. | Live returns to 0 dB and the card reports the observed before-state restored. |
+| 2:15–3:30 | Show Bass's existing EQ Eight on track 5. Ask `Boost amplitude by 3 dB at 200 Hz on track 5 band 2A.` Inspect and Apply, then ask `Undo that.` Inspect and Apply its inverse. | The named band changes from 0 → +3 dB and returns to its original gain, with verified readback for both actions. |
+| 3:30–4:15 | Ask `How does my low end sound?` and show its measured evidence. | Explain that this analysis uses the demo's rendered WAV, with its capture source shown. |
+| 4:15–4:45 | Ask `Delete track 3.` Show the refusal, then close with the demonstrated capabilities. | The track remains present. Label any mentioned future capability as roadmap work. |
+| 4:45–5:00 | Reserved for normal response/navigation variation. | Finish within 300 s. |
+
+Use the first short run as a supervised bug-finding exercise. Stop at the first
+wrong target, refused intended action, missing readback, failed restoration,
+incorrect answer or time overrun. Preserve the failed attempt in the rehearsal
+log: build, exact prompt, card/receipt reference, expected and actual values,
+elapsed time and whether the reset set was restored. Keep captures outside git
+and queue fixes in `KENN_PLAN.md`. Reproduce a software break against fake Live,
+add and mutation-check its regression, fix and review it, then requalify the
+changed candidate before a clean take. A failed attempt cannot count as the
+backup recording; do not edit away errors or waiting to manufacture a pass.
+
+Record a complete successful take only after the sequence passes. Verify video
+playback, readable proposals and Live values, audible before/after and the
+five-minute limit. Reopen the reset set afterwards.
+
+## Twenty-step qualification script
 
 Only text in `code` is typed into KENN. Lines that say Show, Explain or narrate
 are spoken to the audience; never type them into the chat.

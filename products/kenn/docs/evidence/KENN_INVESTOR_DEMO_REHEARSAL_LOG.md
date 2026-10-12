@@ -33,6 +33,20 @@ Any changed build or unexpected failure restarts the consecutive count.
 
 Backup recording: pending capture and playback verification on this candidate.
 
+### Five-minute showcase
+
+Run the short sequence in the operator runbook after current qualification.
+Target 4 min 45 s; a complete pass must take at most 300 s, including answers,
+navigation, listening and Undo. Record the first bug-finding attempt even if it
+fails. Keep captures outside git and put actionable fixes in `KENN_PLAN.md`.
+
+| Attempt | Build | Seconds | Failed prompt / target / expected and actual result | Restoration | Complete pass |
+|---------|-------|---------|----------------------------------------------------|-------------|---------------|
+| 1 | | | | | [ ] |
+
+Successful recording: pending. Playback, readable cards, audible before/after,
+elapsed time and reset restoration: pending.
+
 ## September runs (historical)
 
 | # | Date | Start | End | Mins | Steps passed /20 | Failed step + cause | Recovery drill | Projector | Pass |
