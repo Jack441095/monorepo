@@ -35,7 +35,9 @@ the receipt says the server's cache state is unverified.
 
 Use stubs while other inference work is running. Missing native phases, memory pressure and build identities are
 reported as unknown rather than guessed; `--build-manifest` supplies the ones measured elsewhere, and
-`--review-capture` re-scores a saved capture offline without rerunning the model.
+`--review-capture PATH` exports this run's all-case capture to PATH, overwriting an existing file.
+It still runs measurement and inference. Use `build_captured_review_packet.py` and
+`adjudicate_human_review.py` for subsequent offline review without another model run.
 
 Read-only against Live, and it never writes to one: `answer_payload` only reads the session snapshot. It never builds
 an index either.
@@ -555,7 +557,8 @@ def main() -> int:
     parser.add_argument("--cache-condition", choices=("cold", "warm"), default="cold")
     parser.add_argument("--timeout", type=float, default=90.0)
     parser.add_argument("--build-manifest", type=Path, help="exact model/prompt/index/corpus/hardware and supervision identity JSON")
-    parser.add_argument("--review-capture", type=Path, help="all-case offline capture JSON; keep outside git")
+    parser.add_argument("--review-capture", type=Path,
+                        help="export this run's all-case capture JSON, overwriting PATH; still runs measurement; keep outside git")
     args = parser.parse_args()
     if args.surface in {"foreground", "background"} and not args.endpoint:
         parser.error("HTTP delivery requires --endpoint")
