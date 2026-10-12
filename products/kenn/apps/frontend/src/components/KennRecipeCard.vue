@@ -174,13 +174,19 @@ function transition(step: KennActionStep): string {
 }
 .kenn-recipe-card__step {
   display: grid;
-  grid-template-columns: 20px 1fr auto auto;
-  gap: 8px;
+  /* Guarded device paths need the row width in the narrow chat panel. */
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 3px 8px;
   align-items: baseline;
   font-size: 13px;
 }
 .kenn-recipe-card__index {
   opacity: 0.6;
+}
+.kenn-recipe-card__track,
+.kenn-recipe-card__action,
+.kenn-recipe-card__transition {
+  grid-column: 2;
 }
 .kenn-recipe-card__action {
   font-size: 11px;
