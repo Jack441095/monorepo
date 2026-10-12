@@ -1053,10 +1053,12 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
 ### Investor demo — Wednesday 14 October 2026
 
 Agreed 12 Oct: demonstrate KENN's web UI on the owner's Mac controlling Ableton
-Live. Target a repeatable 8–12 minute presentation using the existing
-[20-step operator script](docs/runbooks/KENN_INVESTOR_DEMO.md). Its ten consecutive
-full-rehearsal requirement remains in force. Historical September receipts and
-the current fake tests do not qualify the October candidate.
+Live. Jack then requested a walkthrough of **five minutes maximum** once the
+current work is finished, also as a bug-finding exercise. Use the
+[five-minute showcase](docs/runbooks/KENN_INVESTOR_DEMO.md#five-minute-ableton-showcase)
+for the presentation. The existing 20-step operator script and its ten consecutive
+8–12 minute qualification runs remain the internal release check. Historical
+September receipts and the current fake tests do not qualify the October candidate.
 
 The first milestone is a browser-driven real-Live Apply/readback/Undo round trip
 on the exact candidate. The final milestone is the full scripted presentation,
@@ -1118,6 +1120,8 @@ is a target; an unresolved failure keeps the corresponding item open.
   do not turn the 15 s answer benchmark into an "instant response" claim. Exit:
   no incorrect or unsupported answer in the script and a usable presentation pace.
   This bounded owner check does not close the wider held-out grading gate.
+  Grade the short showcase's answers as well, and measure its actual end-to-end
+  time, including Live navigation, listening and Undo; the hard limit is 300 s.
 - [ ] **D5 — Rehearse and freeze, Tuesday 13 Oct.** Reserve at least 2–3 hours with
   Jack for ten consecutive complete runs: each 20/20 steps, 8–12 minutes, no raw
   errors, wrong targets or failed/stale readbacks. Include the planned recovery
@@ -1128,16 +1132,21 @@ is a target; an unresolved failure keeps the corresponding item open.
   build, times, failures, restoration and recovery outcomes; do not carry forward
   September passes. An unexpected failure resets the consecutive count. A code,
   model, index or script change requires qualification of the new candidate.
-  Record one successful web-UI/Live run with intelligible narration, readable
-  cards and audible before/after; play the recording back to verify it. Keep raw
-  captures and local set/audio artifacts outside git. Exit: ten passes, checked
-  backup recording and a frozen candidate by Tuesday evening.
+  After qualification, run the five-minute showcase as a supervised bug-finding
+  dry run, targeting 4 min 45 s and stopping at 5 min. Record failures in the
+  rehearsal log with the prompt, target, expected/actual values and restoration;
+  add actionable fixes to this plan. Fix and recheck any failure before a clean
+  take, and requalify if code changes. Record one successful complete showcase
+  with intelligible narration, readable cards and audible before/after; play it
+  back to verify it. Keep raw captures and local set/audio artifacts outside git.
+  Exit: ten qualification passes, a successful showcase of at most 300 s,
+  checked backup recording and a frozen candidate by Tuesday evening.
 - [ ] **D6 — Room preflight and showing, Wednesday 14 Oct.** Jack and Codex verify
   the frozen build, mains power, loaded local model/index, disposable reset set,
   selected starting device, connection, projector and audio. Run read-only
   preflight and check the backup recording plays before the audience arrives.
-  Jack presents only the rehearsed commands and handles questions using the
-  reviewed FAQ. If preflight fails, use a previously verified recording of the
+  Jack presents the rehearsed five-minute showcase and handles questions using
+  the reviewed FAQ afterwards. If preflight fails, use a verified recording of the
   same demonstrated sequence and describe it as a recording; do not improvise
   mutations. Exit: live showing only with D1–D5 and room preflight passed.
 
