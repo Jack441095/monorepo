@@ -30,7 +30,7 @@ LIVE_STOP_BUTTON = (670.0, 73.0)
 CHAT_INPUT_CENTER = (1515.0, 1084.0)
 
 # Target output location at repository root requested by user.
-REPO_ROOT_MP4 = Path("/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/kenn_investor_demo.mp4")
+REPO_ROOT_MP4 = Path.cwd() / "kenn_investor_demo.mp4"
 
 
 def _check_preconditions(directory: Path) -> None:

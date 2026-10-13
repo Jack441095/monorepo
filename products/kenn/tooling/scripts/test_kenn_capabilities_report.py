@@ -329,7 +329,7 @@ def main() -> int:
         time.sleep(1.0)
 
     # Save summary report
-    out_path = "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/kenn_capability_test_results.json"
+    out_path = Path.cwd() / "kenn_capability_test_results.json"
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
     print(f"\n======================================================================")
