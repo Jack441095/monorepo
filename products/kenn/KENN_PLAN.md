@@ -1595,6 +1595,89 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       1.7B probe remains
       ungraded and mostly cut off at its 128-token response cap, so it is latency
       and format diagnostics only, not a quality result.
+      **14 October follow-up (agent/Gemini evidence review, no owner sign-off
+      required):** the Pro-D2 conflict was resolved against FabFilter primary
+      sources checked 2026-10-13 (catalog lists no Pro-D2; Pro-C 3 is the
+      compressor, Timeless 3 a delay, Pro-R 2 a reverb). The sound-stage note
+      body already denied Pro-D2; its false-name Tags were removed (2660B
+      `9bc90930` to 2765B `f0d6e27c`), denial body kept. Targeted BM25 rerun
+      against staged `v-d1788545da5c` (read-only) still surfaces the note rank 1
+      because staged chunks carry pre-correction text: a rebuild is required
+      before the product-name check can pass. Candidate stays inactive; active
+      index `v-db8c6334cf63` untouched. Schedule batches 2–5 (80 notes) were
+      independently claim-reviewed: 31 corrected, 49 unchanged with input hashes
+      recorded but no pass marks. Batch 2: 7 corrected (noisia units, arpeggiator
+      shortcut, Auto Filter circuits, Auto Pan waveshapes, Auto Shift
+      latency/scale, Cabinet mechanism, Channel EQ specifics). Batch 3: 11
+      corrected (Chorus-Ensemble, Collision, Corpus, CPU buffer claim, CV Tools,
+      delay-compensation shortcut, Drift/Meld, Drift, Drum Buss/Beat Repeat,
+      Drum Sampler, Dynamic Tube). Batch 4: 6 corrected (audio-utilities Erosion
+      modes/harmonics, workflow-hacks shortcut, external-audio latency wording,
+      Granulator II parameters, Limiter Link semantics, DJing gestures/clock).
+      Batch 5: 7 corrected (Looper state order/Sync/clear, Looper Song
+      Control/Warp, Meld architecture, MIDI Tools Slice/audio-engine, Redux
+      Jitter, Multiband per-band sidechain, Phaser-Flanger Notches/Sync).
+      Batch 6: 11 corrected (physical-modeling exciters/Radius/model names,
+      Note Length Vel Scale fiction, 16-macro cap, Roar Level filler rewrite,
+      routing shortcut platform split, Saturator Base/Depth fiction, Chord
+      before Scale ordering, Shifter Voice/Rhythm + tube lore, Simpler Morph
+      question, Spectral Resonator invented controls, Spectral Time invented
+      sliders) and 9 unchanged. Batch 7: 10 corrected (template LUFS-meter
+      fiction + default-set path, Tuner invented specs incl. a residual Strobe
+      reference cleared in a follow-up fix, tuning-systems Control Bar display,
+      Vinyl Pinch parity + switch attribution, Wavetable Unison specifics,
+      arrangement loop/move/link gestures and paths, arrangement-pt4 false body
+      replaced with breakpoint editing, warping Crossfade-mode fiction) and 10
+      unchanged. Batch 8: 8 corrected (warping Pitch-mode question, warping-pt4
+      fabricated device rewrite, chain-splitting wrong-product examples +
+      zone-splitting fiction, racks-pt4 routing fiction incl. a residual
+      Zone-Editor question cleared in a follow-up fix, fact-sheet false 32-bit
+      switch + disclaimer Width retraction, automation Thin-Automation rewrite,
+      bounce outside-the-DAW wording, clip-envelopes ADSR-model rewrite) and 12
+      unchanged. Batch 9: 8 corrected (comping-pt2/pt3 fabricated tools,
+      latency-pt2/pt3 false paths, converting-pt1 chain-count inflation,
+      converting-pt2/pt3 invented parameters + render mythology, DDC mechanism
+      reframing incl. a residual Why-it-matters paragraph cleared in a
+      follow-up fix) and 12 unchanged. Batch 10: 10 corrected (MPE-pt2/pt3
+      false setup paths, racks-pt1 zone caveat, racks-pt2 fade numbering,
+      launching-pt3 invented actions incl. residual title/answer framing cleared
+      in a follow-up fix, ref-pt11 export direction + transplanted Compressor
+      controls incl. residual questions cleared in a follow-up fix, ref-pt12
+      RMS/Peak question, ref-pt14 Flat polarity, ref-pt16 0.5 Hz delay +
+      Freq/Harmonics recipe, ref-pt17 Time slider + Freq/Unison numbers) and 10
+      unchanged. Batch 11: 10 corrected (ref-pt2 PRD/sidechain-mid, ref-pt3
+      scale contradiction, ref-pt6 beat math, ref-pt7 Offset units, ref-pt8
+      Filter-Width/Dry fiction, effects-pt11 Insert-Looper/Feedback fiction,
+      effects-pt13 LFO2 transplant, effects-pt14 Tone dB unit, effects-pt16
+      Freq/Poly/Damp/Gate recipe incl. a residual MIDI-Gate question cleared in
+      a follow-up fix, effects-pt19 phase/width fiction) and 10 unchanged.
+      Batch 12: 12 corrected (ref-pt20 Push step-mode clarification, ref-pt3
+      Auto Shift MIDI/Scale controls, ref-pt4 Channel EQ & Chorus-Ensemble
+      parameters, ref-pt5 Compressor sidechain & Listen controls, ref-pt6
+      Delay sync modes & transition settings, ref-pt9 Glue Compressor & Grain
+      Delay/Hybrid Reverb parameters, concepts-pt1 Control Bar & view shortcuts,
+      concepts-pt3 MIDI/Key map workflows, instrument-pt1 Analog subtractive
+      architecture, instrument-pt10 Operator voice/spread/glide cleanup,
+      instrument-pt11 Operator LFO routing, instrument-pt14 Sampler envelope
+      & LFO routing) and 8 unchanged.
+      Receipts: `.runtime/mimo-note-review-validation-2026-10-13/pro-d2-resolution-2026-10-13.json`
+      and `batch2/batch3/batch4/batch5-corrections-2026-10-13.json` plus
+      `batch6-corrections-2026-10-14.json` and
+      `batch7-corrections-2026-10-14.json` with
+      `batch7-addendum-2026-10-14.json` plus
+      `batch8-corrections-2026-10-14.json` with
+      `batch8-addendum-2026-10-14.json` plus
+      `batch9-corrections-2026-10-14.json` with
+      `batch9-addendum-2026-10-14.json` plus
+      `batch10-corrections-2026-10-14.json` with
+      `batch10-addendum-2026-10-14.json` plus
+      `batch11-corrections-2026-10-14.json` with
+      `batch11-addendum-2026-10-14.json` plus
+      `batch12-corrections-2026-10-14.json` (all
+      json.load verified). No training, no rebuild/promotion, no Live contact;
+      all sources rights-unknown with no shared-weight grant. Live 12 manual
+      remains absent locally, so Live 11 grounding does not qualify Live 12
+      claims. S1 stays open.
     - [ ] **S2 — Build a harder, reviewed packet within today's limits.** Start with
       four training source families and two ordinary targets per context: eight
       reviewed examples, including concise explanations and follow-ups. Prepare
