@@ -1706,6 +1706,9 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
   The real-path test and inline counts landed in `2d8d779d`. The no-answer split merged 8 Oct (`draft/no-answer-cause`):
   the route now ends `: request failed`, `: structure check` or `: llm disabled`, so the next probe can say how many
   answers the cap cut off. The streamed path still logs the bare reason. The chat-test skip match is not yet checked.
+  13 Oct: an empty stream now reads `generation returned no answer: empty reply` (a dead stream already named its
+  exception). The chat-test skip could not be located in this tree; its commit predates the clone's history.
+  [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
 - [x] Stop a template counting as a model answer when the quality check swaps it in after generation. A correctness
   fix; it didn't change any of the last four scores. Merged to main 7 Oct (`draft/honest-answers` 0fd4b7b1): the
   `brain=True` log row now waits for the quality check, and a swap logs `generation:quality gate: <reason>` instead.
@@ -2162,7 +2165,9 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
         put the extra rejections on the reorder, so it was reverted outright to save a bench.
       - `c288275a` passes seconds to `_log_generation_outcome` on both accepted paths of `make_answer`. Two
         tests in `test_generation_outcome_log.py` drive a 6 s fake clock through each path and expect 6.0. The
-        request-scoped usage half of item 2 is not done.
+        request-scoped usage half of item 2 is not done. Done 13 Oct: the route-log timing reads this thread's own
+        newest call, and `make_answer()` forgets it on entry, so a busy refusal no longer carries another chat's
+        timing. [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
       - `d783942b` numbers the excerpts in `model_evidence` (`id="1"`, `id="2"`…) instead of the 12-hex chunk id,
         and the Rules line now reads "a figure from the excerpt with id="2" is written 150 ms [#2]". The gate builds
         its shown list through the same `model_evidence` call on the same budget, and `_resolve_chunk_id` already
@@ -2174,7 +2179,10 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       - Review (inline): nothing outside the tests parses the `[#…]` tag, enhance() hands the model and the gate
         the same `results`, and the 128-token cap is unchanged.
       - Follow-up for the product, not the gate: answers show `[#2]` to the producer as written (before, a 12-hex
-        id). Strip the tags or map them to the Sources list numbering.
+        id). Strip the tags or map them to the Sources list numbering. Done 13 Oct for the companion's payload path:
+        stripped after every check, because the Sources list is de-duplicated and capped at three so an ordinal
+        cannot map onto it. The terminal stream still shows tags as they are written.
+        [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
       - Watch in v6: misattributed figures. A model that tags every figure [#1] is now caught as misattribution
         rather than as an unshown id, so that count may rise as the unshown count falls.
   - [ ] v6 development bench, 11 Oct: one probe run and one held-out run on main `2377eed1`, at Jack's call. A read
