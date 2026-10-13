@@ -23,13 +23,19 @@ import numpy as np
 PRODUCT_ROOT = Path(__file__).resolve().parents[2]
 RATES = (44_100, 48_000, 96_000)  # Stereo input frames per second.
 INSERT_COUNTS = (1, 8, 32, 64)
-MODES = ("current", "juce4", "juce8", "juce8_frame")
+PROFILE_MODES = ("current", "juce8", "juce8_float", "juce8_low", "juce8_low_float", "juce8_iir", "juce8_iir_float")
+CONTINUITY_PAIRS = tuple((mode, mode + "_frame") for mode in PROFILE_MODES if mode != "current")
+MODES = PROFILE_MODES + ("juce4",) + tuple(single for _, single in CONTINUITY_PAIRS)
 FREQUENCIES = (.125, .25, .375, .4, .425, .45)  # Cycles per input frame.
 PHASE_COUNT = 16  # Uniform phases over half a cycle; absolute peaks repeat there.
 METADATA = {
     "current": (4, 5.875, 0.0), "juce4": (4, 35.75, 59.5),
     "juce8": (8, 38.625, 64.25), "juce8_frame": (8, 38.625, 64.25),
+    "juce8_float": (8, 38.625, 64.25), "juce8_low": (8, 24.625, 41.0),
+    "juce8_low_float": (8, 24.625, 41.0), "juce8_iir": (8, None, 4.951390480676138),
+    "juce8_iir_float": (8, None, 4.951390743255615),
 }  # Factor, measured upsampling delay and API round-trip delay, in input frames.
+METADATA.update({single: METADATA[batched] for batched, single in CONTINUITY_PAIRS})
 JUCE_COMMIT = "4ada2e1f4db082f5dd803f249f37b3bf9c5f55ef"  # Cached JUCE 8.0.2 source.
 # Half the selected Tech 3341 cases' -0.4/+0.2 dB tolerance leaves engineering
 # margin. This bounded tone sweep is not a standards conformance test.
@@ -77,6 +83,24 @@ def tone(rate: int, case: dict[str, Any]) -> np.ndarray:
     return np.column_stack((values, -values)).astype("<f4")
 
 
+def paired_tone_cases() -> list[dict[str, Any]]:
+    """Describe equal cosine pairs whose continuous peaks are exactly 0.5."""
+    # Every frequency is an integer multiple of 1/40 cycles/frame. Both
+    # components equal +0.25 every 40 input frames after the requested offset;
+    # the triangle inequality bounds every other continuous sample by 0.5.
+    return [{"name": f"pair_{first}_{second}_{offset}", "frequencies": (first, second), "offset_frames": offset}
+            for first, second in ((.025, .45), (.05, .4), (.1, .4), (.1, .45), (.125, .375), (.2, .4))
+            for offset in (0.0, .0625, .125)]
+
+
+def paired_tone(rate: int, case: dict[str, Any]) -> np.ndarray:
+    """Generate aligned cosine pairs; relative phase changes must retain their peak."""
+    positions = np.arange(3 * (rate // 10), dtype=np.float64) - case["offset_frames"]
+    first, second = case["frequencies"]
+    values = .25 * np.cos(2 * np.pi * first * positions) + .25 * np.cos(2 * np.pi * second * positions)
+    return np.column_stack((values, -values)).astype("<f4")
+
+
 def native_trace(binary: Path, samples: np.ndarray, rate: int, mode: str) -> dict[str, Any]:
     """Reject malformed fixtures/output and return contiguous causal 100 ms peaks."""
     values = np.asarray(samples)
@@ -88,9 +112,18 @@ def native_trace(binary: Path, samples: np.ndarray, rate: int, mode: str) -> dic
         fixture = Path(directory) / "synthetic.f32"
         values.astype("<f4").tofile(fixture)
         payload = _call(binary, "--trace", mode, str(rate), str(fixture))
-    metadata = tuple(payload.get(key) for key in ("factor", "upsampling_delay_frames", "round_trip_delay_frames"))
+    factor, delay, roundtrip = METADATA[mode]
+    iir = "iir" in mode
     peaks = payload.get("peaks")
-    if (metadata != METADATA[mode] or type(payload.get("cpp_heap_calls")) is not int
+    impulse = payload.get("impulse_peak_frame")
+    # Round-trip IIR estimates differ slightly with arithmetic precision. One
+    # millionth of an input frame is ample for this pinned metadata check.
+    if (payload.get("factor") != factor or payload.get("upsampling_delay_frames") != delay
+            or payload.get("linear_phase") is not (not iir)
+            or not _number(payload.get("round_trip_delay_frames"))
+            or not math.isclose(payload["round_trip_delay_frames"], roundtrip, rel_tol=0, abs_tol=1e-6)
+            or (impulse is not None if mode == "current" else impulse != (3.125 if iir else delay))
+            or type(payload.get("cpp_heap_calls")) is not int
             or payload["cpp_heap_calls"] < 0 or not isinstance(peaks, list)
             or len(peaks) != len(values) // (rate // 10) or not all(_number(value) for value in peaks)):
         raise ValueError("Native trace has incorrect delay/factor, heap count or peaks.")  # Wrong units and missing windows cannot qualify a filter.
@@ -99,7 +132,7 @@ def native_trace(binary: Path, samples: np.ndarray, rate: int, mode: str) -> dic
 
 def summarize_timings(cells: list[dict[str, Any]], repeats: int) -> list[dict[str, Any]]:
     """Require the entire warmed matrix and retain raw process CPU/wall samples."""
-    expected = {(rate, inserts, mode) for rate in RATES for inserts in INSERT_COUNTS for mode in MODES}
+    expected = {(rate, inserts, mode) for rate in RATES for inserts in INSERT_COUNTS for mode in PROFILE_MODES}
     seen = set()
     summaries = []
     for cell in cells:
@@ -142,7 +175,8 @@ def run(binary: Path, juce_source: Path, repeats: int = 20) -> dict[str, Any]:
         raise ValueError("Repeats must be an integer from 3 through 30.")  # Bound warmed timing receipts before starting a native process.
     info = _call(binary, "--info")
     if (info.get("juce_version") != "8.0.2" or info.get("assertions_enabled") is not False
-            or info.get("pointer_bits") != 64 or not _number(info.get("current_meter_bytes"), positive=True)
+            or info.get("pointer_bits") != 64 or info.get("compiled_arch") != platform.machine()
+            or not _number(info.get("current_meter_bytes"), positive=True)
             or not isinstance(info.get("compiler"), str) or not info["compiler"]):
         raise ValueError("Comparison requires the qualified 64-bit Release build.")  # Debug and unknown builds cannot support the CPU decision.
     commit = subprocess.run(["git", "-C", str(juce_source), "rev-parse", "HEAD"], check=True,
@@ -152,38 +186,45 @@ def run(binary: Path, juce_source: Path, repeats: int = 20) -> dict[str, Any]:
     if commit != JUCE_COMMIT or dirty:
         raise ValueError("JUCE source must be the unmodified cached 8.0.2 checkout.")  # Version macros alone cannot identify modified filter code.
     cases = tone_cases()
+    pairs = paired_tone_cases()
     accuracy, continuity = [], []
     for rate in RATES:
-        for mode in MODES:
-            results = []
+        for mode in PROFILE_MODES:
             heap_calls = 0
-            for case in cases:
-                trace = native_trace(binary, tone(rate, case), rate, mode)
-                # Discard the first 200 ms, longer than every measured filter
-                # delay; the final continuous 100 ms interval contains many peaks.
-                error = 20 * math.log10(trace["peaks"][-1] / .5)
-                results.append({**case, "error_db": error})
-                heap_calls += trace["cpp_heap_calls"]
-            minimum = min(results, key=lambda row: row["error_db"])
-            maximum = max(results, key=lambda row: row["error_db"])
-            failures = sum(not ERROR_BOUNDS_DB[0] <= row["error_db"] <= ERROR_BOUNDS_DB[1] for row in results)
-            accuracy.append({"rate": rate, "mode": mode, "cases": len(results),
-                             "failed_cases": failures, "passed": failures == 0,
-                             "minimum": minimum, "maximum": maximum, "cpp_heap_calls": heap_calls,
+            families = {}
+            for family, generator, descriptions in (("single_tones", tone, cases), ("paired_tones", paired_tone, pairs)):
+                results = []
+                for case in descriptions:
+                    trace = native_trace(binary, generator(rate, case), rate, mode)
+                    # Discard 200 ms of startup. Every steady 100 ms interval
+                    # contains many exact continuous maxima of these signals.
+                    peak = trace["peaks"][-1]
+                    if peak <= 0:
+                        raise ValueError("A known-amplitude tone produced no positive peak.")  # Silence cannot qualify an interpolator.
+                    results.append({**case, "error_db": 20 * math.log10(peak / .5)})
+                    heap_calls += trace["cpp_heap_calls"]
+                failures = sum(not ERROR_BOUNDS_DB[0] <= row["error_db"] <= ERROR_BOUNDS_DB[1] for row in results)
+                families[family] = {"cases": len(results), "failed_cases": failures, "passed": failures == 0,
+                                    "minimum": min(results, key=lambda row: row["error_db"]),
+                                    "maximum": max(results, key=lambda row: row["error_db"])}
+            accuracy.append({"rate": rate, "mode": mode, "passed": all(row["passed"] for row in families.values()),
+                             **families, "cpp_heap_calls": heap_calls,
+                             "linear_phase": trace["linear_phase"], "impulse_peak_frame": trace["impulse_peak_frame"],
                              "factor": METADATA[mode][0], "upsampling_delay_frames": METADATA[mode][1],
                              "round_trip_delay_frames": METADATA[mode][2]})
-        for name, fixture in _continuity_fixtures(rate).items():
-            batched = native_trace(binary, fixture, rate, "juce8")
-            single = native_trace(binary, fixture, rate, "juce8_frame")
-            delta = float(np.max(np.abs(np.array(batched["peaks"]) - np.array(single["peaks"]))))
-            continuity.append({"rate": rate, "fixture": name, "maximum_linear_delta": delta,
-                               "passed": delta <= 1e-12 and (name != "silence" or not any(batched["peaks"])),
-                               "cpp_heap_calls": batched["cpp_heap_calls"] + single["cpp_heap_calls"],
-                               "batched_peaks": batched["peaks"], "single_frame_peaks": single["peaks"]})
+        for batched_mode, single_mode in CONTINUITY_PAIRS:
+            for name, fixture in _continuity_fixtures(rate).items():
+                batched = native_trace(binary, fixture, rate, batched_mode)
+                single = native_trace(binary, fixture, rate, single_mode)
+                delta = float(np.max(np.abs(np.array(batched["peaks"]) - np.array(single["peaks"]))))
+                continuity.append({"rate": rate, "mode": batched_mode, "fixture": name, "maximum_linear_delta": delta,
+                                   "passed": delta <= 1e-12 and (name != "silence" or not any(batched["peaks"])),
+                                   "cpp_heap_calls": batched["cpp_heap_calls"] + single["cpp_heap_calls"],
+                                   "batched_peaks": batched["peaks"], "single_frame_peaks": single["peaks"]})
         print(f"Completed accuracy and continuity at {rate} Hz", flush=True)
     timings = summarize_timings([
         _call(binary, "--profile", mode, str(rate), str(inserts), str(repeats))
-        for rate in RATES for inserts in INSERT_COUNTS for mode in MODES
+        for rate in RATES for inserts in INSERT_COUNTS for mode in PROFILE_MODES
     ], repeats)
     source_files = ("tooling/native/peak_compare/CMakeLists.txt", "tooling/native/peak_compare/main.cpp",
                     "tooling/scripts/profile_peak_reuse.py", "plugins/kenn-vst3-au/Source/StreamingMeter.h")
@@ -191,7 +232,7 @@ def run(binary: Path, juce_source: Path, repeats: int = 20) -> dict[str, Any]:
                   "modules/juce_dsp/filter_design/juce_FilterDesign.cpp", "modules/juce_dsp/filter_design/juce_FilterDesign.h")
     heap_passed = all(row["cpp_heap_calls"] == 0 for row in accuracy + continuity + timings)
     return {
-        "schema": "kenn.peak_reuse_comparison.v1", "repeats": repeats,
+        "schema": "kenn.peak_reuse_comparison.v2", "repeats": repeats, "profile_modes": PROFILE_MODES,
         "provenance": {"native": info, "machine": platform.machine(), "python": platform.python_version(),
                        "numpy": np.__version__, "binary_sha256": _hash(binary), "juce_commit": commit,
                        "source_sha256": {name: _hash(PRODUCT_ROOT / name) for name in source_files},
@@ -199,15 +240,17 @@ def run(binary: Path, juce_source: Path, repeats: int = 20) -> dict[str, Any]:
         "accuracy_method": {"input": "Generated float32 antiphase stereo; continuous sinusoid amplitude 0.5",
                             "frequencies_cycles_per_frame": FREQUENCIES, "uniform_half_cycle_phases": PHASE_COUNT,
                             "tone_cases": cases,
-                            "cases_per_rate_and_mode": len(cases), "warmup_ms": 200, "peak_interval_ms": 100,
+                            "paired_tone_cases": pairs, "single_tones_per_rate_and_mode": len(cases),
+                            "paired_tones_per_rate_and_mode": len(pairs), "warmup_ms": 200, "peak_interval_ms": 100,
                             "error_bounds_db": ERROR_BOUNDS_DB, "bounds_are_engineering_margin": True},
         "accuracy": accuracy, "continuity": continuity, "timings": timings,
         "ordinary_cpp_new_guard_passed": heap_passed,
         "juce8_bounded_checks_passed": heap_passed and all(row["passed"] for row in continuity)
-            and all(row["passed"] for row in accuracy if row["mode"] in ("juce8", "juce8_frame")),
+            and all(row["passed"] for row in accuracy if row["mode"] == "juce8"),
         "limitations": [
             "Tone sweep and continuity checks are bounded comparisons, not full BS.1770/EBU conformance.",
             "Peaks describe delayed causal output bins, not corrected input intervals.",
+            "IIR has nonlinear phase: its impulse peak and round-trip estimate are not a fixed input-window delay.",
             "Current workload includes K-weighting and rolling M/S; JUCE modes include interpolation and peak scan only.",
             "Timings exclude capture/FFT worker, HTTP, model contention and host scheduling; not callback deadlines.",
             "C++ guard counts ordinary new/new[] only, not malloc or aligned allocations; no full heap proof.",

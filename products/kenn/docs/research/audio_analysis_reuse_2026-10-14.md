@@ -42,7 +42,7 @@ guard and memory measurement are still required.
 These licence facts are engineering screening against the existing project
 policy; they do not replace review of the exact distribution and its notices.
 
-## Next offline comparison
+## Measured offline comparisons
 
 The [first measured comparison](peak_reuse_comparison_2026-10-14.json) uses the
 existing cached JUCE 8.0.2 source, double-precision linear-phase FIR upsampling
@@ -64,9 +64,54 @@ selected runtime implementation. The receipt records its substantial CPU cost
 before capture/FFT/publishing. Current mode also includes K-weighting and M/S,
 whereas JUCE modes only interpolate and scan peaks, so this is not an equal-work
 speedup comparison. Ordinary C++ `new/new[]` observations are zero; malloc,
-aligned allocations, JUCE state size and RSS are not qualified. Next compare
-cheaper existing-framework variants before adding a new dependency. The live
-candidate remains disabled and all broader plan gates remain open.
+aligned allocations, JUCE state size and RSS are not qualified. This historical
+v1 receipt was produced by commit `684a9ffe6ac6c94ce14e9a307d0a412ae9f85580`.
+
+The [variant comparison](peak_reuse_variants_2026-10-14.json) varies arithmetic
+precision, FIR quality and filter algorithm in the same pinned framework. It
+adds 18 equal-amplitude cosine pairs to the 98 single tones per mode/rate. The
+two components reach +0.25 together every 40 input frames, so their exact
+continuous peak is 0.5; changing their relative phase must not count as better
+peak measurement. Every variant runs in prepared 128-frame chunks, with
+one-frame calls used separately to check boundary history.
+
+All four 8x FIR variants pass both families at 44.1/48/96 kHz. Their worst
+single-tone error is -0.108 dB and worst paired-tone error is -0.0713 dB. Both
+8x IIR variants pass the single tones but fail 9 of 18 pairs at every rate,
+underreading by as much as -0.947 dB. This agrees with JUCE's documented
+phase-changing IIR behavior; [the API](https://docs.juce.com/master/classjuce_1_1dsp_1_1Oversampling.html)
+also identifies maximum quality as the more expensive setting. Pinned
+[8.0.2 source](https://github.com/juce-framework/JUCE/blob/8.0.2/modules/juce_dsp/processors/juce_Oversampling.cpp)
+selects wider transitions and lower stopband attenuation for the lower-quality
+FIR. Lower-quality FIR's measured upsampling delay is 24.625 input frames,
+versus 38.625 at maximum quality; round-trip delays are 41 and 64.25 frames.
+IIR's 3.125-frame impulse maximum is recorded separately from delay. Its
+frequency-dependent phase prevents reporting a fixed upsampling delay.
+
+The Apple M3 arm64 Release run records 84 warmed CPU/wall cells with 20 raw
+repeats, 72 passing boundary/history comparisons and zero observed ordinary C++
+`new/new[]` calls during processing. At 64 inserts and 10 Hz, interpolation
+and peak scanning alone use these percentages of one core:
+
+| Input rate | FIR maximum quality, double | FIR maximum quality, float | FIR lower quality, double | FIR lower quality, float | IIR maximum quality, double | IIR maximum quality, float |
+|---|---|---|---|---|---|---|
+| 44.1 kHz | 43.54% | 46.70% | 31.71% | 34.33% | 21.26% | 21.15% |
+| 48 kHz | 47.24% | 50.90% | 34.78% | 33.31% | 23.14% | 23.02% |
+| 96 kHz | 94.58% | 101.40% | 68.48% | 66.87% | 46.44% | 46.03% |
+
+**Variant decision:** reject these IIR configurations for peak measurement.
+Float precision alone does not save CPU on this machine. Shorter FIR filters
+reduce the 96 kHz/64-insert cost by 27.6% in double and 29.3% in float versus
+the double maximum-quality reference, while clearing this bounded accuracy
+screen. Shortlist both shorter FIR variants for further comparison; precision
+ordering varies by sample rate. Their maximum serial 100 ms batch at 96 kHz
+is 68.54 ms and 67.78 ms respectively, before capture/FFT, loudness, publication
+or model work. This remains a substantial cost, not a worker deadline result.
+Do not select a production implementation from these isolated timings. Broader
+frequency/transient checks, corrected input intervals, reset/gap retirement,
+prepared storage/RSS and combined-worker contention remain open. Keep the live
+candidate disabled; retain the independently screened resampler/loudness
+options if the existing framework cannot meet the remaining accuracy/cost gates.
 
 Reproduce without fetching or installing libraries:
 
@@ -78,24 +123,29 @@ cmake --build /tmp/kenn-peak-reuse -j4
 apps/backend/.venv/bin/python tooling/scripts/profile_peak_reuse.py \
   --binary /tmp/kenn-peak-reuse/KENNPeakCompare \
   --juce-source "$KENN_JUCE_SOURCE_DIR" --repeats 20 \
-  --json-out /tmp/kenn-peak-reuse-comparison.json
+  --json-out /tmp/kenn-peak-reuse-variants.json
 KENN_PEAK_REUSE_TEST_BINARY=/tmp/kenn-peak-reuse/KENNPeakCompare \
   apps/backend/.venv/bin/python -m pytest -q \
   apps/backend/src/kenn/tests/test_profile_peak_reuse.py
 ```
 
 Set `KENN_JUCE_SOURCE_DIR` to the existing unmodified JUCE 8.0.2 checkout.
-The tool pins its commit and rejects Debug builds; generated audio stays in
-temporary storage. The committed receipt carries compiler and source/binary
-hashes, raw timing samples and every tone's generating parameters. Passing the
-runner's bounded checks does not select a library or close a runtime cost gate.
+The tool pins its commit and rejects Debug or mismatched architecture builds;
+run Python natively on the same architecture as the executable. Generated audio
+stays in temporary storage. The current runner writes schema v2 and retains
+failing configurations in its receipt; v1 reproduction requires the historical
+commit above. The receipt carries compiler and source/binary hashes, raw timing
+samples and every tone's generating parameters. The 87 scoped tool tests include
+compiled filter checks for all batch variants and the mixed-signal IIR failure.
+Passing the runner's bounded checks does not select a library or close a runtime
+cost gate.
 
 1. Keep the live LUFS/dBTP candidate disabled. Use the existing
    [qualification receipt](streaming_meter_qualification_2026-10-13.json) and
    plan gates as the baseline: broader high-frequency accuracy, delayed peak
    intervals, transient/temporal checks and sustained contention remain open.
-2. Compare existing KENN DSP with prepared JUCE FIR interpolation first; use
-   pinned libebur128 as a separate loudness/peak comparator. Evaluate pinned
+2. Carry the shorter JUCE FIR shortlist through the remaining accuracy/cost
+   gates; use pinned libebur128 as a separate loudness/peak comparator. Evaluate pinned
    r8brain only if the first comparison leaves an accuracy/cost gap. New
    dependency additions still require user approval.
 3. Use the same generated signals at 44.1/48/96 kHz, phase/frequency sweeps,

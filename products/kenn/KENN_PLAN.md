@@ -265,6 +265,11 @@ Execution plan for efficient continuous analysis (2026-10-13):
   single-frame 8x processing. Record analytic tone errors, causal delay,
   boundary history, ordinary C++ allocation observations and the CPU matrix.
   This bounded comparison does not close the meter qualification gate.
+- [x] Compare cheaper existing JUCE variants offline before adding a dependency:
+  float/double precision, shorter FIR filters and phase-changing IIR. Add paired
+  tones with analytic continuous peaks, retain failing scores, verify all batch
+  histories and profile the complete 1/8/32/64-insert matrix. Shorter FIR remains
+  a shortlist; the measured IIR peak errors rule out these IIR configurations.
 - [x] Connect web chat to explicitly associated native inserts before showing
   this continuous analysis in the browser. Carry the chosen insert identity and
   conversation ownership through `/api/ask`; never choose the latest insert
@@ -280,9 +285,11 @@ Execution plan for efficient continuous analysis (2026-10-13):
   First apply the standing reuse check: evaluate existing JUCE DSP and upstream
   loudness/resampling tools before extending KENN's interpolation kernel.
   The 14 October comparison makes JUCE double FIR 8x an accuracy reference,
-  but its measured 64-insert cost is too high to select this path. Compare cheaper
-  existing-framework variants next; retain independent resampler/loudness options
-  from the reuse review, with approval before adding dependencies.
+  but its measured 64-insert cost is too high to select this path. The cheaper
+  variant comparison shortlists lower-quality 8x FIR in float/double, with
+  remaining frequency/transient, interval, memory and combined-worker gates.
+  Retain independent resampler/loudness options from the reuse review, with
+  approval before adding dependencies.
   Keep the candidate disabled and its 10 Hz measurement cadence separate from 2 Hz
   HTTP publication until those gates pass.
 - [ ] Qualify controlled, matched sidechain bypass comparisons before reporting
@@ -557,10 +564,10 @@ or host deadline claim follows. All processing observations of ordinary C++
 `new/new[]` are zero; malloc/aligned allocation, JUCE prepared storage and RSS
 remain unmeasured. **Decision: retain double FIR 8x as an accuracy reference;
 do not select this measured path for runtime integration.** Its 64-insert cost
-leaves too little room for the owning worker. Next compare cheaper existing
-JUCE variants; use the [reuse review](docs/research/audio_analysis_reuse_2026-10-14.md)
-for independent alternatives and licence screening. New dependencies require
-approval. The live LUFS/dBTP candidate remains disabled.
+leaves too little room for the owning worker. The variant follow-up below
+applies the next reuse check; the [reuse review](docs/research/audio_analysis_reuse_2026-10-14.md)
+records independent alternatives and licence screening. New dependencies
+require approval. The live LUFS/dBTP candidate remains disabled.
 
 The reuse review gives the exact build/profile/test commands. Changed files:
 `KENN_PLAN.md`, `docs/research/audio_analysis_reuse_2026-10-14.md`,
@@ -568,6 +575,49 @@ The reuse review gives the exact build/profile/test commands. Changed files:
 `tooling/native/peak_compare/CMakeLists.txt`, `tooling/native/peak_compare/main.cpp`,
 `tooling/scripts/profile_peak_reuse.py`, and
 `apps/backend/src/kenn/tests/test_profile_peak_reuse.py`.
+
+Offline cheaper-JUCE follow-up (14 October): **148 scoped checks passed, four
+optional streaming-module checks skipped**. This includes all 87 peak-tool
+checks against the compiled native executable, streaming-tool guards and the
+sharing/export tests. The separate
+[v2 receipt](docs/research/peak_reuse_variants_2026-10-14.json) preserves the
+historical v1 evidence above and records seven modes, 98 single tones plus 18
+paired tones per mode/rate, 72 batch-history checks and 84 warmed timing cells.
+Every timing cell retains 20 raw CPU/wall repeats; source/binary hashes and
+native arm64 Release identity are verified.
+
+All maximum/lower-quality 8x FIR variants in float/double pass the -0.2/+0.1 dB
+engineering bounds at all three rates. Both IIR variants pass the single tones
+but fail nine paired tones per rate, underreading by as much as -0.947 dB.
+Their frequency-dependent phase changes relative component timing, so reject
+these IIR configurations for peak measurement. Float precision alone costs
+more CPU than double maximum-quality FIR in this run.
+
+| 64 inserts at 10 Hz | Maximum-quality double 8x FIR CPU | Lower-quality double 8x FIR CPU | Lower-quality float 8x FIR CPU |
+|---|---|---|---|
+| 44.1 kHz | 43.54% of one core | 31.71% | 34.33% |
+| 48 kHz | 47.24% | 34.78% | 33.31% |
+| 96 kHz | 94.58% | 68.48% | 66.87% |
+
+**Decision:** shortlist both shorter FIR variants for the remaining offline
+qualification. They cut the 96 kHz/64-insert microbenchmark cost by 27.6% and
+29.3%; their maximum serial 100 ms batch is 68.54 ms and 67.78 ms. These figures
+cover interpolation and peak scanning only. Combined capture/FFT, loudness,
+publisher/model contention and host scheduling are still unmeasured for these
+variants. Lower-quality FIR's measured upsampling delay is 24.625 input frames
+(round trip 41), versus 38.625 (round trip 64.25) at maximum quality. IIR impulse
+location is recorded separately and is not reported as fixed delay. All 72
+history checks pass with zero observed ordinary C++ `new/new[]` calls; broader
+frequency/transient accuracy, input-aligned intervals, reset/gap retirement,
+malloc/aligned allocations, prepared storage and RSS remain open. The production
+plug-in target and disabled live LUFS/dBTP gate stay unchanged.
+
+Build/profile/test commands and the versioned decisions are in the reuse review.
+This follow-up changes `KENN_PLAN.md`,
+`docs/research/audio_analysis_reuse_2026-10-14.md`,
+`docs/research/peak_reuse_variants_2026-10-14.json`,
+`tooling/native/peak_compare/main.cpp`, `tooling/scripts/profile_peak_reuse.py`,
+and `apps/backend/src/kenn/tests/test_profile_peak_reuse.py`.
 
 Jack selected **keep the next work offline** on 13 October. Continue the streaming
 meter qualification above; the prepared supervised Live qualification remains open.

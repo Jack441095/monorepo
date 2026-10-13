@@ -8,7 +8,9 @@
 #include <iostream>
 #include <memory>
 #include <new>
+#include <optional>
 #include <time.h>
+#include <type_traits>
 #include <vector>
 
 static_assert(JUCE_MAJOR_VERSION == 8 && JUCE_MINOR_VERSION == 0 && JUCE_BUILDNUMBER == 2,
@@ -31,8 +33,63 @@ void operator delete[](void* value) noexcept { std::free(value); }
 using StereoFrame = std::array<float, 2>;
 constexpr int blockFrames = 128; // Shared-worker input chunk for the batched alternative.
 
-// Each comparison owns its filter state. The frame-at-a-time mode exposes the
-// cost of dropping JUCE into the current push(frame) interface without batching.
+// Precision, quality and algorithm vary behind the same prepared interface;
+// neither conversion nor the peak scan is omitted from a candidate's cost.
+template <typename Sample>
+class Interpolator
+{
+public:
+    Interpolator(size_t power, bool iir, bool maximumQuality, int chunk)
+        : sampler(2, power, iir ? juce::dsp::Oversampling<Sample>::filterHalfBandPolyphaseIIR
+                               : juce::dsp::Oversampling<Sample>::filterHalfBandFIREquiripple,
+                  maximumQuality, false), chunkFrames(chunk)
+    {
+        sampler.initProcessing(blockFrames);
+        audio.setSize(2, blockFrames);
+        factor = static_cast<int>(sampler.getOversamplingFactor());
+        roundTripDelay = sampler.getLatencyInSamples();
+        // The impulse peak locates the FIR centre, but an IIR's phase changes
+        // with frequency. Never turn its impulse maximum into a fixed delay.
+        audio.clear(); audio.setSample(0, 0, 1.0);
+        const auto response = sampler.processSamplesUp(juce::dsp::AudioBlock<const Sample>(audio));
+        size_t maximum = 0;
+        for (size_t sample = 1; sample < response.getNumSamples(); ++sample)
+            if (std::abs(response.getSample(0, sample)) > std::abs(response.getSample(0, maximum))) maximum = sample;
+        // Dimensionless full-scale tolerances reflect the two arithmetic types.
+        constexpr double tolerance = std::is_same_v<Sample, float> ? 1e-6 : 1e-12;
+        if (!iir && std::abs(response.getSample(0, maximum) - 1.0) > tolerance)
+            throw std::runtime_error("Impulse centre is not unity"); // Reject an unrecognised FIR response instead of guessing its delay.
+        impulsePeakFrame = static_cast<double>(maximum) / factor;
+        if (!iir) delay = impulsePeakFrame;
+        sampler.reset(); // Retire the artificial impulse before measurement.
+    }
+
+    double processBin(const StereoFrame* input, int binFrames)
+    {
+        double peak = 0.0;
+        for (int first = 0; first < binFrames; first += chunkFrames)
+        {
+            const auto count = std::min(chunkFrames, binFrames - first);
+            for (int sample = 0; sample < count; ++sample)
+                for (int channel = 0; channel < 2; ++channel) audio.setSample(channel, sample, input[first + sample][channel]);
+            const auto up = sampler.processSamplesUp(juce::dsp::AudioBlock<const Sample>(audio).getSubBlock(0, static_cast<size_t>(count)));
+            for (size_t channel = 0; channel < up.getNumChannels(); ++channel)
+                for (size_t sample = 0; sample < up.getNumSamples(); ++sample)
+                    peak = std::max(peak, std::abs(static_cast<double>(up.getSample(static_cast<int>(channel), static_cast<int>(sample)))));
+        }
+        return peak;
+    }
+
+    std::optional<double> delay;
+    double impulsePeakFrame = 0.0, roundTripDelay = 0.0;
+    int factor = 0;
+
+private:
+    juce::dsp::Oversampling<Sample> sampler;
+    juce::AudioBuffer<Sample> audio;
+    int chunkFrames;
+};
+
 class Candidate
 {
 public:
@@ -45,66 +102,81 @@ public:
             factor = 4;
             return;
         }
-        if (mode != "juce4" && mode != "juce8" && mode != "juce8_frame")
+        struct Choice { const char* name; size_t power; bool floats, iir, maximumQuality; int chunk; };
+        // power is log2(interpolation ratio); chunks are input frames. Keep
+        // named configurations explicit so a typo cannot alter another variable.
+        constexpr Choice choices[] {
+            { "juce4", 2, false, false, true, blockFrames },
+            { "juce8", 3, false, false, true, blockFrames },
+            { "juce8_frame", 3, false, false, true, 1 },
+            { "juce8_float", 3, true, false, true, blockFrames },
+            { "juce8_float_frame", 3, true, false, true, 1 },
+            { "juce8_low", 3, false, false, false, blockFrames },
+            { "juce8_low_frame", 3, false, false, false, 1 },
+            { "juce8_low_float", 3, true, false, false, blockFrames },
+            { "juce8_low_float_frame", 3, true, false, false, 1 },
+            { "juce8_iir", 3, false, true, true, blockFrames },
+            { "juce8_iir_frame", 3, false, true, true, 1 },
+            { "juce8_iir_float", 3, true, true, true, blockFrames },
+            { "juce8_iir_float_frame", 3, true, true, true, 1 },
+        };
+        const auto choice = std::find_if(std::begin(choices), std::end(choices), [&](const auto& value) { return mode == value.name; });
+        if (choice == std::end(choices))
             throw std::runtime_error("Unknown candidate"); // A misspelt mode must not select another implementation.
-        chunkFrames = mode == "juce8_frame" ? 1 : blockFrames;
-        const size_t power = mode == "juce4" ? 2 : 3; // JUCE's factor argument is log2(interpolation ratio).
-        sampler = std::make_unique<juce::dsp::Oversampling<double>>(
-            2, power, juce::dsp::Oversampling<double>::filterHalfBandFIREquiripple, true, false);
-        sampler->initProcessing(blockFrames);
-        audio.setSize(2, blockFrames);
-        factor = static_cast<int>(sampler->getOversamplingFactor());
-        roundTripDelay = sampler->getLatencyInSamples();
-        // getLatencyInSamples includes downsampling. Locate the prepared FIR's
-        // impulse centre to measure the upsampling-only delay, then retire that
-        // artificial passage before feeding any qualification signal.
-        audio.clear(); audio.setSample(0, 0, 1.0);
-        const auto response = sampler->processSamplesUp(juce::dsp::AudioBlock<const double>(audio));
-        size_t maximum = 0;
-        for (size_t sample = 1; sample < response.getNumSamples(); ++sample)
-            if (std::abs(response.getSample(0, sample)) > std::abs(response.getSample(0, maximum))) maximum = sample;
-        if (std::abs(response.getSample(0, maximum) - 1.0) > 1e-12)
-            throw std::runtime_error("Impulse centre is not unity"); // Reject an unrecognised FIR response instead of guessing its delay.
-        delay = static_cast<double>(maximum) / factor;
-        sampler->reset();
+        linearPhase = !choice->iir;
+        if (choice->floats)
+        {
+            floats = std::make_unique<Interpolator<float>>(choice->power, choice->iir, choice->maximumQuality, choice->chunk);
+            copyMetadata(*floats);
+        }
+        else
+        {
+            doubles = std::make_unique<Interpolator<double>>(choice->power, choice->iir, choice->maximumQuality, choice->chunk);
+            copyMetadata(*doubles);
+        }
     }
 
     double processBin(const StereoFrame* input)
     {
         watchCppHeap = true;
         double peak = 0.0;
-        if (!sampler)
+        if (floats) peak = floats->processBin(input, binFrames);
+        else if (doubles) peak = doubles->processBin(input, binFrames);
+        else
         {
             // Include the actual meter's loudness work; the receipt explicitly
             // distinguishes this from JUCE's interpolation-only workload.
             for (int sample = 0; sample < binFrames; ++sample) meter.push(input[sample][0], input[sample][1]);
             peak = meter.snapshot().truePeakLinear;
         }
-        else
-        {
-            for (int first = 0; first < binFrames; first += chunkFrames)
-            {
-                const auto count = std::min(chunkFrames, binFrames - first);
-                for (int sample = 0; sample < count; ++sample)
-                    for (int channel = 0; channel < 2; ++channel) audio.setSample(channel, sample, input[first + sample][channel]);
-                const auto up = sampler->processSamplesUp(juce::dsp::AudioBlock<const double>(audio).getSubBlock(0, static_cast<size_t>(count)));
-                for (size_t channel = 0; channel < up.getNumChannels(); ++channel)
-                    for (size_t sample = 0; sample < up.getNumSamples(); ++sample) peak = std::max(peak, std::abs(up.getSample(static_cast<int>(channel), static_cast<int>(sample))));
-            }
-        }
         watchCppHeap = false;
         return peak;
     }
 
-    double delay = 0.0, roundTripDelay = 0.0;
+    std::optional<double> delay, impulsePeakFrame;
+    double roundTripDelay = 0.0;
+    bool linearPhase = true;
     int factor = 0;
 
 private:
-    int binFrames = 0, chunkFrames = blockFrames;
+    template <typename Sample>
+    void copyMetadata(const Interpolator<Sample>& value)
+    {
+        factor = value.factor; delay = value.delay; impulsePeakFrame = value.impulsePeakFrame;
+        roundTripDelay = value.roundTripDelay;
+    }
+
+    int binFrames = 0;
     KENNStreamingMeter meter;
-    std::unique_ptr<juce::dsp::Oversampling<double>> sampler;
-    juce::AudioBuffer<double> audio;
+    std::unique_ptr<Interpolator<float>> floats;
+    std::unique_ptr<Interpolator<double>> doubles;
 };
+
+static void jsonOptional(const std::optional<double>& value)
+{
+    if (value) std::cout << *value;
+    else std::cout << "null"; // IIR phase and the current filter's unmeasured impulse cannot be reported as fixed measured delay.
+}
 
 static int integerArgument(const char* text)
 {
@@ -150,7 +222,10 @@ static void trace(const std::string& mode, int rate, const char* path)
         throw std::runtime_error("Input must contain complete stereo frames and 100 ms bins"); // Never hide an omitted tail in comparison evidence.
     Candidate candidate(mode, rate);
     cppHeapCalls = 0;
-    std::cout << "{\"factor\":" << candidate.factor << ",\"upsampling_delay_frames\":" << candidate.delay
+    std::cout << "{\"factor\":" << candidate.factor << ",\"upsampling_delay_frames\":";
+    jsonOptional(candidate.delay);
+    std::cout << ",\"impulse_peak_frame\":"; jsonOptional(candidate.impulsePeakFrame);
+    std::cout << ",\"linear_phase\":" << (candidate.linearPhase ? "true" : "false")
               << ",\"round_trip_delay_frames\":" << candidate.roundTripDelay << ",\"peaks\":[";
     for (size_t first = 0; first < frames.size(); first += bin)
     {
@@ -207,6 +282,13 @@ int main(int argc, char** argv)
         if (argc == 2 && std::string(argv[1]) == "--info")
         {
             std::cout << "{\"juce_version\":\"8.0.2\",\"compiler\":\"" << __VERSION__
+#if defined(__aarch64__)
+                      << "\",\"compiled_arch\":\"arm64"
+#elif defined(__x86_64__)
+                      << "\",\"compiled_arch\":\"x86_64"
+#else
+                      << "\",\"compiled_arch\":\"unknown" // Unknown native targets cannot support an architecture-specific CPU comparison.
+#endif
                       << "\",\"pointer_bits\":" << sizeof(void*) * 8
                       << ",\"current_meter_bytes\":" << sizeof(KENNStreamingMeter)
 #ifdef NDEBUG
