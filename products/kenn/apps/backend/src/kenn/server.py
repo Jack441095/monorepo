@@ -147,7 +147,7 @@ _LIVE_IMPERATIVE_VERBS = (
     "set", "pan", "focus", "boost", "cut", "raise", "lower", "turn", "mute", "unmute", "solo", "unsolo", "center",
     "centre", "recenter", "recentre", "create", "make", "arm", "disarm", "insert", "add", "rename", "remove", "delete",
     "undo", "duplicate", "group", "select", "put", "bring", "push", "pull", "crank", "drop", "nudge", "tuck", "take",
-    "kill", "max",
+    "kill", "max", "jump", "fold", "unfold", "toggle",
 )
 _LIVE_IMPERATIVE_RE = re.compile(
     r"^\s*(?:please\s+)?(?:" + "|".join(_LIVE_IMPERATIVE_VERBS) + r"|gain[- ]stage)\b",
