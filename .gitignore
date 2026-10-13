@@ -47,6 +47,8 @@ workspace/tmp/
 *.sqlite3
 *.sqlite
 *.wav
+*.mp4
+*.mov
 *.pack
 *.onnx.data
 
