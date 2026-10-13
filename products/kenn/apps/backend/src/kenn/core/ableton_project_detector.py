@@ -124,7 +124,6 @@ def detect_active_ableton_project() -> Optional[Dict[str, Any]]:
 
         # Search standard Ableton project directories
         search_roots = [
-            "/Volumes/Jack_Gandy_1TB_SSD/Ableton Projects",
             os.path.expanduser("~/Music/Ableton/Live Projects"),
             os.path.expanduser("~/Documents/Ableton"),
         ]
