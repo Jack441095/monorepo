@@ -260,6 +260,11 @@ Execution plan for efficient continuous analysis (2026-10-13):
   K-weighting, ungated 400 ms/3-second energy and fixed FIR history. Verify
   retirement/warm-up, generated calibration/peak cases, continuous numerical
   references and combined worker cost across 44.1/48/96 kHz and 1/8/32/64 inserts.
+- [x] Apply the standing reuse check to the peak accuracy gap: compare current
+  KENN DSP with prepared JUCE 8.0.2 double FIR at 4x/8x, including batched and
+  single-frame 8x processing. Record analytic tone errors, causal delay,
+  boundary history, ordinary C++ allocation observations and the CPU matrix.
+  This bounded comparison does not close the meter qualification gate.
 - [x] Connect web chat to explicitly associated native inserts before showing
   this continuous analysis in the browser. Carry the chosen insert identity and
   conversation ownership through `/api/ask`; never choose the latest insert
@@ -274,6 +279,10 @@ Execution plan for efficient continuous analysis (2026-10-13):
   contention. Investigate the intermittent callback/freshness tails recorded below.
   First apply the standing reuse check: evaluate existing JUCE DSP and upstream
   loudness/resampling tools before extending KENN's interpolation kernel.
+  The 14 October comparison makes JUCE double FIR 8x an accuracy reference,
+  but its measured 64-insert cost is too high to select this path. Compare cheaper
+  existing-framework variants next; retain independent resampler/loudness options
+  from the reuse review, with approval before adding dependencies.
   Keep the candidate disabled and its 10 Hz measurement cadence separate from 2 Hz
   HTTP publication until those gates pass.
 - [ ] Qualify controlled, matched sidechain bypass comparisons before reporting
@@ -517,6 +526,48 @@ apps/backend/.venv/bin/python tooling/scripts/profile_streaming_meter.py
 --json-out /tmp/kenn-streaming-meter.json`. This uses already installed NumPy/SciPy
 and the configured native target. No dependency, permission or CI setting changed;
 no plug-in was installed or distributed, and no producer session was accessed.
+
+Offline JUCE reuse comparison (14 October): **47 scoped tool checks passed**,
+including compiled-native integration checks. The
+[receipt](docs/research/peak_reuse_comparison_2026-10-14.json) records 98 generated
+known-amplitude tones per mode/rate at 44.1/48/96 kHz, 12 boundary/history checks,
+48 warmed timing cells with 20 raw repeats, compiler and source/binary hashes.
+The standalone tool links the already cached, pinned JUCE 8.0.2 DSP module;
+it does not fetch a library or change the production plug-in target.
+
+The -0.2/+0.1 dB tone bound is an engineering margin, not a conformance claim.
+At every rate, current KENN fails 28 of 98 tones (-0.455 to +0.220 dB), JUCE
+double FIR 4x fails six (down to -0.436 dB), and JUCE double FIR 8x passes all
+98 (down to -0.108 dB). Both 128-frame and one-frame 8x calls preserve the same
+causal peak bins across silence, right-channel DC, bin-edge impulses and noise.
+Upsampling-only delay measures 35.75 input frames at 4x and 38.625 at 8x;
+JUCE's round-trip API reports 59.5 and 64.25 frames. Input-aligned peak bounds,
+reset/gap retirement and full transient/temporal conformance remain open.
+
+| 64 inserts at 10 Hz | Current meter CPU | JUCE double FIR 4x CPU | JUCE double FIR 8x CPU, 128-frame chunks | JUCE double FIR 8x CPU, one frame | Batched 8x maximum serial 100 ms tick |
+|---|---|---|---|---|---|
+| 44.1 kHz | 4.32% of one core | 24.28% | 43.46% | 50.77% | 43.57 ms |
+| 48 kHz | 4.67% | 26.45% | 47.35% | 53.21% | 47.42 ms |
+| 96 kHz | 9.36% | 52.86% | 94.95% | 110.01% | 97.13 ms |
+
+These are separate serial microbenchmarks. Current mode includes K-weighting
+and rolling M/S; JUCE modes only interpolate and scan peaks. They exclude the
+capture/FFT worker, HTTP, model and host scheduling, so no equal-work speedup
+or host deadline claim follows. All processing observations of ordinary C++
+`new/new[]` are zero; malloc/aligned allocation, JUCE prepared storage and RSS
+remain unmeasured. **Decision: retain double FIR 8x as an accuracy reference;
+do not select this measured path for runtime integration.** Its 64-insert cost
+leaves too little room for the owning worker. Next compare cheaper existing
+JUCE variants; use the [reuse review](docs/research/audio_analysis_reuse_2026-10-14.md)
+for independent alternatives and licence screening. New dependencies require
+approval. The live LUFS/dBTP candidate remains disabled.
+
+The reuse review gives the exact build/profile/test commands. Changed files:
+`KENN_PLAN.md`, `docs/research/audio_analysis_reuse_2026-10-14.md`,
+`docs/research/peak_reuse_comparison_2026-10-14.json`,
+`tooling/native/peak_compare/CMakeLists.txt`, `tooling/native/peak_compare/main.cpp`,
+`tooling/scripts/profile_peak_reuse.py`, and
+`apps/backend/src/kenn/tests/test_profile_peak_reuse.py`.
 
 Jack selected **keep the next work offline** on 13 October. Continue the streaming
 meter qualification above; the prepared supervised Live qualification remains open.

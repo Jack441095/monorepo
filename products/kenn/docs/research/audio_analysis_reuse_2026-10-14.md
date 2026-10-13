@@ -1,7 +1,7 @@
 # Audio analysis reuse review — 14 October 2026
 
-This is a shortlist for the next offline comparison, not a dependency change or
-qualification result. The standing reuse process lives in [KENN_PLAN.md](../../KENN_PLAN.md).
+This is a shortlist with a bounded offline comparison, not a dependency change
+or host qualification. The standing reuse process lives in [KENN_PLAN.md](../../KENN_PLAN.md).
 Distribution screening follows [THIRD_PARTY_LICENCES.md](THIRD_PARTY_LICENCES.md);
 pinned package versions, transitive code and required notices remain part of the
 distribution evidence. No library was installed or added during this review.
@@ -43,6 +43,52 @@ These licence facts are engineering screening against the existing project
 policy; they do not replace review of the exact distribution and its notices.
 
 ## Next offline comparison
+
+The [first measured comparison](peak_reuse_comparison_2026-10-14.json) uses the
+existing cached JUCE 8.0.2 source, double-precision linear-phase FIR upsampling
+and generated stereo audio. Current KENN, JUCE 4x, JUCE 8x in 128-frame chunks,
+and JUCE 8x one frame at a time are tested at 44.1/48/96 kHz. Each mode/rate has
+98 known-amplitude tones; a -0.2/+0.1 dB engineering margin is deliberately
+stricter than the selected Tech 3341 cases. It is not a conformance claim.
+
+At every rate, current KENN fails 28 tones (errors -0.455 to +0.220 dB), JUCE
+4x fails six (minimum -0.436 dB), and both JUCE 8x modes pass all 98 (minimum
+-0.108 dB). Better filtering removes one error source; a 4x sample grid still
+misses some continuous peaks. Twelve silence/DC/boundary-impulse/noise checks
+preserve the 8x peak bins across batch sizes. Upsampling-only delay is 35.75
+input frames at 4x and 38.625 at 8x; the API reports round-trip delays of 59.5
+and 64.25 frames. Corrected input intervals remain unimplemented.
+
+**Decision:** keep this JUCE double 8x path as an accuracy reference, not a
+selected runtime implementation. The receipt records its substantial CPU cost
+before capture/FFT/publishing. Current mode also includes K-weighting and M/S,
+whereas JUCE modes only interpolate and scan peaks, so this is not an equal-work
+speedup comparison. Ordinary C++ `new/new[]` observations are zero; malloc,
+aligned allocations, JUCE state size and RSS are not qualified. Next compare
+cheaper existing-framework variants before adding a new dependency. The live
+candidate remains disabled and all broader plan gates remain open.
+
+Reproduce without fetching or installing libraries:
+
+```sh
+cmake -S tooling/native/peak_compare -B /tmp/kenn-peak-reuse \
+  -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
+  -DKENN_JUCE_SOURCE_DIR="$KENN_JUCE_SOURCE_DIR"
+cmake --build /tmp/kenn-peak-reuse -j4
+apps/backend/.venv/bin/python tooling/scripts/profile_peak_reuse.py \
+  --binary /tmp/kenn-peak-reuse/KENNPeakCompare \
+  --juce-source "$KENN_JUCE_SOURCE_DIR" --repeats 20 \
+  --json-out /tmp/kenn-peak-reuse-comparison.json
+KENN_PEAK_REUSE_TEST_BINARY=/tmp/kenn-peak-reuse/KENNPeakCompare \
+  apps/backend/.venv/bin/python -m pytest -q \
+  apps/backend/src/kenn/tests/test_profile_peak_reuse.py
+```
+
+Set `KENN_JUCE_SOURCE_DIR` to the existing unmodified JUCE 8.0.2 checkout.
+The tool pins its commit and rejects Debug builds; generated audio stays in
+temporary storage. The committed receipt carries compiler and source/binary
+hashes, raw timing samples and every tone's generating parameters. Passing the
+runner's bounded checks does not select a library or close a runtime cost gate.
 
 1. Keep the live LUFS/dBTP candidate disabled. Use the existing
    [qualification receipt](streaming_meter_qualification_2026-10-13.json) and
