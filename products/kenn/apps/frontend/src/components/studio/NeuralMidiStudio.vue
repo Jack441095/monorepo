@@ -49,7 +49,7 @@
           @click="generateBassline"
         >
           <span v-if="isGenerating" class="midi-studio__spinner"></span>
-          <span v-else>⚡ Generate Bassline</span>
+          <span v-else>Generate Bassline</span>
         </button>
       </div>
     </div>

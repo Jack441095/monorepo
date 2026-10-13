@@ -39,13 +39,13 @@
         </div>
         <div v-if="proposal.predicted_metrics" class="kenn-action-card__metrics-row">
           <span class="kenn-action-card__metric-badge kenn-action-card__metric-badge--masking">
-            📉 -{{ proposal.predicted_metrics.masking_reduction_percent }}% Masking
+            -{{ proposal.predicted_metrics.masking_reduction_percent }}% Masking
           </span>
           <span class="kenn-action-card__metric-badge kenn-action-card__metric-badge--headroom">
-            🎚️ +{{ proposal.predicted_metrics.headroom_reclaimed_db }} dB Headroom
+            +{{ proposal.predicted_metrics.headroom_reclaimed_db }} dB Headroom
           </span>
           <span class="kenn-action-card__metric-badge kenn-action-card__metric-badge--mono">
-            🌐 +{{ proposal.predicted_metrics.mono_correlation_delta }} Correlation
+            +{{ proposal.predicted_metrics.mono_correlation_delta }} Correlation
           </span>
         </div>
       </div>

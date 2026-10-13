@@ -21,7 +21,10 @@ RATE_LIMITS = {
     "audiogen_status": (80, 60),
     "suggest": (80, 60),
     "feedback": (60, 60),
-    "mix_review": (6, 60 * 60),
+    # 120 requests per 60 seconds (2 Hz burst ceiling) for mix review, masking radar,
+    # and reference matching. The previous 6/hr limit triggered 429 Too Many Requests
+    # during active studio mixing where workspace analysis fans out to multiple sub-endpoints.
+    "mix_review": (120, 60),
     "mix_review_status": (120, 60),
     "automix_upload": (6, 60 * 60),
     "automix_status": (120, 60),

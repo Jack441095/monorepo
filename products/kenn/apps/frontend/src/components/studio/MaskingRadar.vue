@@ -104,7 +104,7 @@
                 @click="applyRemedy(issue)"
               >
                 <span v-if="remediatingCode === issue.code" class="masking-card__spinner"></span>
-                <span v-else>⚡ Formulate Surgical Carve</span>
+                <span v-else>Formulate Surgical Carve</span>
               </button>
             </div>
           </div>
@@ -119,13 +119,13 @@
         <span>{{ activeProposal.action }} on {{ activeProposal.track_name }}</span>
         <div class="masking-radar__metrics-chips" v-if="activeProposal.predicted_metrics">
           <span class="chip-masking">
-            📉 -{{ activeProposal.predicted_metrics.masking_reduction_percent }}% Masking
+            -{{ activeProposal.predicted_metrics.masking_reduction_percent }}% Masking
           </span>
           <span class="chip-headroom">
-            🎚️ +{{ activeProposal.predicted_metrics.headroom_reclaimed_db }} dB Headroom
+            +{{ activeProposal.predicted_metrics.headroom_reclaimed_db }} dB Headroom
           </span>
           <span class="chip-mono">
-            🌐 +{{ activeProposal.predicted_metrics.mono_correlation_delta }} Correlation
+            +{{ activeProposal.predicted_metrics.mono_correlation_delta }} Correlation
           </span>
         </div>
       </div>

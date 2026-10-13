@@ -10,7 +10,7 @@
         :title="realtimeAnalysisEnabled ? 'Pause realtime analysis to eliminate OSC latency & CPU load' : 'Resume realtime analysis'"
         @click="toggleRealtimeAnalysis()"
       >
-        {{ realtimeAnalysisEnabled ? '⚡ Realtime ON' : '⏸ Paused' }}
+        {{ realtimeAnalysisEnabled ? 'Realtime ON' : 'Paused' }}
       </button>
       <button type="button" class="live-status__refresh-btn" :disabled="refreshing" title="Refresh Live status" @click="refresh">
         {{ refreshing ? 'Checking…' : 'Refresh' }}

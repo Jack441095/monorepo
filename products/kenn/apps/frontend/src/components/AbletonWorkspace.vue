@@ -4,7 +4,7 @@
     <transition name="fade">
       <div v-if="detectedBounce" class="mix-lab__bounce-alert" role="alert">
         <div class="mix-lab__bounce-alert-info">
-          <span class="mix-lab__bounce-alert-badge">⚡ Live Export Detected</span>
+          <span class="mix-lab__bounce-alert-badge">Live Export Detected</span>
           <strong>{{ detectedBounce.label }}</strong>
           <span class="mix-lab__bounce-alert-filename">({{ detectedBounce.filename }} • {{ formatSize(detectedBounce.size_bytes) }})</span>
         </div>
@@ -99,7 +99,7 @@
           title="Jump to Session Doctor & 40-Band Masking Radar"
           @click="activeView = 'masking'"
         >
-          🎯 Masking Radar
+          Masking Radar
         </button>
         <button
           type="button"
@@ -108,7 +108,7 @@
           title="Jump to Commercial Reference Matcher (A/B)"
           @click="activeView = 'reference'"
         >
-          ⚖️ Stem A/B Match
+          Stem A/B Match
         </button>
       </div>
 
@@ -505,7 +505,7 @@
                     :title="`Ask KENN to formulate a Live 12 proposal for ${flag.label}`"
                     @click="askKennToFix(flag)"
                   >
-                    ⚡ Ask KENN to Fix
+                    Ask KENN to Fix
                   </button>
                 </li>
               </ul>
@@ -521,7 +521,7 @@
                 :disabled="sending"
                 @click="askKennToFixAll"
               >
-                🩺 Propose Live 12 Fix Recipe for All Flags
+                Propose Live 12 Fix Recipe for All Flags
               </button>
             </div>
           </div>
@@ -571,7 +571,7 @@
               :disabled="sending"
               @click="askKennToFixAll"
             >
-              🩺 Propose Live 12 Fix Recipe for All Flags
+              Propose Live 12 Fix Recipe for All Flags
             </button>
           </div>
         </div>
@@ -765,7 +765,7 @@ async function pollForNewBounces() {
       if (data.has_new && data.new_bounce) {
         detectedBounce.value = data.new_bounce
         void scanProjectAudio()
-        showToast(`⚡ New Live bounce detected: ${data.new_bounce.label}`, 'info')
+        showToast(`New Live bounce detected: ${data.new_bounce.label}`, 'info')
       }
     }
   } catch {
