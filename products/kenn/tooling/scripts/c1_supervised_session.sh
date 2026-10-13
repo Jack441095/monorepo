@@ -214,7 +214,7 @@ run_measure() {
     note "kept the existing $label.json"
     return 0
   fi
-  say "Running $label: 30 questions, roughly 10 minutes. Leave the Mac alone until it finishes."
+  say "Running $label: 30 questions, 5 to 15 minutes. Leave the Mac alone until it finishes."
   # The harness exits 1 when any row errored; that is a result to keep, not a reason to stop the session.
   if ! (cd "$KENN_ROOT" && env "${STREAM_ENV[@]}" "$PYTHON" tooling/scripts/measure_chat_latency.py --limit 30 \
         --build-manifest "$OUT/manifest.json" --timeout 90 --receipt "$receipt" "$@" 2>&1 | tee "$OUT/$label.log"); then
@@ -348,9 +348,15 @@ for path in sorted(glob.glob(f"{out}/*.json")):
     c, s = report["counts"], report["seconds"]
     swaps = [r["swap_bytes"] for r in report["rows"] if r.get("swap_bytes") is not None]
     pressure = sorted({r["memory_pressure"] for r in report["rows"] if r.get("memory_pressure")})
+    # Median decode rate over calls that report both halves. A fanless Air fell from about 29 to 20 tok/s mid-session
+    # in the 11 Oct v4 bench; watching this per run is how a throttled run gets spotted instead of a fixed cool-down.
+    rates = sorted(call["completion_tokens"] / (call["eval_duration_ns"] / 1e9)
+                   for row in report["rows"] for call in row.get("provider_calls") or []
+                   if call.get("completion_tokens") and call.get("eval_duration_ns"))
+    decode = f"{rates[len(rates) // 2]:.1f}" if rates else "?"
     print(f"  {name:24} delivery {c.get('delivery')}  accepted<=15s {c['eligible_accepted_within_15_seconds']}/{c['eligible']}"
           f"  median {s['all_median']}s  ttft {s.get('ttft_median')}s"
-          f"  swap {min(swaps) if swaps else '?'}..{max(swaps) if swaps else '?'} B  pressure {pressure or '?'}")
+          f"  decode {decode} tok/s  swap {min(swaps) if swaps else '?'}..{max(swaps) if swaps else '?'} B  pressure {pressure or '?'}")
     notes["runs"][name] = ({"live_open": True, "live_set": os.environ["LIVE_SET"], "buffer_samples": os.environ["LIVE_BUFFER"],
                             "sample_rate_hz": os.environ["LIVE_RATE"], "audio_dropouts": os.environ["DROPOUTS"]}
                            if name.startswith("live-open") else closed)

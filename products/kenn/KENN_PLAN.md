@@ -579,12 +579,17 @@ what to do; they do not supply owner grades, and each still runs only when its o
 - **Note-served answers do not count as model answers** for the 15 s / 70% gate. If notes are served they get their
   own delivery class, reported beside model answers the way abstentions are; C5 forbids relabelling a missed
   target as passed. Whether to serve them at all still waits on Jack grading the ~40-question pack.
-- **MLX against Ollama on the same Qwen3-4B-Instruct-2507 checkpoint:** run it as a measurement, on the Mac, after the
-  C1 receipts exist, with `mlx-lm` installed in that owner session. Production stays on Ollama unless MLX is faster
-  on the same 30 questions with held-out quality and grounding unchanged. Speculative decoding follows only that
-  comparison.
-- **Reference-numbers and precedence-effect notes:** write both from published, citable conventions, check each
-  figure against its source before merge, and rebuild on a GPU box per L2, never on the Mac.
+- **MLX and speculative decoding: parked.** The speed item was opened because v4 had 8 late answers; v7 (11 Oct,
+  Live open, mains) had 0 model answers over 15 s and a 6 s median in all six runs. Speed is not what keeps the
+  gate open now; owner-graded correctness is. Reopen only if the C1 receipts or a later bench show late answers
+  again, and then on the same Qwen3-4B-Instruct-2507 checkpoint with held-out quality unchanged.
+- **Reference-numbers and precedence-effect notes: held, then done together.** The 11 Oct check found the reference
+  figures already indexed and the misses to be retrieval, and any rebuild makes the next bench incomparable with
+  v7 while its grading is pending. After Jack grades v7, write both notes from cited sources, check each figure
+  against its source, and rebuild once on a GPU box per L2, never on the Mac.
+- **Cool-down between runs: none fixed.** v7 ran six back to back without slowing; v4's 29 to 20 tok/s fall did not
+  recur. Instead the C1 session prints each run's median decode rate so throttling shows up, rather than a pause
+  whose length nobody measured.
 - **128-token cap:** keep it until the C1 receipts are in, then compare truncation and timely acceptance against the
   384-token ceiling on the same 30 questions before changing it.
 
