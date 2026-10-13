@@ -246,8 +246,24 @@ def get_accumulated_usage() -> list[dict]:
     return [u.to_dict() for u in _global_usage]
 
 
+# The newest call made on this thread. Each HTTP request and each background upgrade runs on its own thread, so this
+# is the call the answer on that thread made; _global_usage[-1] could be another chat's call that finished later,
+# or the call that held the model slot when this one was refused as busy (11 Oct 2026 audit, item 2).
+_thread_usage = threading.local()
+
+
+def last_thread_usage() -> LLMUsage | None:
+    return getattr(_thread_usage, "last", None)
+
+
+def forget_thread_usage() -> None:
+    """Start a new answer on this thread with no call on record, so a template answer never borrows the last one."""
+    _thread_usage.last = None
+
+
 def _add_usage(usage: LLMUsage) -> None:
     _global_usage.append(usage)
+    _thread_usage.last = usage
     captured = _usage_capture.get()
     if captured is not None:
         captured.append(usage)

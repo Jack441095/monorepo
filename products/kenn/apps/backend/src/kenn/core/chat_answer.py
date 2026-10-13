@@ -977,6 +977,9 @@ def make_answer(
     _last_outcome.abstained = False
     _last_outcome.rejected = None
     _last_outcome.transient = False
+    from kenn.llm import llm_rewrite as _llm
+
+    _llm.forget_thread_usage()
     template = build_template_answer(
         query,
         results,
@@ -1209,13 +1212,14 @@ def _last_call_timing() -> list[str]:
 
     Probe medians crept from 10 s to 14 s over three runs on one companion (4 Oct 2026) and nothing in the log said
     whether load, prefill or decode grew. Ollama keeps these numbers on every response, so we write them down.
-    One background job runs at a time, so the newest record belongs to this answer.
+    Read from this thread's own newest call: the global list's newest can belong to another chat, or to the call
+    that held the model slot when this one was refused as busy.
     """
     from kenn.llm import llm_rewrite
 
-    if not llm_rewrite._global_usage:
+    call = llm_rewrite.last_thread_usage()
+    if call is None:
         return []
-    call = llm_rewrite._global_usage[-1]
     if call.eval_duration_ns is None:
         return [f"call {call.status} {call.latency_ms}ms"]
 
