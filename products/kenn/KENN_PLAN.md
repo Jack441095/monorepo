@@ -606,6 +606,11 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
   - [x] FabFilter Pro-Q 3 de-essing with a dynamic band, drafted 13 Oct from FabFilter's Pro-Q 3 manual pp.13-15
     (Pro-Q 3 has no attack/release knobs; Pro-Q 4 does). With Jack for review; when it lands, decide whether the
     `trap-third-party-plugin` probe row becomes an `answer` row.
+  - [x] FabFilter Pro-DS de-essing, drafted 13 Oct from the Pro-DS manual pp.8-12 (one major version, no split).
+  - [x] FabFilter Pro-C 3 styles and setup, drafted 13 Oct from the Pro-C 3 manual pp.3-15, with what Pro-C 2 lacks;
+    "Pro-C 2 has eight styles" is an inference marked for Jack.
+  - [x] FabFilter Pro-L 2 mastering limiter, drafted 13 Oct from the Pro-L 2 manual pp.10-13 and 24-25; one listening
+    tip is marked as KENN's own advice rather than FabFilter's.
   - [ ] The rest of the FabFilter bundle, then iZotope, Soundtoys, Kilohearts and Damage.
 - [ ] **Audio calculators** on `draft/audio-calculators` (`dc97516`, not merged): note lengths at a tempo (straight,
   dotted, triplet, as ms and LFO Hz), buffer latency, frequency to note and back, dB to gain factor. The figures go in
