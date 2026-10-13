@@ -2,7 +2,9 @@ import { expect, type Locator, type Page } from '@playwright/test'
 
 export async function openKenn(page: Page) {
   await page.goto('/')
-  await expect(page.getByText('Live connected')).toBeVisible()
+  // Chrome's first workspace page also starts session discovery. Keep cold
+  // startup tolerance separate from the one-second audio freshness contract.
+  await expect(page.getByText('Live connected')).toBeVisible({ timeout: 30_000 })
 }
 
 /** Send one chat message and return the assistant reply bubble it produced. */

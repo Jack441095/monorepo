@@ -240,12 +240,14 @@ Execution plan for efficient continuous analysis (2026-10-13):
   K-weighting, ungated 400 ms/3-second energy and fixed FIR history. Verify
   retirement/warm-up, generated calibration/peak cases, continuous numerical
   references and combined worker cost across 44.1/48/96 kHz and 1/8/32/64 inserts.
-- [ ] Connect web chat to explicitly associated native inserts before showing
+- [x] Connect web chat to explicitly associated native inserts before showing
   this continuous analysis in the browser. Carry the chosen insert identity and
   conversation ownership through `/api/ask`; never choose the latest insert
   implicitly. Verify current evidence, wrong/stale/unbound insert refusals,
   paired-insert ownership and an analysis proposal's Apply/readback/Undo through
   the actual browser against FakeLive. Native Ask tests do not close this gate.
+  Closed offline on 13 October by `plugin_audio.e2e.ts`; exact installed-build
+  and supervised Ableton verification remain D2–D5 below.
 - [ ] Complete meter qualification before exposing live LUFS/dBTP: resolve 44.1 kHz
   interpolation accuracy and delayed peak interval semantics, cover temporal and
   transient conformance cases, and measure sustained shared-worker/publisher/model
@@ -532,6 +534,10 @@ Changed files for this execution (all relative to `products/kenn`):
   `apps/backend/src/kenn/core/live_track_analysis.py`,
   `apps/backend/src/kenn/plugin_handoff.py`, `apps/backend/src/kenn/server.py`,
   `apps/backend/src/kenn/server_rate_limit.py`.
+- Browser implementation: `apps/frontend/src/api/kenn.ts`,
+  `apps/frontend/src/api/paths.ts`, `apps/frontend/src/composables/pluginLaunch.ts`,
+  `apps/frontend/src/composables/useKenn.ts`,
+  `apps/frontend/src/components/KennLiveStatus.vue`.
 - Verification: `plugins/kenn-vst3-au/Source/test_continuous_analysis_main.cpp`,
   `plugins/kenn-vst3-au/Source/test_command_integration_main.cpp`,
   `plugins/kenn-vst3-au/Source/test_numerical_parity_main.cpp`,
@@ -540,11 +546,17 @@ Changed files for this execution (all relative to `products/kenn`):
   `apps/backend/src/kenn/tests/test_live_track_analysis.py`,
   `apps/backend/src/kenn/tests/test_live_paired_analysis.py`,
   `apps/backend/src/kenn/tests/test_plugin_handoff.py`,
+  `apps/backend/src/kenn/tests/test_plugin_insert_sources.py`,
+  `apps/backend/src/kenn/tests/test_plugin_parameters_api.py`,
   `apps/backend/src/kenn/tests/test_audio_ai_features.py`,
   `apps/backend/src/kenn/tests/test_server_rate_limit.py`,
   `apps/backend/src/kenn/tests/test_profile_live_loudness.py`,
   `apps/backend/src/kenn/tests/test_profile_streaming_meter.py`,
   `apps/frontend/e2e/demo_path.e2e.ts`,
+  `apps/frontend/e2e/plugin_audio.e2e.ts`, `apps/frontend/e2e/helpers.ts`,
+  `apps/frontend/src/composables/pluginLaunch.test.ts`,
+  `apps/frontend/src/composables/useKennPlugin.test.ts`,
+  `apps/frontend/src/api/kenn.test.ts`,
   `tooling/scripts/profile_live_loudness.py`,
   `tooling/scripts/profile_streaming_meter.py`.
 - Documentation: `plugins/kenn-vst3-au/README.md`, `KENN_PLAN.md`.
@@ -1870,7 +1882,8 @@ on the exact candidate. The final milestone is the full scripted presentation,
 recovery, display/audio checks and a verified backup recording. Items below stay
 open until their checks pass; the qualification window remains unscheduled.
 
-Demo-readiness audit on 13 October, for Jack's planned 14 October video:
+Initial demo-readiness audit on 13 October, for Jack's planned 14 October video
+(superseded for the insert bridge by the offline follow-up below):
 the existing web chat and action cards are connected, but the new continuous
 insert analysis is not yet connected to browser requests. `askKenn` in
 `apps/frontend/src/api/kenn.ts` sends a page-created conversation `session_id`
@@ -1914,6 +1927,73 @@ is not qualified by the chat/action passes; inspect the candidate's cache before
 including it in the video. Browser checks here do not qualify the recording build's
 model configuration, live audio, new insert bridge or real Ableton writes. D2–D5
 remain open.
+
+Offline insert/browser follow-up on 13 October: the native launch now preserves
+its explicit conversation and insert in the browser. Ordinary pages still create
+a fresh chat. Owner-scoped source discovery never chooses the newest sibling;
+the native launch insert remains selected before its first publication. The
+browser sends the selected `plugin_session_id` with each question and offers
+explicit Start/Pause requests. The companion keeps requested controls separate
+from native-reported state; Pause requests both local measurement and background
+publishing off, and retires cached audio immediately, including
+late frames before acknowledgement. Page load never enables publication.
+A native explicit Ask can still provide fresh measured audio while background
+publishing is off and local measurement remains enabled. Raw audio stays local, continuous features remain
+at 2 Hz, and browser status polling is bounded to one request per second while
+visible. Native parameter polling currently requires the insert editor to remain
+open; the browser states that limitation.
+
+The actual Chrome browser test against the temporary production build and an
+isolated FakeLive companion passed the complete flow: unpublished Kick stays
+selected while Bass publishes; Start receives fresh generated features; measured
+Kick advice produces an approval-gated card; Apply returns verified readback and
+Undo restores the original value. Wrong-track, unbound, paused, stale and foreign
+conversation cases refuse measurement-backed actions. Explicit Kick/Bass bindings
+permit paired spectral comparison without claiming proven audible masking or
+offering an unsupported sidechain action. This closes the offline browser bridge
+gate above. The generated publisher fixture replaces native audio delivery; a
+separate actual C++ `TestCommandIntegration` HTTP test passed against FakeLive with
+background publishing disabled. Neither test qualifies an installed Ableton build.
+
+Verification: frontend type checking and **102 unit tests passed**; **50 scoped
+backend tests passed, four skipped**, including the actual native HTTP round trip;
+**122 additional handoff/paired/demo tests passed**. The full backend rerun returned
+**5,183 passed, 20 skipped and two pre-existing failures**:
+`test_mixing_doctor.py::test_low_end_name_and_fader_overlap_is_an_advisory_candidate`
+and `test_mixing_doctor.py::test_near_ceiling_track_meter_creates_track_specific_headroom_advisory`.
+Those tests still expect alerts in the observation store after its pure read-only
+audit; their existing failures are outside this bridge change. The stale plug-in
+parameter-default expectation was corrected to the native publishing opt-in.
+All **24 sharing regression tests** and the tracked personal-path gate passed.
+The combined `demo_path.e2e.ts` and `plugin_audio.e2e.ts` browser run returned
+**10 passes in 4.2 minutes**. After the final Pause adjustment, the insert flow
+was rerun against `/tmp/kenn-browser-audio-pause-2026-10-13`: **one pass in 53.1
+seconds**, including receipt of both disabled controls by the generated native
+fixture. Type checking, all 102 frontend unit tests and the final production
+build passed again. The browser screenshot was visually checked; source status,
+the Kick action card, verified readback and Undo remain visible. Screenshots,
+initial failure traces and generated runtime state stay outside git.
+Cold Chrome/workspace startup exceeded the old
+ten-second connection assertion, so its startup wait is now 30 seconds; the
+one-second continuous audio freshness limit is unchanged. Production assets were
+built in `/tmp/kenn-browser-audio-pause-2026-10-13` and served only by our isolated
+port-18933 FakeLive companion. No producer server was restarted, no plug-in was
+installed, no Live session was mutated and no dependency or CI configuration changed.
+
+Commands: `./node_modules/.bin/vue-tsc -b`, `./node_modules/.bin/vitest run`,
+`./node_modules/.bin/vite build --outDir /tmp/kenn-browser-audio-pause-2026-10-13`,
+and `KENN_E2E_PORT=18933 ./node_modules/.bin/playwright test
+e2e/demo_path.e2e.ts e2e/plugin_audio.e2e.ts` from `apps/frontend`; the final Pause
+check used only `e2e/plugin_audio.e2e.ts` against the final temporary build.
+`KENN_NATIVE_COMMAND_TEST_BINARY=/tmp/kenn-live-analysis-arm64/TestCommandIntegration
+.venv/bin/python -m pytest src/kenn/tests/test_plugin_insert_sources.py
+src/kenn/tests/test_plugin_parameters_api.py src/kenn/tests/test_live_track_analysis.py
+-q --tb=short` from `apps/backend`. Native AU/VST3 Release builds and nine offline
+functional CTests passed with the existing arm64 JUCE cache; these artifacts were
+not installed. Live LUFS/dBTP, callback deadline tails, sustained host/model
+contention, SLO classification cache and recording-build model qualification remain
+open. D2–D5 still require the exact candidate and owner-supervised Ableton rehearsal;
+Jack's current instruction is to keep this work offline.
 
 - [x] **D1 — Review the fixes.** Fresh independent Standards and
   Spec reviews covered citation repair `67921916`, the Stage 2/3 integration and

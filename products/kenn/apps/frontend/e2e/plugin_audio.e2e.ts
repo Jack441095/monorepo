@@ -65,11 +65,13 @@ test('explicit insert audio reaches browser advice, approved Apply/readback/Undo
   try {
     // These unrelated panels discover local projects even in FakeLive mode.
     // Keep this browser fixture independent of the producer's private files.
-    await page.route(/\/api\/ableton\/(project-audio|session-tracks)(?:\?|$)/, route => route.fulfill({
+    await page.route(/\/api\/ableton\/(project-audio(?:\/poll)?|session-tracks)(?:\?|$)/, route => route.fulfill({
       json: { ok: true, project_name: 'Generated audio fixture', project_dir: '', bounces: [], tracks: [] },
     }))
     await page.goto(`/?session_id=${owner}&plugin_session_id=${owner}-kick`)
-    await expect(page.getByText('Live connected')).toBeVisible()
+    // The first Chrome page also starts the workspace's session requests;
+    // allow its cold start without changing the one-second audio freshness rule.
+    await expect(page.getByText('Live connected')).toBeVisible({ timeout: 30_000 })
     const audio = page.getByRole('region', { name: 'Insert audio analysis' })
     const selector = audio.getByLabel('Audio source')
     await expect(selector).toHaveValue(`${owner}-kick`)
@@ -83,6 +85,7 @@ test('explicit insert audio reaches browser advice, approved Apply/readback/Undo
     await expect(reply).toContainText("Measured at 'Kick': sample peak -0.5 dBFS, 100 ms RMS -16.0 dBFS")
     await reply.getByRole('button', { name: 'Apply to Live 12' }).click()
     await expect(reply).toContainText('Readback Verified')
+    await page.screenshot({ path: test.info().outputPath('insert-audio-analysis.png'), fullPage: true })
     await reply.getByRole('button', { name: 'Undo' }).click()
     await expect(reply).toContainText('Restored to Original State')
     const wrongTrack = await ask(page, 'Analyse the bass')
@@ -99,6 +102,7 @@ test('explicit insert audio reaches browser advice, approved Apply/readback/Undo
     await expect(paired.getByRole('button', { name: 'Apply to Live 12' })).toHaveCount(0)
     await audio.getByRole('button', { name: 'Pause audio analysis' }).click()
     await expect(audio).toContainText('Pause requested')
+    await expect.poll(() => publisher.inserts.find(insert => insert.id === `${owner}-bass`)?.analysis).toBe(false)
     const paused = await ask(page, 'Analyse the bass')
     await expect(paused).toContainText('no current audio measurement')
     await expect(paused.getByRole('button', { name: 'Apply to Live 12' })).toHaveCount(0)

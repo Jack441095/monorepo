@@ -53,6 +53,13 @@ def test_pause_retires_diagnosis_without_claiming_the_host_has_acknowledged_it()
     assert not handoff.plugin_insert_sources("song", "kick")["sources"][0]["current_for_diagnosis"]
 
 
+def test_explicit_native_ask_does_not_require_background_publishing():
+    # Ask deliberately captures audio even when idle publication has never been enabled.
+    _publish(plugin_state={"assistant_mode": "suggest",
+             "analysis_enabled": True, "live_context_enabled": False})
+    assert handoff.live_context_summary("kick")["freshness"]["current_for_diagnosis"]
+
+
 def test_first_publication_can_be_enabled_explicitly_without_routing_to_a_sibling():
     _publish("known", owner="new-insert")
     assert handoff.get_plugin_parameters("unpublished")["parameters"]["live_context_enabled"] is False

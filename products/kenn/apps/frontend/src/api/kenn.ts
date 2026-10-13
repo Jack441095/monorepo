@@ -538,7 +538,9 @@ export async function requestPluginAudio(conversationId: string, insert: string,
   const res = await fetch(`${getApiBase()}${API_PATHS.kenn.parameters}`, {
     method: 'POST', credentials: 'include', headers: withCsrf({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({ session_id: insert, conversation_id: conversationId,
-      parameters: enabled ? { analysis_enabled: true, live_context_enabled: true } : { live_context_enabled: false } }),
+      // Pause also stops local measurement; disabling publication alone leaves
+      // the native shared worker analysing every callback window.
+      parameters: { analysis_enabled: enabled, live_context_enabled: enabled } }),
   })
   const data = await parseJson(res)
   if (!res.ok || !data.ok) throw new ApiError(parseApiErrorMessage(data, 'Audio analysis request failed.'), res.status)

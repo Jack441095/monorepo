@@ -17,7 +17,8 @@ def test_get_plugin_parameters_defaults():
     assert params["parameters"]["target_lufs"] == -14.0
     assert params["parameters"]["assistant_mode"] == "suggest"
     assert params["parameters"]["analysis_enabled"] is True
-    assert params["parameters"]["live_context_enabled"] is True
+    # Match the native default: only explicit opt-in enables background publishing.
+    assert params["parameters"]["live_context_enabled"] is False
     assert params["pending_updates"] == {}
 
 

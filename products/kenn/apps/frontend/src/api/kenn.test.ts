@@ -14,7 +14,7 @@ describe('native browser audio association', () => {
   })
 
   it('scopes discovery and opt-in to the same explicit owner and insert', async () => {
-    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ ok: true, sources: [] })))
+    const fetchMock = vi.fn(async (_url: unknown, _options?: RequestInit) => new Response(JSON.stringify({ ok: true, sources: [] })))
     vi.stubGlobal('fetch', fetchMock)
     try {
       await fetchPluginSources('owner & one', 'insert')
@@ -22,8 +22,12 @@ describe('native browser audio association', () => {
       expect(new URL(String(get[0]), 'http://localhost').searchParams.get('conversation_id')).toBe('owner & one')
       await requestPluginAudio('owner & one', 'insert', true)
       const post = fetchMock.mock.calls.find(([, options]) => options?.method === 'POST')!
-      expect(JSON.parse(String(post[1].body))).toEqual({ session_id: 'insert', conversation_id: 'owner & one',
+      expect(JSON.parse(String(post[1]?.body))).toEqual({ session_id: 'insert', conversation_id: 'owner & one',
         parameters: { analysis_enabled: true, live_context_enabled: true } })
+      await requestPluginAudio('owner & one', 'insert', false)
+      const pause = fetchMock.mock.calls.filter(([, options]) => options?.method === 'POST').at(-1)!
+      expect(JSON.parse(String(pause[1]?.body))).toEqual({ session_id: 'insert', conversation_id: 'owner & one',
+        parameters: { analysis_enabled: false, live_context_enabled: false } })
     } finally { vi.unstubAllGlobals() }
   })
 })

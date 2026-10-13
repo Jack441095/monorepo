@@ -63,9 +63,15 @@ on this channel?”** now carries a fresh feature snapshot with the Ask request.
 The companion matches a host-reported name to one track in a fresh AbletonOSC
 snapshot; an ambiguous name, another track's insert, stopped audio, or disabled
 analysis prompts a clarification. API callers use the conversation as `session_id` and the measured insert as
-`plugin_session_id`. Native Ask supplies both. The embedded web URL carries both
-IDs, but frontend selection of paired sources is not qualified by these native
-checks. Parameter API callers may use the conversation for a single insert;
+`plugin_session_id`. Native Ask supplies both. The embedded web URL preserves
+both IDs in browser questions. Its source picker lists only inserts associated
+with that conversation and keeps the launch insert selected before publication.
+Start explicitly enables local measurement and feature publishing; Pause requests
+both off. Keep the insert editor open to receive these requests. The browser
+distinguishes requested controls from fresh native-reported state.
+Generated-feature/FakeLive browser checks cover selected and paired sources,
+stale/paused/wrong-owner refusals, Apply/readback and Undo. Installed Ableton
+qualification remains separate. Parameter API callers may use the conversation for a single insert;
 multiple inserts require an explicit insert ID. An ambiguous conversation
 cannot queue or consume another instance's parameter updates. The response separates `measured`, `session`,
 `interpretations`, `recommendations`, and `unavailable` fields under

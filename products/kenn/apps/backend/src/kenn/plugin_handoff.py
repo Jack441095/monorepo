@@ -589,8 +589,12 @@ def _audio_currentness(item: dict[str, Any], now: float) -> tuple[float, bool]:
     window = item.get("measurement_window")
     maximum = _MAX_CONTINUOUS_AGE_SECONDS if window else _MAX_CURRENT_DIAGNOSIS_AGE_SECONDS
     state = item["plugin_state"]
+    # A native Ask can send a fresh window while background publishing is off.
+    # A queued Pause still retires cached audio immediately; late frames must
+    # not restore diagnosis before the host receives that request.
     return age, bool(age <= maximum and state.get("analysis_enabled", True)
-                     and state.get("live_context_enabled", True) and not item.get("source_pending")
+                     and item.get("parameter_requests", {}).get("live_context_enabled") is not False
+                     and not item.get("source_pending")
                      and (not window or window["valid"]))
 
 
