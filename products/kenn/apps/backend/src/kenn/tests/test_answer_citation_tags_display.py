@@ -74,3 +74,20 @@ def test_the_gate_still_judges_the_tagged_text(monkeypatch, cache_writes):  # no
     chat_answer.answer_payload(QUERY)
 
     assert judged and all("[#1]" in text for text in judged)
+
+
+def test_the_stream_keeps_tags_on_the_wire_but_not_in_its_final_answer(monkeypatch):
+    # The terminal stream shows tokens as the model writes them, tags included (a token-level filter is not worth its
+    # risk for a developer tool). The final answer is another matter: memory and the semantic cache keep it, and a
+    # cache hit replays it as the whole answer to the next asker, so it gets the same treatment as the payload.
+    from kenn.tests.test_streamed_generation_prefix_guard import _stream, _text_and_metadata
+
+    def model(*args, **kwargs):
+        for word in TAGGED.split(" "):
+            yield {"event": "token", "token": word + " "}
+
+    text, metadata = _text_and_metadata(list(_stream(monkeypatch, model)))
+    assert metadata["generation_validation"]["accepted"] is True
+    assert "[#1]" in text
+    assert "[#" not in metadata["answer"]
+    assert "Set the release to 150 ms so the bass recovers" in metadata["answer"]

@@ -2145,6 +2145,9 @@ def _answer_payload_stream_raw(
                         "event": "token",
                         "token": final_answer[: len(final_answer) - len(candidate)],
                     }
+                # The tokens above went out with their [#n] tags, but the final answer is what memory and the semantic
+                # cache keep, and a cache hit replays it whole, so it drops them as the payload path does.
+                final_answer = display_answer(final_answer)
             else:
                 # No re-send. The candidate is already streaming, and appending the template would hand the
                 # producer two answers; the metadata event below carries the authoritative one.

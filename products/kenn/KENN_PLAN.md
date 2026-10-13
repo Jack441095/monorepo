@@ -2188,7 +2188,8 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       - Follow-up for the product, not the gate: answers show `[#2]` to the producer as written (before, a 12-hex
         id). Strip the tags or map them to the Sources list numbering. Done 13 Oct for the companion's payload path:
         stripped after every check, because the Sources list is de-duplicated and capped at three so an ordinal
-        cannot map onto it. The terminal stream still shows tags as they are written.
+        cannot map onto it. The terminal stream still shows tags as they are written; its final answer (what
+        memory and the semantic cache keep and replay) drops them too.
         [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
       - Watch in v6: misattributed figures. A model that tags every figure [#1] is now caught as misattribution
         rather than as an unshown id, so that count may rise as the unshown count falls.
