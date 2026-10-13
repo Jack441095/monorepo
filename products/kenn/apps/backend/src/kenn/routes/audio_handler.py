@@ -327,8 +327,36 @@ def handle_track_diagnostic_scan(handler: Any) -> None:
         track_name = str(payload.get("track_name", "Track")).strip()
         track_index = int(payload.get("track_index", 0))
 
+        # If no explicit path was provided, locate audio from the active Ableton project
         if not file_path or not os.path.isfile(file_path):
-            handler.send_json(400, {"ok": False, "error": f"Audio file not found on disk: {file_path}"})
+            from kenn.core.ableton_project_detector import detect_active_ableton_project, find_project_bounces
+            active_proj = detect_active_ableton_project()
+            p_dir = active_proj.get("project_dir", "")
+            if p_dir and os.path.isdir(p_dir):
+                bounces = find_project_bounces(p_dir)
+                t_lower = track_name.lower().strip()
+                # 1. Look for stem matching the track name (e.g. "drums", "kick", "bass")
+                for b in bounces:
+                    b_label = b.get("label", "").lower()
+                    if t_lower and (t_lower in b_label or b_label in t_lower):
+                        file_path = b.get("path", "")
+                        break
+                # 2. Look for any drum/kick stem if track name contains drum or kick
+                if not file_path and ("drum" in t_lower or "kick" in t_lower):
+                    for b in bounces:
+                        b_label = b.get("label", "").lower()
+                        if "drum" in b_label or "kick" in b_label or "beat" in b_label or "loop" in b_label:
+                            file_path = b.get("path", "")
+                            break
+                # 3. Fall back to the first available project bounce
+                if (not file_path or not os.path.isfile(file_path)) and bounces:
+                    file_path = bounces[0].get("path", "")
+
+        if not file_path or not os.path.isfile(file_path):
+            handler.send_json(400, {
+                "ok": False,
+                "error": f"No audio render or stem found for '{track_name}'. Use 'Choose Alternate WAV' to pick an audio file.",
+            })
             return
 
         try:

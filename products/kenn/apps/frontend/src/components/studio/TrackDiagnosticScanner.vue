@@ -734,72 +734,80 @@ onUnmounted(() => {
 .track-scanner {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.14rem;
   color: #e2e8f0;
-  padding: 0.5rem;
+  padding: 0.08rem;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .track-scanner__toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 0.12rem;
   background: rgba(15, 23, 42, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 1.1rem 1.25rem;
+  border-radius: 0.08rem;
+  padding: 0.1rem 0.12rem;
+  flex-wrap: wrap;
 }
 
 .track-scanner__headline {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.04rem;
+  min-width: 200px;
+  flex: 1;
 }
 
 .track-scanner__title-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.08rem;
 }
 
 .track-scanner__badge {
-  font-size: 0.7rem;
+  font-size: 0.11rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.3);
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.02rem 0.06rem;
+  border-radius: 0.04rem;
+  white-space: nowrap;
 }
 
 .track-scanner__title {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 0.15rem;
   font-weight: 700;
   color: #f8fafc;
 }
 
 .track-scanner__subtitle {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.12rem;
   color: #94a3b8;
 }
 
 .track-scanner__controls {
   display: flex;
   align-items: flex-end;
-  gap: 1rem;
+  gap: 0.08rem;
+  flex-shrink: 0;
 }
 
 .track-scanner__select-group {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.04rem;
 }
 
 .track-scanner__label {
-  font-size: 0.75rem;
+  font-size: 0.11rem;
   font-weight: 600;
   color: #94a3b8;
   text-transform: uppercase;
@@ -810,10 +818,11 @@ onUnmounted(() => {
   background: #0f172a;
   color: #f8fafc;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  padding: 0.5rem 0.85rem;
-  font-size: 0.9rem;
-  min-width: 200px;
+  border-radius: 0.06rem;
+  padding: 0.06rem 0.1rem;
+  font-size: 0.13rem;
+  min-width: 140px;
+  max-width: 200px;
   cursor: pointer;
   outline: none;
 }
@@ -826,16 +835,18 @@ onUnmounted(() => {
   background: #0284c7;
   color: #ffffff;
   border: none;
-  border-radius: 6px;
-  padding: 0.55rem 1.25rem;
-  font-size: 0.9rem;
+  border-radius: 0.06rem;
+  padding: 0.06rem 0.14rem;
+  font-size: 0.13rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 100px;
+  min-width: 85px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .track-scanner__scan-btn:hover:not(:disabled) {
@@ -851,49 +862,49 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.1rem;
   background: rgba(30, 41, 59, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
+  border-radius: 0.06rem;
+  padding: 0.08rem 0.12rem;
 }
 
 .track-scanner__context-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.08rem;
   flex-wrap: wrap;
 }
 
 .track-scanner__tag {
-  font-size: 0.75rem;
+  font-size: 0.11rem;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.08);
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.02rem 0.06rem;
+  border-radius: 0.04rem;
 }
 
 .track-scanner__track-name {
-  font-size: 1rem;
+  font-size: 0.14rem;
   color: #f8fafc;
 }
 
 .track-scanner__match-badge {
-  font-size: 0.78rem;
+  font-size: 0.11rem;
   font-weight: 600;
   color: #34d399;
   background: rgba(52, 211, 153, 0.1);
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
+  padding: 0.02rem 0.06rem;
+  border-radius: 0.04rem;
 }
 
 .track-scanner__unmatched-badge {
-  font-size: 0.78rem;
+  font-size: 0.11rem;
   color: #94a3b8;
 }
 
 .track-scanner__upload-label {
-  font-size: 0.8rem;
+  font-size: 0.12rem;
   color: #38bdf8;
   cursor: pointer;
   text-decoration: underline;
@@ -905,8 +916,8 @@ onUnmounted(() => {
 
 .track-scanner__metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.08rem;
 }
 
 .metric-card {
@@ -914,20 +925,21 @@ onUnmounted(() => {
   flex-direction: column;
   background: rgba(15, 23, 42, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  padding: 0.75rem 0.9rem;
-  gap: 0.2rem;
+  border-radius: 0.06rem;
+  padding: 0.08rem 0.1rem;
+  gap: 0.02rem;
 }
 
 .metric-card__label {
-  font-size: 0.72rem;
+  font-size: 0.1rem;
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .metric-card__value {
-  font-size: 1.2rem;
+  font-size: 0.16rem;
+  font-weight: 700;
   color: #f8fafc;
 }
 
@@ -944,14 +956,14 @@ onUnmounted(() => {
 }
 
 .metric-card__sub {
-  font-size: 0.7rem;
+  font-size: 0.1rem;
   color: #64748b;
 }
 
 .track-scanner__stage {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: 0.1rem;
 }
 
 .track-scanner__visualizer-box {
@@ -959,7 +971,7 @@ onUnmounted(() => {
   flex-direction: column;
   background: rgba(15, 23, 42, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  border-radius: 0.06rem;
   overflow: hidden;
 }
 
@@ -967,19 +979,19 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.6rem 1rem;
+  padding: 0.06rem 0.1rem;
   background: rgba(30, 41, 59, 0.4);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .track-scanner__viz-title {
-  font-size: 0.8rem;
+  font-size: 0.12rem;
   font-weight: 600;
   color: #cbd5e1;
 }
 
 .track-scanner__viz-meta {
-  font-size: 0.75rem;
+  font-size: 0.11rem;
   color: #64748b;
 }
 
@@ -991,15 +1003,15 @@ onUnmounted(() => {
 .legend-scale {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.72rem;
+  gap: 0.04rem;
+  font-size: 0.11rem;
   color: #94a3b8;
 }
 
 .legend-color {
   display: inline-block;
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 2px;
 }
 
@@ -1027,12 +1039,12 @@ onUnmounted(() => {
 }
 
 .spectrogram-axis-y {
-  width: 38px;
+  width: 34px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0.4rem 0.3rem;
-  font-size: 0.68rem;
+  padding: 0.04rem 0.02rem;
+  font-size: 0.1rem;
   color: #64748b;
   text-align: right;
   background: #090d16;
@@ -1053,15 +1065,15 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   color: #64748b;
-  font-size: 0.85rem;
+  font-size: 0.12rem;
   background: rgba(9, 13, 22, 0.85);
 }
 
 .track-scanner__defects-section {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  margin-top: 0.5rem;
+  gap: 0.08rem;
+  margin-top: 0.04rem;
 }
 
 .track-scanner__defects-head {
@@ -1072,40 +1084,40 @@ onUnmounted(() => {
 
 .track-scanner__defects-title {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.14rem;
   font-weight: 700;
   color: #f8fafc;
 }
 
 .track-scanner__defects-count {
-  font-size: 0.8rem;
+  font-size: 0.11rem;
   color: #94a3b8;
 }
 
 .track-scanner__clean-card {
   background: rgba(16, 185, 129, 0.08);
   border: 1px solid rgba(16, 185, 129, 0.25);
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
+  border-radius: 0.06rem;
+  padding: 0.1rem 0.14rem;
   color: #34d399;
 }
 
 .track-scanner__clean-card strong {
   display: block;
-  font-size: 0.95rem;
-  margin-bottom: 0.2rem;
+  font-size: 0.13rem;
+  margin-bottom: 0.02rem;
 }
 
 .track-scanner__clean-card p {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.12rem;
   color: #cbd5e1;
 }
 
 .track-scanner__defects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.08rem;
 }
 
 .defect-card {
@@ -1113,21 +1125,21 @@ onUnmounted(() => {
   flex-direction: column;
   background: rgba(15, 23, 42, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 1rem;
-  gap: 0.6rem;
+  border-radius: 0.06rem;
+  padding: 0.1rem;
+  gap: 0.06rem;
 }
 
 .defect-card--critical {
-  border-left: 4px solid #ef4444;
+  border-left: 3px solid #ef4444;
 }
 
 .defect-card--warning {
-  border-left: 4px solid #f59e0b;
+  border-left: 3px solid #f59e0b;
 }
 
 .defect-card--info {
-  border-left: 4px solid #38bdf8;
+  border-left: 3px solid #38bdf8;
 }
 
 .defect-card__top {
@@ -1137,11 +1149,11 @@ onUnmounted(() => {
 }
 
 .defect-card__severity {
-  font-size: 0.68rem;
+  font-size: 0.1rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 0.15rem 0.45rem;
-  border-radius: 4px;
+  padding: 0.02rem 0.05rem;
+  border-radius: 0.03rem;
 }
 
 .defect-card__severity--critical {
@@ -1160,41 +1172,41 @@ onUnmounted(() => {
 }
 
 .defect-card__freq {
-  font-size: 0.75rem;
+  font-size: 0.11rem;
   color: #94a3b8;
   font-family: monospace;
 }
 
 .defect-card__title {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.13rem;
   font-weight: 700;
   color: #f8fafc;
 }
 
 .defect-card__measurement {
-  font-size: 0.8rem;
+  font-size: 0.11rem;
   color: #e2e8f0;
 }
 
 .defect-card__description {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.12rem;
   color: #94a3b8;
   line-height: 1.4;
 }
 
 .defect-card__solution {
   background: rgba(0, 0, 0, 0.25);
-  border-radius: 6px;
-  padding: 0.5rem 0.65rem;
+  border-radius: 0.05rem;
+  padding: 0.05rem 0.08rem;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.02rem;
 }
 
 .solution-label {
-  font-size: 0.7rem;
+  font-size: 0.1rem;
   font-weight: 700;
   color: #38bdf8;
   text-transform: uppercase;
@@ -1202,14 +1214,14 @@ onUnmounted(() => {
 
 .solution-text {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.11rem;
   color: #e2e8f0;
 }
 
 .defect-card__actions {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.4rem;
+  gap: 0.06rem;
+  margin-top: 0.04rem;
 }
 
 .defect-card__apply-btn {
@@ -1217,9 +1229,9 @@ onUnmounted(() => {
   background: #0284c7;
   color: #ffffff;
   border: none;
-  border-radius: 6px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.82rem;
+  border-radius: 0.05rem;
+  padding: 0.05rem 0.08rem;
+  font-size: 0.11rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -1249,9 +1261,9 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.07);
   color: #cbd5e1;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  padding: 0.5rem 0.65rem;
-  font-size: 0.82rem;
+  border-radius: 0.05rem;
+  padding: 0.05rem 0.06rem;
+  font-size: 0.11rem;
   cursor: pointer;
   transition: background 0.15s ease;
 }
