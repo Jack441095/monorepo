@@ -948,8 +948,8 @@ what to do; they do not supply owner grades, and each still runs only when its o
     | Producer dialogue and proposals | Handle short follow-ups, incomplete evidence and conflicting briefs; request the missing audio or meter evidence; prepare inspectable proposals through existing services and report confirmation/readback/Undo truthfully. |
 
     - [ ] **S1 — Curate a first source batch and freeze the experiment.** Audit 20
-      candidate notes, roughly half Ableton and half engineering, starting from
-      observed failure families rather than note count. Record source URL/author,
+      candidate notes, predominantly checked against the Live 12 manual, starting
+      from observed failure families rather than note count. Record source URL/author,
       content hash, license and shared-weight permission, review, Live version and
       manual/observed/measured status. Approved note status is not permission for
       every derived answer. Public availability is not a training-rights finding.
@@ -959,6 +959,13 @@ what to do; they do not supply owner grades, and each still runs only when its o
       and conversations from shared weights. Freeze code, prompts, model/tokenizer,
       quantization, index and settings for each condition. Do not scrape or rebuild
       the index as part of this first training comparison.
+      **13 October resume:** [20 notes corrected against primary evidence](docs/research/KENN_SEAL_SOURCE_AUDIT_2026-10-13.md),
+      17 primarily Live 12 manual-backed, with exact before/after hashes and five
+      four-note review pages. The 807-note inventory has 118 flagged records and
+      347 “ableton” filenames; no purge or index rebuild. Owner factual review,
+      shared-weight rights and derived-target approval remain pending. Read-only
+      assets were re-frozen after pulling cloud main `ab63cd33`; paired retrieval
+      and full condition manifests remain pending. S1 stays open.
     - [ ] **S2 — Build a harder, reviewed packet within today's limits.** Start with
       four training source families and two ordinary targets per context: eight
       reviewed examples, including concise explanations and follow-ups. Prepare
@@ -973,6 +980,14 @@ what to do; they do not supply owner grades, and each still runs only when its o
       content-bound approvals. New wording needs new review. Run the unchanged 4B
       first: if reward is again 1.0, stop using this packet to claim positive learning
       gain and prepare a new version; never revise a frozen reference to bless output.
+      **13 October resume:** the [source-checked draft](docs/research/KENN_SEAL_PACKET_SOURCES_2026-10-13.md)
+      was emitted locally as version 1: four contexts, eight ordinary targets,
+      24 reward, 12 retention and 24 reserved final questions, on 23 four-card
+      pages. Split aliases, exact hashes and lexical guards passed; semantic
+      review and rights remain pending, approvals empty and training disabled.
+      Final wording stays reserved. Preparation/SEAL checks pass 101 tests and
+      ten isolated guard mutations were caught. Paired KENN retrieval and the
+      harder unchanged-4B baseline await exact-content review. S2 stays open.
     - [ ] **S3 — Establish specialist learning on the 4B.** Start ordinary SFT at
       eight steps so every ordinary example can be used. Compare development-only
       4/8/16-step budgets, recording actual example exposure and training/target tokens.
@@ -994,12 +1009,14 @@ what to do; they do not supply owner grades, and each still runs only when its o
       If C/D do not beat B enough to justify their extra cost, retain ordinary SFT
       as the specialist method. SEAL and LoRA do not establish faster decoding.
     - [ ] **S4 — Run the 1B-class challenger as a separate model experiment.** First
-      candidate: [Qwen3 1.7B](https://huggingface.co/Qwen/Qwen3-1.7B), using its
-      pretrained/post-trained checkpoint and explicitly pinned non-thinking mode.
+      candidate: [Qwen3 1.7B](https://huggingface.co/Qwen/Qwen3-1.7B), using the
+      publisher’s pretrained/post-trained checkpoint and explicitly pinned non-thinking mode.
       This is a candidate, not a claim that it is the best small model or already
       an audio expert. Before running, verify checkpoint/license/tokenizer/template
-      and existing-environment compatibility; add separately tested model identity
-      support because today's worker deliberately accepts only the pinned 4B.
+      and existing-environment compatibility. The [13 October metadata check](docs/research/KENN_QWEN3_17B_COMPATIBILITY_2026-10-13.md)
+      pins revisions, metadata hashes and nine rendered-template checks; native
+      tokenizer IDs, weights, adapters and M3 costs remain untested. Add separately
+      tested model identity support because today's worker deliberately accepts only the pinned 4B.
       Do not bypass that guard. New model assets or dependencies need the approval
       required by the existing plan. Compare unchanged and ordinary-tuned 1.7B with
       unchanged and ordinary-tuned 4B on the same evidence and held-out tasks.
