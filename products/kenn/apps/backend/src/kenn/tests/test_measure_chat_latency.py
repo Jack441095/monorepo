@@ -504,3 +504,35 @@ def test_provenance_names_the_model_each_task_resolves_to(tool, monkeypatch):
     models = tool.run_provenance()["resolved_models"]
     assert models["rewrite"] == "fixture-rewrite-model"
     assert set(models) == {"rewrite", "route", "paraphrase", "followups"}
+
+
+def test_payload_retrieval_time_fills_the_context_retrieval_phase(tool, monkeypatch):
+    # answer_payload has returned timings_ms all along; the harness left context_retrieval unknown regardless.
+    monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
+    timings = {"load_index_ms": 12.0, "search_ms": 30.0, "section_ms": 1.0, "answer_ms": 9000.0}
+    monkeypatch.setattr(tool, "_ask", lambda *a, **k: ({"answer": "x", "timings_ms": timings}, 0, None))
+    row = tool.measure([{"id": "a", "question": "Synthetic"}], surface="payload")["rows"][0]
+    assert row["phase_seconds"]["context_retrieval"] == pytest.approx(0.042)
+    assert row["payload_timings_ms"] == timings
+    # The gate runs inside answer_ms with the model call, so verification is still not separable.
+    assert row["phase_seconds"]["verification"] is None
+
+
+def test_foreground_retrieval_time_comes_from_the_companion_timing_block(tool, monkeypatch):
+    row = _measure_http(tool, monkeypatch, _FakeCompanion(
+        {"answer": "x", "timing": {"total_ms": 9100.0, "load_index_ms": 2.0, "search_ms": 18.0}}), surface="foreground")
+    assert row["phase_seconds"]["context_retrieval"] == pytest.approx(0.020)
+
+
+def test_background_retrieval_stays_unknown_because_the_template_is_not_the_upgrade(tool, monkeypatch):
+    row = _measure_http(tool, monkeypatch, _FakeCompanion(
+        {"answer": "Template", "timing": {"load_index_ms": 2.0, "search_ms": 18.0}, "answer_upgrade": {"id": "job"}},
+        [{"status": "accepted", "answer": "Model", "seconds": 8.0}]))
+    assert row["phase_seconds"]["context_retrieval"] is None
+
+
+def test_retrieval_stays_unknown_when_either_half_is_missing(tool, monkeypatch):
+    monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
+    monkeypatch.setattr(tool, "_ask", lambda *a, **k: ({"answer": "x", "timings_ms": {"search_ms": 30.0}}, 0, None))
+    row = tool.measure([{"id": "a", "question": "Synthetic"}], surface="payload")["rows"][0]
+    assert row["phase_seconds"]["context_retrieval"] is None

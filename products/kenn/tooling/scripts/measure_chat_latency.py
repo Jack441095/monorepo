@@ -519,6 +519,16 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             "accepted" if validation.get("accepted") and not validation.get("abstained") else
             "rejected" if validation.get("attempted") else "not_attempted")
         calls = [usage.to_dict() for usage in provider_calls]
+        # _answer_payload_raw times index load and retrieval itself (timings_ms); the companion copies those keys
+        # into its timing block. Their sum is retrieval and nothing else: route_query runs before it and the
+        # grounding gate runs inside answer_ms beside the model call, so neither is folded in. Background rows are
+        # left unknown because the timing there belongs to the template, and the upgrade retrieves again unseen.
+        stage_ms = (payload.get("timings_ms") if surface == "payload" else
+                    payload.get("timing") if surface == "foreground" else None)
+        stage_ms = stage_ms if isinstance(stage_ms, dict) else {}
+        retrieval_parts = [stage_ms.get("load_index_ms"), stage_ms.get("search_ms")]
+        retrieval_seconds = (sum(retrieval_parts) / 1000.0
+                             if all(isinstance(part, (int, float)) for part in retrieval_parts) else None)
         def native_seconds(field):
             values = [call.get(field) for call in calls]
             return sum(values) / 1e9 if values and all(value is not None for value in values) else None
@@ -544,7 +554,8 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             # Nothing this harness can read sees Live's audio engine. C1 asks for dropouts at a fixed buffer, so
             # the owner records them during the supervised session; None here means "not measured", never zero.
             "audio_dropouts": None,
-            "phase_seconds": {"admission": None, "queue": None, "context_retrieval": None,
+            "payload_timings_ms": payload.get("timings_ms") if isinstance(payload.get("timings_ms"), dict) else None,
+            "phase_seconds": {"admission": None, "queue": None, "context_retrieval": retrieval_seconds,
                               "prefill": native_seconds("prompt_eval_duration_ns"),
                               "generation": native_seconds("eval_duration_ns"), "verification": None},
             "category": str(case.get("category") or "uncategorized"),

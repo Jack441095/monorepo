@@ -82,7 +82,9 @@ approval they were installed into a throwaway virtualenv in the session scratchp
 - Memory pressure and swap readings across the run; audio dropouts at a fixed Live buffer and session, recorded by
   the owner.
 - The Live-open/closed comparison only under controlled, supervised conditions, with FakeLive and no writes.
-- Admission/queue, retrieval, verification and displayed-result timing remain unknown in the tooling; the plan's
+- Retrieval time is reported on the payload and foreground surfaces since the follow-up
+  [payload cache receipt](KENN_C2_PAYLOAD_TRANSIENT_CACHE_2026-10-13.md). Admission/queue, verification and
+  displayed-result timing, and retrieval on stream and background, remain unknown in the tooling; the plan's
   C2 items own instrumenting them. The receipts will say `None` for them.
 
 ## Commands for the local session
