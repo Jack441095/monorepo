@@ -189,32 +189,38 @@ public struct PDFExtractor: Sendable {
     }
 
     static func ocrLines(from observations: [VNRecognizedTextObservation]) -> [String] {
-        struct OCRItem {
-            let x: CGFloat
-            let y: CGFloat
-            let text: String
-        }
-        let items = observations.compactMap { observation -> OCRItem? in
+        let items = observations.compactMap { observation -> (bounds: CGRect, text: String)? in
             guard let text = observation.topCandidates(1).first?.string else { return nil }
-            return OCRItem(x: observation.boundingBox.minX,
-                           y: observation.boundingBox.maxY,
-                           text: text)
-        }.sorted { lhs, rhs in
-            if abs(lhs.y - rhs.y) > 0.025 { return lhs.y > rhs.y }
-            return lhs.x < rhs.x
+            return (observation.boundingBox, text)
         }
-        var groups: [(y: CGFloat, items: [OCRItem])] = []
+        return ocrLines(from: items)
+    }
+
+    // Geometry is independent of Vision's recognition model. Keeping this seam
+    // lets tests pin reading order without depending on OCR spelling changes.
+    static func ocrLines(from boxes: [(bounds: CGRect, text: String)]) -> [String] {
+        let items = boxes.sorted { lhs, rhs in
+            if lhs.bounds.midY != rhs.bounds.midY { return lhs.bounds.midY > rhs.bounds.midY }
+            return lhs.bounds.minX < rhs.bounds.minX
+        }
+        var groups: [(bounds: CGRect, items: [(bounds: CGRect, text: String)])] = []
         for item in items {
-            if let index = groups.firstIndex(where: { abs($0.y - item.y) <= 0.025 }) {
+            // Require half the shorter glyph box to overlap vertically. A fixed
+            // 2.5% page-height tolerance swallowed neighbouring cover rows. The
+            // first box anchors each row so overlap cannot chain down the page.
+            if let index = groups.firstIndex(where: {
+                let overlap = min($0.bounds.maxY, item.bounds.maxY) - max($0.bounds.minY, item.bounds.minY)
+                return overlap > 0 && overlap >= min($0.bounds.height, item.bounds.height) * 0.5
+            }) {
                 groups[index].items.append(item)
             } else {
-                groups.append((item.y, [item]))
+                groups.append((item.bounds, [item]))
             }
         }
         return groups
-            .sorted { $0.y > $1.y }
+            .sorted { $0.bounds.midY > $1.bounds.midY }
             .map { group in
-                let joined = group.items.sorted { $0.x < $1.x }
+                let joined = group.items.sorted { $0.bounds.minX < $1.bounds.minX }
                     .map(\.text)
                     .joined(separator: " ")
                 return normaliseLines(joined).joined(separator: " ")

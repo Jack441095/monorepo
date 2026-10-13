@@ -1,0 +1,461 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "profile": "rebuilt_public",
+      "corpus_id": "REBUILT_PUBLIC_2026_10_11_V1",
+      "documents": [
+        {
+          "id": "shu_research_thesis_guidelines_2024_25",
+          "pdf": "university_templates/shu_research_thesis_guidelines_2024_25.pdf",
+          "sha256": "e64194de9290f103aaad336bc4181934983979dcbef7a8094fbacd9d2996a882",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "lse_mc499_dissertation_handbook",
+          "pdf": "university_templates/lse_mc499_dissertation_handbook.pdf",
+          "sha256": "77939292d742a8bcf6c35413d74a5e29704e45524ce75bab4ce7a51fba6ab09e",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "soton_producing_your_thesis_guide",
+          "pdf": "university_templates/soton_producing_your_thesis_guide.pdf",
+          "sha256": "d21342dc1b0ea87bc14907dda8dc5f0f15f36aca194fba782b780c32dd869eb1",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "oxford_maths_dissertation_guidenotes_2025_26",
+          "pdf": "university_templates/oxford_maths_dissertation_guidenotes_2025_26.pdf",
+          "sha256": "ebd490254a5dd7552b28b8f71c8207f487c8099249dc8b8500f4a714dbb5dca6",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "rutgers_ece_capstone_report_guidelines",
+          "pdf": "university_templates/rutgers_ece_capstone_report_guidelines.pdf",
+          "sha256": "7001f1c826f31fc0dd0db0cba87e2fb53744301c06a3e889fb68106ab109c9e2",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "uw_tacoma_mscss_capstone_guidelines",
+          "pdf": "university_templates/uw_tacoma_mscss_capstone_guidelines.pdf",
+          "sha256": "8861f3e1a9ead2a02be4967b76ff57465fdea86016c5856d4f7f299084487851",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "edge_hill_hea3183_assignment_header",
+          "pdf": "university_templates/edge_hill_hea3183_assignment_header.pdf",
+          "sha256": "87ce3ac91b428f99478cc8d9e784b440fd422a5eedd6dfe2f7aa1f74945eae70",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "whiterose_30585_stacey_phd_sheffield",
+          "pdf": "dissertations/whiterose_30585_stacey_phd_sheffield.pdf",
+          "sha256": "ea4fa89d2850585fb67b8ad7ed7c1c0bdc3912b1f9f4de0ed5442b180193c312",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "project_title",
+            "student_name",
+            "university"
+          ],
+          "truth_sha256": "b48f04016d05fbb5e7d4462189f7fa5f19e6793fc192c8bec305efbf99f84331"
+        },
+        {
+          "id": "whiterose_37689_junaid_phd_york",
+          "pdf": "dissertations/whiterose_37689_junaid_phd_york.pdf",
+          "sha256": "2b96e60de0621b5cbdd0d06dad14f12999fa79516938212e6f5b9837e6cf34f4",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "project_title",
+            "student_name",
+            "university"
+          ],
+          "truth_sha256": "6d7d004735915bee1398ed076e5dfddb7c161f63dc1a0465e6affdaba747a82d"
+        },
+        {
+          "id": "whiterose_34471_newcomb_phd_sheffield",
+          "pdf": "dissertations/whiterose_34471_newcomb_phd_sheffield.pdf",
+          "sha256": "f3c5a8b3b01ed05a4512bb78fbbaad0d06f060327d1df1bfc38fd9c4d4d1668c",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "project_title",
+            "student_name",
+            "university"
+          ],
+          "truth_sha256": "17141cef1c286de58af8c4b43b9e4820ed65c01f7c6199d0055895f2a1a79064"
+        },
+        {
+          "id": "whiterose_18613_long_phd_sheffield",
+          "pdf": "dissertations/whiterose_18613_long_phd_sheffield.pdf",
+          "sha256": "3d9318b40aa95783d49129471d5585bde38416326bb4d5e7180b083498340527",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "project_title",
+            "student_name",
+            "university"
+          ],
+          "truth_sha256": "2251ebc24a3c1676026523ff6b73c2867daad90e88f47433e36904b4a08c9fb2"
+        },
+        {
+          "id": "mit_scm_capstone_zaunick_paredes_2025",
+          "pdf": "project_reports/mit_scm_capstone_zaunick_paredes_2025.pdf",
+          "sha256": "18655901008e6a614bd79c3e3afeb6cc506c73e505e8d6f10c3efd5e69d4b838",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "project_title",
+            "university"
+          ],
+          "truth_sha256": "22c8166460bd7b96a167e5351eb4854c022b5ed020edeab23e744d90b9951b04"
+        },
+        {
+          "id": "aiub_capstone_smart_water_metering_2023",
+          "pdf": "project_reports/aiub_capstone_smart_water_metering_2023.pdf",
+          "sha256": "47203f9da9e625a98a4fb58a108269a0d1500ec173e1c5220350fe97b69ade98",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "project_title",
+            "university"
+          ],
+          "truth_sha256": "8989334cc86a88908256309d5ada0a7a553f1f5fc9e3077f2220411b300fa3b3"
+        },
+        {
+          "id": "essex_example_thesis_title_page",
+          "pdf": "university_templates/wave2/essex_example_thesis_title_page.pdf",
+          "sha256": "be1bdee79455629a17734bd6b6a5a1fa0c90dd565c9dedca73b865bf71f50be2",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "manchester_taught_dissertation_guidance",
+          "pdf": "university_templates/wave2/manchester_taught_dissertation_guidance.pdf",
+          "sha256": "e52b8aa496347189f2f299c61b5fe9948d4a69a50ceecdcc7c70fe402cebf54b",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "washington_ms_capstone_format_guidelines",
+          "pdf": "university_templates/wave2/washington_ms_capstone_format_guidelines.pdf",
+          "sha256": "8bf1c857ce27cdee625afe24c3eb190a9e31db391cb8935ffeb4b49a68931d56",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "south_carolina_research_project_guidelines",
+          "pdf": "university_templates/wave3/south_carolina_research_project_guidelines.pdf",
+          "sha256": "cdb33ed2529174bf18ee8026a196ffb41f764e64bd3a229af9334e75bf80b87b",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "anschutz_capstone_final_report",
+          "pdf": "university_templates/wave3/anschutz_capstone_final_report.pdf",
+          "sha256": "762332eb1e3a5d3883f29eca65f7ff8b883e2f7cdeb3f4d64623fddb44f0fe79",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "uga_mph_capstone_manual",
+          "pdf": "university_templates/wave3/uga_mph_capstone_manual.pdf",
+          "sha256": "e308ebcc19f8d51ddbdd94587531becfd2f05ca3990c708347fb5538c44c6d8a",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "whiterose_28683_charles_phd_sheffield",
+          "pdf": "dissertations/wave3/whiterose_28683_charles_phd_sheffield.pdf",
+          "sha256": "d9c4e7a7f5b1197f0df46455e0899830303879f58e1de751670c46e3137d3239",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "project_title",
+            "student_name",
+            "university"
+          ],
+          "truth_sha256": "b4c2f13a00d004f734e2e15c210226419b116b095a9dd359399d460107c3f385"
+        },
+        {
+          "id": "whiterose_27895_murray_phd_sheffield",
+          "pdf": "dissertations/wave3/whiterose_27895_murray_phd_sheffield.pdf",
+          "sha256": "b53845299a504fbf60d666a0fdb50645cfcb3ea923c1a6f85b6f80ca3603ad3e",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "project_title",
+            "student_name",
+            "university"
+          ],
+          "truth_sha256": "3ee4e41f5032075aa36e3bd2eb9ce8e80d0e0f45df02a6f1e256041d0485c331"
+        },
+        {
+          "id": "whiterose_22495_morales_martinez_phd_sheffield",
+          "pdf": "dissertations/wave3/whiterose_22495_morales_martinez_phd_sheffield.pdf",
+          "sha256": "4d7879bf73eb46d736065bd266c4454478aa2843ad572427f99b271760806a5f",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "project_title",
+            "student_name",
+            "university"
+          ],
+          "truth_sha256": "e4ff7f0c38b5bd0575b6f6f52c2cc24ba3ead3e29fdae955af24e151ccabc28e"
+        },
+        {
+          "id": "colorado_thesis",
+          "pdf": "university_templates/rebuilt_2026_10/colorado_thesis.pdf",
+          "sha256": "36c6ad08716925f355923f5606d302b4bd9dd4ff6eb62a590c6ceebae0646f4f",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "colorado_dissertation",
+          "pdf": "university_templates/rebuilt_2026_10/colorado_dissertation.pdf",
+          "sha256": "02493be515336833fdbb07ee3fb1bbb9b1569dc7b16d529a0cbacc9c672ebb2d",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "niu_title",
+          "pdf": "university_templates/rebuilt_2026_10/niu_title.pdf",
+          "sha256": "a597536c5584101bdc13809b0bb124a52e7fef47b7ab187b7829871c824c2ff6",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "nebraska_sample",
+          "pdf": "university_templates/rebuilt_2026_10/nebraska_sample.pdf",
+          "sha256": "7579d2c3dcc93cb53addc1ff80bcb71edbfa37a773d52e7c93637dd4196b6b34",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "esf_format",
+          "pdf": "university_templates/rebuilt_2026_10/esf_format.pdf",
+          "sha256": "414ce004588476ddbdfa156a594cefb61551748e99dd431a904a4a9037f4a78c",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "missouri_thesis",
+          "pdf": "university_templates/rebuilt_2026_10/missouri_thesis.pdf",
+          "sha256": "56d17d2d6fc3baac89abf947cad8ca231cce2205ad242c88f507644f09bf7df8",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "missouri_dissertation",
+          "pdf": "university_templates/rebuilt_2026_10/missouri_dissertation.pdf",
+          "sha256": "06a102a0e726e2a515ab09f254d3b2aa2e649d1e2cb076967b5f14dcf529bb9b",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "illinois_doctoral",
+          "pdf": "university_templates/rebuilt_2026_10/illinois_doctoral.pdf",
+          "sha256": "f5f624317414ab537dd5e072eb38b225d86ed5a1b6f6f6767b54a709f00a59c3",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "utah_preliminary",
+          "pdf": "university_templates/rebuilt_2026_10/utah_preliminary.pdf",
+          "sha256": "8b9b0a742389bc0c9b3e1b72412e098f3e3a4d932e94796b62362f2eba35d6d3",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "utah_checklist",
+          "pdf": "university_templates/rebuilt_2026_10/utah_checklist.pdf",
+          "sha256": "4cc70816ce4baec7cdc46fa423309f5408e108a421efe8a2fb0e80700223a039",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "st_andrews_submission",
+          "pdf": "university_templates/rebuilt_2026_10/st_andrews_submission.pdf",
+          "sha256": "323085d7ad3a9ace4880be1af30c8bcf20ba162180001282c7c642af860d0e4e",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "cambridge_cover_current",
+          "pdf": "university_templates/rebuilt_2026_10/cambridge_cover_current.pdf",
+          "sha256": "ab81e7c5918f26a5e074157c215586ce47f94e993f6660480b2daa1943663117",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": "exeter_presentation_current",
+          "pdf": "university_templates/rebuilt_2026_10/exeter_presentation_current.pdf",
+          "sha256": "068fdfb3bf4870e245285281015aa999d7827dd75485f7c0a5c857adf9dd5870",
+          "evaluation_mode": "layout_only",
+          "reviewed_fields": [],
+          "truth_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        }
+      ]
+    },
+    {
+      "profile": "field_policy_rebuilt",
+      "corpus_id": "REBUILT_FIELD_POLICY_2026_10_11_V1",
+      "documents": [
+        {
+          "id": "clear_000",
+          "pdf": "controlled_field_policy/clear_000.pdf",
+          "sha256": "f1b88cdd605927d48309118956531ce6b6d6670375d3a8cfe7f400ff78d6d521",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "module_code",
+            "student_id"
+          ],
+          "truth_sha256": "7f6290fc71bdbb30c0606e89af7230aec373160a4177c348ddacc8cb354a67ed"
+        },
+        {
+          "id": "clear_001",
+          "pdf": "controlled_field_policy/clear_001.pdf",
+          "sha256": "dbdafd24104579fb5cb6ac02edf3191f859bd5230ea1db5db1bae2fb6381bab7",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "module_code",
+            "student_id"
+          ],
+          "truth_sha256": "342f84ae3e76d622bcc578a4a912fb0cfb61e00e0e1d05968416292582623116"
+        },
+        {
+          "id": "clear_002",
+          "pdf": "controlled_field_policy/clear_002.pdf",
+          "sha256": "d257e8a8378620af0ab9b2377282fec65876f4271d2752bc4004a094573b52f5",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "module_code",
+            "student_id"
+          ],
+          "truth_sha256": "3a578f325201343d1506f19f96cb96545ad48d3c00d46dd5dafe42d44f38e3d2"
+        },
+        {
+          "id": "clear_003",
+          "pdf": "controlled_field_policy/clear_003.pdf",
+          "sha256": "eb0691d9918c34aa589b160452e13d8e9b7899cb798d22512dbe7751f22e1878",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "module_code",
+            "student_id"
+          ],
+          "truth_sha256": "d0a5cdeb1426633ef38516f30d4f72f6785f2649c57f3da9fd729c3a01d80b6e"
+        },
+        {
+          "id": "clear_004",
+          "pdf": "controlled_field_policy/clear_004.pdf",
+          "sha256": "afb1a7685a449afdf01b5da151acbf0179e1eb40ea78ca9167f9f2cd2319481d",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "module_code",
+            "student_id"
+          ],
+          "truth_sha256": "cea6d328822fb3ec0d2db84eec119ca44807a0c4aba2aeffbc7855fb80e3e1a7"
+        },
+        {
+          "id": "clear_005",
+          "pdf": "controlled_field_policy/clear_005.pdf",
+          "sha256": "38a21a0441888b294086adac9445b1868a46a2dd3219389991d2e2fda5fc64b9",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "module_code",
+            "student_id"
+          ],
+          "truth_sha256": "fd49a595777353c28f1c9c8f2e8c1076a711ba30655c37d63a57bf621fff60ea"
+        },
+        {
+          "id": "clear_006",
+          "pdf": "controlled_field_policy/clear_006.pdf",
+          "sha256": "2c1e0ba4e86e1c87902d41c68d1024463972b8a8ed00acda23539cb7e9af6fea",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "module_code",
+            "student_id"
+          ],
+          "truth_sha256": "5cda4036ad37645cae8b87780aad0c38da18f3ace557acc9d5cb3b93e59caaa6"
+        },
+        {
+          "id": "clear_007",
+          "pdf": "controlled_field_policy/clear_007.pdf",
+          "sha256": "175a071b5949a1419d218bc330d477f3cb2aa819331e0eb120bf1356d94e48c4",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "module_code",
+            "student_id"
+          ],
+          "truth_sha256": "7c305772d4424df513d7779cf4aa19ceb79069e6dbbdbcd46c5a33161de5d427"
+        },
+        {
+          "id": "clear_008",
+          "pdf": "controlled_field_policy/clear_008.pdf",
+          "sha256": "7725310936fdd27d4fb6120e403462f117951d8e538af22401bedffdb5565eb4",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "module_code",
+            "student_id"
+          ],
+          "truth_sha256": "6a7543010341ccbc2f14cb8e215c4483d5ed42b61f7be8f4ee37797a39df7789"
+        },
+        {
+          "id": "clear_009",
+          "pdf": "controlled_field_policy/clear_009.pdf",
+          "sha256": "5e072beee7c0323c25f01bb2fd11337c120d0bd143612100e4ddd81841ba4d9f",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "module_code",
+            "student_id"
+          ],
+          "truth_sha256": "bab518bd9dd8f07cb9f80bfd1e266e203091c9d78dfedf8e0d4e6e72d4fc448d"
+        },
+        {
+          "id": "id_variant_01",
+          "pdf": "controlled_field_policy/id_variant_01.pdf",
+          "sha256": "70c0295393d1109e1477b3544cd7b63efe7cdcbd1b13e5a484d4b084505a250c",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "student_id"
+          ],
+          "truth_sha256": "d11c5d620a80595fef4db8d847c6f1f5fbd7ec965e4f25e2d5f00b2b6a21f57c"
+        },
+        {
+          "id": "id_variant_03",
+          "pdf": "controlled_field_policy/id_variant_03.pdf",
+          "sha256": "566d913d0db006eb582b3e4c3507fbf24180b42103be3eea7d00b6322572e6b2",
+          "evaluation_mode": "accuracy",
+          "reviewed_fields": [
+            "student_id"
+          ],
+          "truth_sha256": "ee9664d2c3d64870962276a0093c1a4fb7a7bbae1277b18e3599249a63cb2818"
+        }
+      ]
+    }
+  ]
+}

@@ -122,6 +122,15 @@ assert_batch() {
     }
 
     if [[ "$template" == *full_name* ]]; then
+        # Every synthetic fixture has name alternatives. The batch gate must
+        # hold those choices even when it has detected a plausible full name.
+        local unheld_names
+        unheld_names="$(jq '[.[] | select(.status != "review_required" or
+            .output != null or (.gaps | index("Student name")) == null)] | length' "$results")"
+        [[ "$unheld_names" == "0" ]] || {
+            echo "Name-bearing batch has $unheld_names rows without an explicit name-choice hold" >&2
+            exit 1
+        }
         local missing_names
         missing_names="$(jq '[.[] | select(.status == "processed") | select(.fields.student_name == null or .fields.first_name == null or .fields.last_name == null)] | length' "$results")"
         [[ "$missing_names" == "0" ]] || { echo "Name-bearing output has $missing_names missing names" >&2; exit 1; }

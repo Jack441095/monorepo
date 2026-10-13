@@ -1234,8 +1234,8 @@ _MUTE_IDIOM = re.compile(rf"^\s*(?:(?:turn|switch|shut|cut)\s+{_NAME}\s+(?:off|o
                          rf"|lose\s+{_NAME.replace('name', 'name3')})\s*[.!]?\s*$", re.I)
 _UNMUTE_IDIOM = re.compile(rf"^\s*(?:turn|switch|bring|put)\s+{_NAME}\s+back\s+(?:on|in)\s*[.!]?\s*$", re.I)
 _NOT_A_TRACK_NAME = re.compile(r"\b(?:it|that|this|them|everything|all|solo|arm|record|mute|metronome|click|loop|"
-                               r"playback|transport|song|master|plugin|device|effect|fx)\s*$|^(?:the\s+)?(?:it|that|this)\b"
-                               r"|\b(?:pan|comp|compressor|ratio|attack|release|tempo|bpm|pitch|transpose|key|swing)\b", re.I)
+                               r"playback|transport|song|master|plugin|device|effect|fx|mode|groove)\s*$|^(?:the\s+)?(?:it|that|this)\b"
+                               r"|\b(?:pan|comp|compressor|ratio|attack|release|tempo|bpm|pitch|transpose|key|swing|arrangement\s+record(?:ing)?|record\s+mode|groove\s+amount)\b", re.I)
 # A negative bare number as a fader target is dB (Live shows faders in dB): "set hats to -6", "turn the kick down to
 # -16", "make the clap -12". A verb is required, so a bare "kick to -9" still asks, and positive numbers still ask.
 _NEGATIVE = r"(?P<amount>(?:minus\s+|-)\d+(?:\.\d+)?)\s*(?:dbs?)?(?:\s+again)?\s*[.!?]?\s*$"
@@ -2211,6 +2211,94 @@ def _loop_request(text: str, snapshot: dict[str, Any] | None = None) -> dict[str
         return {"mode": "assist", "action": "set_loop", "desired_value": True, "unit": "boolean", "confirmation_required": True, "confidence": 0.98}
     if _LOOP_OFF.search(text):
         return {"mode": "assist", "action": "set_loop", "desired_value": False, "unit": "boolean", "confirmation_required": True, "confidence": 0.98}
+    return None
+
+
+_GROOVE_REQUEST = re.compile(
+    r"\b(?:set|make|change|put)\s+(?:the\s+)?(?:song\s+|global\s+)?(?:groove(?:\s+amount)?|swing)\s+(?:to\s+)?(?P<val>\d+(?:\.\d+)?)\s*(?P<pct>%|percent)?\b|"
+    r"^\s*(?:groove|swing)\s+(?:to\s+)?(?P<val2>\d+(?:\.\d+)?)\s*(?P<pct2>%|percent)?\s*[.!]?\s*$|"
+    r"\b(?:turn|switch)\s+off\s+(?:the\s+)?(?:groove|swing)\b",
+    re.I,
+)
+
+
+def _groove_request(text: str, snapshot: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    """A song groove amount modification request."""
+    if re.search(r"\b(?:turn|switch)\s+off\s+(?:the\s+)?(?:groove|swing)\b", text, re.I):
+        return {
+            "mode": "assist",
+            "action": "set_groove_amount",
+            "desired_value": 0.0,
+            "unit": "normalized",
+            "confirmation_required": True,
+            "confidence": 0.96,
+        }
+    m = _GROOVE_REQUEST.search(text)
+    if m:
+        raw_val = m.group("val") or m.group("val2")
+        pct = m.group("pct") or m.group("pct2")
+        if raw_val:
+            try:
+                v = float(raw_val)
+                if pct or v > 1.0:
+                    v /= 100.0
+                clamped = max(0.0, min(1.0, v))
+                return {
+                    "mode": "assist",
+                    "action": "set_groove_amount",
+                    "desired_value": clamped,
+                    "unit": "normalized",
+                    "confirmation_required": True,
+                    "confidence": 0.96,
+                }
+            except (TypeError, ValueError):
+                pass
+    return None
+
+
+_RECORD_MODE_ON = re.compile(
+    r"\b(?:turn|switch|put)\s+(?:the\s+)?(?:arrangement\s+)?record(?:ing)?(?:\s+mode)?\s+on\b|"
+    r"\b(?:turn|switch|put)\s+on\s+(?:the\s+)?(?:arrangement\s+)?record(?:ing)?(?:\s+mode)?\b|"
+    r"\b(?:enable|activate|engage)\s+(?:the\s+)?(?:arrangement\s+)?record(?:ing)?(?:\s+mode)?\b|"
+    r"^\s*(?:(?:arrangement\s+)?record(?:ing)?|rec)(?:\s+mode)?\s+on\s*[.!]?\s*$",
+    re.I,
+)
+_RECORD_MODE_OFF = re.compile(
+    r"\b(?:turn|switch|put)\s+(?:the\s+)?(?:arrangement\s+)?record(?:ing)?(?:\s+mode)?\s+off\b|"
+    r"\b(?:turn|switch|put)\s+off\s+(?:the\s+)?(?:arrangement\s+)?record(?:ing)?(?:\s+mode)?\b|"
+    r"\b(?:disable|deactivate|disengage)\s+(?:the\s+)?(?:arrangement\s+)?record(?:ing)?(?:\s+mode)?\b|"
+    r"^\s*(?:(?:arrangement\s+)?record(?:ing)?|rec)(?:\s+mode)?\s+off\s*[.!]?\s*$",
+    re.I,
+)
+
+
+def _record_mode_request(text: str, snapshot: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    """An arrangement record mode enable/disable request."""
+    if _RECORD_MODE_ON.search(text):
+        return {"mode": "assist", "action": "set_record_mode", "desired_value": True, "unit": "boolean", "confirmation_required": True, "confidence": 0.98}
+    if _RECORD_MODE_OFF.search(text):
+        return {"mode": "assist", "action": "set_record_mode", "desired_value": False, "unit": "boolean", "confirmation_required": True, "confidence": 0.98}
+    return None
+
+
+_LOCATOR_JUMP = re.compile(
+    r"\b(?:jump|go|move|skip)\s+to\s+(?:the\s+)?(?:locator|marker|cue(?:\s+point)?)\s+(?P<name>[\w\s'-]+?)\s*[.!]?\s*$|"
+    r"\b(?:jump|go|skip)\s+to\s+(?:the\s+)?(?P<direction>next|prev(?:ious)?)\s+(?:locator|marker|cue(?:\s+point)?)\b",
+    re.I,
+)
+
+
+def _locator_jump_request(text: str, snapshot: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    """A playhead jump to locator or cue point request."""
+    m = _LOCATOR_JUMP.search(text)
+    if m:
+        direction = m.group("direction")
+        if direction:
+            action = "jump_to_next_locator" if "next" in direction.lower() else "jump_to_prev_locator"
+            return {"mode": "assist", "action": action, "confirmation_required": True, "confidence": 0.96}
+        name = (m.group("name") or "").strip()
+        if name:
+            return {"mode": "assist", "action": "jump_to_locator", "locator_name": name, "confirmation_required": True, "confidence": 0.96}
     return None
 
 

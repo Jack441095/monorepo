@@ -60,8 +60,10 @@ for the artifact checksum, test missions, and privacy-safe feedback workflow.
 
 ## Privacy
 
-Fully local. No upload, no account, no analytics, no network use.
-Your assignment never leaves your computer. See [PRIVACY.md](PRIVACY.md).
+Document processing and offline licence validation stay local. Submit does not
+upload assignments or collect analytics. A user-requested update check fetches
+release metadata over HTTPS; purchasing and downloading use the website.
+See [PRIVACY.md](PRIVACY.md).
 
 ## Build
 
@@ -79,12 +81,13 @@ swift run nitesubmit-tests  # full test suite + corpus evaluation
 ```sh
 nitesubmit-cli suggest report.pdf --template "{student_id}_{module_code}_{project_title}"
 nitesubmit-cli copy report.pdf --to ~/Desktop --name 12345678_Project
-nitesubmit-cli batch real_validation_corpus/public_examples --out /tmp/nite-submit-results \
+nitesubmit-cli batch /path/to/authorised-inputs --out /tmp/nite-submit-results \
   --template "{student_id}_{full_name}_{project_title}" --student-id 75589 --dry-run
 ```
 
-Batch dry-run writes only a JSON preview report; it does not create or rename
-PDFs.
+Batch dry-run writes JSON and CSV preview reports; it does not create or rename
+PDFs. These reports can contain document values, so share the aggregate beta
+validator report when privacy-safe feedback is needed.
 When `--template` is omitted, batch mode uses the same safe default as the app:
 `{student_id}_{project_title}`. Use an explicit template or profile when the
 course requires a student name in the filename.

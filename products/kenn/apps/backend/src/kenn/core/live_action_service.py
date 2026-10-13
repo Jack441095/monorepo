@@ -156,8 +156,8 @@ SUPPORTED_TRACK_CREATION_ACTIONS = {"create_midi_track", "create_audio_track"}
 SUPPORTED_RETURN_TRACK_CREATION_ACTIONS = {"create_return_track"}
 SUPPORTED_TRANSPORT_ACTIONS = {"transport_play", "transport_stop"}
 SUPPORTED_TEMPO_ACTIONS = {"set_tempo", "set_time_signature"}
-# Song-level session controls: metronome click toggle, arrangement loop toggle, and loop bounds (in beats).
-SUPPORTED_SONG_ACTIONS = {"set_metronome", "set_loop", "set_loop_bounds"}
+# Song-level session controls: metronome, arrangement loop, loop bounds, groove amount, and record mode.
+SUPPORTED_SONG_ACTIONS = {"set_metronome", "set_loop", "set_loop_bounds", "set_groove_amount", "set_record_mode"}
 # Return-track mixer changes (27 Sept 2026), written through /live/kenn/set/return_mixer and read back through
 # /live/kenn/get/bus_mixer: action -> (Remote Script field, proposal parameter).
 SUPPORTED_RETURN_MIXER_ACTIONS = {"set_return_volume": ("volume", "volume"), "set_return_pan": ("panning", "pan"),
@@ -169,7 +169,7 @@ TEMPO_RANGE_BPM = (20.0, 999.0)
 SUPPORTED_SCENE_ACTIONS = {"launch_scene"}
 SUPPORTED_CLIP_ACTIONS = {"stop_clip"}
 SUPPORTED_SEND_ACTIONS = {"set_send"}
-SUPPORTED_LOCATOR_ACTIONS = {"add_locator", "remove_locator"}
+SUPPORTED_LOCATOR_ACTIONS = {"add_locator", "remove_locator", "jump_to_locator", "jump_to_next_locator", "jump_to_prev_locator", "jump_to_time"}
 SUPPORTED_VIEW_ACTIONS = {"focus_track", "focus_device"}
 LOCATOR_TIME_TOLERANCE = 1e-4
 
@@ -1631,6 +1631,93 @@ class LiveActionService(Tier2Tier3ControlMixin):
         _PROPOSALS_BY_TOKEN[token] = proposal
         return {"ok": True, "proposal": proposal}
 
+    def propose_groove_amount_action(self, amount: float, *, session_id: str) -> dict[str, Any]:
+        """Propose setting song global groove/swing amount (0.0 to 1.0, 0% to 100%)."""
+        _cleanup_memory()
+        state = self.snapshot()
+        if state.get("status") in {"offline", "dispatched"}:
+            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
+        current = state.get("groove_amount")
+        if current is None and hasattr(self.client, "get_groove_amount"):
+            current = self.client.get_groove_amount()
+        if current is None:
+            return {"ok": False, "error": "Live didn't report its groove amount, so there's nothing to compare or undo to."}
+        v = float(amount)
+        if not (0.0 <= v <= 1.0):
+            return {"ok": False, "error": "Groove amount must be between 0.0 and 1.0 (or 0% and 100%)."}
+        before = round(float(current), 4)
+        after = round(v, 4)
+        before_display = f"{round(before * 100):g}%"
+        after_display = f"{round(after * 100):g}%"
+        proposal = {
+            "schema": PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": "set_groove_amount",
+            "operation": "set_groove_amount",
+            "target": "ableton_song_groove_amount",
+            "parameter": "groove_amount",
+            "before": before,
+            "after": after,
+            "before_display": before_display,
+            "after_display": after_display,
+            "unit": "normalized",
+            "valid_range": (0.0, 1.0),
+            "reason": f"Explicit user request to set song groove amount to {after_display}.",
+            "evidence": [f"Current Live groove amount: {before_display}."],
+            "confidence": 1.0,
+            "risk": "local_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_text(proposal))
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
+    def propose_record_mode_action(self, enabled: bool, *, session_id: str) -> dict[str, Any]:
+        """Propose enabling or disabling arrangement record mode."""
+        _cleanup_memory()
+        state = self.snapshot()
+        if state.get("status") in {"offline", "dispatched"}:
+            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
+        current = state.get("record_mode")
+        if current is None and hasattr(self.client, "get_record_mode"):
+            current = self.client.get_record_mode()
+        if current is None:
+            return {"ok": False, "error": "Live didn't report its arrangement record mode state, so there's nothing to compare or undo to."}
+        before = bool(current)
+        after = bool(enabled)
+        proposal = {
+            "schema": PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": "set_record_mode",
+            "operation": "set_record_mode",
+            "target": "ableton_song_record_mode",
+            "parameter": "record_mode",
+            "before": before,
+            "after": after,
+            "before_display": "Active" if before else "Inactive",
+            "after_display": "Active" if after else "Inactive",
+            "unit": "boolean",
+            "valid_range": None,
+            "reason": f"Explicit user request to {'enable' if after else 'disable'} arrangement recording.",
+            "evidence": [f"Current Live arrangement record mode: {'active' if before else 'inactive'}."],
+            "confidence": 1.0,
+            "risk": "local_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_text(proposal))
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
     def propose_scene_action(
         self,
         action: str,
@@ -1794,6 +1881,98 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
         }
         token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_locator_text(proposal))
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
+    def propose_jump_to_locator_action(self, locator_name: str, *, session_id: str) -> dict[str, Any]:
+        """Propose jumping the playhead to a named cue point/locator."""
+        _cleanup_memory()
+        state = self.snapshot()
+        if state.get("status") in {"offline", "dispatched"}:
+            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
+        name = str(locator_name or "").strip()
+        if not name:
+            return {"ok": False, "error": "jump_to_locator requires a non-empty locator name."}
+        locators, available = self._locator_observation()
+        if not available:
+            return {"ok": False, "error": "Ableton did not return the current locator list."}
+        matches = [
+            loc for loc in locators
+            if str(loc.get("name", "")).strip().casefold() == name.casefold()
+        ]
+        if not matches:
+            available_names = [f"'{l.get('name')}'" for l in locators if l.get("name")]
+            return {"ok": False, "error": f"No locator named '{name}' found. Available locators: {', '.join(available_names) if available_names else 'none'}."}
+        target_cue = matches[0]
+        target_time = round(float(target_cue.get("time_beats", target_cue.get("time", 0.0))), 3)
+        cur_time = self.client.get_current_song_time() if hasattr(self.client, "get_current_song_time") else state.get("current_song_time")
+        before_time = round(float(cur_time), 3) if cur_time is not None else 0.0
+        proposal = {
+            "schema": PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": "jump_to_locator",
+            "operation": "jump_to_locator",
+            "target": "ableton_playhead",
+            "parameter": "song_time",
+            "locator_name": str(target_cue.get("name")),
+            "before": before_time,
+            "after": target_time,
+            "before_display": f"{before_time:g} beats",
+            "after_display": f"{target_cue.get('name')} ({target_time:g} beats)",
+            "unit": "beats",
+            "valid_range": None,
+            "reason": f"Explicit user request to jump playhead to locator '{target_cue.get('name')}'.",
+            "evidence": [
+                f"Target locator '{target_cue.get('name')}' is at {target_time:g} beats.",
+                f"Current playhead position: {before_time:g} beats.",
+            ],
+            "confidence": 1.0,
+            "risk": "local_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_text(proposal))
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
+    def propose_relative_cue_jump_action(self, direction: str, *, session_id: str) -> dict[str, Any]:
+        """Propose jumping playhead to the next or previous locator."""
+        _cleanup_memory()
+        state = self.snapshot()
+        if state.get("status") in {"offline", "dispatched"}:
+            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
+        cur_time = self.client.get_current_song_time() if hasattr(self.client, "get_current_song_time") else state.get("current_song_time")
+        before_time = round(float(cur_time), 3) if cur_time is not None else 0.0
+        action = "jump_to_next_locator" if direction == "next" else "jump_to_prev_locator"
+        proposal = {
+            "schema": PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": action,
+            "operation": action,
+            "target": "ableton_playhead",
+            "parameter": "song_time",
+            "before": before_time,
+            "after": None,
+            "before_display": f"{before_time:g} beats",
+            "after_display": f"{'Next' if direction == 'next' else 'Previous'} locator",
+            "unit": "beats",
+            "valid_range": None,
+            "reason": f"Explicit user request to jump to the {'next' if direction == 'next' else 'previous'} locator.",
+            "evidence": [f"Current playhead position: {before_time:g} beats."],
+            "confidence": 1.0,
+            "risk": "local_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_text(proposal))
         proposal["confirmation_token"] = token
         proposal["confirmation_meta"] = meta
         _PROPOSALS_BY_TOKEN[token] = proposal
@@ -4083,6 +4262,20 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 length_beats=float(before.get("loop_length", 16.0)),
                 session_id=session_id,
             )
+        if action == "set_groove_amount":
+            current = self.snapshot().get("groove_amount")
+            if current is None and hasattr(self.client, "get_groove_amount"):
+                current = self.client.get_groove_amount()
+            if current is None or not _values_match(round(float(current), 4), receipt.get("readback")):
+                return {"ok": False, "error": "Live groove amount changed since the receipt; undo is stale."}
+            return self.propose_groove_amount_action(float(receipt.get("before")), session_id=session_id)
+        if action == "set_record_mode":
+            current = self.snapshot().get("record_mode")
+            if current is None and hasattr(self.client, "get_record_mode"):
+                current = self.client.get_record_mode()
+            if current is None or bool(current) != bool(receipt.get("requested")):
+                return {"ok": False, "error": "Live arrangement record mode state changed since the receipt; undo is stale."}
+            return self.propose_record_mode_action(bool(receipt.get("before")), session_id=session_id)
         if action in SUPPORTED_SCENE_ACTIONS:
             # Firing a scene has no reversible prior state to restore to -
             # unlike a parameter change, there is no single "before" scene
@@ -4463,8 +4656,10 @@ class LiveActionService(Tier2Tier3ControlMixin):
             confirmation_text = _clip_text(proposal)
         elif proposal_action in SUPPORTED_SEND_ACTIONS:
             confirmation_text = _send_text(proposal)
-        elif proposal_action in SUPPORTED_LOCATOR_ACTIONS:
+        elif proposal_action in {"add_locator", "remove_locator"}:
             confirmation_text = _locator_text(proposal)
+        elif proposal_action in {"jump_to_locator", "jump_to_next_locator", "jump_to_prev_locator", "jump_to_time"}:
+            confirmation_text = _text(proposal)
         elif proposal_action in SUPPORTED_VIEW_ACTIONS:
             confirmation_text = _view_text(proposal)
         elif proposal_action in SUPPORTED_TRACK_CREATION_ACTIONS:
@@ -4636,6 +4831,34 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 write_error = str(exc)
             write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
             timer.mark("write")
+        elif action == "set_groove_amount":
+            current = state.get("groove_amount")
+            if current is None and hasattr(self.client, "get_groove_amount"):
+                current = self.client.get_groove_amount()
+            if current is not None and not _values_match(round(float(current), 4), proposal.get("before")):
+                _finish_idempotency_key(key)
+                return {"ok": False, "error": "Live's groove amount changed since the proposal was created; create a new proposal."}
+            try:
+                write_ok = bool(self.client.set_groove_amount(float(proposal["after"])))
+            except Exception as exc:
+                write_ok = False
+                write_error = str(exc)
+            write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
+            timer.mark("write")
+        elif action == "set_record_mode":
+            current = state.get("record_mode")
+            if current is None and hasattr(self.client, "get_record_mode"):
+                current = self.client.get_record_mode()
+            if current is not None and bool(current) != bool(proposal.get("before")):
+                _finish_idempotency_key(key)
+                return {"ok": False, "error": "Live's arrangement record mode state changed since the proposal was created; create a new proposal."}
+            try:
+                write_ok = bool(self.client.set_record_mode(bool(proposal["after"])))
+            except Exception as exc:
+                write_ok = False
+                write_error = str(exc)
+            write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
+            timer.mark("write")
         elif action in SUPPORTED_SCENE_ACTIONS:
             fresh_scene, scene_error = _find_scene(state, int(proposal.get("scene_index", -1)), str(proposal.get("scene_name", "")))
             if scene_error or fresh_scene is None:
@@ -4703,7 +4926,22 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 write_error = str(exc)
             write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
             timer.mark("write")
-        elif action in SUPPORTED_LOCATOR_ACTIONS:
+        elif action in {"jump_to_locator", "jump_to_next_locator", "jump_to_prev_locator", "jump_to_time"}:
+            try:
+                if action == "jump_to_locator":
+                    write_ok = bool(self.client.jump_to_cue_point(str(proposal["locator_name"])))
+                elif action == "jump_to_next_locator":
+                    write_ok = bool(self.client.jump_to_next_cue())
+                elif action == "jump_to_prev_locator":
+                    write_ok = bool(self.client.jump_to_prev_cue())
+                else:
+                    write_ok = bool(self.client.set_current_song_time(float(proposal["after"])))
+            except Exception as exc:
+                write_ok = False
+                write_error = str(exc)
+            write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
+            timer.mark("write")
+        elif action in {"add_locator", "remove_locator"}:
             if bool(state.get("is_playing", False)):
                 _finish_idempotency_key(key)
                 return {"ok": False, "error": "Ableton transport started since the proposal; create a new locator proposal with transport stopped."}
@@ -4857,6 +5095,16 @@ class LiveActionService(Tier2Tier3ControlMixin):
                     if isinstance(bounds, dict) and bounds.get("loop_start") is not None and bounds.get("loop_length") is not None
                     else None
                 )
+            elif action == "set_groove_amount":
+                readback = after_state.get("groove_amount")
+                if readback is None and hasattr(self.client, "get_groove_amount"):
+                    readback = self.client.get_groove_amount()
+                readback = round(float(readback), 4) if readback is not None else None
+            elif action == "set_record_mode":
+                readback = after_state.get("record_mode")
+                if readback is None and hasattr(self.client, "get_record_mode"):
+                    readback = self.client.get_record_mode()
+                readback = bool(readback) if readback is not None else None
             elif action in SUPPORTED_SCENE_ACTIONS:
                 # Scenes have no stable "is_playing" property of their own; the
                 # transient is_triggered flag is the primary observable evidence
@@ -4881,7 +5129,10 @@ class LiveActionService(Tier2Tier3ControlMixin):
             elif action in SUPPORTED_SEND_ACTIONS:
                 send_readback = self.client.get_track_send(int(proposal["track_index"]), int(proposal["return_track_index"]))
                 readback = round(float(send_readback), 6) if send_readback is not None else None
-            elif action in SUPPORTED_LOCATOR_ACTIONS:
+            elif action in {"jump_to_locator", "jump_to_next_locator", "jump_to_prev_locator", "jump_to_time"}:
+                after_time = self.client.get_current_song_time() if hasattr(self.client, "get_current_song_time") else after_state.get("current_song_time")
+                readback = round(float(after_time), 3) if after_time is not None else proposal.get("after")
+            elif action in {"add_locator", "remove_locator"}:
                 locators, locators_available = self._locator_observation()
                 matches = [
                     locator for locator in self._locator_at_time(locators, float(proposal["locator_time_beats"]))
@@ -4923,7 +5174,10 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 receipt["write_error"] = write_error
             _remember_owned_receipt(receipt, session_id)
             return {"ok": False, "error": receipt["error"], "receipt": receipt}
-        readback_matches = _values_match(readback, proposal.get("after"))
+        if action in {"jump_to_next_locator", "jump_to_prev_locator"}:
+            readback_matches = (readback is not None)
+        else:
+            readback_matches = _values_match(readback, proposal.get("after"))
         state_change_expected = not _values_match(proposal.get("before"), proposal.get("after"))
         verified = readback_matches and (write_ok or state_change_expected)
         # Live can land on a value nobody asked for (it clamps, rounds, or trims a name). That is a failed change,

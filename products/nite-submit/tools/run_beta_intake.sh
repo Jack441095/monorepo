@@ -20,9 +20,14 @@ else
 fi
 
 product_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+version=$(tr -d '[:space:]' < "$product_dir/VERSION")
 cli_path=""
+if [ -n "${NITE_SUBMIT_CLI:-}" ] && [ ! -x "$NITE_SUBMIT_CLI" ]; then
+  echo "Requested packaged CLI is not executable: $NITE_SUBMIT_CLI" >&2
+  exit 2
+fi
 for candidate in \
-  "$product_dir/artifacts/Submit-0.2.0-macOS.app/Contents/MacOS/nitesubmit-cli" \
+  "${NITE_SUBMIT_CLI:-$product_dir/artifacts/Submit-${version}-macOS.app/Contents/MacOS/nitesubmit-cli}" \
   "$product_dir/.build/release/nitesubmit-cli" \
   "$product_dir/.build/debug/nitesubmit-cli"; do
   if [ -x "$candidate" ]; then
@@ -38,4 +43,6 @@ fi
 
 results_dir=$(dirname "$results_path")
 mkdir -p "$results_dir"
+# Remove a previous result before starting; a crash cannot leave green evidence.
+rm -f -- "$results_path"
 exec "$cli_path" validate --manifest "$manifest_path" --out "$results_path"

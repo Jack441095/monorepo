@@ -1,116 +1,106 @@
-# RELEASE — NITE Submit 1.0.0
+# Submit release procedure
 
-## Build the artifact
+Read VERSION for filenames. The current verified private beta is 1.0.0;
+[NITE_SUBMIT_RELEASE_REPORT.md](NITE_SUBMIT_RELEASE_REPORT.md) records its hashes
+and [NITE_SUBMIT_BETA_HANDOFF.md](NITE_SUBMIT_BETA_HANDOFF.md) its tester workflow.
+
+## Local private-beta gate
+
+From this product directory:
 
 ```sh
-./tools/package_app.sh
+./tools/run_release_checks.sh
 ```
 
-Produces `artifacts/Submit-1.0.0-macOS.app` containing the app plus the
-`nitesubmit-cli` helper. Record version, source SHA, architecture and SHA-256
-in `NITE_SUBMIT_RELEASE_REPORT.md`.
+No corpus argument is accepted. The gate stages exactly 47 cases from the pinned
+rebuilt qualification record and verifies the independent ignored review records
+and source hashes. Public/controlled identities remain distinct. It never uses
+private intake, rejected PDFs, renamed output or a directory-wide PDF scan as
+qualification. The image-only edge is checked separately. Missing historical
+manifests are not fabricated; see docs/CORPUS_REBUILD_2026-10-11.md.
 
-Packaging removes stale semver-named NITE Submit app bundles and ZIP archives
-from `artifacts/` after the current bundle has passed verification. It keeps
-the current version, test evidence, metadata, and the Swift `.build` cache.
-The release gate also runs `tools/test_artifact_cleanup.sh` in an isolated
-temporary directory to verify that boundary.
-ZIP creation normalises timestamps in a temporary staging copy, and the gate
-runs `tools/test_deterministic_archive.sh` to verify repeatable checksums.
-The release gate also runs `tools/run_pdf_matrix_check.sh` across dissertation,
-capstone, guidance, anonymous-candidate, and image-only PDFs.
-It also runs `tools/run_full_corpus_write_check.sh`, which writes and verifies
-both the safe ID+Project and explicit name-bearing rules across all 233
-synthetic fixture PDFs without modifying the source corpus. The expected
-processed/review split comes from the corpus manifest, and
-`tools/check_corpus_parity.sh` fails if the two checked-in copies of the
-corpus drift apart.
+The gate runs Swift and Python checks, synthetic parity, dependency integrity,
+bundle/resources/notices, privacy, cleanup, deterministic ZIP, matrix, approval,
+archive/password/volume/optimisation, acceptance and 233-PDF write checks.
+It builds a fresh app, ZIP and DMG, then tests both extracted/mounted bundles and
+their own CLI/helpers, including all 47 rebuilt inputs. It removes a stale pass
+manifest before starting and writes a new one only at the end.
 
-Packaging automatically runs `tools/verify_app_bundle.sh`, which checks the
-bundle identifier, executable/CLI presence, PDF association, and code-signature
-validity.
+Outputs are `artifacts/Submit-<VERSION>-macOS.app`, `.zip`, `.dmg` and
+`Submit-<VERSION>-release-manifest.json`. Packaging can remove older top-level
+semver artifacts; preserve verified rollback copies in a separate ignored
+subdirectory first. The current snapshot is under
+`artifacts/shipping-2026-10-11/verified-private-beta-1.0.0/` with SHA256SUMS.
 
-For a private tester handoff, run `./tools/package_beta_zip.sh`. It produces a
-single ZIP archive, tests the archive contents, and prints its SHA-256 checksum.
+## Public signing preparation
 
-The full local gate is `./tools/run_release_checks.sh`. With no argument it
-automatically stages the approved PDFs under `real_validation_corpus/`,
-excluding rejected documents and generated results. An explicit controlled
-corpus directory may be passed as the first argument when needed.
+The current artifacts are ad-hoc signed and unnotarised. Do not publish them as
+Developer ID releases or remove quarantine in the tester install instructions.
+Readiness fails closed without the owner identity/profile and stapled artifacts:
 
-The gate also extracts the exact ZIP into a temporary directory, verifies the
-copied bundle, and exercises the staged CLI through detection and an explicitly
-approved byte-identical copy.
+```sh
+python3 -m unittest discover -s tools -p 'test_signing_workflow.py'
+./tools/sign_and_notarize.sh --identity 'Developer ID Application: <owner identity>' --profile NITE_SUBMIT
+./tools/check_distribution_readiness.sh --profile NITE_SUBMIT --require-ready
+```
 
-Before public distribution, run
-`./tools/check_distribution_readiness.sh --require-ready`. It reports only
-boolean/key-count status (never secrets) and fails closed until a Developer ID
-Application identity, a configured `notarytool` keychain profile, and a
-Developer ID-signed app are all present. The private-beta gate intentionally
-does not require those owner-controlled credentials.
+The prepared signing workflow checks credentials before changing artifacts,
+runs the full local gate, signs libraries/helpers/executables inside-out with
+hardened runtime, notarises and staples the app, rebuilds both delivery formats,
+then signs/notarises/staples the DMG. It verifies the final ZIP/DMG, assesses the
+app, checks public readiness and regenerates hashes with the measured test
+counts. Apple submission could not be exercised without owner credentials.
 
-The private-beta tester checklist is [NITE_SUBMIT_BETA_HANDOFF.md](NITE_SUBMIT_BETA_HANDOFF.md).
+The four signing-workflow tests use isolated artifacts and stub Apple tools.
+They verify failure cleanup and ordering without submitting anything to Apple.
+The pass manifest is removed before the first signature and recreated only
+after notarisation and delivery verification succeed.
 
-## Signing status
+Signing changes the final hashes. Recheck delivery with the signed final ZIP,
+record its new manifest, and verify clean-Mac/quarantined installation. The
+arm64 artifact targets macOS 13; this run tested macOS 27.0.1. Do not claim Intel
+or minimum-version testing until those checks actually run.
 
-- Ad-hoc signed (`codesign -s -`). Not Developer-ID signed, not notarised.
-- First launch requires right-click → Open (Gatekeeper bypass).
-- The `tools/install.sh` curl installer removes quarantine automatically.
-- The sales page guides users through Download → Unzip → Right-click Open.
+## Licensing, delivery and updates
 
-## Release channel
+Submit activates offline with Ed25519 licence keys. Developer-only keygen reads
+`$XDG_CONFIG_HOME/nite-submit/license-private-key.base64`, defaulting to
+`~/.config/nite-submit/`. Never put the signer into a bundle or source tree.
 
-PRIVATE CANDIDATE — not cleared for paid public distribution. The current app
-is ad-hoc signed and not notarised; public distribution also needs a Developer
-ID identity, a configured notary profile, a notarised disk image, and clean-Mac
-installation and launch checks. Core workflows pass the deterministic synthetic
-corpus. The governed first-wave run and wave-3 run pass for reviewed name/title/
-university fields. Real student-ID/module-code accuracy still needs authorised
-tester PDFs before a broader real-document claim.
+Stripe is the payment provider, with GBP 2 one-time intended for Submit. The
+current host is Fly with production R2/Resend. Checkout remains closed pending
+verified company details, legal/release approval and the active Stripe product,
+price and environment. Local integration used simulated test-mode events and
+captured email; a current-build hosted Sandbox purchase/inbox/download rehearsal
+still needs approved durable staging and explicit real-email authorization.
 
-## Known limitations (honest list)
+The owner must provide the offline update key matching UpdateEngine's existing
+pin. After final signing, review the enclosure version/URL and run:
 
-- macOS only, macOS 13+.
-- Local English OCR covers the first few pages of scanned PDFs; OCR-derived
-  fields remain review-required and manual entry is still available.
-- Presets are generic patterns, not official university rules; users should
-  enter their university's own rule.
-- Unsigned/un-notarized artifact for controlled testing only.
-- The macOS UI now supports a multi-file queue (drop/select several files,
-  each keeps its own independent detection/review/approval state); the local
-  CLI separately provides scriptable batch dry-run and processing with
-  CSV/JSON reports and collision controls.
-- Real tester PDFs must be supplied through the ignored
-  `real_validation_corpus/beta_intake/` workflow; they are never part of the
-  committed corpus.
+```sh
+./tools/update_appcast.sh --version "$(tr -d '[:space:]' < VERSION)" \
+  --zip "artifacts/Submit-$(tr -d '[:space:]' < VERSION)-macOS.zip" \
+  --key /path/to/offline-update-private-key.base64
+```
 
-## Licensing
+The tool checks version, archive name, enclosure URL and key match before editing.
+The signature covers version + URL; the app opens that approved URL and does not
+verify downloaded archive bytes. Release SHA-256 is verified separately during
+delivery. The current unsigned/zero-length feed is a placeholder, not release
+approval. Do not rotate its public pin to manufacture a passing update.
 
-Ed25519 offline licence key system (`LicenseEngine.swift`). The app gates
-behind activation on first launch. Keys are generated with the developer-only
-`nitesubmit-keygen` CLI, which reads
-`$XDG_CONFIG_HOME/nite-submit/license-private-key.base64` (falling back to
-`~/.config/nite-submit/`) and warns if it has to fall back to the old
-in-tree `tools/` copy. The private key lives outside the source tree, and
-`tools/package_app.sh` and `tools/verify_app_bundle.sh` both refuse a bundle
-that contains any `*private-key*` file.
+## Publication and rollback
 
-Price: £2 one-time is the planned Submit price. Do not publish or accept payment
-at that price until the legal and release gates pass and the active Stripe
-product, price, and fulfilment metadata are verified. Payment/checkout lives in
-the website and Stripe, not in the product code.
+Finish the owner requirements in the release report, then present the exact
+signed artifacts, checksums, legal details and delivery evidence for publication
+approval. No public deployment, real email, charge, commit or push occurred here.
 
-## Rollback plan
+For a private beta issue, pause distribution and verify the saved snapshot's
+SHA256SUMS before restoring it. Do not reset the shared working tree or use an
+old unverified tag/artifact as a certified rollback. A future public rollback
+must close the affected download/checkout and restore a previously verified
+signed release; customer communication requires explicit owner instruction.
 
-If a critical issue is discovered after launch:
-
-1. **Pull the download.** Remove `Submit-1.0.0-macOS.zip` and `install.sh`
-   from the hosting location (`releases.nitedsp.co.uk/submit/`). Replace
-   with a static page explaining the temporary removal.
-2. **Revert the artifact.** The previous artifact (`artifacts/Submit-0.2.0-macOS.dmg`)
-   is retained in the repo. Restore from the `v0.2.0-private-beta.1` tag if
-   needed: `git checkout v0.2.0-private-beta.1 -- artifacts/`.
-3. **Notify customers.** Email purchasers via the payment processor's customer
-   list. Update the sales page with a banner.
-4. **Fix and re-release.** Apply the fix, bump to 1.0.1, rebuild, retest,
-   re-upload. Update `appcast.xml` so the update checker picks it up.
+Refresh the selected corpus backup after any reviewed-record change and compare
+all archive members with source bytes. Its same-drive archive does not replace
+an independent backup.

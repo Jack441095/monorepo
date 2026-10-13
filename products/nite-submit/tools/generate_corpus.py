@@ -42,8 +42,10 @@ EXPECTED_BATCH_SUMMARY = {
     },
     "name_project": {
         "template": "{student_id}_{full_name}_{project_title}",
-        "processed": 162,
-        "review_required": 71,
+        # These fixtures expose alternative names. The shared approval gate
+        # requires a person's choice before any name-bearing copy is written.
+        "processed": 0,
+        "review_required": 233,
         "collisions": 0,
         "failures": 0,
     },

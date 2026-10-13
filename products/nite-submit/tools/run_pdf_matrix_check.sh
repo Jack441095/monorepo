@@ -15,8 +15,8 @@ trap 'rm -R -- "$work_dir"' EXIT
 name_stage="$work_dir/name-input"
 name_output="$work_dir/name-output"
 mkdir -p "$name_stage"
-ln -s "$product_dir/real_validation_corpus/dissertations/utar_3904_meow_fyp_2019.pdf" \
-  "$name_stage/utar.pdf"
+ln -s "$product_dir/real_validation_corpus/dissertations/whiterose_30585_stacey_phd_sheffield.pdf" \
+  "$name_stage/stacey.pdf"
 ln -s "$product_dir/real_validation_corpus/dissertations/whiterose_18613_long_phd_sheffield.pdf" \
   "$name_stage/white_rose.pdf"
 ln -s "$product_dir/real_validation_corpus/project_reports/aiub_capstone_smart_water_metering_2023.pdf" \
@@ -25,31 +25,30 @@ ln -s "$product_dir/real_validation_corpus/university_templates/edge_hill_hea318
   "$name_stage/edge_hill_guidance.pdf"
 
 "$cli" batch "$name_stage" --out "$name_output" --student-id 75589 \
-  --template '{student_id}_{first_name}_{last_name}_{project_title}' --dry-run >/dev/null
+  --template '{student_id}_{first_name}_{last_name}_{project_title}' >/dev/null
 
+# Dry runs preview medium-confidence values; the write path must hold them.
+# Replacements have different ambiguity labels, so check each actual barrier.
 jq -e '
-  (map(select(.source == "utar.pdf" and .status == "dry_run" and
-             .fields.first_name == "MERVYN" and .fields.last_name == "YANG")) | length) == 1 and
-  (map(select(.source == "white_rose.pdf" and .status == "dry_run" and
-             .fields.first_name == "Yang" and .fields.last_name == "Long" and
-             (.output | contains("Zero-shot_Image_Classification")))) | length) == 1 and
-  (map(select(.source == "aiub.pdf" and .status == "dry_run" and
-             .fields.first_name == "Majid" and .fields.last_name == "Abdul" and
-             (.fields.project_title | length) > 10)) | length) == 1 and
-  (map(select(.source == "edge_hill_guidance.pdf" and .status == "review_required" and
-             (.gaps | index("student_name")))) | length) == 1
+  length == 4 and all(.[]; .status == "review_required" and .output == null) and
+  (map(select((.source == "stacey.pdf" or .source == "white_rose.pdf") and
+             .gaps == ["medium_or_low_confidence_review"])) | length) == 2 and
+  (map(select(.source == "aiub.pdf" and (.gaps | index("Student name")) != null)) | length) == 1 and
+  (map(select(.source == "edge_hill_guidance.pdf" and
+             (.gaps | index("First name is required for this naming rule.")) != null)) | length) == 1
 ' "$name_output/batch_results.json" >/dev/null
+[[ "$(find "$name_output" -maxdepth 1 -name '*.pdf' | wc -l | tr -d ' ')" == 0 ]]
 
 required_stage="$work_dir/required-input"
 required_output="$work_dir/required-output"
 mkdir -p "$required_stage"
-ln -s "$product_dir/real_validation_corpus/public_examples/75589_An_Ecosystem_of_Custom_Laser_Controlled_Devices.pdf" \
+ln -s "$product_dir/real_validation_corpus/dissertations/whiterose_18613_long_phd_sheffield.pdf" \
   "$required_stage/public.pdf"
 "$cli" batch "$required_stage" --out "$required_output" --student-id 75589 \
   --template '{module_code}_{student_id}_{project_title}' --dry-run >/dev/null
 jq -e '
   length == 1 and .[0].status == "review_required" and .[0].output == null and
-  .[0].fields.module_code == null and (.[0].gaps | index("module_code")) != null
+  .[0].fields.module_code == null and (.[0].gaps | index("Module code is required for this naming rule.")) != null
 ' "$required_output/batch_results.json" >/dev/null
 
 us_assignment_stage="$work_dir/us-assignment-input"
@@ -62,7 +61,7 @@ ln -s "$product_dir/real_validation_corpus/university_templates/uw_tacoma_mscss_
 jq -e '
   length == 1 and .[0].status == "review_required" and .[0].output == null and
   .[0].fields.document_type == "guidance_template" and
-  (.[0].gaps | index("assignment_code")) != null
+  (.[0].gaps | index("Assignment code is required for this naming rule.")) != null
 ' "$us_assignment_output/batch_results.json" >/dev/null
 
 identity_output="$work_dir/identity-output"
@@ -112,4 +111,21 @@ fi
   exit 1
 }
 
-echo "PDF matrix check passed: dissertation, capstone, guidance, anonymous, and image-only cases."
+# Encryption and malformed bytes stay separate from reviewed accuracy inputs.
+broken_stage="$work_dir/broken-input"
+mkdir "$broken_stage"
+resources="$(dirname "$cli")/../Resources"
+"$resources/bin/qpdf" --encrypt fixture-password fixture-owner 256 -- \
+  "$product_dir/Sources/NiteSubmitTests/Fixtures/corpus/pdf/clear_000.pdf" "$broken_stage/locked.pdf"
+printf 'not a PDF\n' > "$broken_stage/malformed.pdf"
+"$cli" batch "$broken_stage" --out "$work_dir/broken-output" --dry-run >/dev/null
+jq -e 'length == 2 and all(.[]; .status == "failed" and .output == null)' \
+  "$work_dir/broken-output/batch_results.json" >/dev/null
+
+if "$cli" batch "$anonymous_stage" --out "$anonymous_stage/nested" --dry-run >/dev/null 2>&1; then
+  echo 'Batch accepted an output directory inside its input.' >&2
+  exit 1
+fi
+[[ ! -e "$anonymous_stage/nested/batch_results.json" ]]
+
+echo "PDF matrix passed: approval holds, required fields, identity, image-only, locked/malformed, invalid templates and containment."

@@ -14,14 +14,16 @@ cli="${NITE_SUBMIT_CLI:-$product_dir/artifacts/Submit-${version}-macOS.app/Conte
 work_dir=$(mktemp -d /tmp/nite-submit-approval-check.XXXXXX)
 trap 'rm -rf "$work_dir"' EXIT
 
-source_name="75589_An_Ecosystem_of_Custom_Laser_Controlled_Devices.pdf"
-source_path="$product_dir/real_validation_corpus/public_examples/$source_name"
+source_name="whiterose_18613_long_phd_sheffield.pdf"
+source_path="$product_dir/real_validation_corpus/dissertations/$source_name"
 stage="$work_dir/approved-input"
 output="$work_dir/approved-output"
 approval="$work_dir/approval_manifest.json"
 mkdir -p "$stage"
-ln -s "$source_path" "$stage/$source_name"
-printf '%s\n' '{"approval_version":"BATCH_APPROVAL_V1","approved_sources":["75589_An_Ecosystem_of_Custom_Laser_Controlled_Devices.pdf"]}' > "$approval"
+# Approved writes require a regular source: the app rejects symlinks to keep a
+# replaced link from redirecting a copy after review.
+cp "$source_path" "$stage/$source_name"
+printf '%s\n' '{"approval_version":"BATCH_APPROVAL_V1","approved_sources":["whiterose_18613_long_phd_sheffield.pdf"]}' > "$approval"
 
 echo "== approved uncertain case =="
 "$cli" batch "$stage" --out "$output" --student-id 75589 \
@@ -42,13 +44,29 @@ cmp -s "$source_path" "$output/$output_name" || {
   exit 1
 }
 
+# Approval can authorize copying, never silently replacing a prior submission.
+"$cli" batch "$stage" --out "$output" --student-id 75589 \
+  --template '{student_id}_{first_name}_{last_name}_{project_title}' \
+  --collision counter --approved-manifest "$approval" >/dev/null
+second_name=$(jq -r '.[0].output' "$output/batch_results.json")
+[[ "$second_name" != "$output_name" && -f "$output/$second_name" ]]
+cmp -s "$source_path" "$output/$second_name"
+cmp -s "$source_path" "$output/$output_name"
+
+"$cli" copy "$source_path" --name '章 Résumé' --to "$work_dir" >/dev/null
+cmp -s "$source_path" "$work_dir/章 Résumé.pdf"
+if "$cli" copy "$source_path" --name '../escape' --to "$work_dir" >/dev/null 2>&1; then
+  echo 'A path-bearing filename escaped the naming gate.' >&2
+  exit 1
+fi
+
 echo "== required-gap case remains blocked =="
 gap_stage="$work_dir/gap-input"
 gap_output="$work_dir/gap-output"
-gap_source="cambridge_cover_sheet_written_work.pdf"
+gap_source="cambridge_cover_current.pdf"
 mkdir -p "$gap_stage"
-ln -s "$product_dir/real_validation_corpus/university_templates/$gap_source" "$gap_stage/$gap_source"
-printf '%s\n' '{"approval_version":"BATCH_APPROVAL_V1","approved_sources":["cambridge_cover_sheet_written_work.pdf"]}' > "$approval"
+ln -s "$product_dir/real_validation_corpus/university_templates/rebuilt_2026_10/$gap_source" "$gap_stage/$gap_source"
+printf '%s\n' '{"approval_version":"BATCH_APPROVAL_V1","approved_sources":["cambridge_cover_current.pdf"]}' > "$approval"
 "$cli" batch "$gap_stage" --out "$gap_output" --student-id 75589 \
   --template '{student_id}_{first_name}_{last_name}_{project_title}' \
   --collision counter --approved-manifest "$approval"

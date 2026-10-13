@@ -378,3 +378,32 @@ def test_metronome_and_loop_and_fold_queries() -> None:
     color_res = answer_live_session_question("What is the color of track 1?", service=service)
     assert color_res is not None and color_res["status"] == "inspected"
     assert "Track 1 ('Kick') is set to color palette index 13." in color_res["answer"]
+
+    # 5. Groove amount inspection
+    fake.set_groove_amount(0.25)
+    groove_res = answer_live_session_question("What is the groove amount?", service=service)
+    assert groove_res is not None and groove_res["status"] == "inspected"
+    assert groove_res["answer"] == "The global groove amount is currently 25%."
+    assert groove_res["groove_amount"] == 0.25
+
+    # 6. Record mode inspection
+    fake.set_record_mode(True)
+    rec_res = answer_live_session_question("Is record mode on?", service=service)
+    assert rec_res is not None and rec_res["status"] == "inspected"
+    assert rec_res["answer"] == "Arrangement recording is currently active (on)."
+    assert rec_res["record_mode"] is True
+
+    # 7. Locators list inspection
+    loc_res = answer_live_session_question("What locators are in the project?", service=service)
+    assert loc_res is not None and loc_res["status"] == "inspected"
+    assert "The Live Set has" in loc_res["answer"]
+    assert "'Intro'" in loc_res["answer"] and "'Verse'" in loc_res["answer"]
+
+    # 8. Track routing inspection
+    route_res = answer_live_session_question("Where is track 1 routed?", service=service)
+    assert route_res is not None and route_res["status"] == "inspected"
+    assert "routed to output" in route_res["answer"]
+
+    input_res = answer_live_session_question("What is the input routing of track 1?", service=service)
+    assert input_res is not None and input_res["status"] == "inspected"
+    assert "receives input from" in input_res["answer"]

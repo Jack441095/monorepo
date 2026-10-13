@@ -31,7 +31,13 @@ struct ValidationCase: Decodable {
         case id, pdf, category, evaluationMode = "evaluation_mode", truth
     }
 }
-struct ValidationManifest: Decodable { let cases: [ValidationCase] }
+struct ValidationManifest: Decodable {
+    let cases: [ValidationCase]
+    let corpusID: String?
+    private enum CodingKeys: String, CodingKey {
+        case cases, corpusID = "corpus_id"
+    }
+}
 
 let fieldNames = ["student_name", "student_id", "university", "module_code", "project_title"]
 
@@ -171,7 +177,9 @@ func runValidation(manifestPath: String, outPath: String?) {
     }
 
     let result: [String: Any] = [
-        "corpus_id": "REAL_DOCUMENT_VALIDATION_V1",
+        // Preserve the approved input identity so a release gate cannot accept
+        // a successful report generated for a different collection.
+        "corpus_id": manifest.corpusID ?? "REAL_DOCUMENT_VALIDATION_V1",
         "privacy_note": "anonymous ids + status codes only; no document text or personal values",
         "processed": processed,
         "encrypted_or_unreadable": encryptedCount,

@@ -1,154 +1,91 @@
-# NITE Submit — Private Beta Handoff
+# Submit private beta handoff — 1.0.0
 
-**Version:** 0.2.0 · PRIVATE BETA INTEGRATION CANDIDATE
-**Platform:** macOS 13+, Apple Silicon
-**Purpose:** Validate real university PDFs locally before wider distribution.
+The private tester artifacts passed the local release gate on 2026-10-11.
+They have not been published or sent to testers. Public paid release remains
+blocked. Exact hashes and evidence are in
+[NITE_SUBMIT_RELEASE_REPORT.md](NITE_SUBMIT_RELEASE_REPORT.md).
 
-An isolated staging deployment previously verified the exact checksum-bound
-remote download. That environment is no longer part of current release
-operations. This candidate has not been sent to testers or enabled in
-production; the owner send gate still requires explicit approval.
+## Install and activate
 
-## Tester artifact
+Use `artifacts/Submit-1.0.0-macOS.zip` or
+`artifacts/Submit-1.0.0-macOS.dmg`. Confirm the report's SHA-256 before opening.
+The bundle is arm64 for Apple Silicon, targeting macOS 13.0. Tests ran on macOS
+27.0.1; clean-Mac/quarantined installation and macOS 13 remain tester missions.
+Intel is not supported by this artifact.
 
-Archive: `artifacts/Submit-0.2.0-macOS.zip`
+Extract the ZIP, or mount the DMG and copy Submit.app to Applications. The app
+is ad-hoc signed, not Developer ID signed or notarised. Gatekeeper may reject a
+quarantined download. An owner-supervised private test can use Finder's Open
+flow or the macOS Privacy & Security Open Anyway control if offered. Do not
+remove quarantine automatically or claim that public installation is verified.
 
-SHA-256:
+Activation requires an owner-issued offline Submit licence matching the current
+public key. Keep the key private; never send signing material to testers. The
+first-run student-number prompt is optional. The number stays in local settings
+and can be cleared. A fresh install defaults to `{student_id}_{project_title}`.
 
-```text
-64c503ebbbc975a8c839cb731ec158b9e0ef14029e84df23ff2e91dc5f0096a9
-```
+## Tester missions
 
-The build is ad-hoc signed, not Developer-ID signed or notarised. On first
-launch, use Finder: right-click the app → **Open** → **Open**.
+Use a disposable copy of a document you own or have permission to process.
+Check your brief's naming and anonymity rules before accepting a preset.
 
-## Five-minute product check
+1. Open a text PDF through the picker or Finder. Check detected title, name and
+   institution, including alternative suggestions. Correct anything uncertain.
+2. Approve the filename, then Create submission. The GUI writes beside the input;
+   use the CLI `--to` or `--out` when choosing another destination. Confirm the
+   copy opens and the original is unchanged.
+3. Repeat the copy to exercise the numbered-name collision prompt. Edit a field
+   and verify approval is revoked before another write.
+4. Add several files and switch between them. Review each independently; archive
+   only approved entries. Try the bundled ZIP/7z options and PDF optimisation.
+5. Try an image/scanned PDF, enter missing details manually, and approve again.
+   Try a missing module/candidate number and verify the selected rule blocks.
+6. Test authorized real IDs/modules, group submissions and anonymous work.
+   Controlled fixtures cover these rules but are not real-document accuracy.
+7. Verify activation rejection for an invalid key and normal relaunch. Test the
+   clean-Mac and minimum-macOS install path before any public support claim.
 
-1. Open Submit, or open a PDF with it from Finder.
-2. On first launch, optionally enter the student number to reuse when a PDF
-   does not contain one. This value stays in the local settings file and can
-   be cleared in the app.
-3. Load an authorised assignment PDF.
-4. Check every detected field, evidence note, confidence marker, and candidate
-   alternative. Choose an alternative from the field's **Use…** menu or
-   correct anything missing or uncertain manually.
-5. Try **Harvard-style (generic)**, **US coursework (generic)**, and
-   **Chicago-style (generic)**
-   profiles. They are editable filename starting points, not claims of a
-   universal university rule.
-6. Click **Approve details**, inspect the preview, then choose **Create Renamed
-   Copy**. Keep the original unchanged for the test.
+Internal final-app checks passed picker/review/correction/copy, collisions,
+queue state, a two-entry archive and image-only manual recovery. CLI checks also
+cover locked/malformed input, invalid templates, Unicode and path containment.
+The release report distinguishes those checks from new tester evidence.
 
-## Missions
+## Privacy-safe feedback
 
-- [x] Normal text-based assignment PDF (internally verified)
-- [x] PDF with a missing student number, using the saved-number fallback (internally verified)
-- [x] PDF with a missing module code or title, entered manually (internally verified)
-- [x] Harvard-style profile and preview (internally verified)
-- [x] Chicago-style profile and preview (internally verified)
-- [x] Candidate-number/anonymous profile, if the PDF has a candidate number (synthetic fixture internally verified)
-- [x] Alternative candidate menu on a group or ambiguous title-page PDF (internally verified)
-- [x] Filename collision (confirm the numbered-copy behaviour) (internally verified)
-- [x] Scanned or image-only PDF, if available (internally verified)
-- [x] Rename Original followed by Undo Rename (internally verified)
+Use [docs/BETA_FEEDBACK_TEMPLATE.md](docs/BETA_FEEDBACK_TEMPLATE.md). Report app
+and macOS versions, field correctness, text/scanned layout, chosen profile,
+warning behavior and whether the original/output opened correctly. Redact names,
+IDs, titles and paths from screenshots or examples. Do not attach PDFs, manifests
+or ordinary batch JSON/CSV without the document owner's permission.
 
-The checked items are engineering smoke evidence from the packaged RC1 build;
-beta testers can still repeat them on their own authorised documents. The
-anonymous profile has been verified in both directions: approval stays blocked
-when no candidate number is available, while a synthetic `Candidate No.:
-A12345678` fixture renders `A12345678_Soundscape_Study_1.pdf` and does not use
-the saved student number. A positive authorised university document remains a
-tester mission because no such local example is available.
-
-## What to report
-
-Use [docs/BETA_FEEDBACK_TEMPLATE.md](docs/BETA_FEEDBACK_TEMPLATE.md). Please
-report field-level behaviour and the suggested filename; do not attach a PDF
-unless its owner has explicitly authorised sharing it.
-
-Useful details include:
-
-- macOS version and beta version;
-- which fields were correct, missing, or wrong;
-- whether the first page contained a cover sheet/title page;
-- whether the PDF was text-based or scanned;
-- which university/profile/template was selected;
-- whether the original stayed unchanged and the output opened normally.
-
-## Optional authorised corpus validation
-
-Only use this path for PDFs the tester owns or has explicitly authorised for
-local processing. The validator reads files in place and writes aggregate
-metrics only; it does not copy, rename, upload, or log document text.
-
-1. Put authorised PDFs in the ignored `real_validation_corpus/beta_intake/`
-   folder.
-2. Copy `manifest.template.json` to `real_manifest.json`.
-3. Replace every example path and fill only manually confirmed truth values;
-   leave unknown fields as `UNREVIEWED` or omit them.
-4. Run:
+Authorized intake stays under ignored `real_validation_corpus/beta_intake/`.
+Copy its `manifest.template.json` to `real_manifest.json`, replace every example
+path, and enter only independently reviewed truth. Omit unknown fields or mark
+UNREVIEWED. Then run:
 
 ```sh
-./tools/run_beta_intake.sh \
-  real_validation_corpus/beta_intake/real_manifest.json
+./tools/run_beta_intake.sh real_validation_corpus/beta_intake/real_manifest.json
 ```
 
-5. Share aggregate results or the feedback form, not the PDFs or manifest.
-   Remove the local PDFs, manifest, progress file, and results when the test
-   is finished unless retention is explicitly authorised.
+Share only its aggregate result. Remove disposable input, manifest and generated
+reports when their authorized retention ends. This task used public fixtures;
+it did not access private student documents.
 
-## Current evidence and limitations
+## Limits and rollback
 
-- 252/252 deterministic checks pass.
-- A prior isolated staging deployment passed health/readiness checks and the
-  authenticated magic-link → entitlement →
-  licence → signed-download journey. The downloaded ZIP matched the release
-  SHA-256 `64c503ebbbc975a8c839cb731ec158b9e0ef14029e84df23ff2e91dc5f0096a9`.
-- 43 public university PDFs pass the controlled batch safety gate.
-- 12/12 targeted beta-harness fixtures process with zero wrong
-  high-confidence cases.
-- The private-beta validator path has also been smoke-tested against the
-  governed 21-PDF manifest: 21 processed, zero unreadable/missing files, zero
-  wrong high-confidence cases, and aggregate-only output. This is a harness
-  check using public fixtures, not a substitute for authorised student PDFs.
-- 16 public dissertation/project originals have now been explicitly approved
-  and copied in the packaged real-file load waves, with byte-identical output
-  hashes and no source modifications.
-- The packaged UI has completed the normal, saved-number fallback, manual
-  module-field, Harvard, Chicago, alternative-candidate, collision,
-  image-only, and rename/undo smoke paths.
-- Public university samples rarely contain real student numbers or module
-  codes, so those fields still require authorised tester PDFs.
-- Every inferred filename remains behind the app's explicit approval gate.
-- CLI batch mode defaults to ID + Project; name-bearing output requires an
-  explicit template or profile.
-- A fresh app install also defaults to ID + Project, so a missing module code
-  does not block ordinary preparation unless the tester chooses a
-  module-bearing rule.
-- Batch review can be handed off through the exact-source
-  `BATCH_APPROVAL_V1` manifest; required-field gaps remain blocked.
+Public reviewed coverage is 7 authors, 9 titles and 9 institutions, all passing.
+Twenty-six guidance PDFs supply layout coverage only. Controlled coverage is
+11 IDs, 10 modules and one explicit absent ID. Real ID/module/anonymous accuracy
+needs authorized beta evidence. English OCR can make mistakes and suggestions
+remain reviewable. Presets are editable starting points, not universal rules.
 
-## Next beta evidence to collect
+The signed-update feed is not ready: its matching offline key is unavailable.
+Do not advertise the placeholder appcast or this ad-hoc beta as a public update.
+Current hosted staging still needs durable storage/email and an actual Sandbox
+purchase rehearsal; the final ZIP passed local captured-email delivery only.
 
-The next useful test set is 10–20 tester-owned or explicitly authorised PDFs,
-kept only in the ignored `real_validation_corpus/beta_intake/` workspace. Aim
-for a mixture of essays, reports, dissertations, scanned documents, group
-submissions, and anonymous-marking work. The set should deliberately include:
-
-- documents with a real student number and documents where the saved-number
-  fallback is needed;
-- labelled module/course codes and documents where the code is absent;
-- a visible student name, a name-required title page, and an anonymous file
-  where a name must not be used;
-- titles on the first page, later title pages, and titles requiring manual
-  correction; and
-- at least one group identifier and one document with multiple author names.
-
-For each case, confirm the truth values visually and record only aggregate
-results or redacted feedback. Do not commit the manifest or PDFs. This is the
-remaining evidence needed before making stronger claims about real-world
-student-number, module-code, group, and identity-policy accuracy.
-
-See [NITE_SUBMIT_RELEASE_REPORT.md](NITE_SUBMIT_RELEASE_REPORT.md) for the
-complete release evidence and [real_validation_corpus/beta_intake/README.md](real_validation_corpus/beta_intake/README.md)
-for the privacy boundary.
+If testing finds a release blocker, pause distribution and use the verified
+snapshot at `artifacts/shipping-2026-10-11/verified-private-beta-1.0.0/` after
+checking its SHA256SUMS. Keep earlier source files untouched. No older 0.2.0
+artifact has been recertified for rollback. Publication and real invitations
+remain owner actions; no message was sent by this task.

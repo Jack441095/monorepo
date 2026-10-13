@@ -156,6 +156,25 @@ public struct FieldDetector: Sendable {
                                  rule: "label_candidate_number")
             }
         }
+        // Some cover sheets omit the colon after "No.". Restrict this form to
+        // a whole labelled line so a reference to somebody else's candidate
+        // number in prose cannot become the submission's anonymous identity.
+        let abbreviation = #"^(?:(?:exam|examination)\s+)?candidate\s+no\.?\s+"#
+        for page in doc.pages.prefix(3) {
+            for line in page.lines {
+                let trimmed = line.trimmingCharacters(in: .whitespaces)
+                guard let label = trimmed.range(of: abbreviation,
+                                                options: [.regularExpression, .caseInsensitive]) else {
+                    continue // Other labels retain their explicit separator requirement.
+                }
+                if let value = matchingIdentifier(String(trimmed[label.upperBound...]),
+                                                  patterns: config.labelledCandidateNumberPatterns) {
+                    return Detection(value: value, confidence: .high,
+                                     source: "Found after candidate abbreviation on page \(page.pageNumber)",
+                                     rule: "label_candidate_number")
+                }
+            }
+        }
         return .missing("No labelled candidate number found")
     }
 
@@ -581,9 +600,24 @@ public struct FieldDetector: Sendable {
                                    "validated by", "awarded by", "submitted to",
                                    "in fulfilment", "in fulfillment", "requirements for",
                                    "thesis submitted"]
+        let previousQualifications = Set(doc.pages.prefix(2).flatMap { page in
+            page.lines.enumerated().compactMap { index, line -> String? in
+                var qualification = line
+                // Long degree biographies wrap their year onto a separate row.
+                // Only a standalone year belongs to that row; a submission date
+                // or sentence on the next line cannot date the previous degree.
+                if index + 1 < page.lines.count,
+                   page.lines[index + 1].range(of: #"^(?:18|19|20)\d{2}$"#,
+                                              options: .regularExpression) != nil {
+                    qualification += " " + page.lines[index + 1]
+                }
+                return isPriorDegreeLine(qualification) ? line : nil
+            }
+        })
         // Page-1 first line is the strongest institution signal (cover sheets put
         // the primary institution first; partnership/bibliography mentions come later).
         if let firstLine = doc.pages.first?.lines.first,
+           !previousQualifications.contains(firstLine),
            !nonInstitutionWords.contains(where: { firstLine.lowercased().contains($0) }),
            let v = bestUniversityMatch(in: firstLine, pattern: uniRe), isUsefulUniversityName(v) {
             return Detection(value: v, confidence: .high,
@@ -592,7 +626,8 @@ public struct FieldDetector: Sendable {
         }
         for page in doc.pages.prefix(2) {
             for line in page.lines
-            where !nonInstitutionWords.contains(where: { line.lowercased().contains($0) }) {
+            where !previousQualifications.contains(line) &&
+                !nonInstitutionWords.contains(where: { line.lowercased().contains($0) }) {
                 if let v = bestUniversityMatch(in: line, pattern: uniRe), isUsefulUniversityName(v) {
                     return Detection(value: v, confidence: .high,
                                      source: "Found institution name on page \(page.pageNumber)",
@@ -602,6 +637,7 @@ public struct FieldDetector: Sendable {
         }
         // First prominent page-1 line heuristic (covers short names like “UWE Bristol”).
         if let first = doc.pages.first?.lines.first,
+           !previousQualifications.contains(first),
            first.count >= 3, first.count <= 80 {
             let lower = first.lowercased()
             let excludeWords = ["student", "module", "project", "assignment", "declaration",
@@ -614,6 +650,7 @@ public struct FieldDetector: Sendable {
             }
         }
         for hit in findLabels(Self.universityLabels, in: doc, maxPage: 2) {
+            guard !previousQualifications.contains(hit.line) else { continue }
             let tail = remainder(of: hit.line, after: hit.label)
             // Reject fragments like “of Arts, Design and Humanities”.
             guard !tail.isEmpty, let fc = tail.first, fc.isUppercase else { continue }
@@ -629,6 +666,15 @@ public struct FieldDetector: Sendable {
                              rule: "metadata_university")
         }
         return .missing("No university found")
+    }
+
+    func isPriorDegreeLine(_ line: String) -> Bool {
+        let lower = line.lowercased()
+        // A dated qualification is biographical evidence, not a current award.
+        // Undated degree/submission statements still participate in detection.
+        return lower.range(of: #"\b(?:18|19|20)\d{2}\b"#, options: .regularExpression) != nil &&
+            ["master of", "bachelor of", "b.sc.", "b.s.", "m.sc.", "m.s."]
+                .contains(where: lower.contains)
     }
 
     func isUsefulUniversityName(_ value: String) -> Bool {
@@ -860,6 +906,68 @@ public struct FieldDetector: Sendable {
             }
         }
 
+        // A cover's text boxes need not follow their visual order. PDFKit puts
+        // some split headings after the byline, institution and date. Join only
+        // a terminal block on page 1: joining across pages could absorb prose
+        // from the abstract, and a single line adds no evidence of continuation.
+        if let marker = authorMarkerIndex, let firstPage = doc.pages.first,
+           marker < firstPage.lines.count {
+            var reversedParts: [String] = []
+            // Inspect at most 20 trailing lines with the existing 60% letter
+            // density threshold, so drawing placeholders end the text block.
+            for raw in firstPage.lines.dropFirst(marker + 1).suffix(20).reversed() {
+                let line = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard isPlausibleTitle(line), !line.hasSuffix("."),
+                      !isTitlePageNoise(line), !isTitlePageStaffLine(line),
+                      !isTitlePageInstitutionLine(line),
+                      !isTitlePageDateOrLocationNoise(line),
+                      !looksLikeTitlePagePersonName(line),
+                      Double(line.filter(\.isLetter).count) / Double(max(line.count, 1)) > 0.6
+                else { break } // A footer, date or byline ends this heading block.
+                reversedParts.append(line)
+            }
+            let parts = Array(reversedParts.reversed())
+            if parts.count >= 2, let first = parts.first,
+               titlePageTitleValue(first) != nil {
+                let joined = parts.joined(separator: " ")
+                if isPlausibleTitle(joined) {
+                    // Match the 500-point join bonus used before the byline.
+                    ranked.append((joined, 500 + joined.count))
+                }
+            }
+        }
+
+        // A scan can print its title again immediately above the abstract. That
+        // second title block avoids cover artwork and supplies its own spelling.
+        // Accept only a repeat of the cover (including I/l/1 OCR confusables),
+        // never an unrelated abstract heading. Both readings stay reviewable.
+        if doc.textOrigin == .ocr, let cover = doc.pages.first {
+            func ocrTitleKey(_ value: String) -> String {
+                value.replacingOccurrences(of: #"[Il1]"#, with: "|", options: .regularExpression)
+                    .lowercased()
+            }
+            for page in doc.pages.dropFirst().prefix(1) {
+                let pageLines = Array(page.lines.prefix(30))
+                guard let abstract = pageLines.firstIndex(where: { $0.lowercased() == "abstract" }),
+                      let byline = pageLines[..<abstract].firstIndex(where: {
+                          ["by", "by:"].contains($0.lowercased())
+                      }) else { continue } // No bounded repeated title block on this page.
+                let parts = pageLines[..<byline].compactMap { raw -> String? in
+                    guard let value = titlePageTitleValue(raw), isPlausibleTitle(value),
+                          !isTitlePageNoise(value), !isTitlePageInstitutionLine(value)
+                    else { return nil } // Page numbers and institutional wrappers are not title parts.
+                    return value
+                }
+                let repeated = parts.joined(separator: " ")
+                guard repeated.count >= 12, isPlausibleTitle(repeated),
+                      let original = cover.lines.prefix(20).compactMap({ titlePageTitleValue($0) })
+                        .first(where: { ocrTitleKey($0) == ocrTitleKey(repeated) })
+                else { continue } // Different work titles remain ordinary alternatives.
+                ranked.append((original, 500 + original.count))
+                ranked.append((repeated, 1000 + repeated.count))
+            }
+        }
+
         guard !ranked.isEmpty else { return nil }
         let ordered = ranked.sorted { $0.score > $1.score }
         var unique: [String] = []
@@ -903,6 +1011,11 @@ public struct FieldDetector: Sendable {
             if let range = lower.range(of: marker) {
                 return String(value[..<range.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
             }
+        }
+        // Dense OCR used to append the following standalone `by` row. Strip
+        // only the terminal marker; ordinary words containing "by" are intact.
+        if value.lowercased().hasSuffix(" by") {
+            value = String(value.dropLast(3)).trimmingCharacters(in: .whitespacesAndNewlines)
         }
         return value
     }
@@ -953,6 +1066,8 @@ public struct FieldDetector: Sendable {
     /// wording such as “dissertation”.
     func isTitlePageStaffLine(_ s: String) -> Bool {
         let lower = s.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        if lower.range(of: #"^(?:title:\s*)?(?:research scientist|senior research scientist|capstone advis[oe]r)$"#,
+                       options: .regularExpression) != nil { return true }
         let markers = ["professor ", "prof. ", "dr. ", "dr ", "advisor:",
                        "adviser:", "supervisor:", "director of research",
                        "committee chair", "doctoral committee", "chair:"]

@@ -68,6 +68,14 @@ class FakeLiveBackend:
         self._session.setdefault("loop", False)
         self._session.setdefault("loop_start", 0.0)
         self._session.setdefault("loop_length", 16.0)
+        self._session.setdefault("groove_amount", 0.0)
+        self._session.setdefault("record_mode", False)
+        self._session.setdefault("current_song_time", 0.0)
+        self._session.setdefault("cue_points", [
+            {"name": "Intro", "time": 0.0},
+            {"name": "Verse", "time": 16.0},
+            {"name": "Chorus", "time": 32.0},
+        ])
         self._returns = copy.deepcopy(fixture.get("return_tracks") or [])
         # Return-track mixers, for the fixtures that didn't record them: -14 dB (fader 0.5), centre, unmuted.
         self._return_mixers = {int(r.get("index", i)): {"volume": 0.5, "panning": 0.0, "mute": False}
@@ -90,6 +98,11 @@ class FakeLiveBackend:
         self._written_observations = {}
         # Live's cue points; the playhead stays at beat 0 here, so one locator can be added before the next asks.
         self._locators: list[dict[str, Any]] = copy.deepcopy(fixture.get("locators") or [])
+        if not self._locators and self._session.get("cue_points"):
+            self._locators = [
+                {"index": idx, "name": str(c.get("name")), "time_beats": float(c.get("time", 0.0))}
+                for idx, c in enumerate(self._session.get("cue_points", []))
+            ]
         self._clips: dict[tuple[int, int], dict[str, Any]] = {}
         self.writes: list[tuple[Any, ...]] = []
 
@@ -666,6 +679,82 @@ class FakeLiveBackend:
             self._session["loop_start"] = max(0.0, float(start_beats))
             self._session["loop_length"] = max(0.25, float(length_beats))
             self.writes.append(("set_loop_bounds", float(start_beats), float(length_beats)))
+            return True
+
+    def get_groove_amount(self) -> float:
+        with self._lock:
+            return float(self._session.get("groove_amount", 0.0))
+
+    def set_groove_amount(self, amount: float) -> bool:
+        with self._lock:
+            clamped = max(0.0, min(1.0, float(amount)))
+            self._session["groove_amount"] = clamped
+            self.writes.append(("set_groove_amount", clamped))
+            return True
+
+    def get_record_mode(self) -> bool:
+        with self._lock:
+            return bool(self._session.get("record_mode", False))
+
+    def set_record_mode(self, enabled: bool) -> bool:
+        with self._lock:
+            self._session["record_mode"] = bool(enabled)
+            self.writes.append(("set_record_mode", bool(enabled)))
+            return True
+
+    def get_cue_points(self) -> list[tuple[str, float]]:
+        with self._lock:
+            cues = self._session.get("cue_points", [])
+            return [(c["name"], float(c["time"])) for c in cues if isinstance(c, dict)]
+
+    def get_current_song_time(self) -> float:
+        with self._lock:
+            return float(self._session.get("current_song_time", 0.0))
+
+    def set_current_song_time(self, beats: float) -> bool:
+        with self._lock:
+            self._session["current_song_time"] = max(0.0, float(beats))
+            self.writes.append(("set_current_song_time", float(beats)))
+            return True
+
+    def jump_to_cue_point(self, cue_point: str | int) -> bool:
+        with self._lock:
+            cues = self._session.get("cue_points", [])
+            matched_time = None
+            if isinstance(cue_point, int):
+                if 0 <= cue_point < len(cues):
+                    matched_time = float(cues[cue_point]["time"])
+            else:
+                for c in cues:
+                    if str(c.get("name", "")).strip().casefold() == str(cue_point).strip().casefold():
+                        matched_time = float(c["time"])
+                        break
+            if matched_time is not None:
+                self._session["current_song_time"] = matched_time
+                self.writes.append(("jump_to_cue_point", cue_point, matched_time))
+                return True
+            return False
+
+    def jump_to_prev_cue(self) -> bool:
+        with self._lock:
+            cues = sorted(self._session.get("cue_points", []), key=lambda c: float(c.get("time", 0.0)))
+            cur = float(self._session.get("current_song_time", 0.0))
+            prev_cues = [c for c in cues if float(c.get("time", 0.0)) < cur - 0.01]
+            if prev_cues:
+                self._session["current_song_time"] = float(prev_cues[-1]["time"])
+            elif cues:
+                self._session["current_song_time"] = float(cues[0]["time"])
+            self.writes.append(("jump_to_prev_cue", self._session["current_song_time"]))
+            return True
+
+    def jump_to_next_cue(self) -> bool:
+        with self._lock:
+            cues = sorted(self._session.get("cue_points", []), key=lambda c: float(c.get("time", 0.0)))
+            cur = float(self._session.get("current_song_time", 0.0))
+            next_cues = [c for c in cues if float(c.get("time", 0.0)) > cur + 0.01]
+            if next_cues:
+                self._session["current_song_time"] = float(next_cues[0]["time"])
+            self.writes.append(("jump_to_next_cue", self._session["current_song_time"]))
             return True
 
 

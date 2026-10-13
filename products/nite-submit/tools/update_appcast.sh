@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Sign and stamp web/appcast.xml for a release.
 #
-# The enclosure carries two things UpdateEngine checks: the byte length of the
-# download, and an Ed25519 signature over "<version>\n<download URL>". The
+# The enclosure records the download's byte length and an Ed25519 signature
+# over "<version>\n<download URL>". UpdateEngine verifies the signature; it
+# opens the download URL rather than downloading and checking those bytes. The
 # release private key stays offline with the owner, so this is a manual step
 # after packaging, not something the build can do for you. It refuses to write a
 # signature the shipped public key does not verify, which is the whole point of
@@ -24,9 +25,9 @@ zip_path=""
 key_path=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --version) [[ $# -ge 2 ]] || usage; version="$2"; shift 2 ;;
-        --zip) [[ $# -ge 2 ]] || usage; zip_path="$2"; shift 2 ;;
-        --key) [[ $# -ge 2 ]] || usage; key_path="$2"; shift 2 ;;
+        --version) [[ $# -ge 2 ]] || { usage >&2; exit 2; }; version="$2"; shift 2 ;;
+        --zip) [[ $# -ge 2 ]] || { usage >&2; exit 2; }; zip_path="$2"; shift 2 ;;
+        --key) [[ $# -ge 2 ]] || { usage >&2; exit 2; }; key_path="$2"; shift 2 ;;
         -h|--help) usage; exit 0 ;;
         *) echo "Unknown argument: $1" >&2; usage; exit 2 ;;
     esac
@@ -36,6 +37,13 @@ done
 [[ -f "$zip_path" ]] || { echo "Missing release zip: $zip_path" >&2; exit 1; }
 [[ -f "$key_path" ]] || { echo "Missing release private key: $key_path" >&2; exit 1; }
 [[ -f "$appcast" ]] || { echo "Missing appcast: $appcast" >&2; exit 1; }
+# A valid signature for yesterday's build still advertises the wrong release.
+[[ "$version" == "$(tr -d '[:space:]' < "$product_dir/VERSION")" ]] || {
+    echo 'Requested feed version differs from VERSION.' >&2; exit 1;
+}
+[[ "$(basename "$zip_path")" == "Submit-${version}-macOS.zip" ]] || {
+    echo 'Archive filename differs from the requested version.' >&2; exit 1;
+}
 
 download_url="https://releases.nitedsp.co.uk/submit/Submit-${version}-macOS.zip"
 length="$(stat -f%z "$zip_path")"
@@ -69,6 +77,10 @@ if not match:
     sys.exit(f"No <enclosure> for version {version} in {appcast_path}")
 
 tag = match.group(1)
+# The signature covers the URL too. Do not leave a different URL in the feed.
+url_match = re.search(r'\burl="([^"]*)"', tag)
+if not url_match or url_match.group(1) != download_url:
+    sys.exit('Feed enclosure URL differs from the signed download URL; refusing to edit.')
 tag = re.sub(r'\s+length="[^"]*"', "", tag)
 tag = re.sub(r'\s+sparkle:edSignature="[^"]*"', "", tag)
 tag = tag.rstrip()

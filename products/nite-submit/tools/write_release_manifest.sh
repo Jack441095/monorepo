@@ -82,7 +82,7 @@ fi
     verification: {
       deterministic_checks: $checks,
       batch_summary: $batchSummary,
-      release_check: "pass"
+      release_check: (if $checks != "not-recorded" and $batchSummary != "not-recorded" then "pass" else "not_recorded" end)
     },
     artifacts: {
       app_binary_sha256: $appHash,

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from urllib.parse import urlparse
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .submit_licensing import load_submit_signing_key
@@ -32,6 +33,16 @@ class Settings(BaseSettings):
     staging_customer_rehearsal: bool = False
 
     database_url: str = "postgresql+psycopg2://localhost/nitedsp_staging"
+
+    @field_validator("database_url")
+    @classmethod
+    def normalize_postgres_scheme(cls, value: str) -> str:
+        """Accept hosting providers' legacy PostgreSQL URL without changing credentials."""
+        # Fly's database attachment emits postgres://, which SQLAlchemy 2 no
+        # longer recognizes. Only replace the scheme; the password may contain it too.
+        if value.startswith("postgres://"):
+            return "postgresql+psycopg2://" + value[len("postgres://"):]
+        return value
 
     # Public-facing URLs -- Phase 4 Section 6. Defaulting to localhost is
     # deliberate: a missing env var in a real deployment fails loudly (links
