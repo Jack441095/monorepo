@@ -42,7 +42,10 @@ def _question_kind(question: str) -> str | None:
     ):
         return "change_history"
     if re.search(
-        r"\b(?:how does my (?:mix|low[ -]?end) sound|check (?:my low[ -]?end|(?:the )?vocals? for clipping)|any masking issues?|analy[sz]e my (?:session|mix)|mix advice|review my mix)\b",
+        r"\b(?:how does my (?:mix|low[ -]?end) sound|check (?:my low[ -]?end|(?:the )?vocals? for clipping)|any masking issues?|"
+        r"analy[sz]e\s+(?:the\s+|my\s+|our\s+|this\s+|current\s+|ableton\s+)*(?:session|mix|project|set)|"
+        r"audit\s+(?:the\s+|my\s+|our\s+|this\s+|current\s+|ableton\s+)*(?:session|mix|project|set)|"
+        r"mix advice|review my mix)\b",
         lower,
     ):
         return "mix_advice"
@@ -417,10 +420,47 @@ def answer_live_session_question(
             payload.update({"status": "unavailable", "answer": "Live did not expose a selected track in the fresh snapshot."})
         else:
             number = tracks.index(selected) + 1
-            payload.update({
-                "answer": f"Track {number}, '{selected.get('name', '')}', is selected.",
-                "track": {"number": number, "index": selected.get("index"), "name": selected.get("name", "")},
-            })
+            wants_analysis = bool(re.search(r"\b(?:analy[sz]e|audit|check|diagnose|review|how is|how's)\b", question, re.I))
+            if wants_analysis:
+                from kenn.core import volume_law
+                from kenn.core.session_doctor import SessionDoctor
+                from kenn.project_analysis import normalize_session, creative_suggestions_for_selected_track
+
+                raw_vol = selected.get("volume")
+                vol_db = volume_law.raw_to_db(float(raw_vol)) if isinstance(raw_vol, (int, float)) and not isinstance(raw_vol, bool) else None
+                vol_str = f"{vol_db:.1f} dB" if vol_db is not None else "nominal fader"
+                devices = [str(d.get("name", "")).strip() for d in selected.get("devices", []) if isinstance(d, dict) and d.get("name")]
+                device_str = ", ".join(devices) if devices else "no insert devices"
+
+                doc_report = SessionDoctor.audit(snapshot)
+                track_issues = [i for i in doc_report.issues if i.track_index == selected.get("index")]
+                suggestions = creative_suggestions_for_selected_track(normalize_session(snapshot))
+
+                lines = [f"Track {number}, '{selected.get('name', '')}', is selected (fader: {vol_str}, {len(devices)} device(s): {device_str})."]
+                if track_issues:
+                    for iss in track_issues:
+                        lines.append(f"- {iss.severity.title()} risk ({iss.code}): {iss.description} Suggested fix: {iss.suggested_action}")
+                else:
+                    lines.append("- Headroom & frequency checks: clean; no critical low-end mud or clipping flags detected on this track.")
+                if suggestions:
+                    lines.append(f"- Creative option: {suggestions[0].title}. {suggestions[0].description}")
+
+                payload.update({
+                    "answer": "\n".join(lines),
+                    "track": {
+                        "number": number,
+                        "index": selected.get("index"),
+                        "name": selected.get("name", ""),
+                        "volume_db": vol_db,
+                        "devices": devices,
+                        "issues": [{"code": i.code, "severity": i.severity, "description": i.description} for i in track_issues],
+                    },
+                })
+            else:
+                payload.update({
+                    "answer": f"Track {number}, '{selected.get('name', '')}', is selected.",
+                    "track": {"number": number, "index": selected.get("index"), "name": selected.get("name", "")},
+                })
     elif kind == "duplicate_names":
         counts = Counter(name for name in names if name)
         duplicates = sorted(name for name, count in counts.items() if count > 1)

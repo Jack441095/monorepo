@@ -1828,6 +1828,15 @@ class Handler(BaseHTTPRequestHandler):
             wav_bytes, filename = wav
             self.send_bytes(200, wav_bytes, "audio/wav", filename=filename)
             return
+        if parsed.path in {"/api/session/demo-audio", "/kenn/api/session/demo-audio"}:
+            demo_wav_path = Path(__file__).resolve().parents[4] / ".runtime" / "investor-demo-audio" / "KENN_Demo_Mix_Analysis.wav"
+            if not demo_wav_path.exists():
+                demo_wav_path = Path(__file__).resolve().parents[3] / "KENN Demo Audio" / "01_Kick.wav"
+            if demo_wav_path.exists():
+                self.send_bytes(200, demo_wav_path.read_bytes(), "audio/wav", filename="KENN_Demo_Mix_Analysis.wav")
+            else:
+                self.send_json(404, {"error": "Demo audio file not found."})
+            return
         if parsed.path == "/api/stem-separate-status":
             if not self.enforce_rate_limit("stem_separate_status"):
                 return

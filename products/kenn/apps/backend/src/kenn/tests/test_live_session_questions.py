@@ -407,3 +407,17 @@ def test_metronome_and_loop_and_fold_queries() -> None:
     input_res = answer_live_session_question("What is the input routing of track 1?", service=service)
     assert input_res is not None and input_res["status"] == "inspected"
     assert "receives input from" in input_res["answer"]
+
+
+def test_analyze_selected_track_inspects_devices_and_checks() -> None:
+    client = SessionLive()
+    client.state["selected_track_index"] = 0
+    client.state["tracks"][0]["devices"] = [{"name": "EQ Eight"}]
+    result = answer_live_session_question("analyze the selected track", service=Service(client))
+
+    assert result is not None
+    assert result["status"] == "inspected"
+    assert "Track 1, '1-MIDI', is selected" in result["answer"]
+    assert "EQ Eight" in result["answer"]
+    assert result["track"]["devices"] == ["EQ Eight"]
+

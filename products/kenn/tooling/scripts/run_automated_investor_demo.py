@@ -136,7 +136,7 @@ def find_latest_chat_button(name: str) -> tuple[float, float, float, float] | No
     """Locate the center and dimensions of an action button in Safari's chat history."""
     script = f'''
 tell application "Safari" to activate
-delay 0.1
+delay 0.3
 tell application "System Events"
     tell process "Safari"
         tell window 1
@@ -202,7 +202,7 @@ def click_quick_chip(chip_name: str, current_pos: tuple[float, float]) -> tuple[
     """Click a quick-action chip located in the KENN sidebar below the chat history."""
     script = f'''
 tell application "Safari" to activate
-delay 0.1
+delay 0.3
 tell application "System Events"
     tell process "Safari"
         tell window 1
@@ -260,21 +260,35 @@ def run_showcase(output_dir: Path, total_seconds: int = TARGET_SECONDS, use_mic:
         # Act 1: Simple Question 1 - Track Count
         print("[00:04] Act 1: Track Count Introspection", flush=True)
         pos = type_chat_message("How many tracks are in this session?", pos)
-        time.sleep(8.0)
+        time.sleep(7.0)
+
+        # Act 1b: Real-Time Selected Track Introspection
+        print("[00:11] Act 1b: Real-Time Selected Track Introspection", flush=True)
+        pos = type_chat_message("analyze the selected track", pos)
+        time.sleep(7.0)
 
         # Act 2: Simple Question 2 - Session Tempo and Key
-        print("[00:14] Act 2: Tempo and Key Check", flush=True)
+        print("[00:18] Act 2: Tempo and Key Check", flush=True)
         pos = type_chat_message("What is the project tempo and key?", pos)
-        time.sleep(8.0)
+        time.sleep(7.0)
+
+        # Act 2b: Live 12 Song Groove Control with Confirmation & Undo
+        print("[00:21] Act 2b: Live 12 Groove Amount Proposal & Sync", flush=True)
+        pos = type_chat_message("set groove amount to 50%", pos)
+        time.sleep(5.0)
+        pos = click_chat_card_button("Apply to Live 12", pos)
+        time.sleep(5.0)
+        pos = click_chat_card_button("Undo", pos)
+        time.sleep(5.0)
 
         # Act 3: Live Track Control - Track 12 Renaming with Confirmation & Readback
-        print("[00:24] Act 3: Live Track Renaming & Proposal Execution", flush=True)
+        print("[00:36] Act 3: Live Track Renaming & Proposal Execution", flush=True)
         pos = type_chat_message("rename track 12 to Ambient Pads", pos)
-        time.sleep(6.0)
+        time.sleep(5.0)
         pos = click_chat_card_button("Apply to Live 12", pos)
-        time.sleep(6.0)
+        time.sleep(5.0)
         pos = click_chat_card_button("Undo", pos)
-        time.sleep(6.0)
+        time.sleep(5.0)
 
         # Act 4: Advanced Live Control - Auditory Playback & Volume A/B
         print("[00:42] Act 4: Start Live Playback & Propose Fader Adjustment", flush=True)

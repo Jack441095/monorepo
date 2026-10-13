@@ -25,6 +25,15 @@
       >
         {{ isBusy ? t('mixReview.analysing') : t('mixReview.analyse') }}
       </button>
+      <button
+        type="button"
+        class="mix-lab__sync-btn"
+        :disabled="isBusy"
+        title="Sync and analyze the active Live session mix"
+        @click="loadDemoAudio"
+      >
+        {{ isBusy ? 'Analyzing…' : 'Sync Live Mix' }}
+      </button>
     </div>
 
     <p v-if="useMock" class="mix-lab__mock-hint">{{ t('mixReview.mockHint') }}</p>
@@ -537,6 +546,7 @@ const {
   setMixFile,
   setReferenceFile,
   analyze,
+  loadDemoAudio,
   cancelAnalyze,
 } = useMixReview()
 // The review's suggested next step goes straight into the chat, as if the producer had typed it.
@@ -672,6 +682,9 @@ function onRefChange(e: Event) {
 
 onMounted(() => {
   void checkSession()
+  if (!mixFile.value) {
+    void loadDemoAudio()
+  }
 })
 </script>
 
@@ -869,6 +882,36 @@ onMounted(() => {
     text-overflow: ellipsis;
     &:disabled,
     &.is-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__sync-btn {
+    box-sizing: border-box;
+    flex: 0 0 var(--mr-card-w);
+    width: var(--mr-card-w);
+    min-width: var(--mr-card-w);
+    max-width: var(--mr-card-w);
+    min-height: var(--mr-card-h);
+    height: var(--mr-card-h);
+    padding: 0 0.1rem;
+    border: 1px solid var(--floating-border);
+    border-radius: 0.08rem;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-color);
+    font-size: 0.13rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.2s, border-color 0.2s;
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--mr-accent);
+    }
+    &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }

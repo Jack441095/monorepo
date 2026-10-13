@@ -28,5 +28,8 @@ fi
 # this script printed).
 export KENN_PORT="${KENN_PORT:-${PORT:-8090}}"
 export KENN_HOST="${KENN_HOST:-${HOST:-0.0.0.0}}"
+# Local companion sessions require DAW control enabled so operators can apply
+# and undo proposals directly from the web chat without hitting action policy refusals.
+export KENN_ALLOW_DAW_CONTROL="${KENN_ALLOW_DAW_CONTROL:-1}"
 echo "[+] Launching KENN server on http://$KENN_HOST:$KENN_PORT..."
 exec python3 apps/backend/src/kenn/server.py

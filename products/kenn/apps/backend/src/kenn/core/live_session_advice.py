@@ -313,13 +313,35 @@ def _arrangement_advice(snapshot: dict[str, Any], *, scope: str) -> dict[str, An
         caveat = "The observed energy labels suggest limited buildup-to-drop contrast."
     else:
         caveat = "The observed section labels provide structural evidence, but not audio evidence."
+
+    answer_parts = [f"{finding['explanation']} {caveat} Listening test: {finding['suggested_listening_test']}"]
+    extra_findings = []
+    if scope != "vocal":
+        try:
+            from kenn.core.session_doctor import SessionDoctor
+            doctor_report = SessionDoctor.audit(snapshot)
+            if doctor_report.issues:
+                answer_parts.append(f"Live Session Doctor audited {len(tracks)} tracks and identified {len(doctor_report.issues)} issue(s):")
+                for iss in doctor_report.issues[:3]:
+                    answer_parts.append(f"- {iss.severity.title()} ({iss.code}) on '{iss.track_name}': {iss.description} Action: {iss.suggested_action}")
+                    extra_findings.append({
+                        "type": iss.code.lower(),
+                        "severity": iss.severity,
+                        "confidence": 0.85,
+                        "explanation": iss.description,
+                        "suggested_listening_test": iss.suggested_action,
+                        "track_index": iss.track_index,
+                    })
+        except Exception:
+            pass
+
     return {
         "schema": "kenn.ableton_mix_advice.v1",
         "status": "inspected",
         "advice_mode": "arrangement_fallback",
         "analysis_scope": scope,
-        "answer": f"{finding['explanation']} {caveat} Listening test: {finding['suggested_listening_test']}",
-        "findings": [finding],
+        "answer": "\n".join(answer_parts),
+        "findings": [finding, *extra_findings],
         "arrangement": report.to_dict(),
         "advisory_only": True,
         "changed": False,

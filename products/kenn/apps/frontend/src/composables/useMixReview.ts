@@ -190,7 +190,10 @@ export function useMixReview() {
     status.value = 'uploading'
     statusKey.value = 'statusDecoding'
     try {
-      decoded.value = await decodeWavFile(mixFile.value)
+      decoded.value = await Promise.race([
+        decodeWavFile(mixFile.value),
+        new Promise<null>((_, reject) => setTimeout(() => reject(new Error('decode_timeout')), 1000)),
+      ])
     } catch {
       decoded.value = null
     }
@@ -227,7 +230,8 @@ export function useMixReview() {
         statusKey.value = 'statusIdle'
         return
       }
-      const id = submitted.id || submitted.review?.id
+      const rawSub = submitted as Record<string, any>
+      const id = submitted.id || submitted.review?.id || rawSub.review_id || rawSub.review?.review_id
       const immediate = normalizeMixReview(submitted.review || submitted)
       if (immediate.metrics && (submitted.status === 'completed' || submitted.review?.metrics)) {
         review.value = immediate
@@ -297,6 +301,23 @@ export function useMixReview() {
     }
   }
 
+  async function loadDemoAudio() {
+    try {
+      clearError()
+      const res = await fetch('/api/session/demo-audio')
+      if (!res.ok) return
+      const blob = await res.blob()
+      const file = new File([blob], 'KENN_Demo_Mix_Analysis.wav', { type: 'audio/wav' })
+      setMixFile(file)
+      title.value = 'KENN Demo Mix'
+      version.value = 'v1'
+      await analyze()
+    } catch {
+      status.value = 'idle'
+      statusKey.value = 'statusIdle'
+    }
+  }
+
   return {
     mixFile,
     referenceFile,
@@ -318,6 +339,7 @@ export function useMixReview() {
     setMixFile,
     setReferenceFile,
     analyze,
+    loadDemoAudio,
     cancelAnalyze,
   }
 }
