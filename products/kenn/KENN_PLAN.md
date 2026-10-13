@@ -1093,6 +1093,20 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       indexed gain-staging note's blanket -18 dB input-gain instruction: the
       grounding gate accepted it because it was in the evidence. No production
       model change or SEAL gain is established by this sample.
+      **13 October advanced probe, one run at Jack's request:** unchanged Ollama
+      1.7B delivered 36/44 eligible answers within 15 s (81.8%); the full pass
+      kept all 47 cases, including three abstention controls. Background browser
+      upgrades on `71515b88`, the same `v-db8c6334cf63` hybrid index, FakeLive,
+      fresh state, response cache off, thinking off and the 128-token prose cap.
+      The probe reported 37/45 accepted attempts, median final 3.11 s, no errors
+      and no late model answers. Two unasked-plugin flags and only 2/3 abstention
+      controls handled need review; 42/43 recorded generation calls hit the cap.
+      The model was already resident, 8B was co-resident, memory pressure warned
+      and swap rose from 6,259.94 to 8,380.88 MiB. Local receipt
+      `.runtime/probe-17b-44-2026-10-13-154843/` passed 20 integrity checks.
+      This is one development diagnostic, not a controlled 4B comparison or a
+      qualifying session; correctness, retention and Live coexistence remain
+      unmeasured. S4/S6 stay open and the production control remains 4B.
     - [ ] **S5 — Grow only after an independent signal.** If the bounded packet
       shows a reviewed quality gain, prepare a first larger batch of 200–400 reviewed
       targets, balanced across the curriculum and actual failure families. Drafting,
