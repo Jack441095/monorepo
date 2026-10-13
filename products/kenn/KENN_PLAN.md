@@ -1881,6 +1881,10 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   note. Weight synonym terms at about ×0.35 and stem the user's own words, together: ×0.35 alone lifts oversampling
   only to rank 4 and costs 2 probe concepts (112 → 110; MRR 0.8502 → 0.8464). Measure on coverage, the held-out set
   and the probe together, like the ranking change. Sealed rows 066/068/069/114 are the sensitive ones.
+  Built 13 Oct on `draft/synonym-weight-stemming` (`9cd19dc`, not merged): typed words and their inflections at weight 1,
+  untyped synonyms at 0.35, each word counted once. Unit and mutation checks only; no index in the cloud, so it waits
+  for the Mac measurement against main. [Draft receipt and commands](docs/evidence/KENN_SYNONYM_WEIGHT_AND_STEMMING_DRAFT_2026-10-13.md),
+  which lives on that branch.
 - [ ] A precedence-effect note for the corpus (needs Jack and an index rebuild); no ranking change can supply it.
   Drafted 13 Oct from Wallach et al. 1949, Haas 1951/1972, Lochner & Burger 1958 and Litovsky et al. 1999, with a
   per-figure check sheet; three figures rest on secondary citations and are marked for Jack to confirm. Delivered to
