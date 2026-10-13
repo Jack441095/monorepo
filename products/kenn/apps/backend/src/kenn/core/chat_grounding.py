@@ -1488,6 +1488,24 @@ def repair_misattributed_citations(answer: str, misattributed: list[dict]) -> st
     return repaired
 
 
+def display_answer(answer: str) -> str:
+    """The accepted answer as the producer should read it: every [#n] figure tag removed, figures untouched.
+
+    The tags exist for the gate, which has already read them by the time this runs. Removal goes through
+    repair_misattributed_citations() with every tag marked "no holder", so it gets the same spacing rules and
+    the same refusal when a figure would change; on refusal the tagged text is returned, since a visible tag
+    is only untidy and an altered figure would be wrong. The Sources list is not numbered to match because it
+    is bulleted, de-duplicated and capped at three, so excerpt 2 is not reliably its second line.
+    """
+    count = len(CLAIM_CITATION_RE.findall(answer))
+    if not count:
+        return answer
+    stripped = repair_misattributed_citations(
+        answer, [{"citation_index": index, "attributed_ordinals": []} for index in range(count)]
+    )
+    return stripped or answer
+
+
 _WHOLE_SENTENCE_RE = re.compile(r".*[.!?](?=\s|$)", re.DOTALL)
 # A cut right after "3." (or "Try this: 1.") leaves the marker looking like a finished sentence.
 _DANGLING_STEP_RE = re.compile(r"(?:(?<=[.!?\]:])[ \t]+|\n[ \t]*)\d{1,2}[.)]$")

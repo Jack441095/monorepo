@@ -59,6 +59,7 @@ from kenn.core.chat_grounding import (
     answer_quality_report,
     answer_self_check,
     calibrate_answer_for_grounding,
+    display_answer,
     end_on_a_whole_sentence,
     evidence_measurements,
     explicit_abstain_gap,
@@ -2921,6 +2922,9 @@ def _answer_payload_raw(
     if llm_used and confidence in {"high", "medium"}:
         followups = merge_followups(parse_followups_from_answer(answer), followups)
     timings["metadata_ms"] = (time.perf_counter() - started) * 1000
+    # Every check above read the tagged text; from here on it is what the producer, memory and the cache keep.
+    # Until 13 Oct 2026 the companion showed "150 ms [#1]" as written.
+    answer = display_answer(answer)
     payload = {
         "question": query,
         "answer": answer,
