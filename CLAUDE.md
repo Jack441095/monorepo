@@ -13,6 +13,7 @@ Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `pro
 ## Working rules specific to this repo
 
 - **Never add an AI attribution trailer to commits in this repo.** Commits here must not contain `Co-Authored-By: Claude ...` or similar (the `commit-metadata.yml` gate exists on the `kenn-production-hardening` branch; its script `tools/check_commit_metadata.py` is not currently present on `main` — re-add before re-enabling CI enforcement). This overrides the default Claude Code commit-attribution behavior — do not append `Co-Authored-By: Claude ...` when committing here.
+- **Commit as Jack441095.** Author and committer are `Jack441095 <jack.gandy@gmail.com>`, the owner's GitHub account, never `Claude <noreply@anthropic.com>`. Cloud sessions start with the Claude identity configured, so set it first: `git config user.name "Jack441095" && git config user.email "jack.gandy@gmail.com"`.
 - New worktrees go under `workspace/worktrees/<project>/<task>/`; builds/caches go under `workspace/` or already-ignored project-local dirs.
 - `Audio_Too` is a preserved legacy boundary that was *not* bulk-migrated during the Sept 2026 cleanup — it overlaps heavily with `products/slo` (both descend from the SLO codebase) but is kept as a frozen reference; don't assume they mirror each other.
 - Owner audio and corpora are data, not source — kept outside this code estate entirely.
