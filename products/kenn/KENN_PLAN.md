@@ -846,15 +846,38 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       tasks. Jack approved the exact displayed packet in chat; the ignored approval
       receipt binds all 38 source/target records and records the limits of owner
       acceptance. The approved copy validates; the untouched draft remains rejected.
-      Primary references and arithmetic were checked separately. The latest SSH
-      retry refused connections before authentication. No GPU job or server restart occurred;
-      physical GPU 1 remains the only authorized device for this pilot.
+      Primary references and arithmetic were checked separately. Password SSH now
+      works; physical GPU 1 remains the only authorized device for this pilot.
+    - [x] Verified the existing HF Qwen3-4B-Instruct-2507 checkpoint against all 13
+      official repository files and the installed Ollama manifest against the
+      registry. These establish published lineage; BF16 GPU trials remain a distinct
+      condition from Q4_K_M serving. The isolated remote source passed **79 offline
+      tests + 28 existing grounding tests**. No server restart was needed.
+    - [x] Recorded real baseline answers: Jack accepted seven reward answers and
+      two retention answers shown in chat. Ordinary SFT completed four steps on
+      the four approved targets: 176 training tokens, 96 target tokens, 18.06 s
+      operation wall time and 8.55 GB peak reserved GPU memory. The adapter is an
+      isolated artifact. Jack accepted all seven ordinary-arm answers; reward gain
+      is zero on this packet. A lunch batch checks the adapter's retention and
+      collects one/two-step ordinary trials on the same approved targets, without
+      selecting a model from unreviewed answers. The first fixed-policy self-edit
+      reached the 768-token ceiling and was rejected before training; its failure
+      receipt is preserved. New self-edits still need exact-content owner review.
+      Baseline reward is already 1.0 on this tiny packet, so its positive-gain
+      threshold cannot demonstrate an improvement; broader, harder tasks are needed.
     - [ ] Expand the tiny pilot into a public licensed corpus with independently
-      reviewed targets and reward/retention references; bind an existing HF checkpoint to the served
-      4B lineage before actual GPU 1 training. The prior 505 gate-kept teacher
-      answers are not owner-reviewed targets. No actual adaptation was run here.
+      reviewed targets and reward/retention references. Inventory found 807 existing
+      Markdown notes, including 118 Ableton-named notes; 758 carry Approved status,
+      but none has an explicit license or shared-weight training-permission field.
+      The current retrieval manifest uses 748 notes and two PDFs, including the
+      Live 11 manual. Preserve manual-version provenance and review new targets
+      before a separate audio-engineering corpus run. The prior 505 gate-kept
+      teacher answers are not owner-reviewed targets.
       Jack's smaller-model question is recorded in the research note: consider
-      a 1.7–2B challenger before a 0.8B trial, with 4B retained as the control.
+      pretrained Qwen3 1.7B as a specialist challenger before a smaller trial,
+      fine-tuned on reviewed audio-engineering examples with the same retrieval
+      evidence and held-out questions. Measure accuracy, units, unsupported claims,
+      retention, proposal boundaries and M3 delivery costs against the 4B control.
       These are candidates, not a model-selection change; the worker currently
       accepts only the pinned Qwen3 4B architecture.
     - [ ] Grade sealed answers blind, compare B/C/D across development-only step
