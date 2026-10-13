@@ -611,7 +611,11 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     "Pro-C 2 has eight styles" is an inference marked for Jack.
   - [x] FabFilter Pro-L 2 mastering limiter, drafted 13 Oct from the Pro-L 2 manual pp.10-13 and 24-25; one listening
     tip is marked as KENN's own advice rather than FabFilter's.
-  - [ ] The rest of the FabFilter bundle, then iZotope, Soundtoys, Kilohearts and Damage.
+  - [x] FabFilter Saturn 2 multiband saturation (manual pp.3-4, 9-12, 27), Pro-R 2 vocal reverb (pp.7-11; the manual
+    gives two Decay Rate ranges, flagged), Timeless 3 tempo delay (pp.3-4, 9-11) and Pro-Q 4 dynamic/spectral
+    de-essing (pp.3, 13, 15-18), drafted 13 Oct with check sheets.
+  - [ ] The rest of the FabFilter bundle (Pro-MB, Pro-G, Volcano 3, Twin 3 and the smaller ones), then iZotope,
+    Soundtoys, Kilohearts and Damage.
 - [ ] **Audio calculators** on `draft/audio-calculators` (`dc97516`, not merged): note lengths at a tempo (straight,
   dotted, triplet, as ms and LFO Hz), buffer latency, frequency to note and back, dB to gain factor. The figures go in
   as tool readings, so the gate accepts them. [Draft receipt](docs/evidence/KENN_AUDIO_CALCULATORS_DRAFT_2026-10-13.md),
