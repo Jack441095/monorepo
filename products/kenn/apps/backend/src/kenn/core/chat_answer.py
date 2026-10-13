@@ -975,6 +975,7 @@ def make_answer(
     _last_outcome.reason = ""
     _last_outcome.abstained = False
     _last_outcome.rejected = None
+    _last_outcome.transient = False
     template = build_template_answer(
         query,
         results,
@@ -1193,6 +1194,9 @@ def make_answer(
         # The cause rides after a colon so anything matching the old prefix still matches.
         cause = last_enhance_failure()
         reason = f"generation returned no answer: {cause}" if cause else "generation returned no answer"
+        # Only a failed request (timeout, refused connection, a 5xx) says nothing about the next try. A structure
+        # check failure is the model's own output and tends to repeat, so that template may still be cached.
+        _last_outcome.transient = cause == "request failed"
         _log_generation_outcome(False, {"warnings": [reason]}, _time.perf_counter() - _ma_t2)
     _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
     print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (fallback)", file=_sys.stderr, flush=True)
@@ -1233,6 +1237,11 @@ _last_outcome = threading.local()
 
 def last_generation_outcome() -> str:
     return getattr(_last_outcome, "reason", "")
+
+
+def last_generation_transient() -> bool:
+    """Whether the last make_answer() on this thread fell back because the model request itself failed."""
+    return bool(getattr(_last_outcome, "transient", False))
 
 
 def last_generation_abstained() -> bool:
@@ -2476,7 +2485,7 @@ def _may_store_in_semantic_cache(metadata: dict | None) -> bool:
         return False
     # The template left behind by a model that timed out is high confidence too. Caching it keeps the model
     # out of that question for the next hour, even once the load that caused the timeout has gone.
-    if (metadata.get("generation_validation") or {}).get("transient"):
+    if (metadata.get("generation_validation") or {}).get("transient") or metadata.get("generation_transient"):
         return False
     return bool(metadata.get("llm_enhanced") or metadata.get("confidence") == "high")
 
@@ -2950,6 +2959,9 @@ def _answer_payload_raw(
         "abstain_gap": abstain_gap,
         # With KENN_LLM_BACKGROUND=0 there is no upgrade to carry the reason, so the inline answer carries it.
         "generation_outcome": "abstained" if abstained else "" if llm_used else last_generation_outcome(),
+        # The payload twin of the stream's generation_validation["transient"], which this path never sets. Without
+        # it a timed-out request's high-confidence template was cached for an hour (found 13 Oct 2026).
+        "generation_transient": not llm_used and last_generation_transient(),
         "llm_available": llm_enabled(),
         "llm_usage": llm_used and _get_llm_usage_stats(),
         "session": None,

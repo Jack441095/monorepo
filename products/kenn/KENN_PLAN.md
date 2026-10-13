@@ -704,6 +704,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       an hour; those results are now marked transient and not cached (guard trips still are). Stream path only. The
       route-classification model call ignoring `allow_llm` is recorded, not changed.
       [Receipt](docs/evidence/KENN_C1_PAYLOAD_30Q_AND_CACHE_CONTRACT_2026-10-02.md).
+    - Payload cache contract, 13 Oct (cloud, Fake Live, stubbed model): the non-streaming answer path cached the
+      high-confidence template left by a failed model request for an hour, as the stream did before 2 Oct. Failed
+      requests are now marked `generation_transient` and not cached; structure-check failures and accepted answers
+      still are. Six regression tests, three mutations caught. Full backend: 4802 passes, 137 skips and the
+      pre-existing typo-routing failure. No speed gain or model run. The C1 harness now also reports retrieval time
+      on the payload and foreground surfaces. [Receipt](docs/evidence/KENN_C2_PAYLOAD_TRANSIENT_CACHE_2026-10-13.md).
   - [ ] Use measured phase costs to select stable-prefix, KV/residency or explicit
     same-checkpoint MLX experiments. Preserve full grounding policy and exact
     assets; justify new dependencies/assets separately before adding them.
