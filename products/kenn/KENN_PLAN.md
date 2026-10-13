@@ -598,6 +598,24 @@ what to do; they do not supply owner grades, and each still runs only when its o
   The local order for the knowledge work (measure the retrieval draft, grade v7, review notes, one GPU-box rebuild,
   then the reranker trial) is in [the local knowledge checklist](docs/runbooks/KENN_KNOWLEDGE_LOCAL_SESSION.md).
 
+Knowledge work from 13 Oct (each item's evidence is linked where it is done):
+
+- [ ] **Third-party plug-in notes** for the plug-ins Jack named: FabFilter, iZotope, Soundtoys, Kilohearts and Damage
+  (to confirm: Heavyocity's Damage for Kontakt). Each from the maker's own manual, version-checked, every claim cited,
+  delivered outside git with a check sheet, and a matching "with Ableton's own devices" note where it helps.
+  - [x] FabFilter Pro-Q 3 de-essing with a dynamic band, drafted 13 Oct from FabFilter's Pro-Q 3 manual pp.13-15
+    (Pro-Q 3 has no attack/release knobs; Pro-Q 4 does). With Jack for review; when it lands, decide whether the
+    `trap-third-party-plugin` probe row becomes an `answer` row.
+  - [ ] The rest of the FabFilter bundle, then iZotope, Soundtoys, Kilohearts and Damage.
+- [ ] **Audio calculators** on `draft/audio-calculators` (`dc97516`, not merged): note lengths at a tempo (straight,
+  dotted, triplet, as ms and LFO Hz), buffer latency, frequency to note and back, dB to gain factor. The figures go in
+  as tool readings, so the gate accepts them. [Draft receipt](docs/evidence/KENN_AUDIO_CALCULATORS_DRAFT_2026-10-13.md),
+  on that branch.
+  - [x] Built and tested 13 Oct: 21 cases with hand-checked values, a contrast test showing the same "351.6 ms" kept
+    with the calculator and cut without it, mutations caught; full backend 4849 passes.
+  - [ ] Try it on the Mac, confirm Live labels middle C as C3, run a probe, merge if no new rejections.
+  - [ ] KENN's MIDI card names pitches in scientific pitch (middle C = C4) while Live shows C3; make the two agree.
+
 - [ ] **C1 — Current-path baseline.** At least 30 knowledge questions on M3/16 GB,
   separate streaming, foreground and background runs, both caches declared, exact
   model/index/code versions. Capture each stage and rejection reason. Repeat comparable
@@ -631,7 +649,7 @@ what to do; they do not supply owner grades, and each still runs only when its o
     rejections are now accepted; the 15 s gate is still failed. C1 stays open. Same evidence note.
   - [x] Every rejected background upgrade now carries the check that rejected it, and the probe counts them by cause
     (`fcd2914f`, `2be6a7c6`, reviewed 5 Oct). Before this, 34 rejected rows in the 4 Oct runs said nothing about why.
-  - Measurement accounting, 13 Oct (cloud, tooling only): `measure_chat_latency.py` booked a stopped companion as
+  - [x] Measurement accounting, 13 Oct (cloud, tooling only): `measure_chat_latency.py` booked a stopped companion as
     a timeout and a superseded reply as a template, dropped the companion's stage timings and the delivered
     template on a polling timeout, and hard-coded memory pressure and swap to unknown. It now reports `error` and
     `cancelled`, keeps `server_timing_ms`, `server_upgrade_seconds` and `initial_reply_seconds`, resolves
@@ -640,8 +658,9 @@ what to do; they do not supply owner grades, and each still runs only when its o
     on clean main) and a 2 ms timing check that passes alone. No model or Live run, so no
     latency, memory or quality result; C1 stays open pending the local 30-question stream/foreground/background
     repeats in the [return packet](docs/evidence/KENN_C1_HTTP_ACCOUNTING_AND_LOCAL_PACKET_2026-10-13.md).
-    The session is scripted in `tooling/scripts/c1_supervised_session.sh` (seven stages, about 1.5 to 2 hours on
-    the Mac); a stubbed dry run walked every stage here, so it is ready, not run.
+  - [x] Scripted the supervised C1 Mac session, 13 Oct: `tooling/scripts/c1_supervised_session.sh` (seven stages,
+    about 1.5 to 2 hours). A stubbed dry run walked every stage here, so it is ready, not run.
+  - [ ] Run that session on the M3/16 GB (Jack): stream, foreground and background repeats, Live-open run, dropout count.
 - [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already
@@ -736,7 +755,7 @@ what to do; they do not supply owner grades, and each still runs only when its o
       an hour; those results are now marked transient and not cached (guard trips still are). Stream path only. The
       route-classification model call ignoring `allow_llm` is recorded, not changed.
       [Receipt](docs/evidence/KENN_C1_PAYLOAD_30Q_AND_CACHE_CONTRACT_2026-10-02.md).
-    - Payload cache contract, 13 Oct (cloud, Fake Live, stubbed model): the non-streaming answer path cached the
+    - [x] Payload cache contract, 13 Oct (cloud, Fake Live, stubbed model): the non-streaming answer path cached the
       high-confidence template left by a failed model request for an hour, as the stream did before 2 Oct. Failed
       requests are now marked `generation_transient` and not cached; structure-check failures and accepted answers
       still are. Six regression tests, three mutations caught. Full backend: 4802 passes, 137 skips and the
@@ -1209,7 +1228,7 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   - Not checked yet: the handler refuses quantized values that the fake accepts (`parameter_target.py:113`).
     Whether the Remote Script's `is` identity check holds in real Live is also unknown, because the branch has no
     real-Live qualification.
-    - Checked 13 Oct (cloud, stand-in Live objects, no real Live): no gap for anything real Live sends. The handler
+    - [x] Checked 13 Oct (cloud, stand-in Live objects, no real Live): no gap for anything real Live sends. The handler
       refuses any quantized value but the current one, min or max, and always sends `choices: None`; addressed
       proposals and their Apply re-check pass no device name, so a measured chooser profile is never consulted and
       the backend refuses the same values. The fake accepts an in-between value only when a test supplies
@@ -1735,9 +1754,10 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
   The real-path test and inline counts landed in `2d8d779d`. The no-answer split merged 8 Oct (`draft/no-answer-cause`):
   the route now ends `: request failed`, `: structure check` or `: llm disabled`, so the next probe can say how many
   answers the cap cut off. The streamed path still logs the bare reason. The chat-test skip match is not yet checked.
-  13 Oct: an empty stream now reads `generation returned no answer: empty reply` (a dead stream already named its
-  exception). The chat-test skip could not be located in this tree; its commit predates the clone's history.
-  [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
+  - [x] 13 Oct: an empty stream now reads `generation returned no answer: empty reply` (a dead stream already named
+    its exception). [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
+  - [ ] The chat-test skip match: not found in this tree on 13 Oct; its commit predates the clone's history. Look for
+    it in the Mac checkout's history.
 - [x] Stop a template counting as a model answer when the quality check swaps it in after generation. A correctness
   fix; it didn't change any of the last four scores. Merged to main 7 Oct (`draft/honest-answers` 0fd4b7b1): the
   `brain=True` log row now waits for the quality check, and a swap logs `generation:quality gate: <reason>` instead.
@@ -1886,15 +1906,15 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   note. Weight synonym terms at about ×0.35 and stem the user's own words, together: ×0.35 alone lifts oversampling
   only to rank 4 and costs 2 probe concepts (112 → 110; MRR 0.8502 → 0.8464). Measure on coverage, the held-out set
   and the probe together, like the ranking change. Sealed rows 066/068/069/114 are the sensitive ones.
-  Built 13 Oct on `draft/synonym-weight-stemming` (`9cd19dc`, not merged): typed words and their inflections at weight 1,
-  untyped synonyms at 0.35, each word counted once. Unit and mutation checks only; no index in the cloud, so it waits
-  for the Mac measurement against main. [Draft receipt and commands](docs/evidence/KENN_SYNONYM_WEIGHT_AND_STEMMING_DRAFT_2026-10-13.md),
-  which lives on that branch.
+  - [x] Built 13 Oct on `draft/synonym-weight-stemming` (`9cd19dc`, not merged): typed words and their inflections at
+    weight 1, untyped synonyms at 0.35, each word counted once. Unit and mutation checks only.
+    [Draft receipt and commands](docs/evidence/KENN_SYNONYM_WEIGHT_AND_STEMMING_DRAFT_2026-10-13.md), on that branch.
+  - [ ] Measure it against main on the Mac (coverage, held-out, probe together) and merge only with no loss.
 - [ ] A precedence-effect note for the corpus (needs Jack and an index rebuild); no ranking change can supply it.
-  Drafted 13 Oct from Wallach et al. 1949, Haas 1951/1972, Lochner & Burger 1958 and Litovsky et al. 1999, with a
-  per-figure check sheet; three figures rest on secondary citations and are marked for Jack to confirm. Delivered to
-  Jack outside git (corpora stay out of this repo); it joins the corpus with the reference-numbers note after the
-  v7 grading, one GPU-box rebuild and a bench.
+  - [x] Drafted 13 Oct from Wallach et al. 1949, Haas 1951/1972, Lochner & Burger 1958 and Litovsky et al. 1999, with
+    a per-figure check sheet. Delivered to Jack outside git (corpora stay out of this repo).
+  - [ ] Jack confirms the three secondary-cited figures and two Live control names, then it joins the corpus with the
+    reference-numbers note after the v7 grading, one GPU-box rebuild and a bench.
 - [ ] Revisit the fused-list cap of 40 once the synonym fix has landed.
 - [x] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
   reaches the producer instead of a template that pretends to answer. Merged to main 7 Oct (`draft/honest-answers`
@@ -2202,9 +2222,10 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
         put the extra rejections on the reorder, so it was reverted outright to save a bench.
       - `c288275a` passes seconds to `_log_generation_outcome` on both accepted paths of `make_answer`. Two
         tests in `test_generation_outcome_log.py` drive a 6 s fake clock through each path and expect 6.0. The
-        request-scoped usage half of item 2 is not done. Done 13 Oct: the route-log timing reads this thread's own
-        newest call, and `make_answer()` forgets it on entry, so a busy refusal no longer carries another chat's
-        timing. [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
+        request-scoped usage half of item 2 is not done.
+        - [x] Done 13 Oct: the route-log timing reads this thread's own newest call, and `make_answer()` forgets it
+          on entry, so a busy refusal no longer carries another chat's timing.
+          [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
       - `d783942b` numbers the excerpts in `model_evidence` (`id="1"`, `id="2"`…) instead of the 12-hex chunk id,
         and the Rules line now reads "a figure from the excerpt with id="2" is written 150 ms [#2]". The gate builds
         its shown list through the same `model_evidence` call on the same budget, and `_resolve_chunk_id` already
@@ -2216,11 +2237,11 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       - Review (inline): nothing outside the tests parses the `[#…]` tag, enhance() hands the model and the gate
         the same `results`, and the 128-token cap is unchanged.
       - Follow-up for the product, not the gate: answers show `[#2]` to the producer as written (before, a 12-hex
-        id). Strip the tags or map them to the Sources list numbering. Done 13 Oct for the companion's payload path:
-        stripped after every check, because the Sources list is de-duplicated and capped at three so an ordinal
-        cannot map onto it. The terminal stream still shows tags as they are written; its final answer (what
-        memory and the semantic cache keep and replay) drops them too.
-        [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
+        id). Strip the tags or map them to the Sources list numbering.
+        - [x] Done 13 Oct: stripped after every check on the companion's payload path and in the stream's final
+          answer (what memory and the semantic cache keep and replay), because the Sources list is de-duplicated
+          and capped at three so an ordinal cannot map onto it. The terminal stream still shows tags as typed.
+          [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
       - Watch in v6: misattributed figures. A model that tags every figure [#1] is now caught as misattribution
         rather than as an unshown id, so that count may rise as the unshown count falls.
   - [ ] v6 development bench, 11 Oct: one probe run and one held-out run on main `2377eed1`, at Jack's call. A read
