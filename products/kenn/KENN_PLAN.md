@@ -568,6 +568,26 @@ by setup. Local runtime engineering remains paused; C1/C2/C3 remain unticked.
 
 Needs the route/context audit; fixes may land in small slices while that audit continues.
 
+Decisions, 13 Oct, made under Jack's delegation ("go with the best way of doing it, your choice"). These settle
+what to do; they do not supply owner grades, and each still runs only when its own gate is met.
+
+- **Reranker (C5, abstentions):** build it as a trial that is off by default. It is served only if it clears the
+  experiment 2 bar (0.05 more recall@4 or 20% fewer retrieval-caused failures, inside 150 ms p95 and 250 MB) on a
+  held-out set that excludes the six rows the 2 Oct spike was tuned on. `onnxruntime` is already in
+  `apps/backend/requirements.txt`; the model file is the only new asset. Pin it by digest and licence when it is
+  added: the spike's own config named L-12 while the fetched repo path was L-6.
+- **Note-served answers do not count as model answers** for the 15 s / 70% gate. If notes are served they get their
+  own delivery class, reported beside model answers the way abstentions are; C5 forbids relabelling a missed
+  target as passed. Whether to serve them at all still waits on Jack grading the ~40-question pack.
+- **MLX against Ollama on the same Qwen3-4B-Instruct-2507 checkpoint:** run it as a measurement, on the Mac, after the
+  C1 receipts exist, with `mlx-lm` installed in that owner session. Production stays on Ollama unless MLX is faster
+  on the same 30 questions with held-out quality and grounding unchanged. Speculative decoding follows only that
+  comparison.
+- **Reference-numbers and precedence-effect notes:** write both from published, citable conventions, check each
+  figure against its source before merge, and rebuild on a GPU box per L2, never on the Mac.
+- **128-token cap:** keep it until the C1 receipts are in, then compare truncation and timely acceptance against the
+  384-token ceiling on the same 30 questions before changing it.
+
 - [ ] **C1 — Current-path baseline.** At least 30 knowledge questions on M3/16 GB,
   separate streaming, foreground and background runs, both caches declared, exact
   model/index/code versions. Capture each stage and rejection reason. Repeat comparable
@@ -610,6 +630,8 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     on clean main) and a 2 ms timing check that passes alone. No model or Live run, so no
     latency, memory or quality result; C1 stays open pending the local 30-question stream/foreground/background
     repeats in the [return packet](docs/evidence/KENN_C1_HTTP_ACCOUNTING_AND_LOCAL_PACKET_2026-10-13.md).
+    The session is scripted in `tooling/scripts/c1_supervised_session.sh` (seven stages, about 1.5 to 2 hours on
+    the Mac); a stubbed dry run walked every stage here, so it is ready, not run.
 - [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already
