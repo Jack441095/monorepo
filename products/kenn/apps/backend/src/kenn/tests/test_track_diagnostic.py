@@ -180,3 +180,35 @@ def test_handle_track_diagnostic_apply():
     assert data["ok"] is True
     assert data["applied"] is True
 
+
+def test_build_tracks_from_live_session():
+    from kenn.core.track_diagnostic import build_tracks_from_live_session
+
+    live_tracks = [
+        {"index": 0, "name": "1-MIDI", "devices": []},
+        {"index": 1, "name": "2-MIDI", "devices": [{"name": "Operator"}]},
+        {"index": 2, "name": "3-Audio", "devices": []},
+        {"index": 3, "name": "Guitar Solo", "devices": [{"name": "Amp"}]},
+    ]
+    bounces = [
+        {"label": "Guitar Solo", "filename": "Bounce Guitar Solo.wav", "path": "/path/to/guitar.wav"}
+    ]
+
+    tracks = build_tracks_from_live_session(live_tracks, bounces)
+    assert len(tracks) == 4
+    assert tracks[0]["track_name"] == "1-MIDI"
+    assert tracks[0]["track_type"] == "midi"
+    assert tracks[0]["has_audio_match"] is False
+
+    assert tracks[1]["track_name"] == "2-MIDI"
+    assert tracks[1]["track_type"] == "midi"
+
+    assert tracks[2]["track_name"] == "3-Audio"
+    assert tracks[2]["track_type"] == "audio"
+    assert tracks[2]["is_audio"] is True
+
+    assert tracks[3]["track_name"] == "Guitar Solo"
+    assert tracks[3]["has_audio_match"] is True
+    assert tracks[3]["matched_file_path"] == "/path/to/guitar.wav"
+
+

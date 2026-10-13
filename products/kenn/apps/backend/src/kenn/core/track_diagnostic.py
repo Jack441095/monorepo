@@ -118,6 +118,55 @@ def extract_session_tracks(als_path: str, project_dir: str = "") -> List[Dict[st
     return tracks
 
 
+def build_tracks_from_live_session(
+    live_tracks: List[Dict[str, Any]],
+    bounces: Optional[List[Dict[str, Any]]] = None,
+) -> List[Dict[str, Any]]:
+    """Build track diagnostic entries from real-time Ableton Live session state."""
+    bounces = bounces or []
+    tracks: List[Dict[str, Any]] = []
+
+    for t in live_tracks:
+        idx = t.get("index", 0)
+        name = str(t.get("name") or f"Track {idx + 1}").strip()
+        devices = t.get("devices") or []
+
+        # Determine if track is MIDI or Audio based on name and instrument devices
+        name_lower = name.lower()
+        dev_names = [str(d.get("name", "")).lower() for d in devices if isinstance(d, dict)]
+        is_midi = "midi" in name_lower or any(
+            any(inst in dn for inst in ("instrument", "operator", "wavetable", "simpler", "sampler", "drift", "analog", "vst"))
+            for dn in dev_names
+        )
+
+        matched_file = None
+        matched_lbl = None
+        has_match = False
+        if bounces:
+            t_clean = re.sub(r"[^\w\s-]", "", name).lower().strip()
+            for b in bounces:
+                b_lbl = re.sub(r"[^\w\s-]", "", b.get("label", "")).lower()
+                b_fn = re.sub(r"[^\w\s-]", "", b.get("filename", "")).lower()
+                if t_clean and (t_clean in b_lbl or t_clean in b_fn):
+                    matched_file = b.get("path")
+                    matched_lbl = b.get("label")
+                    has_match = True
+                    break
+
+        tracks.append({
+            "track_index": idx,
+            "track_name": name,
+            "track_type": "midi" if is_midi else "audio",
+            "is_audio": not is_midi,
+            "color_index": 13,
+            "has_audio_match": has_match,
+            "matched_file_path": matched_file,
+            "matched_label": matched_lbl,
+        })
+
+    return tracks
+
+
 def _decode_pcm_samples(payload: bytes) -> Tuple[List[float], int, float]:
     """Decode WAV byte payload into mono float samples, sample_rate, and duration."""
     from kenn.core.audio_analysis import _parse_wav

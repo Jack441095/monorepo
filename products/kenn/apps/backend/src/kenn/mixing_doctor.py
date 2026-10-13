@@ -113,6 +113,16 @@ def _poll_once(client: Any) -> None:
             state = {"status": "offline", "tracks": []}
         else:
             state = copy.deepcopy(state)
+        if state.get("status") == "connected" and not state.get("session_name"):
+            try:
+                from kenn.core.ableton_project_detector import detect_active_ableton_project
+                proj = detect_active_ableton_project()
+                if proj:
+                    state["session_name"] = proj.get("project_name") or "Untitled"
+                    state["project_dir"] = proj.get("project_dir", "")
+                    state["als_path"] = proj.get("als_path", "")
+            except Exception:
+                pass
         alerts = _run_session_audits(state["tracks"]) if state["status"] == "connected" else []
         from kenn.core.live_world_model import fingerprint
         state_fingerprint = fingerprint(state)

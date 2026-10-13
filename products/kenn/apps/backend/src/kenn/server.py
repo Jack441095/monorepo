@@ -1315,7 +1315,7 @@ class Handler(BaseHTTPRequestHandler):
             if not proj:
                 self.send_json(200, {"ok": False, "error": "No active Ableton Live project detected.", "bounces": []})
                 return
-            bounces = find_project_bounces(proj["project_dir"])
+            bounces = find_project_bounces(proj["project_dir"]) if proj.get("project_dir") else []
             self.send_json(200, {
                 "ok": True,
                 "project_name": proj["project_name"],
@@ -1325,14 +1325,21 @@ class Handler(BaseHTTPRequestHandler):
             })
             return
         if parsed.path in {"/api/ableton/session-tracks", "/kenn/api/ableton/session-tracks"}:
-            from kenn.core.ableton_project_detector import detect_active_ableton_project
-            from kenn.core.track_diagnostic import extract_session_tracks
+            from kenn.core.ableton_project_detector import detect_active_ableton_project, find_project_bounces
+            from kenn.core.track_diagnostic import extract_session_tracks, build_tracks_from_live_session
+            from kenn.mixing_doctor import get_latest_session_state
 
-            proj = detect_active_ableton_project()
-            if not proj:
-                self.send_json(200, {"ok": False, "error": "No active Ableton Live project detected.", "tracks": []})
-                return
-            tracks = extract_session_tracks(proj["als_path"], proj["project_dir"])
+            proj = detect_active_ableton_project() or {"project_name": "Untitled", "project_dir": "", "als_path": ""}
+            session = get_latest_session_state()
+            bounces = find_project_bounces(proj["project_dir"]) if proj.get("project_dir") else []
+
+            if session.get("status") == "connected" and session.get("tracks"):
+                tracks = build_tracks_from_live_session(session["tracks"], bounces)
+            elif proj.get("als_path") and os.path.isfile(proj["als_path"]):
+                tracks = extract_session_tracks(proj["als_path"], proj["project_dir"])
+            else:
+                tracks = []
+
             self.send_json(200, {
                 "ok": True,
                 "project_name": proj["project_name"],

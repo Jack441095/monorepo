@@ -41,7 +41,7 @@
     <div class="mix-lab__project-bar">
       <div class="mix-lab__project-tag">
         <span class="mix-lab__project-badge">Ableton Project</span>
-        <strong>{{ projectAudioInfo?.project_name || project.name || 'outer shell 2026-kenn-test' }}</strong>
+        <strong>{{ projectAudioInfo?.project_name || project.name || 'Untitled' }}</strong>
       </div>
 
       <div class="mix-lab__source-select-wrap">
@@ -53,7 +53,7 @@
           :disabled="isBusy || scanningProject"
           @change="onBounceSelected"
         >
-          <option value="" disabled>Select Master or Stem from Ableton project…</option>
+          <option value="" disabled>{{ (masterBounces.length || stemBounces.length) ? 'Select Master or Stem from Ableton project…' : 'No bounces found for this set' }}</option>
           <optgroup v-if="masterBounces.length" label="Master Bounces">
             <option v-for="b in masterBounces" :key="b.path" :value="b.path">
               {{ b.label }} ({{ formatSize(b.size_bytes) }})
@@ -687,7 +687,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FloatDetachable from './common/FloatDetachable.vue'
 import MixReviewBandChart from './mix-review/MixReviewBandChart.vue'
@@ -775,14 +775,31 @@ async function scanProjectAudio() {
     if (!res.ok) return
     const data = await res.json()
     if (data.ok) {
+      const prevProject = projectAudioInfo.value?.project_name
       projectAudioInfo.value = {
         project_name: data.project_name,
         project_dir: data.project_dir,
         als_path: data.als_path,
       }
       projectBounces.value = Array.isArray(data.bounces) ? data.bounces : []
-      if (projectBounces.value.length > 0 && latestBounceMtime.value === 0) {
+      if (projectBounces.value.length > 0) {
         latestBounceMtime.value = Math.max(...projectBounces.value.map((b) => b.modified_time), 0)
+      } else {
+        latestBounceMtime.value = 0
+      }
+      // If the project changed or current set has no bounces, reset previously loaded bounce
+      if (prevProject && prevProject !== data.project_name) {
+        selectedBouncePath.value = ''
+        selectedRefBouncePath.value = ''
+        setMixFile(null)
+        setReferenceFile(null)
+        title.value = ''
+      }
+      if (masterBounces.value.length === 0) {
+        selectedBouncePath.value = ''
+        selectedRefBouncePath.value = ''
+        setMixFile(null)
+        setReferenceFile(null)
       }
     }
   } catch {
@@ -890,7 +907,7 @@ async function onBounceSelected() {
     const blob = await res.blob()
     const file = new File([blob], bounce.filename, { type: 'audio/wav' })
     setMixFile(file)
-    const projName = projectAudioInfo.value?.project_name || project.value.name || 'outer shell 2026-kenn-test'
+    const projName = projectAudioInfo.value?.project_name || project.value.name || 'Untitled'
     title.value = `${projName} — ${bounce.label}`
     version.value = bounce.kind === 'master' ? 'Master' : 'Stem'
     await analyze()
@@ -1040,12 +1057,26 @@ onMounted(async () => {
   if (!mixFile.value && masterBounces.value.length > 0) {
     selectedBouncePath.value = masterBounces.value[0].path
     void onBounceSelected()
+  } else if (masterBounces.value.length === 0) {
+    selectedBouncePath.value = ''
+    selectedRefBouncePath.value = ''
+    setMixFile(null)
+    setReferenceFile(null)
   }
   // Periodically check for newly exported Live bounces (Cmd+Shift+R)
   bouncePollTimer = setInterval(() => {
     void pollForNewBounces()
   }, 3500)
 })
+
+watch(
+  () => project.value.name,
+  (newName, oldName) => {
+    if (newName && newName !== oldName && oldName !== undefined) {
+      void scanProjectAudio()
+    }
+  }
+)
 
 onBeforeUnmount(() => {
   if (bouncePollTimer) {

@@ -1014,6 +1014,14 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       shared-weight rights and derived-target approval remain pending. Read-only
       assets were re-frozen after pulling cloud main `ab63cd33`; paired retrieval
       and full condition manifests remain pending. S1 stays open.
+      **MiMo batch 1 correction pass, 13 Oct:** seven independently corroborated
+      corrections were applied to the ignored local note library after reviewing
+      the model's 20-note ledger. Ten other proposed findings were not adopted;
+      MiMo's ten “no issue” classifications were not freshly claim-audited in this
+      pass. Hash and inventory checks account for all 807 notes; the seven edits
+      remain factual-owner-review-pending, with rights and derived-target approval
+      unresolved. No index rebuild, note approval or training occurred. Receipt:
+      `.runtime/mimo-note-review-validation-2026-10-13/REVIEW.md`.
     - [ ] **S2 — Build a harder, reviewed packet within today's limits.** Start with
       four training source families and two ordinary targets per context: eight
       reviewed examples, including concise explanations and follow-ups. Prepare
@@ -1237,6 +1245,10 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
     - Transport & timing: play/stop/continue, loop start/length/toggle, tempo, time signature, metronome, groove amount (`0.0–1.0`), arrangement record mode toggle, and song time position (beats).
     - Navigation & structure: named locator jumps, relative next/prev cue point jumps, track fold/unfold, track color index (`0–69`) and 24-bit hex readouts, and track input/output routing inspection.
     - Verified by 72 scoped unit tests (`test_live_song_and_track_capabilities.py`, `test_live_session_questions.py`, `test_ableton_osc_bridge.py`) and clean 4,912-case backend suite run. Synced to `kenn-app/main`.
+- [ ] **Real-time session and track analysis, 13 Oct (commits `9e209b95`, `349189a9`, `7bf03ddf`, `854c515b`, `b5240f06`).** Main now has Live 12 session/selected-track review, a UI analysis switch and chat-only view, Live project detection and track/master selection, bounce watching, stem A/B reference selection, a proposal bridge for analysis flags, and an acoustic track scanner with waveform, spectrogram and weak-area findings. The scanner composes deterministic measurements and hypotheses; it does not qualify an LLM explanation or establish that a hypothesis is correct. Keep this work read-only with respect to Live. Abrar is taking the next LLM-quality pass; freshness, evidence labels, stale-result handling, usefulness and Live-open behavior still need qualification.
+  - Verification on 13 Oct: the focused backend files (`test_live_session_questions.py`, `test_realtime_observer.py`, `test_realtime_session_review.py`, `test_track_diagnostic.py`, `test_ableton_project_detector.py`) pass **66 tests** on FakeLive. Frontend Vitest passes **86 tests**; `npm run build` passes, including `vue-tsc`.
+  - The adjacent `test_mixing_doctor.py` run has two failures: the low-end name/fader overlap advisory and near-ceiling meter headroom advisory are no longer emitted. Reconcile those expectations with the new evidence path before claiming the mixing-doctor behavior is qualified. The combined six-file run was **78 passed, 2 failed**. No real-Live run or end-to-end producer qualification was performed.
+  - `kenn-app/main` was synced to monorepo source `349189a9` earlier today. The later real-time commits listed above are on monorepo `main` and have not yet been mirrored.
 - [ ] **Stage 2/3 guarded parameter control: implementation reviewed, 12 Oct.** This is Jack's branch
   `codex/kenn-stage2-stage3-integration`, reviewed through `945b4373`. It adds inspect → proposal → explicit
   Apply → readback → Undo for any device parameter, holds retained target references in the AbletonOSC handler, and

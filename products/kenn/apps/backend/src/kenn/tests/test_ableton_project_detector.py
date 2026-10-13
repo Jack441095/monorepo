@@ -64,3 +64,41 @@ def test_find_project_bounces_detects_new_render_by_mtime():
         newest = max(updated_bounces, key=lambda b: b["modified_time"])
         assert newest["filename"] == "Take 2 Final.wav"
         assert newest["modified_time"] > baseline_mtime
+
+
+def test_detect_active_ableton_project_returns_untitled_when_active_window_is_untitled(monkeypatch):
+    """When Live's active window is Untitled, return an unsaved Untitled set without stale bounces."""
+    from kenn.core import ableton_project_detector
+
+    monkeypatch.setattr(ableton_project_detector, "get_live_window_title", lambda: "Untitled")
+    project = ableton_project_detector.detect_active_ableton_project()
+    assert project is not None
+    assert project["project_name"] == "Untitled"
+    assert project["als_path"] == ""
+    assert project["project_dir"] == ""
+    assert project["is_saved"] is False
+
+
+def test_detect_active_ableton_project_matches_named_window_against_log(monkeypatch, tmp_path):
+    """When Live's active window is named, match it to the corresponding document in Log.txt."""
+    from kenn.core import ableton_project_detector
+
+    pref_dir = tmp_path / "Live 12 Preferences"
+    pref_dir.mkdir()
+    als_file = tmp_path / "Summer Jam Project" / "Summer Jam.als"
+    als_file.parent.mkdir()
+    als_file.write_bytes(b"dummy")
+
+    log_file = pref_dir / "Log.txt"
+    log_file.write_text(f'Loading document "{als_file}"\n')
+
+    monkeypatch.setattr(ableton_project_detector, "get_live_window_title", lambda: "Summer Jam")
+    monkeypatch.setattr(ableton_project_detector.glob, "glob", lambda pattern: [str(pref_dir)])
+
+    project = ableton_project_detector.detect_active_ableton_project()
+    assert project is not None
+    assert project["project_name"] == "Summer Jam"
+    assert project["als_path"] == str(als_file)
+    assert project["project_dir"] == str(als_file.parent)
+    assert project["is_saved"] is True
+
