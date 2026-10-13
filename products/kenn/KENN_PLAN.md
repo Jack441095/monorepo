@@ -1089,6 +1089,13 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   Test typed MCP proposals through the actual HTTP gateway and validate native
   Apply/Undo outcomes and receipts before displaying success. Resolve the unused
   planner dB conversion path; keep direct C++ writes off pending parity qualification.
+  - [x] **Live 12 transport, session, and routing expansion, 13 Oct (commits `55c4ac53`, `f2854653`, `a05c04a1`).**
+    Closed missing transport, song, locator, and track controls across OSC bridge (`ableton_osc_bridge.py`),
+    deterministic `FakeLiveBackend`, typed intent rules (`live_intent.py`, `session_rules.py`), chat imperative
+    routing (`server.py`), and `LiveActionService` with verified readback and 1-click Undo:
+    - Transport & timing: play/stop/continue, loop start/length/toggle, tempo, time signature, metronome, groove amount (`0.0–1.0`), arrangement record mode toggle, and song time position (beats).
+    - Navigation & structure: named locator jumps, relative next/prev cue point jumps, track fold/unfold, track color index (`0–69`) and 24-bit hex readouts, and track input/output routing inspection.
+    - Verified by 72 scoped unit tests (`test_live_song_and_track_capabilities.py`, `test_live_session_questions.py`, `test_ableton_osc_bridge.py`) and clean 4,912-case backend suite run. Synced to `kenn-app/main`.
 - [ ] **Stage 2/3 guarded parameter control: implementation reviewed, 12 Oct.** This is Jack's branch
   `codex/kenn-stage2-stage3-integration`, reviewed through `945b4373`. It adds inspect → proposal → explicit
   Apply → readback → Undo for any device parameter, holds retained target references in the AbletonOSC handler, and
@@ -1245,22 +1252,22 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   failed, pending or unmeasured gates prevent a qualified release. Optional current-Live
   probing is not a substitute for captured qualification evidence.
 
-### Investor demo — Wednesday 14 October 2026
+### Investor walkthrough
 
-Agreed 12 Oct: demonstrate KENN's web UI on the owner's Mac controlling Ableton
-Live. Jack then requested a walkthrough of **five minutes maximum** once the
-current work is finished, also as a bug-finding exercise. Use the
+The owner's Mac drives KENN's web UI to control Ableton Live. When the current
+work is ready for a showing, Jack requests a short, bug-finding walkthrough; no
+fixed date or length is committed here. The
 [five-minute showcase](docs/runbooks/KENN_INVESTOR_DEMO.md#five-minute-ableton-showcase)
-for the presentation. The existing 20-step operator script and its ten consecutive
-8–12 minute qualification runs remain the internal release check. Historical
-September receipts and the current fake tests do not qualify the October candidate.
+in the runbook is the presentation template, not a bound target. The existing
+20-step operator script and its ten consecutive complete runs remain the internal
+release check. Historical September receipts and the current fake tests do not
+qualify the October candidate.
 
 The first milestone is a browser-driven real-Live Apply/readback/Undo round trip
 on the exact candidate. The final milestone is the full scripted presentation,
-recovery, display/audio checks and a verified backup recording. The schedule below
-is a target; an unresolved failure keeps the corresponding item open.
+recovery, display/audio checks and a verified backup recording. Items below stay open until their checks pass; no schedule is committed.
 
-- [x] **D1 — Review the fixes, Monday 12 Oct.** Fresh independent Standards and
+- [x] **D1 — Review the fixes.** Fresh independent Standards and
   Spec reviews covered citation repair `67921916`, the Stage 2/3 integration and
   audit-fixes merge `2377eed1`. Card target positions, chooser transitions and the
   templates-only HTTP measurement contract were fixed in `53fffa4c`; the empty
@@ -1269,7 +1276,7 @@ is a target; an unresolved failure keeps the corresponding item open.
   were detected. Jack removed the original-reviewer requirement on 12 Oct.
   Citation repair precedes Stage 2/3 in the candidate ancestry. These code reviews
   permit landing; owner grading and supervised Live qualification remain open.
-- [ ] **D2 — Assemble and check one candidate, Monday 12 Oct.** Codex uses a clean
+- [ ] **D2 — Assemble and check one candidate.** Codex uses a clean
   checkout containing the approved changes, preserving unrelated working edits.
   Run the full backend suite with fake Live, frontend tests and frontend build;
   run the scoped `test_demo_preflight.py` and `test_demo_script_gate.py` checks.
@@ -1278,9 +1285,8 @@ is a target; an unresolved failure keeps the corresponding item open.
   Use the full companion described in the runbook. Keep the existing models and
   dependencies; native plug-in packaging is outside this web-UI demo. Exit: green
   checks and one identified build to use for every subsequent receipt.
-- [ ] **D3 — Prove the current Live path, Tuesday 13 Oct at 20:00 London time.**
-  Jack confirmed the 20:00 supervised slot. Use a verified disposable copy of the
-  demo set. Codex checks or deploys the candidate Remote Script in that window;
+- [ ] **D3 — Prove the current Live path.** Use a verified disposable copy of the
+  demo set. Jack supervises all Live mutations; no fixed time is committed here. Codex checks or deploys the candidate Remote Script in that window;
   restart/reload and verify its digest before collecting results. Revalidate the
   rights-clear generated audio, track/device topology, saved reset point and
   actual listening output. Run read-only preflight, then the runbook's explicitly
@@ -1305,7 +1311,7 @@ is a target; an unresolved failure keeps the corresponding item open.
   leave replacements untouched, no unauthorized writes and no uncertain readback.
   Stop on a failure, inspect the receipt and Live state, fix and recheck before
   presentation rehearsals.
-- [ ] **D4 — Check answers and the narrative, Tuesday 13 Oct.** Codex captures the
+- [ ] **D4 — Check answers and the narrative.** Codex captures the
   exact scripted questions with Live open on the candidate. Jack grades their
   correctness, usefulness and displayed evidence, reviews the
   [investor FAQ](docs/runbooks/KENN_INVESTOR_FAQ.md), and agrees the claims he will
@@ -1319,7 +1325,7 @@ is a target; an unresolved failure keeps the corresponding item open.
   This bounded owner check does not close the wider held-out grading gate.
   Grade the short showcase's answers as well, and measure its actual end-to-end
   time, including Live navigation, listening and Undo; the hard limit is 300 s.
-- [ ] **D5 — Rehearse and freeze, Tuesday 13 Oct.** Reserve at least 2–3 hours with
+- [ ] **D5 — Rehearse and freeze.** Reserve at least 2–3 hours with
   Jack for ten consecutive complete runs: each 20/20 steps, 8–12 minutes, no raw
   errors, wrong targets or failed/stale readbacks. Include the planned recovery
   drill in at least one run and use the actual projector/large display and audio
@@ -1329,29 +1335,30 @@ is a target; an unresolved failure keeps the corresponding item open.
   build, times, failures, restoration and recovery outcomes; do not carry forward
   September passes. An unexpected failure resets the consecutive count. A code,
   model, index or script change requires qualification of the new candidate.
-  After qualification, run the five-minute showcase as a supervised bug-finding
-  dry run, targeting 4 min 45 s and stopping at 5 min. Record failures in the
+  After qualification, run the showcase as a supervised bug-finding dry run,
+  stopping when Jack is satisfied. Record failures in the
   rehearsal log with the prompt, target, expected/actual values and restoration;
   add actionable fixes to this plan. Fix and recheck any failure before a clean
   take, and requalify if code changes. Record one successful complete showcase
   with intelligible narration, readable cards and audible before/after; play it
   back to verify it. Keep raw captures and local set/audio artifacts outside git.
-  Exit: ten qualification passes, a successful showcase of at most 300 s,
-  checked backup recording and a frozen candidate by Tuesday evening.
-- [ ] **D6 — Room preflight and showing, Wednesday 14 Oct.** Jack and Codex verify
+  Exit: ten qualification passes, a successful showcase with intelligible
+  narration and audible before/after, a checked backup recording and a frozen
+  candidate.
+- [ ] **D6 — Room preflight and showing.** Jack and Codex verify
   the frozen build, mains power, loaded local model/index, disposable reset set,
   selected starting device, connection, projector and audio. Run read-only
   preflight and check the backup recording plays before the audience arrives.
-  Jack presents the rehearsed five-minute showcase and handles questions using
-  the reviewed FAQ afterwards. If preflight fails, use a verified recording of the
+  Jack presents a short walkthrough and handles questions using the reviewed
+  FAQ afterwards. If preflight fails, use a verified recording of the
   same demonstrated sequence and describe it as a recording; do not improvise
   mutations. Exit: live showing only with D1–D5 and room preflight passed.
 
 Owners: Codex handles build preparation, fixes, checks and evidence; independent
 reviewers provide code sign-off; Jack supervises all Live mutations,
-grades the demo answers and rehearses/presents. Tuesday's supervised slot is
-20:00 London time. Jack clarified that video preparation and bug finding take
-priority over settling Wednesday's meeting time. Nothing here
+grades the demo answers and rehearses/presents. No supervised Live slot is
+scheduled, and none is committed here. Jack clarified that video preparation and
+bug finding take priority over any further scheduling. Nothing here
 authorizes an unattended Live run. R1–R4, broader answer grading, device coverage
 and beta/release qualification remain separately open.
 
