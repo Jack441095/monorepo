@@ -1305,6 +1305,41 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:
                 self.send_json(500, {"ok": False, "error": str(e)})
             return
+        if parsed.path in {"/api/realtime/status", "/kenn/api/realtime/status"}:
+            from kenn.mixing_doctor import is_realtime_enabled
+            self.send_json(200, {"ok": True, "enabled": is_realtime_enabled()})
+            return
+        if parsed.path in {"/api/ableton/project-audio", "/kenn/api/ableton/project-audio"}:
+            from kenn.core.ableton_project_detector import detect_active_ableton_project, find_project_bounces
+            proj = detect_active_ableton_project()
+            if not proj:
+                self.send_json(200, {"ok": False, "error": "No active Ableton Live project detected.", "bounces": []})
+                return
+            bounces = find_project_bounces(proj["project_dir"])
+            self.send_json(200, {
+                "ok": True,
+                "project_name": proj["project_name"],
+                "project_dir": proj["project_dir"],
+                "als_path": proj["als_path"],
+                "bounces": bounces,
+            })
+            return
+        if parsed.path in {"/api/ableton/project-audio/file", "/kenn/api/ableton/project-audio/file"}:
+            file_path = parse_qs(parsed.query).get("path", [""])[0].strip()
+            if not file_path or not os.path.isfile(file_path):
+                self.send_json(404, {"ok": False, "error": "Audio file not found."})
+                return
+            if not file_path.lower().endswith((".wav", ".aif", ".aiff")):
+                self.send_json(400, {"ok": False, "error": "Requested file is not an audio file."})
+                return
+            try:
+                with open(file_path, "rb") as f:
+                    content = f.read()
+                mime = "audio/aiff" if file_path.lower().endswith((".aif", ".aiff")) else "audio/wav"
+                self.send_bytes(200, content, mime)
+            except Exception as exc:
+                self.send_json(500, {"ok": False, "error": f"Failed to read audio file: {exc}"})
+            return
         if parsed.path == "/api/project-manager/report":
             # Analysis deliberately consumes Mixing Doctor's cached snapshot:
             # the UI can refresh safely without adding a second OSC poll.
@@ -2162,6 +2197,8 @@ class Handler(BaseHTTPRequestHandler):
             "/kenn/api/stems/export-plan",
             "/api/stems/certificate",
             "/kenn/api/stems/certificate",
+            "/api/realtime/toggle",
+            "/kenn/api/realtime/toggle",
         }:
             self.send_json(404, {"error": "Not found"})
             return
@@ -2217,6 +2254,13 @@ class Handler(BaseHTTPRequestHandler):
 
             result = install_remote_script()
             self.send_json(200 if result.get("ok") else 500, result)
+            return
+        if parsed.path in {"/api/realtime/toggle", "/kenn/api/realtime/toggle"}:
+            from kenn.mixing_doctor import set_realtime_enabled, is_realtime_enabled
+            req_val = payload.get("enabled")
+            new_val = bool(req_val) if req_val is not None else not is_realtime_enabled()
+            set_realtime_enabled(new_val)
+            self.send_json(200, {"ok": True, "enabled": new_val})
             return
         if parsed.path in {"/api/ableton/audition_delta", "/kenn/api/ableton/audition_delta"}:
             from kenn.routes.session_intelligence_handler import handle_post_audition_delta

@@ -1,20 +1,51 @@
 <template>
   <div class="home">
-    <div class="home-layout">
-      <!-- 须在工作区之前：FloatDetachable 挂载时就能 Teleport 到此 -->
+    <div
+      class="home-layout"
+      :class="{
+        'home-layout--chat-left': chatSide === 'left',
+        'home-layout--chat-only': !workspaceVisible,
+      }"
+    >
+      <!-- Float root for floating windows -->
       <div id="mix-float-root" class="home-layout__float-root" aria-hidden="true" />
-      <section class="home-layout__workspace" aria-label="Audio Engineering Workspace">
+
+      <!-- Analysis Workspace (can be hidden/collapsed) -->
+      <section
+        v-show="workspaceVisible"
+        class="home-layout__workspace"
+        aria-label="Audio Engineering Workspace"
+      >
         <AbletonWorkspace />
       </section>
+
+      <!-- Floating Restore Pill Button when in Chat-Only mode -->
+      <button
+        v-if="!workspaceVisible"
+        class="home-layout__restore-btn"
+        type="button"
+        title="Show Audio Analysis Workspace"
+        @click="toggleWorkspaceVisible()"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8" />
+          <path d="M14 4V20" stroke="currentColor" stroke-width="1.8" />
+        </svg>
+        <span>Show Analysis Workspace</span>
+      </button>
+
       <aside
         class="home-layout__sidebar"
-        :class="{ 'home-layout__sidebar--collapsed': sidebarStore.collapsed }"
+        :class="{
+          'home-layout__sidebar--collapsed': sidebarStore.collapsed && workspaceVisible,
+          'home-layout__sidebar--fullscreen': !workspaceVisible,
+        }"
         :style="{ zIndex: sidebarZ }"
         aria-label="KENN Sidebar"
         @pointerdown.capture="bringSidebarToFront"
       >
         <button
-          v-if="!sidebarStore.collapsed"
+          v-if="!sidebarStore.collapsed && workspaceVisible"
           class="home-layout__sidebar-collapse"
           type="button"
           :title="t('sidebar.collapse')"
@@ -37,7 +68,7 @@
             />
           </svg>
         </button>
-        <div v-if="!sidebarStore.collapsed" class="home-layout__sidebar-inner">
+        <div v-if="!sidebarStore.collapsed || !workspaceVisible" class="home-layout__sidebar-inner">
           <AppHeader embedded class="home-layout__sidebar-header" />
           <KennLiveStatus />
           <KennChatBody class="home-layout__sidebar-body" aria-label="KENN Chat Area" />
@@ -81,7 +112,7 @@ import KennLiveStatus from '../../components/KennLiveStatus.vue'
 
 const { t } = useI18n()
 const sidebarStore = useSidebarStore()
-const { sendMessage, sending } = useKenn()
+const { sendMessage, sending, chatSide, workspaceVisible, toggleWorkspaceVisible } = useKenn()
 /** 与 Mix Review 浮窗共用层叠计数；点击侧栏（展开/折叠）置顶 */
 const sidebarZ = ref(1)
 
@@ -110,6 +141,76 @@ const onSend = (message: string) => {
   align-items: stretch;
   min-height: 0;
   overflow: visible;
+
+  &--chat-left {
+    flex-direction: row-reverse;
+
+    .home-layout__sidebar {
+      border-left: none;
+      border-right: 1px solid var(--floating-border);
+      box-shadow: 4px 0 16px rgba(0, 0, 0, 0.4);
+      padding-right: 0;
+      padding-left: 0.15rem;
+
+      .home-layout__sidebar-collapse {
+        left: auto;
+        right: 0;
+        transform: translate(50%, -50%);
+
+        svg {
+          transform: rotate(180deg);
+        }
+      }
+    }
+  }
+
+  &--chat-only {
+    .home-layout__sidebar {
+      width: 100% !important;
+      border: none !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+
+      &-inner {
+        max-width: 960px;
+        margin: 0 auto;
+        width: 100%;
+      }
+    }
+  }
+
+  &__restore-btn {
+    position: absolute;
+    top: 0.14rem;
+    left: 0.16rem;
+    z-index: 100;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.08rem;
+    padding: 0.06rem 0.12rem;
+    border: 1px solid var(--floating-border);
+    border-radius: 0.2rem;
+    background: color-mix(in srgb, var(--floating-bg) 85%, #000);
+    backdrop-filter: blur(8px);
+    color: var(--text-color);
+    font-size: 0.12rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    transition: all 0.2s ease;
+
+    svg {
+      width: 0.16rem;
+      height: 0.16rem;
+      color: #37d67a;
+    }
+
+    &:hover {
+      background: var(--floating-bg-hover);
+      border-color: var(--floating-border-active);
+      transform: translateY(-1px);
+    }
+  }
 
   &__workspace {
     position: relative;

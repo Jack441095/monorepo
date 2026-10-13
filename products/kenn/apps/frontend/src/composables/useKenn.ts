@@ -187,8 +187,42 @@ const lastActionAt = ref<Date | null>(null)
 const sessionId = newSessionId()
 let answerTurn = 0
 
+const realtimeAnalysisEnabled = ref(localStorage.getItem('kenn_realtime_analysis') !== 'false')
+const chatSide = ref<'left' | 'right'>(localStorage.getItem('kenn_chat_side') === 'left' ? 'left' : 'right')
+const workspaceVisible = ref(localStorage.getItem('kenn_workspace_visible') !== 'false')
+
+export function toggleChatSide() {
+  chatSide.value = chatSide.value === 'right' ? 'left' : 'right'
+  localStorage.setItem('kenn_chat_side', chatSide.value)
+}
+
+export function toggleWorkspaceVisible() {
+  workspaceVisible.value = !workspaceVisible.value
+  localStorage.setItem('kenn_workspace_visible', String(workspaceVisible.value))
+}
+
+export async function toggleRealtimeAnalysis(enabled?: boolean) {
+  const target = enabled !== undefined ? enabled : !realtimeAnalysisEnabled.value
+  realtimeAnalysisEnabled.value = target
+  localStorage.setItem('kenn_realtime_analysis', String(target))
+  try {
+    const base = import.meta.env.VITE_KENN_API_BASE ?? ''
+    await fetch(`${base}/api/realtime/toggle`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled: target }),
+    })
+  } catch {
+    // Graceful offline degradation
+  }
+  if (target) {
+    void refreshSessionCard()
+  }
+  return target
+}
+
 export async function refreshSessionCard() {
-  if (useMock.value) return
+  if (useMock.value || !realtimeAnalysisEnabled.value) return
   const maxAttempts = 6
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
@@ -463,6 +497,12 @@ export function useKenn() {
     sending,
     error,
     lastActionAt,
+    realtimeAnalysisEnabled,
+    toggleRealtimeAnalysis,
+    chatSide,
+    toggleChatSide,
+    workspaceVisible,
+    toggleWorkspaceVisible,
     sendMessage,
     refreshSessionCard,
     applyMessageProposal,

@@ -3,14 +3,24 @@
     <div class="live-status__connection">
       <span class="live-status__dot" :class="{ 'live-status__dot--online': project.connected }" />
       <strong>{{ project.connected ? 'Live connected' : 'Live offline' }}</strong>
-      <button type="button" :disabled="refreshing" title="Refresh Live status" @click="refresh">
+      <button
+        type="button"
+        class="live-status__toggle-btn"
+        :class="{ 'is-active': realtimeAnalysisEnabled }"
+        :title="realtimeAnalysisEnabled ? 'Pause realtime analysis to eliminate OSC latency & CPU load' : 'Resume realtime analysis'"
+        @click="toggleRealtimeAnalysis()"
+      >
+        {{ realtimeAnalysisEnabled ? '⚡ Realtime ON' : '⏸ Paused' }}
+      </button>
+      <button type="button" class="live-status__refresh-btn" :disabled="refreshing" title="Refresh Live status" @click="refresh">
         {{ refreshing ? 'Checking…' : 'Refresh' }}
       </button>
     </div>
     <div class="live-status__facts">
       <span><small>Session</small>{{ project.name }}</span>
       <span><small>Tracks</small>{{ project.trackCount }}</span>
-      <span><small>Last action</small>{{ lastActionLabel }}</span>
+      <span><small>Mode</small>{{ realtimeAnalysisEnabled ? 'Live Sync' : 'Paused' }}</span>
+      <span><small>Action</small>{{ lastActionLabel }}</span>
     </div>
   </section>
 </template>
@@ -19,7 +29,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useKenn } from '../composables/useKenn'
 
-const { project, lastActionAt, refreshSessionCard } = useKenn()
+const { project, lastActionAt, refreshSessionCard, realtimeAnalysisEnabled, toggleRealtimeAnalysis } = useKenn()
 const refreshing = ref(false)
 
 const lastActionLabel = computed(() => {
@@ -39,7 +49,11 @@ async function refresh() {
 
 let refreshTimer: number | undefined
 onMounted(() => {
-  refreshTimer = window.setInterval(() => void refresh(), 10_000)
+  refreshTimer = window.setInterval(() => {
+    if (realtimeAnalysisEnabled.value) {
+      void refresh()
+    }
+  }, 10_000)
 })
 onBeforeUnmount(() => {
   if (refreshTimer != null) window.clearInterval(refreshTimer)
@@ -58,16 +72,44 @@ onBeforeUnmount(() => {
     align-items: center;
     gap: 0.07rem;
     font-size: 0.13rem;
+  }
 
-    button {
-      margin-left: auto;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      color: var(--muted-text);
-      font: inherit;
-      font-size: 0.11rem;
-      cursor: pointer;
+  &__toggle-btn {
+    margin-left: auto;
+    padding: 0.02rem 0.07rem;
+    border: 1px solid var(--floating-border);
+    border-radius: 0.1rem;
+    background: color-mix(in srgb, var(--floating-bg) 80%, #000);
+    color: var(--muted-text);
+    font: inherit;
+    font-size: 0.11rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--floating-border-active);
+      color: var(--text-color);
+    }
+
+    &.is-active {
+      background: color-mix(in srgb, #37d67a 15%, var(--floating-bg));
+      border-color: rgba(55, 214, 122, 0.4);
+      color: #37d67a;
+    }
+  }
+
+  &__refresh-btn {
+    padding: 0 0.04rem;
+    border: 0;
+    background: transparent;
+    color: var(--muted-text);
+    font: inherit;
+    font-size: 0.11rem;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--text-color);
     }
   }
 
@@ -86,7 +128,7 @@ onBeforeUnmount(() => {
 
   &__facts {
     display: grid;
-    grid-template-columns: minmax(0, 1.5fr) 0.55fr 1fr;
+    grid-template-columns: minmax(0, 1.3fr) 0.5fr 0.8fr 0.8fr;
     gap: 0.08rem;
     margin-top: 0.08rem;
 

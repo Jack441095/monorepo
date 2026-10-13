@@ -429,3 +429,27 @@ quadrantChart
    - Absolutely no automated AI attribution trailers (`Co-Authored-By: ...`, etc.).
 5. **Security & Data Hygiene:**
    - Never commit API keys, remote hostnames, IP addresses, customer stems, or personal session data.
+
+---
+
+## 8. Real-Time DAW Co-Pilot Controls & Live Project Audio (13 October 2026)
+
+*Implementation Record for M0 Companion Release:*
+
+1. **Real-Time Analysis Latency Switch (ON/OFF)**:
+   - **Rationale**: Continuous UDP OSC querying and Session Doctor auditing every 2s can introduce network jitter, CPU spikes, or audio-engine buffer latency during critical tracking or playback in Ableton Live.
+   - **Architecture**:
+     - Backend: `mixing_doctor.py` provides `set_realtime_enabled(bool)` and `is_realtime_enabled()`. When disabled, the background `_audit_loop` sleeps without transmitting UDP packets over port 11000. Exposed via `POST /api/realtime/toggle` and `GET /api/realtime/status`.
+     - Frontend: Reactive toggle pill in `AppHeader.vue` and `KennLiveStatus.vue` (`⚡ Realtime ON` / `⏸ Paused`) allowing the operator to enter latency-free tracking mode instantly.
+2. **Chat-Only / Workspace Collapse Mode**:
+   - **Rationale**: Allows the producer to focus on creative dialogue, lyrics, or arrangement strategy without visual distraction from the spectral and waveform panels.
+   - **Architecture**: Single-click toggle (`workspaceVisible`) collapses the analysis workspace into a distraction-free, centered reading layout with persistent floating restore control (`Show Analysis Workspace`).
+3. **Flexible Chat Window Positioning (Left / Right Layout)**:
+   - **Rationale**: Adapts to multi-monitor setups and varying DAW monitor placements (e.g. Live arrangement view on the right, KENN chat on the left).
+   - **Architecture**: `chatSide = 'left' | 'right'` layout inversion with CSS `row-reverse`, inverted border/shadow styling, and automatic collapse chevron mirroring, persisted in `localStorage`.
+4. **Active Project Document Detection & Stem / Master Analysis**:
+   - **Rationale**: Eliminates static demo audio files in favor of direct introspection of the operator's actual open Ableton project.
+   - **Architecture**:
+     - `ableton_project_detector.py` scans Live 12 preferences `Log.txt` to identify the active `.als` set (`outer shell 2026-kenn-test`), project directory, and locates rendered bounces (`Samples/Processed/Bounce`, `Bounces`, `Exports`).
+     - Frontend `AbletonWorkspace.vue` provides an interactive Live Project Audio Selector: operators can choose between the Master mixdown (`Bounce MAIN`) or individual stems (`GUITAR`, `PADS`, `Upright Piano`, `SNARE`, `8080 hat`, `CON LA BRISA`, etc.).
+     - Backend streams audio via `GET /api/ableton/project-audio/file` into Web Audio for immediate waveform, LUFS, dynamics, and spectral analysis without manual file imports.

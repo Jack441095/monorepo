@@ -21,6 +21,7 @@ _alerts: Dict[str, Dict[str, Any]] = {}
 _lock = threading.Lock()
 _thread: threading.Thread | None = None
 _running = False
+_realtime_enabled = True
 
 # D1.6 (docs/KENN_FUTURE_PLAN.md Phase 1) -- the live session-state card in
 # chat needs the same track data this loop already fetches every 2s to run
@@ -29,6 +30,24 @@ _running = False
 # loop already has in hand.
 _latest_session_state: Dict[str, Any] = {"status": "unknown", "tracks": []}
 _NEAR_CEILING_METER = 0.98
+
+
+def set_realtime_enabled(enabled: bool) -> None:
+    """Toggle real-time Ableton OSC polling and auditor analysis.
+
+    When disabled, background polling sleeps to eliminate UDP query jitter,
+    CPU usage, and telemetry latency while the producer is tracking or editing.
+    """
+    global _realtime_enabled
+    with _lock:
+        _realtime_enabled = bool(enabled)
+    logger.info("Realtime analysis enabled set to %s", _realtime_enabled)
+
+
+def is_realtime_enabled() -> bool:
+    """Return whether background real-time auditing and polling is active."""
+    with _lock:
+        return _realtime_enabled
 
 
 def get_mixing_alerts() -> List[Dict[str, Any]]:
@@ -42,7 +61,21 @@ def get_latest_session_state() -> Dict[str, Any]:
     "unknown" status with an empty track list before the loop has polled
     even once (e.g. the daemon was just started, or is disabled)."""
     with _lock:
-        return dict(_latest_session_state)
+        snapshot = dict(_latest_session_state)
+    snapshot["realtime_enabled"] = is_realtime_enabled()
+
+    # Enrich with active project information detected from Live's loaded document
+    if not snapshot.get("session_name"):
+        try:
+            from kenn.core.ableton_project_detector import detect_active_ableton_project
+            proj = detect_active_ableton_project()
+            if proj:
+                snapshot["session_name"] = proj["project_name"]
+                snapshot["project_dir"] = proj["project_dir"]
+                snapshot["als_path"] = proj["als_path"]
+        except Exception:
+            pass
+    return snapshot
 
 
 def start_mixing_doctor() -> None:
@@ -73,6 +106,12 @@ def _audit_loop() -> None:
         with _lock:
             if not _running:
                 break
+            active = _realtime_enabled
+
+        if not active:
+            # Paused by operator: sleep without sending any UDP queries to Live
+            time.sleep(1.0)
+            continue
 
         try:
             from kenn.ableton_osc_bridge import live_client

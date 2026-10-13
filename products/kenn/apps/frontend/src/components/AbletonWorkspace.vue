@@ -1,5 +1,48 @@
 <template>
   <div class="mix-lab">
+    <!-- Active Live Project Audio Bar -->
+    <div class="mix-lab__project-bar">
+      <div class="mix-lab__project-tag">
+        <span class="mix-lab__project-badge">Ableton Project</span>
+        <strong>{{ projectAudioInfo?.project_name || project.name || 'outer shell 2026-kenn-test' }}</strong>
+      </div>
+
+      <div class="mix-lab__source-select-wrap">
+        <label for="project-audio-select" class="mix-lab__source-label">Source for Analysis:</label>
+        <select
+          id="project-audio-select"
+          v-model="selectedBouncePath"
+          class="mix-lab__source-select"
+          :disabled="isBusy || scanningProject"
+          @change="onBounceSelected"
+        >
+          <option value="" disabled>Select Master or Stem from Ableton project…</option>
+          <optgroup v-if="masterBounces.length" label="Master Bounces">
+            <option v-for="b in masterBounces" :key="b.path" :value="b.path">
+              {{ b.label }} ({{ formatSize(b.size_bytes) }})
+            </option>
+          </optgroup>
+          <optgroup v-if="stemBounces.length" label="Track Stems">
+            <option v-for="b in stemBounces" :key="b.path" :value="b.path">
+              {{ b.label }} ({{ formatSize(b.size_bytes) }})
+            </option>
+          </optgroup>
+        </select>
+      </div>
+
+      <button
+        type="button"
+        class="mix-lab__scan-btn"
+        :disabled="isBusy || scanningProject"
+        title="Scan project folder for new bounces, stems, and renders from Live"
+        @click="scanProjectAudio"
+      >
+        {{ scanningProject ? 'Scanning…' : '↻ Scan Project' }}
+      </button>
+
+      <span class="mix-lab__status" :data-state="status">● {{ t(`mixReview.${statusKey}`) }}</span>
+    </div>
+
     <div class="mix-lab__inputs">
       <span class="mix-lab__inputs-label">{{ t('mixReview.inputs') }}</span>
       <label class="mix-lab__file">
@@ -14,7 +57,6 @@
       </label>
       <input v-model="title" class="mix-lab__field" type="text" :placeholder="t('mixReview.trackTitle')" :disabled="isBusy" />
       <input v-model="version" class="mix-lab__field mix-lab__field--sm" type="text" :placeholder="t('mixReview.version')" :disabled="isBusy" />
-      <span class="mix-lab__status" :data-state="status">● {{ t(`mixReview.${statusKey}`) }}</span>
       <button
         type="button"
         class="mix-lab__primary"
@@ -24,15 +66,6 @@
         @click="onAnalyseClick"
       >
         {{ isBusy ? t('mixReview.analysing') : t('mixReview.analyse') }}
-      </button>
-      <button
-        type="button"
-        class="mix-lab__sync-btn"
-        :disabled="isBusy"
-        title="Sync and analyze the active Live session mix"
-        @click="loadDemoAudio"
-      >
-        {{ isBusy ? 'Analyzing…' : 'Sync Live Mix' }}
       </button>
     </div>
 
@@ -546,11 +579,81 @@ const {
   setMixFile,
   setReferenceFile,
   analyze,
-  loadDemoAudio,
   cancelAnalyze,
 } = useMixReview()
-// The review's suggested next step goes straight into the chat, as if the producer had typed it.
-const { sendMessage, sending } = useKenn()
+const { sendMessage, sending, project } = useKenn()
+
+type ProjectBounce = {
+  filename: string
+  label: string
+  kind: 'master' | 'stem'
+  path: string
+  size_bytes: number
+  modified_time: number
+  is_main_bounce: boolean
+}
+
+const projectAudioInfo = ref<{
+  project_name?: string
+  project_dir?: string
+  als_path?: string
+} | null>(null)
+
+const projectBounces = ref<ProjectBounce[]>([])
+const selectedBouncePath = ref<string>('')
+const scanningProject = ref<boolean>(false)
+
+const masterBounces = computed(() => projectBounces.value.filter((b) => b.kind === 'master'))
+const stemBounces = computed(() => projectBounces.value.filter((b) => b.kind === 'stem'))
+
+function formatSize(bytes: number) {
+  if (!bytes) return ''
+  const mb = bytes / (1024 * 1024)
+  return `${mb.toFixed(1)} MB`
+}
+
+async function scanProjectAudio() {
+  scanningProject.value = true
+  try {
+    const base = import.meta.env.VITE_KENN_API_BASE ?? ''
+    const res = await fetch(`${base}/api/ableton/project-audio`)
+    if (!res.ok) return
+    const data = await res.json()
+    if (data.ok) {
+      projectAudioInfo.value = {
+        project_name: data.project_name,
+        project_dir: data.project_dir,
+        als_path: data.als_path,
+      }
+      projectBounces.value = Array.isArray(data.bounces) ? data.bounces : []
+    }
+  } catch {
+    // Graceful offline degradation
+  } finally {
+    scanningProject.value = false
+  }
+}
+
+async function onBounceSelected() {
+  if (!selectedBouncePath.value) return
+  const bounce = projectBounces.value.find((b) => b.path === selectedBouncePath.value)
+  if (!bounce) return
+
+  try {
+    const base = import.meta.env.VITE_KENN_API_BASE ?? ''
+    const res = await fetch(`${base}/api/ableton/project-audio/file?path=${encodeURIComponent(bounce.path)}`)
+    if (!res.ok) throw new Error('Failed to fetch audio bounce')
+    const blob = await res.blob()
+    const file = new File([blob], bounce.filename, { type: 'audio/wav' })
+    setMixFile(file)
+    const projName = projectAudioInfo.value?.project_name || project.value.name || 'outer shell 2026-kenn-test'
+    title.value = `${projName} — ${bounce.label}`
+    version.value = bounce.kind === 'master' ? 'Master' : 'Stem'
+    await analyze()
+  } catch (e) {
+    console.error('Error loading project bounce:', e)
+  }
+}
 
 /** Returns decoded audio peaks from client Web Audio or server-measured peaks from Mix Review metrics */
 const activePeaks = computed<Float32Array | null>(() => {
@@ -662,6 +765,7 @@ function onMixChange(e: Event) {
     input.value = ''
     return
   }
+  selectedBouncePath.value = ''
   setMixFile(file)
 }
 
@@ -680,10 +784,13 @@ function onRefChange(e: Event) {
   setReferenceFile(file)
 }
 
-onMounted(() => {
+onMounted(async () => {
   void checkSession()
-  if (!mixFile.value) {
-    void loadDemoAudio()
+  await scanProjectAudio()
+  // Automatically select the master bounce from the active Ableton project if present
+  if (!mixFile.value && masterBounces.value.length > 0) {
+    selectedBouncePath.value = masterBounces.value[0].path
+    void onBounceSelected()
   }
 })
 </script>
@@ -713,6 +820,95 @@ onMounted(() => {
     --mr-ok: #1f8a5a;
     --mr-warn: #a05a28;
     --mr-bad: #c0392b;
+  }
+
+  &__project-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.12rem;
+    padding: 0.08rem 0.14rem;
+    background: color-mix(in srgb, var(--workspace-panel) 90%, #0d1117);
+    border: 1px solid var(--floating-border);
+    border-radius: 0.08rem;
+    flex-wrap: wrap;
+  }
+
+  &__project-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.08rem;
+    font-size: 0.13rem;
+    color: var(--text-color);
+  }
+
+  &__project-badge {
+    padding: 0.02rem 0.06rem;
+    background: color-mix(in srgb, #37d67a 20%, transparent);
+    border: 1px solid rgba(55, 214, 122, 0.4);
+    border-radius: 0.04rem;
+    color: #37d67a;
+    font-size: 0.10rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__source-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.08rem;
+    margin-left: auto;
+  }
+
+  &__source-label {
+    font-size: 0.12rem;
+    color: var(--muted-text);
+    font-weight: 600;
+  }
+
+  &__source-select {
+    padding: 0.05rem 0.1rem;
+    background: var(--floating-bg);
+    border: 1px solid var(--floating-border);
+    border-radius: 0.06rem;
+    color: var(--text-color);
+    font-size: 0.12rem;
+    font-weight: 600;
+    min-width: 2.8rem;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: #37d67a;
+    }
+
+    optgroup {
+      background: #161b22;
+      color: #37d67a;
+      font-weight: 700;
+    }
+
+    option {
+      background: #0d1117;
+      color: var(--text-color);
+    }
+  }
+
+  &__scan-btn {
+    padding: 0.05rem 0.1rem;
+    background: color-mix(in srgb, var(--floating-bg) 80%, #000);
+    border: 1px solid var(--floating-border);
+    border-radius: 0.06rem;
+    color: var(--text-color);
+    font-size: 0.11rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      border-color: #37d67a;
+      color: #37d67a;
+    }
   }
 
   &__inputs {
