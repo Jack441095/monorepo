@@ -1,6 +1,6 @@
 # KENN plan
 
-Updated 13 October 2026. This is KENN's sole product roadmap, architecture direction,
+Updated 14 October 2026. This is KENN's sole product roadmap, architecture direction,
 work queue and progress checklist. Start here, then read the named source, tests and
 evidence for the task. `AGENTS.md` governs repository work. Dated reports describe
 their recorded commit and environment; they do not authorize work or prove today's
@@ -51,6 +51,26 @@ Decisions already made:
 - Engineering runs against `FakeLiveBackend`, mocks and synthetic fixtures. Real
   Live writes require an owner-scheduled, supervised qualification on a disposable
   set. Existing real-Live receipts qualify their recorded scope, not every new build.
+
+### Standing open-source reuse check
+
+Jack requested this on 14 October 2026 for all later audio-analysis work. Before
+implementing or extending an audio measurement, check the existing KENN DSP and
+suitable open-source tools against current upstream documentation, source and
+licences. Prefer reuse when it meets KENN's requirements and saves development time.
+
+Compare numerical accuracy and measurement semantics, supported sample rates,
+latency, CPU/memory cost, allocation behaviour, maintenance, integration effort and
+distribution licence fit. Record the candidates, primary-source links and the
+reason for reusing or retaining an implementation with that task's evidence.
+Benchmark shortlisted tools on synthetic audio in the existing offline harness;
+a library's claims or agreement with another implementation do not qualify KENN.
+Ask before adding a dependency. This check applies at the start of each relevant
+task and again when its requirements change.
+
+The [14 October reuse screen](docs/research/audio_analysis_reuse_2026-10-14.md)
+records the current loudness/interpolation shortlist and later analysis options.
+It is a source review; comparative benchmarks and any adoption remain open.
 
 ### Product direction
 
@@ -252,6 +272,8 @@ Execution plan for efficient continuous analysis (2026-10-13):
   interpolation accuracy and delayed peak interval semantics, cover temporal and
   transient conformance cases, and measure sustained shared-worker/publisher/model
   contention. Investigate the intermittent callback/freshness tails recorded below.
+  First apply the standing reuse check: evaluate existing JUCE DSP and upstream
+  loudness/resampling tools before extending KENN's interpolation kernel.
   Keep the candidate disabled and its 10 Hz measurement cadence separate from 2 Hz
   HTTP publication until those gates pass.
 - [ ] Qualify controlled, matched sidechain bypass comparisons before reporting
