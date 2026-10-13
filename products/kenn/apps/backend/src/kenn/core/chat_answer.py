@@ -2157,7 +2157,9 @@ def _answer_payload_stream_raw(
                 "warnings": [
                     (prefix_guard_trip or {}).get("warning")
                     or cut_short
-                    or "generation returned no answer"
+                    # Neither guard nor exception: the model streamed nothing. Named like the payload path's
+                    # causes so the C1 harness does not count it as a separate, unexplained fault.
+                    or "generation returned no answer: empty reply"
                 ],
                 "unsupported_measurements": (prefix_guard_trip or {}).get(
                     "unsupported_measurements", []
