@@ -206,7 +206,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { getApiBase } from '../api/client'
 import { submitReferenceMatch } from '../api/mixReview'
 import type { ReferenceMatchResult } from '../utils/mixReviewTypes'
@@ -218,6 +218,24 @@ const props = defineProps<{
 
 const mixFile = ref<File | null>(props.initialMixFile ?? null)
 const refFile = ref<File | null>(props.initialRefFile ?? null)
+
+// Keep local dropzone state strictly in sync with parent workspace selections
+watch(
+  () => props.initialMixFile,
+  (file) => {
+    if (file) mixFile.value = file
+  },
+  { immediate: true }
+)
+
+watch(
+  () => props.initialRefFile,
+  (file) => {
+    if (file) refFile.value = file
+  },
+  { immediate: true }
+)
+
 const isDraggingMix = ref(false)
 const isDraggingRef = ref(false)
 const isAnalyzing = ref(false)

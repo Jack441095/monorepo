@@ -1,5 +1,42 @@
 <template>
   <div class="mix-lab">
+    <!-- Proactive Live Export / Bounce Watcher Alert Banner -->
+    <transition name="fade">
+      <div v-if="detectedBounce" class="mix-lab__bounce-alert" role="alert">
+        <div class="mix-lab__bounce-alert-info">
+          <span class="mix-lab__bounce-alert-badge">⚡ Live Export Detected</span>
+          <strong>{{ detectedBounce.label }}</strong>
+          <span class="mix-lab__bounce-alert-filename">({{ detectedBounce.filename }} • {{ formatSize(detectedBounce.size_bytes) }})</span>
+        </div>
+        <div class="mix-lab__bounce-alert-actions">
+          <button
+            type="button"
+            class="mix-lab__bounce-btn mix-lab__bounce-btn--primary"
+            :disabled="isBusy"
+            @click="loadDetectedBounceAsMix"
+          >
+            Load as Mix & Analyse
+          </button>
+          <button
+            type="button"
+            class="mix-lab__bounce-btn"
+            :disabled="isBusy"
+            @click="loadDetectedBounceAsRef"
+          >
+            Set as Reference (A/B)
+          </button>
+          <button
+            type="button"
+            class="mix-lab__bounce-btn mix-lab__bounce-btn--dismiss"
+            title="Dismiss notification"
+            @click="detectedBounce = null"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    </transition>
+
     <!-- Active Live Project Audio Bar -->
     <div class="mix-lab__project-bar">
       <div class="mix-lab__project-tag">
@@ -8,7 +45,7 @@
       </div>
 
       <div class="mix-lab__source-select-wrap">
-        <label for="project-audio-select" class="mix-lab__source-label">Source for Analysis:</label>
+        <label for="project-audio-select" class="mix-lab__source-label">Mix Source:</label>
         <select
           id="project-audio-select"
           v-model="selectedBouncePath"
@@ -28,6 +65,51 @@
             </option>
           </optgroup>
         </select>
+      </div>
+
+      <div class="mix-lab__source-select-wrap">
+        <label for="project-audio-ref-select" class="mix-lab__source-label">Reference (A/B):</label>
+        <select
+          id="project-audio-ref-select"
+          v-model="selectedRefBouncePath"
+          class="mix-lab__source-select mix-lab__source-select--ref"
+          :disabled="isBusy || scanningProject"
+          @change="onRefBounceSelected"
+        >
+          <option value="">None (Upload or choose project audio…)</option>
+          <optgroup v-if="masterBounces.length" label="Master Bounces">
+            <option v-for="b in masterBounces" :key="'ref-'+b.path" :value="b.path">
+              {{ b.label }} ({{ formatSize(b.size_bytes) }})
+            </option>
+          </optgroup>
+          <optgroup v-if="stemBounces.length" label="Track Stems">
+            <option v-for="b in stemBounces" :key="'ref-'+b.path" :value="b.path">
+              {{ b.label }} ({{ formatSize(b.size_bytes) }})
+            </option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Quick Jump Shortcuts to Masking Radar and Reference Matcher -->
+      <div class="mix-lab__quick-nav">
+        <button
+          type="button"
+          class="mix-lab__quick-nav-btn"
+          :class="{ 'is-active': activeView === 'masking' }"
+          title="Jump to Session Doctor & 40-Band Masking Radar"
+          @click="activeView = 'masking'"
+        >
+          🎯 Masking Radar
+        </button>
+        <button
+          type="button"
+          class="mix-lab__quick-nav-btn"
+          :class="{ 'is-active': activeView === 'reference' }"
+          title="Jump to Commercial Reference Matcher (A/B)"
+          @click="activeView = 'reference'"
+        >
+          ⚖️ Stem A/B Match
+        </button>
       </div>
 
       <button
@@ -416,6 +498,15 @@
                 <li v-for="(flag, i) in review.flags" :key="i" :data-severity="flag.severity || 'low'">
                   <i />
                   <strong>{{ flag.label }}</strong>
+                  <button
+                    type="button"
+                    class="mix-lab__fix-btn"
+                    :disabled="sending"
+                    :title="`Ask KENN to formulate a Live 12 proposal for ${flag.label}`"
+                    @click="askKennToFix(flag)"
+                  >
+                    ⚡ Ask KENN to Fix
+                  </button>
                 </li>
               </ul>
               <p v-else class="mix-lab__empty-sm">
@@ -424,6 +515,14 @@
             </div>
             <div v-if="review?.flags?.length" class="mix-lab__card-foot">
               <p v-for="(flag, i) in review.flags" :key="`d-${i}`">{{ flag.detail }}</p>
+              <button
+                type="button"
+                class="mix-lab__remediate-all-btn"
+                :disabled="sending"
+                @click="askKennToFixAll"
+              >
+                🩺 Propose Live 12 Fix Recipe for All Flags
+              </button>
             </div>
           </div>
         </div>
@@ -464,6 +563,15 @@
               @click="sendMessage(review.next_step.say)"
             >
               {{ t('mixReview.askKenn') }}: “{{ review.next_step.say }}”
+            </button>
+            <button
+              v-else-if="review?.flags?.length"
+              type="button"
+              class="mix-lab__remediate-all-btn"
+              :disabled="sending"
+              @click="askKennToFixAll"
+            >
+              🩺 Propose Live 12 Fix Recipe for All Flags
             </button>
           </div>
         </div>
@@ -539,7 +647,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FloatDetachable from './common/FloatDetachable.vue'
 import MixReviewBandChart from './mix-review/MixReviewBandChart.vue'
@@ -601,7 +709,13 @@ const projectAudioInfo = ref<{
 
 const projectBounces = ref<ProjectBounce[]>([])
 const selectedBouncePath = ref<string>('')
+const selectedRefBouncePath = ref<string>('')
 const scanningProject = ref<boolean>(false)
+
+// Proactive Live export detection state
+const latestBounceMtime = ref<number>(0)
+const detectedBounce = ref<ProjectBounce | null>(null)
+let bouncePollTimer: ReturnType<typeof setInterval> | null = null
 
 const masterBounces = computed(() => projectBounces.value.filter((b) => b.kind === 'master'))
 const stemBounces = computed(() => projectBounces.value.filter((b) => b.kind === 'stem'))
@@ -626,12 +740,101 @@ async function scanProjectAudio() {
         als_path: data.als_path,
       }
       projectBounces.value = Array.isArray(data.bounces) ? data.bounces : []
+      if (projectBounces.value.length > 0 && latestBounceMtime.value === 0) {
+        latestBounceMtime.value = Math.max(...projectBounces.value.map((b) => b.modified_time), 0)
+      }
     }
   } catch {
     // Graceful offline degradation
   } finally {
     scanningProject.value = false
   }
+}
+
+async function pollForNewBounces() {
+  if (scanningProject.value) return
+  try {
+    const base = import.meta.env.VITE_KENN_API_BASE ?? ''
+    const res = await fetch(`${base}/api/ableton/project-audio/poll?since=${latestBounceMtime.value}`)
+    if (!res.ok) return
+    const data = await res.json()
+    if (data.ok) {
+      if (typeof data.latest_mtime === 'number' && data.latest_mtime > 0) {
+        latestBounceMtime.value = data.latest_mtime
+      }
+      if (data.has_new && data.new_bounce) {
+        detectedBounce.value = data.new_bounce
+        void scanProjectAudio()
+        showToast(`⚡ New Live bounce detected: ${data.new_bounce.label}`, 'info')
+      }
+    }
+  } catch {
+    // Graceful offline degradation
+  }
+}
+
+async function loadDetectedBounceAsMix() {
+  if (!detectedBounce.value) return
+  const bounce = detectedBounce.value
+  detectedBounce.value = null
+  selectedBouncePath.value = bounce.path
+  await onBounceSelected()
+}
+
+async function loadDetectedBounceAsRef() {
+  if (!detectedBounce.value) return
+  const bounce = detectedBounce.value
+  detectedBounce.value = null
+  selectedRefBouncePath.value = bounce.path
+  await onRefBounceSelected()
+}
+
+async function onRefBounceSelected() {
+  if (!selectedRefBouncePath.value) {
+    setReferenceFile(null)
+    return
+  }
+  const bounce = projectBounces.value.find((b) => b.path === selectedRefBouncePath.value)
+  if (!bounce) return
+
+  try {
+    const base = import.meta.env.VITE_KENN_API_BASE ?? ''
+    const res = await fetch(`${base}/api/ableton/project-audio/file?path=${encodeURIComponent(bounce.path)}`)
+    if (!res.ok) throw new Error('Failed to fetch reference audio bounce')
+    const blob = await res.blob()
+    const file = new File([blob], bounce.filename, { type: 'audio/wav' })
+    setReferenceFile(file)
+    showToast(`Reference audio set to ${bounce.label}`, 'success')
+  } catch (e) {
+    console.error('Error loading reference bounce:', e)
+  }
+}
+
+function askKennToFix(flag: { label?: string; detail?: string }) {
+  const label = flag.label || 'issue'
+  const detail = flag.detail || ''
+  const lower = label.toLowerCase()
+  let prompt = `Fix ${label} in Live 12`
+
+  if (lower.includes('mask') || lower.includes('mud') || lower.includes('sub') || lower.includes('clash')) {
+    prompt = `Fix the masking clashes and low end mud in Live 12: ${detail || label}`
+  } else if (lower.includes('clip') || lower.includes('headroom') || lower.includes('peak') || lower.includes('crest')) {
+    prompt = `Fix clipping risk and reclaim summing headroom in Live 12: ${detail || label}`
+  } else if (lower.includes('phase') || lower.includes('mono') || lower.includes('width') || lower.includes('correlation')) {
+    prompt = `Fix phase correlation and mono compatibility issues in Live 12: ${detail || label}`
+  } else if (lower.includes('sibil') || lower.includes('harsh') || lower.includes('air') || lower.includes('high')) {
+    prompt = `Fix harsh high frequencies and sibilance in Live 12: ${detail || label}`
+  } else {
+    prompt = `Fix ${label} in Live 12: ${detail || ''}`
+  }
+
+  showToast(`Routing "${label}" to KENN to formulate Live 12 proposal…`, 'info')
+  void sendMessage(prompt.trim())
+}
+
+function askKennToFixAll() {
+  showToast('Consulting KENN to formulate atomic Live 12 remedy recipe…', 'info')
+  void sendMessage('Propose fixes in Live 12 for all masking, clipping, and phase issues')
 }
 
 async function onBounceSelected() {
@@ -787,10 +990,24 @@ function onRefChange(e: Event) {
 onMounted(async () => {
   void checkSession()
   await scanProjectAudio()
+  if (projectBounces.value.length > 0) {
+    latestBounceMtime.value = Math.max(...projectBounces.value.map((b) => b.modified_time), 0)
+  }
   // Automatically select the master bounce from the active Ableton project if present
   if (!mixFile.value && masterBounces.value.length > 0) {
     selectedBouncePath.value = masterBounces.value[0].path
     void onBounceSelected()
+  }
+  // Periodically check for newly exported Live bounces (Cmd+Shift+R)
+  bouncePollTimer = setInterval(() => {
+    void pollForNewBounces()
+  }, 3500)
+})
+
+onBeforeUnmount(() => {
+  if (bouncePollTimer) {
+    clearInterval(bouncePollTimer)
+    bouncePollTimer = null
   }
 })
 </script>
@@ -820,6 +1037,90 @@ onMounted(async () => {
     --mr-ok: #1f8a5a;
     --mr-warn: #a05a28;
     --mr-bad: #c0392b;
+  }
+
+  &__bounce-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.12rem;
+    padding: 0.08rem 0.14rem;
+    background: linear-gradient(90deg, rgba(55, 214, 122, 0.15), rgba(22, 27, 34, 0.95));
+    border: 1px solid #37d67a;
+    border-radius: 0.08rem;
+    box-shadow: 0 0 16px rgba(55, 214, 122, 0.18);
+    flex-wrap: wrap;
+  }
+
+  &__bounce-alert-info {
+    display: flex;
+    align-items: center;
+    gap: 0.08rem;
+    font-size: 0.12rem;
+    color: var(--text-color);
+  }
+
+  &__bounce-alert-badge {
+    padding: 0.02rem 0.06rem;
+    background: #37d67a;
+    color: #0d1117;
+    font-size: 0.10rem;
+    font-weight: 800;
+    border-radius: 0.04rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  &__bounce-alert-filename {
+    color: var(--muted-text);
+    font-size: 0.11rem;
+  }
+
+  &__bounce-alert-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.08rem;
+  }
+
+  &__bounce-btn {
+    padding: 0.04rem 0.09rem;
+    background: var(--floating-bg);
+    border: 1px solid var(--floating-border);
+    border-radius: 0.05rem;
+    color: var(--text-color);
+    font-size: 0.11rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+
+    &:hover:not(:disabled) {
+      border-color: #37d67a;
+      color: #37d67a;
+    }
+
+    &--primary {
+      background: #37d67a;
+      border-color: #37d67a;
+      color: #0d1117;
+      font-weight: 700;
+
+      &:hover:not(:disabled) {
+        background: #2ebd67;
+        color: #0d1117;
+      }
+    }
+
+    &--dismiss {
+      background: transparent;
+      border: none;
+      color: var(--muted-text);
+      font-size: 0.13rem;
+      padding: 0.04rem 0.06rem;
+
+      &:hover {
+        color: #c0392b;
+      }
+    }
   }
 
   &__project-bar {
@@ -857,7 +1158,6 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     gap: 0.08rem;
-    margin-left: auto;
   }
 
   &__source-label {
@@ -874,7 +1174,7 @@ onMounted(async () => {
     color: var(--text-color);
     font-size: 0.12rem;
     font-weight: 600;
-    min-width: 2.8rem;
+    min-width: 2.1rem;
     cursor: pointer;
 
     &:focus {
@@ -892,10 +1192,41 @@ onMounted(async () => {
       background: #0d1117;
       color: var(--text-color);
     }
+
+    &--ref {
+      border-color: color-mix(in srgb, var(--floating-border) 80%, #ffd700);
+    }
+  }
+
+  &__quick-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.06rem;
+    margin-left: 0.04rem;
+  }
+
+  &__quick-nav-btn {
+    padding: 0.04rem 0.08rem;
+    background: color-mix(in srgb, var(--floating-bg) 70%, #000);
+    border: 1px solid var(--floating-border);
+    border-radius: 0.05rem;
+    color: var(--muted-text);
+    font-size: 0.11rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+
+    &:hover,
+    &.is-active {
+      border-color: #37d67a;
+      color: #37d67a;
+      background: color-mix(in srgb, #37d67a 10%, var(--floating-bg));
+    }
   }
 
   &__scan-btn {
     padding: 0.05rem 0.1rem;
+    margin-left: auto;
     background: color-mix(in srgb, var(--floating-bg) 80%, #000);
     border: 1px solid var(--floating-border);
     border-radius: 0.06rem;
@@ -1470,6 +1801,46 @@ onMounted(async () => {
       strong {
         font-size: 0.14rem;
       }
+      .mix-lab__fix-btn {
+        margin-left: auto;
+        padding: 0.03rem 0.07rem;
+        background: color-mix(in srgb, #37d67a 15%, transparent);
+        border: 1px solid rgba(55, 214, 122, 0.4);
+        border-radius: 0.04rem;
+        color: #37d67a;
+        font-size: 0.10rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &:hover:not(:disabled) {
+          background: #37d67a;
+          color: #0d1117;
+          box-shadow: 0 0 8px rgba(55, 214, 122, 0.3);
+        }
+      }
+    }
+  }
+
+  &__remediate-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.06rem;
+    padding: 0.06rem 0.12rem;
+    margin-top: 0.08rem;
+    background: linear-gradient(135deg, rgba(55, 214, 122, 0.2), rgba(55, 214, 122, 0.06));
+    border: 1px solid rgba(55, 214, 122, 0.5);
+    border-radius: 0.06rem;
+    color: #37d67a;
+    font-size: 0.11rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: #37d67a;
+      color: #0d1117;
+      box-shadow: 0 0 12px rgba(55, 214, 122, 0.35);
     }
   }
 

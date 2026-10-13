@@ -198,9 +198,11 @@ _NEURAL_MIDI_PATTERNS = [
 ]
 
 _SURGICAL_MASKING_PATTERNS = [
-    re.compile(r"\b(fix|solve|resolve|carve|unmask)\b.{0,30}\b(masking|clash(es)?|sub\s*and\s*kick|kick\s*and\s*sub|vocal\s*presence|low\s*mid\s*mud)\b", re.I),
+    # Matches natural language fix requests generated from analysis flags and doctor audits
+    re.compile(r"\b(fix|solve|resolve|carve|unmask|remediate)\b.{0,40}\b(masking|clash(es)?|sub\s*and\s*kick|kick\s*and\s*sub|vocal\s*presence|low\s*mid\s*mud|phase|mono(\s*compatibility)?|clipping|headroom|sibilance|harsh(ness)?|high\s*frequencies)\b", re.I),
     re.compile(r"\b(surgical|acoustic)\b.{0,30}\b(remediation|unmasking|carving|doctor)\b", re.I),
     re.compile(r"\b(clean\s*up|remove)\b.{0,30}\b(mud|rumble|clash(es)?)\b", re.I),
+    re.compile(r"\bpropose\s+fix(es)?\b.{0,40}\b(live\s*12|session|mix|flags?)\b", re.I),
 ]
 
 

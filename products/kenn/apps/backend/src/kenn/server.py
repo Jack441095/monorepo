@@ -1324,6 +1324,43 @@ class Handler(BaseHTTPRequestHandler):
                 "bounces": bounces,
             })
             return
+        if parsed.path in {"/api/ableton/project-audio/poll", "/kenn/api/ableton/project-audio/poll"}:
+            # Ableton Live writes rendered WAVs directly to disk on export (Cmd+Shift+R)
+            # without firing an OSC notification. We poll filesystem modified timestamps
+            # so the frontend can offer one-click hydration the moment an export lands.
+            from kenn.core.ableton_project_detector import detect_active_ableton_project, find_project_bounces
+            since_raw = parse_qs(parsed.query).get("since", ["0"])[0].strip()
+            try:
+                since = float(since_raw)
+            except ValueError:
+                since = 0.0
+
+            proj = detect_active_ableton_project()
+            if not proj:
+                self.send_json(200, {"ok": False, "has_new": False, "error": "No active Ableton Live project detected.", "latest_mtime": since})
+                return
+
+            bounces = find_project_bounces(proj["project_dir"])
+            if not bounces:
+                self.send_json(200, {"ok": True, "has_new": False, "latest_mtime": since, "new_bounce": None})
+                return
+
+            # Determine the newest rendered audio file
+            newest = max(bounces, key=lambda b: b.get("modified_time", 0.0))
+            newest_mtime = float(newest.get("modified_time", 0.0))
+
+            # When since == 0.0 (initial client mount), we establish baseline latest_mtime
+            # without triggering an alert for historical bounces. A 1 ms threshold prevents
+            # floating-point jitter from falsely re-triggering the same file.
+            has_new = bool(since > 0.0 and newest_mtime > (since + 0.001))
+
+            self.send_json(200, {
+                "ok": True,
+                "has_new": has_new,
+                "latest_mtime": newest_mtime,
+                "new_bounce": newest if has_new else None,
+            })
+            return
         if parsed.path in {"/api/ableton/project-audio/file", "/kenn/api/ableton/project-audio/file"}:
             file_path = parse_qs(parsed.query).get("path", [""])[0].strip()
             if not file_path or not os.path.isfile(file_path):

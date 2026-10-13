@@ -187,24 +187,43 @@ const lastActionAt = ref<Date | null>(null)
 const sessionId = newSessionId()
 let answerTurn = 0
 
-const realtimeAnalysisEnabled = ref(localStorage.getItem('kenn_realtime_analysis') !== 'false')
-const chatSide = ref<'left' | 'right'>(localStorage.getItem('kenn_chat_side') === 'left' ? 'left' : 'right')
-const workspaceVisible = ref(localStorage.getItem('kenn_workspace_visible') !== 'false')
+// Safe storage access guards against undefined localStorage in headless tests and SSR
+function getStorageItem(key: string, fallback: string | null = null): string | null {
+  try {
+    return typeof localStorage !== 'undefined' && localStorage ? localStorage.getItem(key) : fallback
+  } catch {
+    return fallback
+  }
+}
+
+function setStorageItem(key: string, value: string): void {
+  try {
+    if (typeof localStorage !== 'undefined' && localStorage) {
+      localStorage.setItem(key, value)
+    }
+  } catch {
+    // QuotaExceeded or restricted security sandbox
+  }
+}
+
+const realtimeAnalysisEnabled = ref(getStorageItem('kenn_realtime_analysis') !== 'false')
+const chatSide = ref<'left' | 'right'>(getStorageItem('kenn_chat_side') === 'left' ? 'left' : 'right')
+const workspaceVisible = ref(getStorageItem('kenn_workspace_visible') !== 'false')
 
 export function toggleChatSide() {
   chatSide.value = chatSide.value === 'right' ? 'left' : 'right'
-  localStorage.setItem('kenn_chat_side', chatSide.value)
+  setStorageItem('kenn_chat_side', chatSide.value)
 }
 
 export function toggleWorkspaceVisible() {
   workspaceVisible.value = !workspaceVisible.value
-  localStorage.setItem('kenn_workspace_visible', String(workspaceVisible.value))
+  setStorageItem('kenn_workspace_visible', String(workspaceVisible.value))
 }
 
 export async function toggleRealtimeAnalysis(enabled?: boolean) {
   const target = enabled !== undefined ? enabled : !realtimeAnalysisEnabled.value
   realtimeAnalysisEnabled.value = target
-  localStorage.setItem('kenn_realtime_analysis', String(target))
+  setStorageItem('kenn_realtime_analysis', String(target))
   try {
     const base = import.meta.env.VITE_KENN_API_BASE ?? ''
     await fetch(`${base}/api/realtime/toggle`, {

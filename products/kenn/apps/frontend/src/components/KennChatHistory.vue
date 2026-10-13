@@ -79,7 +79,7 @@
             <!-- A recipe proposal is several changes, and carries no track of its own. It has to be rendered as a
                  list or every step shows as "Track " (2026-09-30). -->
             <KennRecipeCard
-              v-if="message.proposal?.action === 'recipe' && message.proposal.steps?.length"
+              v-if="(message.proposal?.action === 'recipe' || message.proposal?.schema === 'kenn.surgical_masking_remediation.v1') && message.proposal.steps?.length"
               :proposal="message.proposal"
               :card-status="message.actionStatus || 'pending'"
               :receipt="message.receipt"

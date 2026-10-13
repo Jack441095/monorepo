@@ -285,12 +285,17 @@ class SessionDoctor:
         # 1. Volume trims from audit (safety clamped to <= 3.0 dB)
         for issue in audit_report.issues:
             if issue.code in {"HEADROOM_CLIPPING_RISK", "MULTI_STEM_SUMMING_OVERLOAD"}:
+                trim_val = round(issue.proposed_value, 3)
                 steps.append({
                     "action": "set_volume",
                     "track_index": issue.track_index,
                     "track_name": issue.track_name,
                     "target_param": "volume",
-                    "value": round(issue.proposed_value, 3),
+                    "parameter": "Volume",
+                    "value": trim_val,
+                    "before_display": "current",
+                    "after_display": f"{trim_val:.2f} fader",
+                    "after_label": f"Trim {issue.track_name} fader",
                     "reason": issue.description,
                 })
                 resolved_conflict_count += 1
@@ -300,7 +305,11 @@ class SessionDoctor:
                     "track_index": issue.track_index,
                     "track_name": issue.track_name,
                     "target_param": "panning",
+                    "parameter": "Pan",
                     "value": 0.0,
+                    "before_display": "Off-center",
+                    "after_display": "Center (C)",
+                    "after_label": f"Center {issue.track_name} pan",
                     "reason": issue.description,
                 })
                 resolved_conflict_count += 1
@@ -310,17 +319,26 @@ class SessionDoctor:
                     "track_index": issue.track_index if issue.track_index >= 0 else 0,
                     "track_name": issue.track_name,
                     "device_name": "Utility",
+                    "parameter": "Utility Bass Mono",
                     "parameters": {"bass_mono": True, "bass_mono_freq": 90.0},
+                    "before_display": "Stereo",
+                    "after_display": "Mono (<90 Hz)",
+                    "after_label": "Collapse sub frequencies to mono",
                     "reason": "Collapse sub frequencies below 90 Hz to mono to resolve negative phase correlation.",
                 })
                 resolved_conflict_count += 1
             elif issue.code == "DYNAMIC_LOW_END_MASKING":
+                duck_db = round(issue.proposed_value, 3)
                 steps.append({
                     "action": "configure_sidechain",
                     "track_index": issue.track_index,
                     "track_name": issue.track_name,
                     "target_param": "compressor_sidechain",
-                    "value": round(issue.proposed_value, 3),
+                    "parameter": "Sidechain Ducking",
+                    "value": duck_db,
+                    "before_display": "Off",
+                    "after_display": f"-{abs(duck_db):.1f} dB ducking",
+                    "after_label": f"Sidechain ducking on {issue.track_name}",
                     "reason": issue.description,
                 })
                 resolved_conflict_count += 1
@@ -337,7 +355,11 @@ class SessionDoctor:
                     "track_index": bass_idx,
                     "track_name": bass_name,
                     "device_name": "EQ Eight",
+                    "parameter": "EQ Eight 60 Hz Notch",
                     "parameters": {"band_index": 3, "frequency": 60.0, "gain_db": -2.5, "q": 3.0},
+                    "before_display": "Flat",
+                    "after_display": "-2.5 dB @ 60 Hz",
+                    "after_label": f"Surgical 60 Hz notch on {bass_name}",
                     "reason": f"Surgical notch at 60 Hz on {bass_name} to give kick transient room.",
                 })
                 resolved_conflict_count += 1
@@ -349,7 +371,11 @@ class SessionDoctor:
                         "track_index": tidx,
                         "track_name": tname,
                         "device_name": "EQ Eight",
+                        "parameter": "EQ Eight 130 Hz HPF",
                         "parameters": {"band1_hp": 130.0, "band1_slope": 12},
+                        "before_display": "Full range",
+                        "after_display": "130 Hz High Pass",
+                        "after_label": f"130 Hz HPF on {tname}",
                         "reason": f"Apply 130 Hz high-pass cut on {tname} to clean low-mid mud.",
                     })
                     resolved_conflict_count += 1
@@ -361,7 +387,11 @@ class SessionDoctor:
                     "track_index": synth_idx,
                     "track_name": synth_name,
                     "device_name": "EQ Eight",
+                    "parameter": "EQ Eight 3.2 kHz Cut",
                     "parameters": {"band_index": 5, "frequency": 3200.0, "gain_db": -2.0, "q": 2.5},
+                    "before_display": "Flat",
+                    "after_display": "-2.0 dB @ 3.2 kHz",
+                    "after_label": f"3.2 kHz vocal pocket on {synth_name}",
                     "reason": f"Carve 3.2 kHz pocket on {synth_name} to grant lead vocal clarity corridor.",
                 })
                 resolved_conflict_count += 1
@@ -388,6 +418,7 @@ class SessionDoctor:
 
         proposal = {
             "schema": "kenn.surgical_masking_remediation.v1",
+            "action": "recipe",
             "session_id": session_id,
             "total_conflicts_analyzed": total_conflict_count,
             "resolved_conflict_count": resolved_conflict_count,
