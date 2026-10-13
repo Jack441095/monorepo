@@ -1865,6 +1865,10 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   only to rank 4 and costs 2 probe concepts (112 → 110; MRR 0.8502 → 0.8464). Measure on coverage, the held-out set
   and the probe together, like the ranking change. Sealed rows 066/068/069/114 are the sensitive ones.
 - [ ] A precedence-effect note for the corpus (needs Jack and an index rebuild); no ranking change can supply it.
+  Drafted 13 Oct from Wallach et al. 1949, Haas 1951/1972, Lochner & Burger 1958 and Litovsky et al. 1999, with a
+  per-figure check sheet; three figures rest on secondary citations and are marked for Jack to confirm. Delivered to
+  Jack outside git (corpora stay out of this repo); it joins the corpus with the reference-numbers note after the
+  v7 grading, one GPU-box rebuild and a bench.
 - [ ] Revisit the fused-list cap of 40 once the synonym fix has landed.
 - [x] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
   reaches the producer instead of a template that pretends to answer. Merged to main 7 Oct (`draft/honest-answers`
