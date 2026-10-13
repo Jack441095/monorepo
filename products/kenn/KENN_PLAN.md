@@ -592,6 +592,11 @@ what to do; they do not supply owner grades, and each still runs only when its o
   whose length nobody measured.
 - **128-token cap:** keep it until the C1 receipts are in, then compare truncation and timely acceptance against the
   384-token ceiling on the same 30 questions before changing it.
+- **Scope, 13 Oct (Jack): KENN is a music-production and audio-engineering specialist,** so third-party plug-ins are in
+  scope, under the existing rule of real control names from the maker's documentation and no invented controls.
+  First draft: a FabFilter Pro-Q 3 de-essing note from FabFilter's manual, delivered with the precedence-effect note.
+  The local order for the knowledge work (measure the retrieval draft, grade v7, review notes, one GPU-box rebuild,
+  then the reranker trial) is in [the local knowledge checklist](docs/runbooks/KENN_KNOWLEDGE_LOCAL_SESSION.md).
 
 - [ ] **C1 — Current-path baseline.** At least 30 knowledge questions on M3/16 GB,
   separate streaming, foreground and background runs, both caches declared, exact
