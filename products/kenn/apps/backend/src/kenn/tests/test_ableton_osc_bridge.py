@@ -71,6 +71,10 @@ def _track_query_response(path: str, args: list, state: dict) -> list | None:
         return [float(state.get("loop_start", 0.0))]
     if path == "/live/song/get/loop_length":
         return [float(state.get("loop_length", 16.0))]
+    if path == "/live/song/get/groove_amount":
+        return [float(state.get("groove_amount", 0.0))]
+    if path == "/live/song/get/record_mode":
+        return [bool(state.get("record_mode", False))]
     if path == "/live/song/get/current_song_time":
         return [float(state.get("current_song_time", 0.0))]
     if path == "/live/view/get/selected_track":

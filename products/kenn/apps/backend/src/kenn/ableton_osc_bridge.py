@@ -166,6 +166,7 @@ WRITE_ENDPOINTS = (
     "/live/song/set/loop_length",
     "/live/song/set/groove_amount",
     "/live/song/set/record_mode",
+    "/live/song/set/current_song_time",
     "/live/song/cue_point/jump",
     "/live/song/jump_to_prev_cue",
     "/live/song/jump_to_next_cue",
@@ -1064,6 +1065,10 @@ class AbletonOSCClient:
         except (TypeError, ValueError):
             return None
         return value if value >= 0.0 else None
+
+    def set_current_song_time(self, beats: float) -> bool:
+        """Set Live playhead position in beats."""
+        return self._send_simple("/live/song/set/current_song_time", max(0.0, float(beats)))
 
     def get_locators(self) -> List[Dict[str, Any]]:
         """Read the song's cue points as stable name/time identities.

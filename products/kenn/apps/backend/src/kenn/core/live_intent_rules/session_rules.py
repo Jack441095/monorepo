@@ -50,6 +50,9 @@ from kenn.core.live_intent import (
     _tempo_request,
     _metronome_request,
     _loop_request,
+    _groove_request,
+    _record_mode_request,
+    _locator_jump_request,
     _track_to_return_send,
     _time_signature_request,
 )
@@ -174,6 +177,18 @@ def resolve_session_rules(
     loop = _loop_request(text, snapshot)
     if loop is not None:
         base.update(loop)
+        return base
+    groove = _groove_request(text, snapshot)
+    if groove is not None:
+        base.update(groove)
+        return base
+    record_mode = _record_mode_request(text, snapshot)
+    if record_mode is not None:
+        base.update(record_mode)
+        return base
+    locator_jump = _locator_jump_request(text, snapshot)
+    if locator_jump is not None:
+        base.update(locator_jump)
         return base
     # Scene launch phrasing ("play scene 2") must be checked before the
     # generic transport play/stop match below, since both contain the bare

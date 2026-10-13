@@ -19,10 +19,11 @@ _TRACK_NUMBER = re.compile(r"\btrack\s*#?\s*(\d+)\b", re.I)
 # "What's the current pan on the drum bus?" was answered "'Drum Bus' has: Compressor." and "is the bass muted?" got
 # "not sure" (27 Sept 2026): a track's level, pan or mute/solo/arm state is read straight from the set.
 _TRACK_STATE_QUESTION = re.compile(
-    r"\bwhat(?:'s|s|\s+is)\s+(?:the\s+)?(?:current\s+)?(?P<field>pan|panning|volume|level|fader|color)\s+(?:on|of|for)\s+(?P<name>.+?)\s*\??\s*$"
-    r"|\bwhat(?:'s|s|\s+is)\s+(?:the\s+)?(?P<name2>.+?)(?:'s|s'|\s+)(?P<field2>pan|panning|volume|level|fader|color)\s*\??\s*$"
+    r"\bwhat(?:'s|s|\s+is)\s+(?:the\s+)?(?:current\s+)?(?P<field>pan|panning|volume|level|fader|color|routing|output\s+routing|input\s+routing)\s+(?:on|of|for)\s+(?P<name>.+?)\s*\??\s*$"
+    r"|\bwhat(?:'s|s|\s+is)\s+(?:the\s+)?(?P<name2>.+?)(?:'s|s'|\s+)(?P<field2>pan|panning|volume|level|fader|color|routing|output\s+routing|input\s+routing)\s*\??\s*$"
     r"|\bhow\s+loud\s+is\s+(?P<name3>.+?)\s*\??\s*$"
     r"|^\s*(?:is|are)\s+(?P<name4>.+?)\s+(?P<state>muted|soloed|armed|(?:record[\s-]?)?armed|panned|cent(?:red|ered)|folded|unfolded|collapsed|expanded)\s*\??\s*$"
+    r"|^\s*where\s+(?:is|does)\s+(?P<name6>.+?)\s+(?:routed|route(?:\s+to)?|send(?:\s+to)?)\s*\??\s*$"
     # "check the lead vocal volume" as the request itself, not "solo the snare to check its level".
     r"|(?:^|(?:can|could|would)\s+you\s+|\bplease\s+|,\s*)check\s+(?:the\s+)?(?P<name5>(?!its?\b)[^,.?!]+?)\s+(?P<field5>volume|level|pan)\b",
     re.I,
@@ -64,6 +65,18 @@ def _question_kind(question: str) -> str | None:
         re.search(r"\b(?:is\s+(?:the\s+)?(?:(?:arrangement\s+)?loop|looping)\s+(?:on|off|active|enabled)|(?:what|which)(?:'s|\s+is)\s+(?:the\s+)?(?:loop\s+bounds?|loop\s+length|loop\s+start|loop\s+range))\b", lower)
     ):
         return "loop_state"
+    if not re.search(r"\b(?:set|turn|change|put|make)\b", lower) and (
+        re.search(r"\b(?:what(?:'s|s|\s+is)\s+(?:the\s+)?(?:global\s+|song\s+)?(?:groove(?:\s+amount)?|swing)|how\s+much\s+(?:groove|swing)|groove\s+amount|swing\s+amount)\b", lower)
+    ):
+        return "groove_state"
+    if not re.search(r"\b(?:set|turn|change|put|switch|enable|disable)\b", lower) and (
+        re.search(r"\b(?:is\s+(?:arrangement\s+)?record(?:ing)?(?:\s+mode)?\s+(?:on|off|active|enabled)|what(?:'s|s|\s+is)\s+(?:the\s+)?(?:arrangement\s+)?record(?:ing)?(?:\s+mode)?|record\s+mode\s+status)\b", lower)
+    ):
+        return "record_mode_state"
+    if not re.search(r"\b(?:jump|go|skip|add|remove|delete|create)\b", lower) and (
+        re.search(r"\b(?:what\s+locators|list\s+(?:the\s+)?(?:locators|markers|cue\s+points)|what\s+markers|what\s+cue\s+points|show\s+(?:the\s+)?(?:locators|markers))\b", lower)
+    ):
+        return "locators_list"
     # Asking what the tempo is, not any sentence with "tempo" in it ("stretch samples to fit my track's tempo" got
     # "The current tempo is 120 BPM", 26 Sept 2026).
     # Tempo and time-signature changes are Live changes now (27 Sept 2026), so only questions land here.
@@ -100,11 +113,13 @@ def _track_state_answer(question: str, tracks: list[dict[str, Any]], *, service:
 
     match = _TRACK_STATE_QUESTION.search(" ".join(str(question).split()))
     groups = match.groupdict() if match else {}
-    phrase = next((groups[key] for key in ("name", "name2", "name3", "name4", "name5") if groups.get(key)), "")
+    phrase = next((groups[key] for key in ("name", "name2", "name3", "name4", "name5", "name6") if groups.get(key)), "")
     field = str(next((groups[key] for key in ("field", "field2", "field5") if groups.get(key)), "")).lower()
     state = str(groups.get("state") or "").lower()
     if groups.get("name3"):
         field = "volume"
+    elif groups.get("name6"):
+        field = "routing"
 
     # Inspect master bus mixer when requested. Live's master track lives outside the ordinary song.tracks array.
     lower_phrase = phrase.strip().lower()
@@ -174,6 +189,26 @@ def _track_state_answer(question: str, tracks: list[dict[str, Any]], *, service:
             "answer": f"{label} is set to {shown_color}.",
             "track": {"index": track.get("index"), "name": name},
             "color_index": color_idx,
+        }
+    if field in {"routing", "output", "output routing"}:
+        out_type = track.get("output_routing_type") or "Master"
+        out_ch = track.get("output_routing_channel") or ""
+        ch_text = f" via {out_ch}" if out_ch else ""
+        return {
+            "answer": f"{label} is routed to output '{out_type}'{ch_text}.",
+            "track": {"index": track.get("index"), "name": name},
+            "output_routing_type": out_type,
+            "output_routing_channel": out_ch,
+        }
+    if field in {"input", "input routing"}:
+        in_type = track.get("input_routing_type") or "All Ins"
+        in_ch = track.get("input_routing_channel") or ""
+        ch_text = f" ({in_ch})" if in_ch else ""
+        return {
+            "answer": f"{label} receives input from '{in_type}'{ch_text}.",
+            "track": {"index": track.get("index"), "name": name},
+            "input_routing_type": in_type,
+            "input_routing_channel": in_ch,
         }
     key = {"muted": "muted", "soloed": "soloed"}.get(state, "armed")
     on = bool(track.get(key))
@@ -337,6 +372,37 @@ def answer_live_session_question(
             "loop_start": float(start) if start is not None else None,
             "loop_length": float(length) if length is not None else None,
         })
+    elif kind == "groove_state":
+        groove = snapshot.get("groove_amount")
+        if groove is None:
+            client = getattr(live, "client", None)
+            if client and hasattr(client, "get_groove_amount"):
+                groove = client.get_groove_amount()
+        pct = round(float(groove) * 100) if groove is not None else 0
+        answer = f"The global groove amount is currently {pct}%."
+        payload.update({"answer": answer, "groove_amount": float(groove) if groove is not None else 0.0})
+    elif kind == "record_mode_state":
+        rec_mode = snapshot.get("record_mode")
+        if rec_mode is None:
+            client = getattr(live, "client", None)
+            if client and hasattr(client, "get_record_mode"):
+                rec_mode = client.get_record_mode()
+        state_text = "active (on)" if rec_mode else "inactive (off)"
+        answer = f"Arrangement recording is currently {state_text}."
+        payload.update({"answer": answer, "record_mode": bool(rec_mode)})
+    elif kind == "locators_list":
+        cues = snapshot.get("cue_points")
+        if cues is None:
+            client = getattr(live, "client", None)
+            if client and hasattr(client, "get_cue_points"):
+                cues = client.get_cue_points()
+        cues = cues or []
+        if not cues:
+            answer = "There are no cue points or locators in the current Live Set."
+        else:
+            cue_descriptions = [f"'{c.get('name')}' at {float(c.get('time', 0.0)):g} beats" for c in cues]
+            answer = f"The Live Set has {len(cues)} locator(s): {', '.join(cue_descriptions)}."
+        payload.update({"answer": answer, "cue_points": cues})
     elif kind == "selected_track":
         selected_index = snapshot.get("selected_track_index")
         selected = next((item for item in tracks if item.get("index") == selected_index), None)

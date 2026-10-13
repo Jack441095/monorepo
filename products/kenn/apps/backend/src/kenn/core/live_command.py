@@ -64,7 +64,7 @@ TRACK_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "re
 TRACK_CREATION_ACTIONS = {"create_midi_track", "create_audio_track"}
 RETURN_TRACK_CREATION_ACTIONS = set(SUPPORTED_RETURN_TRACK_CREATION_ACTIONS)
 TRANSPORT_ACTIONS = {"transport_play", "transport_stop"}
-SONG_ACTIONS = {"set_tempo", "set_time_signature", "set_metronome", "set_loop", "set_loop_bounds"}
+SONG_ACTIONS = {"set_tempo", "set_time_signature", "set_metronome", "set_loop", "set_loop_bounds", "set_groove_amount", "set_record_mode"}
 VIEW_ACTIONS = {"focus_track", "focus_device"}
 LLM_PLAN_FIELDS = frozenset({
     "schema", "action", "track_index", "track_name", "device_index", "device_name",
@@ -80,7 +80,8 @@ LLM_PLAN_ACTIONS = frozenset(
     | SONG_ACTIONS | DEVICE_PARAMETER_ACTIONS | {
         "inspect_tracks", "inspect_devices", "inspect_device_parameters", "clarify", "insert_device",
         "insert_device_with_parameter", "duplicate_clip", "rename_clip", "set_send", "add_locator",
-        "remove_locator", "set_eq_band_gain", "set_eq_band_tuning_gain", "recipe",
+        "remove_locator", "jump_to_locator", "jump_to_next_locator", "jump_to_prev_locator",
+        "set_eq_band_gain", "set_eq_band_tuning_gain", "recipe",
     }
 )
 _NULLABLE_INT = {"type": ["integer", "null"]}
@@ -334,6 +335,19 @@ def _song_plan(plan: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, Any]
         if start < 0.0 or length <= 0.0:
             return {"ok": False, "error": "Loop bounds require start >= 0 and length > 0."}
         return {"ok": True, "plan": dict(plan, value={"loop_start": round(start, 3), "loop_length": round(length, 3)}, unit="beats", relative=False)}
+    if action == "set_groove_amount":
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(float(value)):
+            return {"ok": False, "error": "A groove amount plan needs a numeric value between 0.0 and 1.0 (or 0% to 100%)."}
+        v = float(value)
+        if str(plan.get("unit") or "").strip().lower() in {"%", "percent"} or v > 1.0:
+            v /= 100.0
+        if not (0.0 <= v <= 1.0):
+            return {"ok": False, "error": "Groove amount must be between 0.0 and 1.0 (or 0% and 100%)."}
+        return {"ok": True, "plan": dict(plan, value=round(v, 4), unit="normalized", relative=False)}
+    if action == "set_record_mode":
+        if not isinstance(value, bool):
+            return {"ok": False, "error": "A record mode plan needs a boolean value."}
+        return {"ok": True, "plan": dict(plan, value=value, unit="boolean", relative=False)}
     if action == "set_time_signature":
         match = re.fullmatch(r"\s*(\d{1,2})\s*/\s*(\d{1,2})\s*", str(value or ""))
         if match is None or plan.get("relative"):
@@ -509,7 +523,7 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
         if rejected:
             return rejected
         return {"ok": True, "plan": dict(plan)}
-    if action in {"add_locator", "remove_locator"}:
+    if action in {"add_locator", "remove_locator", "jump_to_locator"}:
         rejected = _reject(
             ("track_index", "track_name", "device_index", "device_name", "insertion_index", "parameter_index", "parameter_name", "value", "relative", "frequency_hz", "eq_band"),
             "A locator plan contains unrelated executable fields",
@@ -522,6 +536,14 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
         unit = str(plan.get("unit") or "beats").strip().lower()
         if unit not in {"", "beats"}:
             return {"ok": False, "error": f"A {action} plan must use beats as its unit."}
+        return {"ok": True, "plan": dict(plan)}
+    if action in {"jump_to_next_locator", "jump_to_prev_locator"}:
+        rejected = _reject(
+            ("track_index", "track_name", "device_index", "device_name", "insertion_index", "parameter_index", "parameter_name", "value", "relative", "frequency_hz", "eq_band", "locator_name"),
+            "A relative locator jump plan contains unrelated executable fields",
+        )
+        if rejected:
+            return rejected
         return {"ok": True, "plan": dict(plan)}
     if action in SONG_ACTIONS:
         rejected = _reject(
@@ -3840,6 +3862,20 @@ def _handle_command_impl(
         if result.get("ok"):
             return _proposal_response(response, result["proposal"], kind="locator")
         return _clarification(response, intent, result.get("error", "I could not create a safe locator proposal."))
+    if action == "jump_to_locator":
+        result = live.propose_jump_to_locator_action(
+            locator_name=str(intent.get("locator_name", "")),
+            session_id=response["session_id"],
+        )
+        if result.get("ok"):
+            return _proposal_response(response, result["proposal"], kind="locator")
+        return _clarification(response, intent, result.get("error", "I could not create a safe locator jump proposal."))
+    if action in {"jump_to_next_locator", "jump_to_prev_locator"}:
+        direction = "next" if action == "jump_to_next_locator" else "prev"
+        result = live.propose_relative_cue_jump_action(direction, session_id=response["session_id"])
+        if result.get("ok"):
+            return _proposal_response(response, result["proposal"], kind="locator")
+        return _clarification(response, intent, result.get("error", "I could not create a safe locator jump proposal."))
     if action in VIEW_ACTIONS:
         result = live.propose_view_action(
             action,
@@ -3943,6 +3979,28 @@ def _handle_command_impl(
         proposal = result["proposal"]
         if proposal.get("before") == proposal.get("after"):
             return _clarification(response, intent, f"The loop bounds are already {proposal['after_display']}. Nothing changed.")
+        return _proposal_response(response, proposal, kind="song")
+    if action == "set_groove_amount":
+        desired = intent.get("desired_value")
+        if desired is None:
+            desired = intent.get("value")
+        result = live.propose_groove_amount_action(float(desired), session_id=response["session_id"])
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a Live groove amount proposal."))
+        proposal = result["proposal"]
+        if abs(float(proposal.get("before", 0.0)) - float(proposal.get("after", 0.0))) < 0.0001:
+            return _clarification(response, intent, f"The song groove amount is already {round(float(proposal['after']) * 100):g}%. Nothing changed.")
+        return _proposal_response(response, proposal, kind="song")
+    if action == "set_record_mode":
+        desired = intent.get("desired_value")
+        if desired is None:
+            desired = intent.get("value")
+        result = live.propose_record_mode_action(bool(desired), session_id=response["session_id"])
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a Live record mode proposal."))
+        proposal = result["proposal"]
+        if proposal.get("before") == proposal.get("after"):
+            return _clarification(response, intent, f"Arrangement recording is already {'active' if proposal['after'] else 'inactive'}. Nothing changed.")
         return _proposal_response(response, proposal, kind="song")
     if action == "transport_play" or action == "transport_stop":
         result = live.propose_transport_action(action, session_id=response["session_id"])
