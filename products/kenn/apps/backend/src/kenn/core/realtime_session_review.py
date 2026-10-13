@@ -10,13 +10,14 @@ from kenn.project_analysis import analyze_project_doctor, normalize_session
 
 
 SCHEMA = "kenn.realtime_session_review.v1"
-MAX_TRACKS = 256
-MAX_ALERTS = 64
-MAX_RECOMMENDATIONS = 32
+MAX_TRACKS = 256  # tracks: bound client payloads in large sets
+MAX_ALERTS = 64  # advisories per review
+MAX_RECOMMENDATIONS = 32  # separate plug-in advisories per review
 
 
 def _number(value: Any) -> float | None:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
+        # Strings and booleans are not measured numeric values.
         return None
     result = float(value)
     return result if math.isfinite(result) else None
@@ -25,15 +26,29 @@ def _number(value: Any) -> float | None:
 def _track_observations(session: dict[str, Any]) -> list[dict[str, Any]]:
     observations: list[dict[str, Any]] = []
     tracks = session.get("tracks") if isinstance(session.get("tracks"), list) else []
-    for position, raw in enumerate(tracks[:MAX_TRACKS]):
-        if not isinstance(raw, dict):
+    for raw in tracks[:MAX_TRACKS]:
+        if not isinstance(raw, dict) or type(raw.get("index")) is not int or raw["index"] < 0:
+            # List position is not host identity, especially in partial snapshots.
             continue
         item: dict[str, Any] = {
-            "track_index": raw.get("index", position),
+            "track_index": raw["index"],
             "track_name": str(raw.get("name") or "").strip()[:128],
-            "muted": bool(raw.get("muted")),
-            "soloed": bool(raw.get("soloed")),
         }
+        for key in ("muted", "soloed", "armed"):
+            value = raw.get(key)
+            if isinstance(value, (bool, int)) and value in (0, 1):
+                item[key] = bool(value)
+        for key, low, high in (("volume", 0.0, 1.0), ("pan", -1.0, 1.0)):
+            value = _number(raw.get(key))
+            if value is not None and low <= value <= high:
+                item[key] = value
+        if isinstance(raw.get("devices"), list):
+            item["devices"] = [
+                {"index": device["index"], "name": device["name"][:128]}
+                for device in raw["devices"][:MAX_TRACKS]
+                if isinstance(device, dict) and type(device.get("index")) is int
+                and device["index"] >= 0 and isinstance(device.get("name"), str)
+            ]
         for key in ("output_meter_level", "output_meter_right"):
             value = _number(raw.get(key))
             if value is not None and 0.0 <= value <= 1.0:
@@ -49,7 +64,7 @@ def _safe_alerts(alerts: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
             continue
         item = {
             key: raw[key]
-            for key in ("id", "type", "severity", "message", "fix_action", "fix_label")
+            for key in ("id", "type", "severity", "message", "fix_action", "fix_label", "evidence_kind", "track_name")
             if key in raw and isinstance(raw[key], (str, int, float, bool))
         }
         track_index = raw.get("track_index")
@@ -137,11 +152,13 @@ def _safe_plugin_bus(
     if not isinstance(plugin_review, dict):
         return None
     context = plugin_review.get("live_context") if isinstance(plugin_review.get("live_context"), dict) else None
-    if plugin_review.get("ok") is not True or context is None:
+    from kenn.core.mcp.realtime import _realtime_context_is_current
+    if plugin_review.get("ok") is not True or context is None or not _realtime_context_is_current(context):
+        # A retained bus frame may be valid history while no longer supporting current advice.
         return {
             "status": "unavailable",
             "scope": "plugin_bus",
-            "error": str(plugin_review.get("error") or "No validated realtime plug-in context was available.")[:512],
+            "error": str(plugin_review.get("error") or "No current validated realtime plug-in context was available.")[:512],
             "recommendations": [],
             "advisory_only": True,
             "capture_requested": False,
@@ -316,6 +333,7 @@ def build_realtime_session_review(
     mixing_alerts: Iterable[dict[str, Any]] = (),
     plugin_review: dict[str, Any] | None = None,
     plugin_recommendations: Iterable[dict[str, Any]] = (),
+    focus: str = "",
 ) -> dict[str, Any]:
     """Build one read-only report without polling or authorising mutation.
 
@@ -326,11 +344,39 @@ def build_realtime_session_review(
     """
     session = session if isinstance(session, dict) else {}
     status = str(session.get("status") or "unknown")
-    current = status in {"connected", "dispatched"}
-    normalized = normalize_session(session)
-    project_findings = [item.payload() for item in analyze_project_doctor(normalized)]
-    alerts = _safe_alerts(mixing_alerts)
+    freshness = session.get("freshness") if isinstance(session.get("freshness"), dict) else {}
+    current = status == "connected" and freshness.get("current_for_diagnosis") is not False
+    # Normalize only validated observations. Optional malformed replies must not
+    # crash the review or acquire defaults that look like facts in its payload.
     track_observations = _track_observations(session)
+    normalized = normalize_session({"status": status, "tracks": [
+        {"index": item["track_index"], "name": item["track_name"],
+         **{key: value for key, value in item.items() if key not in {"track_index", "track_name"}}}
+        for item in track_observations
+    ]})
+    project_findings = [item.payload() for item in analyze_project_doctor(normalized)] if current else []
+    alerts = _safe_alerts(mixing_alerts)
+    selected_index = session.get("selected_track_index")
+    selected_track = next((item for item in track_observations if type(selected_index) is int and item["track_index"] == selected_index), None)
+    selected_only = bool(re.search(r"\b(?:selected|this|current)\s+track\b", focus, re.I))
+    if selected_only:
+        # Selection is explicit; a soloed, armed or first track is never a substitute.
+        current = current and selected_track is not None
+        alerts = [item for item in alerts if item.get("track_index") == selected_index or selected_index in (item.get("track_indices") or [])] if current else []
+        project_findings = [item for item in project_findings if selected_index in (item.get("track_indices") or [])] if current else []
+    available = []
+    candidates = {
+        "track_names": bool(track_observations),
+        "mixer_state": any(any(key in item for key in ("volume", "pan", "muted", "soloed", "armed")) for item in track_observations),
+        "device_names": any("devices" in item for item in track_observations),
+        "instantaneous_track_meters": any("output_meter_level" in item or "output_meter_right" in item for item in track_observations),
+        "tempo": _number(session.get("tempo")) is not None,
+        "transport": isinstance(session.get("is_playing"), bool),
+        "selected_track": selected_track is not None,
+        "project_identity": isinstance(session.get("session_name"), str) and bool(session["session_name"].strip()),
+    }
+    available = [key for key, present in candidates.items() if present and current]
+    unavailable = [key for key in candidates if key not in available]
     metered_track_count = sum(
         1 for item in track_observations
         if "output_meter_level" in item or "output_meter_right" in item
@@ -339,12 +385,20 @@ def build_realtime_session_review(
         "This report composes cached read-only observations; it does not poll Live or request audio capture.",
         "Instantaneous Live track meters are post-fader 0.0-1.0 observations, not audio-rate peak, LUFS, true-peak, spectrum, or masking measurements.",
         "Plug-in findings are bus-scoped and cannot identify a responsible Live track or device.",
-        "No recommendation in this report authorizes a Live mutation; supported changes still require the normal proposal, confirmation, stale check, readback, and receipt path.",
+        "Track roles and overlap candidates are inferred from names and mixer state, not measured audio.",
+        "Project identity is unavailable unless supplied by the backend; Live's last-loaded-document log is not proof of the open set.",
+        "No recommendation in this report authorizes a Live mutation.",
     ]
     result: dict[str, Any] = {
         "ok": current,
         "schema": SCHEMA,
         "status": "current" if current else "unavailable",
+        "focus": focus[:512],
+        "state_revision": session.get("state_revision"),
+        "state_fingerprint": session.get("state_fingerprint"),
+        "observed_at_epoch": session.get("observed_at_epoch"),
+        "freshness": freshness or {"status": "not_supplied", "age_seconds": None},
+        "backend": session.get("backend", "abletonosc"),
         "scope": {
             "live_session": "ableton_session_snapshot",
             "mixing_doctor": "cached_session_audits",
@@ -352,9 +406,12 @@ def build_realtime_session_review(
         },
         "live_session": {
             "status": status,
-            "track_count": len(session.get("tracks") or []),
+            "track_count": len(track_observations),
             "metered_track_count": metered_track_count,
             "track_observations": track_observations,
+            "selected_track": selected_track if current else None,
+            "tempo_bpm": session.get("tempo") if "tempo" in available else None,
+            "is_playing": session.get("is_playing") if "transport" in available else None,
         },
         "mixing_doctor": {
             "status": "current" if current else "unavailable",
@@ -362,8 +419,8 @@ def build_realtime_session_review(
         },
         "project_health": {
             "recommendations": project_findings if current else [],
-            "available_data": list(normalized.available_capabilities) if current else [],
-            "unavailable_data": list(normalized.unavailable_capabilities),
+            "available_data": available,
+            "unavailable_data": unavailable + list(normalized.unavailable_capabilities),
         },
         "plugin_bus": _safe_plugin_bus(plugin_review, plugin_recommendations),
         "limitations": limitations,
@@ -372,7 +429,7 @@ def build_realtime_session_review(
         "mutation_authorized": False,
     }
     if not current:
-        result["error"] = "The current Ableton session snapshot is unavailable; no Live analysis was inferred."
+        result["error"] = "The selected track is unavailable; select a regular Live track and wait for a new observation." if selected_only else "The current Ableton session snapshot is unavailable; no Live analysis was inferred."
     return result
 
 

@@ -217,6 +217,7 @@ export type MixReviewView =
   | 'waveform'
   | 'bands'
   | 'masking'
+  | 'track_diagnostic'
   | 'racks'
   | 'midi'
   | 'timeline'

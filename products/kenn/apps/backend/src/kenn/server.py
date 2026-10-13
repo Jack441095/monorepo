@@ -1324,6 +1324,22 @@ class Handler(BaseHTTPRequestHandler):
                 "bounces": bounces,
             })
             return
+        if parsed.path in {"/api/ableton/session-tracks", "/kenn/api/ableton/session-tracks"}:
+            from kenn.core.ableton_project_detector import detect_active_ableton_project
+            from kenn.core.track_diagnostic import extract_session_tracks
+
+            proj = detect_active_ableton_project()
+            if not proj:
+                self.send_json(200, {"ok": False, "error": "No active Ableton Live project detected.", "tracks": []})
+                return
+            tracks = extract_session_tracks(proj["als_path"], proj["project_dir"])
+            self.send_json(200, {
+                "ok": True,
+                "project_name": proj["project_name"],
+                "project_dir": proj["project_dir"],
+                "tracks": tracks,
+            })
+            return
         if parsed.path in {"/api/ableton/project-audio/poll", "/kenn/api/ableton/project-audio/poll"}:
             # Ableton Live writes rendered WAVs directly to disk on export (Cmd+Shift+R)
             # without firing an OSC notification. We poll filesystem modified timestamps
@@ -2126,6 +2142,16 @@ class Handler(BaseHTTPRequestHandler):
                 self.handle_mix_reference()
             else:
                 self.handle_mix_reference_json()
+            return
+        if parsed.path in {"/api/track-diagnostic/scan", "/kenn/api/track-diagnostic/scan"}:
+            if not self.enforce_rate_limit("mix_review"):
+                return
+            from kenn.routes.audio_handler import handle_track_diagnostic_scan
+            handle_track_diagnostic_scan(self)
+            return
+        if parsed.path in {"/api/track-diagnostic/apply", "/kenn/api/track-diagnostic/apply"}:
+            from kenn.routes.audio_handler import handle_track_diagnostic_apply
+            handle_track_diagnostic_apply(self)
             return
         if parsed.path == "/api/automix-upload":
             if not self.enforce_rate_limit("automix_upload"):

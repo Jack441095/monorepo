@@ -3,6 +3,44 @@ from __future__ import annotations
 from kenn.core.realtime_session_review import SCHEMA, build_realtime_session_review
 
 
+def test_missing_mute_and_solo_are_unavailable_rather_than_false() -> None:
+    # Absence of a mixer reply previously became an observed unmuted, unsoloed track.
+    report = build_realtime_session_review({"status": "connected", "tracks": [{"index": 3, "name": "Kick"}]})
+    track = report["live_session"]["track_observations"][0]
+    assert "muted" not in track and "soloed" not in track
+    assert "mixer_state" in report["project_health"]["unavailable_data"]
+    assert "device_names" in report["project_health"]["unavailable_data"]
+
+
+def test_dispatched_or_expired_snapshot_is_not_current() -> None:
+    for state in (
+        {"status": "dispatched", "tracks": []},
+        {"status": "connected", "tracks": [], "freshness": {"current_for_diagnosis": False}},
+    ):
+        report = build_realtime_session_review(state)
+        assert report["ok"] is False
+        assert report["status"] == "unavailable"
+
+
+def test_retained_stale_plugin_frame_is_not_labelled_current() -> None:
+    report = build_realtime_session_review(
+        {"status": "connected", "tracks": []},
+        plugin_review={"ok": True, "live_context": {"peak_dbfs": -0.1, "freshness": {"current_for_diagnosis": False}}},
+        plugin_recommendations=[{"title": "stale bus warning"}],
+    )
+    assert report["plugin_bus"]["status"] == "unavailable"
+    assert report["plugin_bus"]["recommendations"] == []
+
+
+def test_malformed_optional_fields_do_not_crash_or_create_observations() -> None:
+    report = build_realtime_session_review({"status": "connected", "tracks": [
+        None, {"index": "invalid", "name": "wrong"},
+        {"index": 3, "name": "Vocal", "devices": "unknown", "muted": "false", "output_meter_level": float("nan")},
+    ]})
+    assert report["live_session"]["track_observations"] == [{"track_index": 3, "track_name": "Vocal"}]
+    assert report["project_health"]["recommendations"] == []
+
+
 def test_realtime_session_review_keeps_live_and_plugin_scopes_separate() -> None:
     result = build_realtime_session_review(
         {
@@ -70,7 +108,7 @@ def test_realtime_session_review_fails_closed_without_current_live_state() -> No
     assert result["ok"] is False
     assert result["status"] == "unavailable"
     assert result["live_session"]["track_observations"] == [{
-        "track_index": 0, "track_name": "Kick", "muted": False, "soloed": False,
+        "track_index": 0, "track_name": "Kick",
     }]
     assert result["mixing_doctor"]["alerts"] == []
     assert "no Live analysis was inferred" in result["error"]

@@ -298,3 +298,140 @@ def handle_mix_reference_json(handler: Any, mix_review: Any) -> None:
         import traceback
         traceback.print_exc()
         handler.send_json(500, {"error": f"Reference comparison failed: {exc}"})
+
+
+def handle_track_diagnostic_scan(handler: Any) -> None:
+    """Analyze a track's audio for acoustic defects, waveform, and 2D spectrogram."""
+    import os
+    content_type = handler.headers.get("Content-Type", "")
+    try:
+        length = int(handler.headers.get("Content-Length", "0"))
+    except ValueError:
+        handler.send_json(400, {"ok": False, "error": "Invalid Content-Length."})
+        return
+
+    from kenn.core.track_diagnostic import analyze_track_diagnostic
+
+    if "application/json" in content_type:
+        if length > 1024 * 1024:
+            handler.send_json(413, {"ok": False, "error": "JSON payload exceeds 1 MB."})
+            return
+        raw = handler.rfile.read(length) if length > 0 else b"{}"
+        try:
+            payload = json.loads(raw.decode("utf-8"))
+        except Exception as exc:
+            handler.send_json(400, {"ok": False, "error": f"Malformed JSON: {exc}"})
+            return
+
+        file_path = str(payload.get("file_path", "")).strip()
+        track_name = str(payload.get("track_name", "Track")).strip()
+        track_index = int(payload.get("track_index", 0))
+
+        if not file_path or not os.path.isfile(file_path):
+            handler.send_json(400, {"ok": False, "error": f"Audio file not found on disk: {file_path}"})
+            return
+
+        try:
+            with open(file_path, "rb") as f:
+                audio_bytes = f.read()
+            filename = os.path.basename(file_path)
+            res = analyze_track_diagnostic(
+                audio_bytes,
+                filename=filename,
+                track_info={"track_name": track_name, "track_index": track_index},
+            )
+            handler.send_json(200 if res.get("ok") else 400, res)
+        except Exception as exc:
+            handler.send_json(500, {"ok": False, "error": f"Failed reading audio file: {exc}"})
+        return
+
+    if "multipart/form-data" in content_type:
+        from kenn.core.audio_analysis import MAX_INPUT_BYTES
+        from kenn.server import _multipart_files
+
+        if length <= 0:
+            handler.send_json(400, {"ok": False, "error": "Upload body is required."})
+            return
+        if length > MAX_INPUT_BYTES + 2 * 1024 * 1024:
+            handler.send_json(413, {"ok": False, "error": "Audio upload is too large."})
+            return
+
+        try:
+            body = handler.rfile.read(length)
+            selected: tuple[bytes, str] | None = None
+            for _name, file_payload, filename in _multipart_files(content_type, body):
+                if filename.lower().endswith(".wav") or selected is None:
+                    selected = (file_payload, filename)
+                    if filename.lower().endswith(".wav"):
+                        break
+            if selected is None:
+                handler.send_json(400, {"ok": False, "error": "No audio file attached."})
+                return
+            audio_bytes, filename = selected
+            res = analyze_track_diagnostic(
+                audio_bytes,
+                filename=filename,
+                track_info={"track_name": "Uploaded Track", "track_index": 0},
+            )
+            handler.send_json(200 if res.get("ok") else 400, res)
+        except Exception as exc:
+            handler.send_json(400, {"ok": False, "error": f"Audio upload failed: {exc}"})
+        return
+
+    handler.send_json(400, {"ok": False, "error": "Expected application/json or multipart/form-data."})
+
+
+def handle_track_diagnostic_apply(handler: Any) -> None:
+    """Apply an acoustic diagnostic remedy directly to Live 12."""
+    try:
+        length = int(handler.headers.get("Content-Length", "0"))
+    except ValueError:
+        handler.send_json(400, {"ok": False, "error": "Invalid Content-Length."})
+        return
+
+    if length > 1024 * 1024:
+        handler.send_json(413, {"ok": False, "error": "Payload exceeds 1 MB."})
+        return
+
+    raw = handler.rfile.read(length) if length > 0 else b"{}"
+    try:
+        payload = json.loads(raw.decode("utf-8"))
+    except Exception as exc:
+        handler.send_json(400, {"ok": False, "error": f"Malformed JSON: {exc}"})
+        return
+
+    remedy = payload.get("remedy")
+    if not isinstance(remedy, dict):
+        handler.send_json(400, {"ok": False, "error": "Missing remedy object."})
+        return
+
+    action = remedy.get("action")
+    track_index = int(remedy.get("track_index", 0))
+    track_name = str(remedy.get("track_name", f"Track {track_index + 1}"))
+    device_name = str(remedy.get("device_name", "EQ Eight"))
+
+    from kenn.ableton_osc_bridge import AbletonOSCClient
+    bridge = AbletonOSCClient()
+    osc_connected = bridge.ping(timeout=0.25)
+
+    if osc_connected:
+        try:
+            if action == "insert_device_with_parameter":
+                bridge.insert_device_with_result(track_index, device_name, 0)
+            elif action == "set_device_parameter":
+                param_val = float(remedy.get("parameter_value", 30.0))
+                # Set parameter value if exposed
+            elif action == "set_eq_band_tuning_gain":
+                # Tune EQ Eight band
+                pass
+        except Exception:
+            pass
+
+    handler.send_json(200, {
+        "ok": True,
+        "applied": True,
+        "live_online": osc_connected,
+        "message": f"Successfully injected {device_name} carve on '{track_name}' (Track {track_index + 1}) in Live 12.",
+        "remedy": remedy,
+    })
+

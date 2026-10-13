@@ -58,6 +58,7 @@ export default {
     viewWaveform: '波形',
     viewBands: '频段',
     viewMasking: '遮蔽雷达',
+    viewTrackDiagnostic: '分轨诊断',
     viewRacks: '12 效果器架',
     viewMidi: '神经 MIDI',
     viewTimeline: '时间线',

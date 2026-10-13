@@ -104,6 +104,15 @@
         <button
           type="button"
           class="mix-lab__quick-nav-btn"
+          :class="{ 'is-active': activeView === 'track_diagnostic' }"
+          title="Jump to Track Acoustic Diagnostic Scanner"
+          @click="activeView = 'track_diagnostic'"
+        >
+          Track Scanner
+        </button>
+        <button
+          type="button"
+          class="mix-lab__quick-nav-btn"
           :class="{ 'is-active': activeView === 'reference' }"
           title="Jump to Commercial Reference Matcher (A/B)"
           @click="activeView = 'reference'"
@@ -377,6 +386,37 @@
               </div>
               <div class="mix-lab__view-chart" style="height: 100%;">
                 <MaskingRadar />
+              </div>
+            </div>
+          </FloatDetachable>
+        </div>
+
+        <div v-show="activeView === 'track_diagnostic'" class="mix-lab__view-host">
+          <FloatDetachable
+            v-model:open="viewOpen.track_diagnostic"
+            layout="fill"
+            :enabled="true"
+            title="Track Acoustic Diagnostic Scanner"
+            #default="{ openFloat, canPop, showPop, floating }"
+          >
+            <div class="mix-lab__view-pane">
+              <div v-if="!floating" class="mix-lab__view-head">
+                <h3>Track Acoustic Diagnostic Scanner</h3>
+                <button
+                  v-if="showPop"
+                  type="button"
+                  class="mix-lab__pop-btn"
+                  :disabled="!canPop"
+                  @pointerdown.stop
+                  @click="openFloat()"
+                >
+                  {{ t('mixReview.floatOpen') }}
+                </button>
+              </div>
+              <div class="mix-lab__view-chart" style="height: 100%;">
+                <TrackDiagnosticScanner
+                  @ask-kenn="sendMessage"
+                />
               </div>
             </div>
           </FloatDetachable>
@@ -658,6 +698,7 @@ import MaskingRadar from './studio/MaskingRadar.vue'
 import ProRackGallery from './studio/ProRackGallery.vue'
 import NeuralMidiStudio from './studio/NeuralMidiStudio.vue'
 import SloClassificationPanel from './studio/SloClassificationPanel.vue'
+import TrackDiagnosticScanner from './studio/TrackDiagnosticScanner.vue'
 import { useMixReview } from '../composables/useMixReview'
 import { useKenn } from '../composables/useKenn'
 import { showToast } from '../composables/useToast'
@@ -871,6 +912,7 @@ const tabs: Array<{ id: MixReviewView; labelKey: string }> = [
   { id: 'waveform', labelKey: 'mixReview.viewWaveform' },
   { id: 'bands', labelKey: 'mixReview.viewBands' },
   { id: 'masking', labelKey: 'mixReview.viewMasking' },
+  { id: 'track_diagnostic', labelKey: 'mixReview.viewTrackDiagnostic' },
   { id: 'racks', labelKey: 'mixReview.viewRacks' },
   { id: 'midi', labelKey: 'mixReview.viewMidi' },
   { id: 'classification', labelKey: 'mixReview.viewClassification' },
@@ -892,6 +934,7 @@ const viewOpen = reactive({
   waveform: false,
   bands: false,
   masking: false,
+  track_diagnostic: false,
   racks: false,
   midi: false,
   timeline: false,

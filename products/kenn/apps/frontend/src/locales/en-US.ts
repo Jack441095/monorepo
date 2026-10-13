@@ -58,6 +58,7 @@ export default {
     viewWaveform: 'Waveform',
     viewBands: 'Spectrum',
     viewMasking: 'Masking Radar',
+    viewTrackDiagnostic: 'Track Scanner',
     viewRacks: '12 Pro Racks',
     viewMidi: 'Neural MIDI',
     viewTimeline: 'Timeline',
