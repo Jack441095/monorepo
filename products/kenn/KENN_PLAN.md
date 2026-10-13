@@ -31,9 +31,12 @@ product requirement: unsupported measurements, sources and claims must be reject
 
 Decisions already made:
 
-- Local Qwen3 4B chat (`qwen3:4b-instruct-2507-q4_K_M`) and Qwen3 4B planner.
+- Current baseline: local Qwen3 4B chat (`qwen3:4b-instruct-2507-q4_K_M`) and Qwen3 4B planner.
   Jack confirmed the current 4B chat choice on 13 October 2026; this supersedes the
-  earlier 8B chat decision. Preserve it in the offline SEAL experiment. The local
+  earlier 8B chat decision. Model choice stays open per Jack's 13 October request:
+  4B is the control, not a permanent size requirement. Compare alternatives under S4/S6
+  and choose from reviewed quality, retention, M3 latency and memory measurements.
+  Preserve the control's identity in the offline SEAL experiment. The local
   main checkout's `.env` still names the old 8B, so pin the 4B explicitly in experiment
   manifests; do not treat that stale file as the running app's configuration. No hosted brain.
 - The Mac target is Apple M3 with 16 GB unified memory. Model residency, context and
@@ -582,7 +585,8 @@ what to do; they do not supply owner grades, and each still runs only when its o
 - **MLX and speculative decoding: parked.** The speed item was opened because v4 had 8 late answers; v7 (11 Oct,
   Live open, mains) had 0 model answers over 15 s and a 6 s median in all six runs. Speed is not what keeps the
   gate open now; owner-graded correctness is. Reopen only if the C1 receipts or a later bench show late answers
-  again, and then on the same Qwen3-4B-Instruct-2507 checkpoint with held-out quality unchanged.
+  again, and then on the same explicitly pinned checkpoint as the selected Ollama control,
+  with held-out quality unchanged. Compare a change of model separately from a change of runtime.
 - **Reference-numbers and precedence-effect notes: held, then done together.** The 11 Oct check found the reference
   figures already indexed and the misses to be retrieval, and any rebuild makes the next bench incomparable with
   v7 while its grading is pending. After Jack grades v7, write both notes from cited sources, check each figure
@@ -683,8 +687,8 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already
   exist; verify the selected model digest and actual response path before blaming
-  hardware. Any MLX comparison must explicitly use the chosen Qwen3 4B Instruct 2507 lineage,
-  rather than the engine's smaller default. Require unchanged safety and a held-out
+  hardware. Any MLX comparison must explicitly use the selected control's checkpoint
+  lineage, rather than the engine's default model. Require unchanged safety and a held-out
   quality comparison for each latency change.
   - [x] Reviewed the pinned Ollama runtime, existing cache/attention behavior,
     conditional source costs, fixed-model backend options and Jev/Kev fit against
@@ -907,7 +911,8 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
   a new implementation's mistakes; no tuning on sealed cases.
   - [ ] **Bounded offline SEAL experiment, requested 13 Oct.** Compare unchanged
     retrieval, reviewed ordinary SFT, reviewed synthetic SFT with a fixed generator,
-    and an explicitly learned self-edit policy on the current Qwen3 4B. This covers
+    and an explicitly learned self-edit policy, starting with the current Qwen3 4B
+    control; separately qualified model candidates follow S4. This covers
     conversational answers and follow-ups; planner training is only a code reference.
     [Paper/upstream findings](docs/research/KENN_SEAL_RESEARCH_2026-10-13.md) and
     [contracts, commands and baseline](docs/runbooks/KENN_SEAL_OFFLINE_EXPERIMENT.md).
@@ -975,7 +980,8 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     transferable production concepts, diagnosis and concise grounded dialogue on a
     pretrained model. Keep exact manual facts, version-specific controls and current
     session evidence in retrieval and existing services. Keep the current 4B as the
-    control; test a smaller challenger before deciding whether it can replace it.
+    control; test alternative sizes before choosing the serving model. A smaller
+    inference-only comparison can precede specialist training.
     This is the next staged experiment, not a production model change or a bulk run.
     Today's [offline pipeline](docs/runbooks/KENN_SEAL_OFFLINE_EXPERIMENT.md) supplies
     source/target review, isolated adaptation, family splits and trial receipts.
@@ -1030,7 +1036,9 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       Final wording stays reserved. Preparation/SEAL checks pass 101 tests and
       ten isolated guard mutations were caught. Paired KENN retrieval and the
       harder unchanged-4B baseline await exact-content review. S2 stays open.
-    - [ ] **S3 — Establish specialist learning on the 4B.** Start ordinary SFT at
+    - [ ] **S3 — Establish specialist learning against a pinned control.** Start
+      with the current worker's verified 4B condition; another model requires the
+      separate identity and compatibility checks in S4. Start ordinary SFT at
       eight steps so every ordinary example can be used. Compare development-only
       4/8/16-step budgets, recording actual example exposure and training/target tokens.
       At each budget, compare A unchanged retrieval, B reviewed ordinary examples,
@@ -1050,14 +1058,18 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       reviewed positive gains with retention intact; resample after policy updates.
       If C/D do not beat B enough to justify their extra cost, retain ordinary SFT
       as the specialist method. SEAL and LoRA do not establish faster decoding.
-    - [ ] **S4 — Run the 1B-class challenger as a separate model experiment.** First
+    - [ ] **S4 — Compare alternative model sizes as separate experiments.** First
       candidate: [Qwen3 1.7B](https://huggingface.co/Qwen/Qwen3-1.7B), using the
       publisher’s pretrained/post-trained checkpoint and explicitly pinned non-thinking mode.
       This is a candidate, not a claim that it is the best small model or already
-      an audio expert. Before running, verify checkpoint/license/tokenizer/template
+      an audio expert; later candidates remain open to the same qualification.
+      An inference-only comparison against the unchanged 4B can precede S3 and
+      does not select a production model or require changing the training worker.
+      Before running, verify checkpoint/license/tokenizer/template
       and existing-environment compatibility. The [13 October metadata check](docs/research/KENN_QWEN3_17B_COMPATIBILITY_2026-10-13.md)
       pins revisions, metadata hashes and nine rendered-template checks; native
-      tokenizer IDs, weights, adapters and M3 costs remain untested. Add separately
+      Hugging Face tokenizer IDs, weights and adapters remain untested. The Ollama
+      GGUF sample below does not attest to their equivalence. Add separately
       tested model identity support because today's worker deliberately accepts only the pinned 4B.
       Do not bypass that guard. New model assets or dependencies need the approval
       required by the existing plan. Compare unchanged and ordinary-tuned 1.7B with
@@ -1069,6 +1081,18 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       Cross-model distillation needs its own generator/student provenance and is
       not evidence of a learned self-edit policy. Check retention after sequential
       updates, including language, calculations, clarification and proposal rules.
+      **13 October inference-only sample:** one five-question pass per model, with
+      identical backend/script bytes, questions, existing index and 128-token cap,
+      FakeLive and both answer caches bypassed. Median answer time was 6.65 s for
+      unchanged 4B and 3.80 s for Ollama `qwen3:1.7b-q4_K_M`; grounding accepted
+      4/5 and 5/5 respectively. The 1.7B first answer, including load, was slower
+      (11.81 s versus 10.47 s), and all five 1.7B outputs hit the token cap.
+      8B co-residency differed between passes; the 1.7B pass showed warning memory
+      pressure, so this does not establish lower system memory use. Reviewed
+      correctness and retention remain unmeasured; S4/S6 stay open. Review the
+      indexed gain-staging note's blanket -18 dB input-gain instruction: the
+      grounding gate accepted it because it was in the evidence. No production
+      model change or SEAL gain is established by this sample.
     - [ ] **S5 — Grow only after an independent signal.** If the bounded packet
       shows a reviewed quality gain, prepare a first larger batch of 200–400 reviewed
       targets, balanced across the curriculum and actual failure families. Drafting,
@@ -1084,7 +1108,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       candidate choice on development data before opening final answers once for
       blind owner review. Test BF16 adapters offline, then verify any merge and
       Q4_K_M conversion as separately identified candidate artifacts. Compare the
-      unchanged 4B, best specialist 4B and useful smaller challenger with retrieval,
+      unchanged 4B control and qualified unchanged/tuned candidates with retrieval,
       grounding and proposal policy active on M3/16 GB. Use FakeLive for engineering;
       a Live-open qualification measures coexistence without unsupervised writes.
       Run on mains power; separate cold, repeated warm and cache-hit conditions.
@@ -1103,12 +1127,14 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       serving memory for the smaller model while preserving reviewed quality and
       those existing targets; this does not replace the first-useful-answer p95
       target. A tiny packet cannot establish specialist coverage or close C4/C5.
-      Recommend promotion only with reviewed correctness gains over the unchanged
-      production control and no material quality, retention, latency, memory or
-      policy regression. Keep experimental serving disabled until the owner chooses.
+      Recommend promotion only after the existing gates pass, with either reviewed
+      correctness gains or preserved reviewed quality and measured inference-cost
+      gains over the unchanged production control. Require no material quality,
+      retention, latency, memory or policy regression. Keep experimental serving
+      disabled until the owner chooses.
 - [ ] **C5 — Reach the quality and timing targets below.** Improve evidence selection
-  and useful answers without lowering grounding thresholds. The fixed local model is
-  a constraint to measure against, not a reason to label a missed target as passed.
+  and useful answers without lowering grounding thresholds. Pin the local model
+  within each comparison; model choice stays open and a missed target stays failed.
   - [ ] Carried over from A3: six held-out wrapper rows still fail (`upgrade-kick-tail`, `upgrade-room-null`,
     `upgrade-buffer-recording`, `internet-itu-target-boundary`, `eval-followup-snare-layer-mono`,
     `harsh-after-mastering`). Prefer curated approved notes over close transcript notes, build the answer lead from
@@ -1346,10 +1372,11 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   validation, clean-account setup under 15 minutes, supported matrix, feedback channel,
   privacy-preserving diagnostics, tester sign-off and exercised rollback. Do not invite
   testers or publish from a historical “ready” assertion.
-  - [ ] **First-run model download.** The answering model (Qwen3 4B Instruct 2507,
-    Q4_K_M) isn't in the app, so first run fetches it with progress and a resume, checks
-    its digest, and says plainly when the Mac can't run it. Until it's there, chat says
-    no model is installed rather than falling back to anything smaller. Blocked on
+  - [ ] **First-run model download.** The selected answering model (currently Qwen3
+    4B Instruct 2507, Q4_K_M) isn't in the app, so first run fetches it with progress
+    and a resume, checks its digest, and says plainly when the Mac can't run it.
+    Until it's there, chat says no model is installed rather than silently
+    substituting an unqualified model. Blocked on
     Jack: where it's hosted (Ollama registry or our own server), the Qwen3 weight
     licence and the fine-tune's terms, and the minimum Mac (16 GB Apple Silicon is
     the working guess). Counts toward the 15-minute setup above.
