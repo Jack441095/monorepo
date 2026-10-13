@@ -2,7 +2,8 @@ name: Sync KENN sharing repository
 
 on:
   push:
-    branches-ignore: ["sync/**"]
+    # Tool-named session branches (claude/...) must never become kenn-app branches; AGENTS.md wants neutral names.
+    branches-ignore: ["sync/**", "claude/**"]
     paths:
       - "products/kenn/**"
       - ".github/workflows/kenn-app-sync.yml"
