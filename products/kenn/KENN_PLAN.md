@@ -65,8 +65,9 @@ intelligence. The route is a strong small model made reliable in the domain:
 - Deterministic reaction routing for follow-ups, vague asks, off-topic asks and
   third-party plug-ins.
 - A small fine-tune (LoRA) so the model keeps the answer format, stays grounded and
-  declines properly. It improves behaviour, not general ability. It needs the owner's
-  explicit approval, answers checked against the notes, and a held-out evaluation.
+  declines properly, using reviewed domain examples. Domain learning and general
+  reasoning gains need separate evidence. It needs the owner's explicit approval,
+  answers checked against the notes, and a held-out evaluation.
 - Control of Live as typed tool calls; the model picks the action and policy executes it.
 
 Open for the owner, not decided: whether very hard or open-ended questions may go to
@@ -858,16 +859,16 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       the four approved targets: 176 training tokens, 96 target tokens, 18.06 s
       operation wall time and 8.55 GB peak reserved GPU memory. The adapter is an
       isolated artifact. Jack accepted all seven ordinary-arm answers; reward gain
-      is zero on this packet. A lunch batch checks the adapter's retention and
-      collects one/two-step ordinary trials on the same approved targets, without
-      selecting a model from unreviewed answers. The first fixed-policy self-edit
-      reached the 768-token ceiling and was rejected before training; its failure
+      is zero on this packet. The lunch batch completed the adapter's retention
+      checks and one/two-step ordinary trials in 409.94 s on GPU 1. Eight newly
+      worded answers await owner grading; no model was selected. The first fixed-policy
+      self-edit reached the 768-token ceiling and was rejected before training; its failure
       receipt is preserved. New self-edits still need exact-content owner review.
       Baseline reward is already 1.0 on this tiny packet, so its positive-gain
       threshold cannot demonstrate an improvement; broader, harder tasks are needed.
-    - [ ] Expand the tiny pilot into a public licensed corpus with independently
-      reviewed targets and reward/retention references. Inventory found 807 existing
-      Markdown notes, including 118 Ableton-named notes; 758 carry Approved status,
+    - [ ] Prepare the specialist corpus through the staged C4 work below, with
+      independently reviewed targets and reward/retention references. Inventory found
+      807 existing Markdown notes, including 118 Ableton-named notes; 758 carry Approved status,
       but none has an explicit license or shared-weight training-permission field.
       The current retrieval manifest uses 748 notes and two PDFs, including the
       Live 11 manual. Preserve manual-version provenance and review new targets
@@ -886,6 +887,124 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       cold/warm/cache conditions. GPU timings cannot close the Mac gate. SEAL's
       value over ordinary fine-tuning and amortization remain **unmeasured**;
       no promotion recommendation until these checks support one.
+  - [ ] **Ableton and audio-engineering specialist pass, requested 13 Oct.** Teach
+    transferable production concepts, diagnosis and concise grounded dialogue on a
+    pretrained model. Keep exact manual facts, version-specific controls and current
+    session evidence in retrieval and existing services. Keep the current 4B as the
+    control; test a smaller challenger before deciding whether it can replace it.
+    This is the next staged experiment, not a production model change or a bulk run.
+    Today's [offline pipeline](docs/runbooks/KENN_SEAL_OFFLINE_EXPERIMENT.md) supplies
+    source/target review, isolated adaptation, family splits and trial receipts.
+
+    | Curriculum | Behavior to teach and independently check |
+    |---|---|
+    | Signal flow and levels | Explain gain staging, sends/returns, headroom, dBFS/dBTP/LUFS, sample rate and bit depth with correct units; use existing deterministic calculations for numeric results. |
+    | EQ and dynamics | Explain filter choices, masking, compression, sidechains, gates and transient trade-offs; distinguish a diagnostic hypothesis from a measurement and avoid universal presets. |
+    | Space and translation | Explain delay/reverb, stereo and mono checks, polarity/phase, monitoring and room issues; identify when EQ cannot resolve a cancellation problem. |
+    | Ableton workflows | Teach Session/Arrangement, clips, Warp, recording, automation, routing, racks and export through version-applicable references; distinguish manual capability from implemented KENN control. |
+    | Device knowledge | Use actual device/control names, units and documented ranges; cover missing devices, third-party plug-ins and version conflicts without inventing controls. Coordinate scope with L1/L2. |
+    | Producer dialogue and proposals | Handle short follow-ups, incomplete evidence and conflicting briefs; request the missing audio or meter evidence; prepare inspectable proposals through existing services and report confirmation/readback/Undo truthfully. |
+
+    - [ ] **S1 — Curate a first source batch and freeze the experiment.** Audit 20
+      candidate notes, roughly half Ableton and half engineering, starting from
+      observed failure families rather than note count. Record source URL/author,
+      content hash, license and shared-weight permission, review, Live version and
+      manual/observed/measured status. Approved note status is not permission for
+      every derived answer. Public availability is not a training-rights finding.
+      Use the [official Live 12 manual](https://www.ableton.com/en/live-manual/12/)
+      to check version applicability; the indexed Live 11 PDF cannot settle a
+      Live 12 control question. Exclude private audio, session facts, preferences
+      and conversations from shared weights. Freeze code, prompts, model/tokenizer,
+      quantization, index and settings for each condition. Do not scrape or rebuild
+      the index as part of this first training comparison.
+    - [ ] **S2 — Build a harder, reviewed packet within today's limits.** Start with
+      four training source families and two ordinary targets per context: eight
+      reviewed examples, including concise explanations and follow-ups. Prepare
+      24 reward questions, 12 retention checks and 24 separately reserved final
+      questions, covering all seven language/policy categories required by the
+      validator. Group related source facts, task templates and paraphrases before
+      splitting; renaming a family or a manual chapter does not remove overlap.
+      Check cross-partition semantic overlap as well as hashes. Keep final prompts
+      out of training/generation and give generators only training sources. Capture
+      the same retrieval evidence for paired trials. Review sources, targets and
+      reference answers in short numbered packets, with sources visible and exact
+      content-bound approvals. New wording needs new review. Run the unchanged 4B
+      first: if reward is again 1.0, stop using this packet to claim positive learning
+      gain and prepare a new version; never revise a frozen reference to bless output.
+    - [ ] **S3 — Establish specialist learning on the 4B.** Start ordinary SFT at
+      eight steps so every ordinary example can be used. Compare development-only
+      4/8/16-step budgets, recording actual example exposure and training/target tokens.
+      At each budget, compare A unchanged retrieval, B reviewed ordinary examples,
+      C reviewed synthetic examples from the fixed generator and D a learned
+      self-edit policy. Match inner step/token ceilings across B/C/D; record D's
+      extra candidate and policy-training cost separately. Begin with rank 8,
+      learning rate 2e-4, 2048-token maximum length, two candidates and two policy
+      rounds. Set the padded training-token ceiling to 8192/16384/32768 for the
+      4/8/16-step runs, with policy steps no greater than that run's inner steps.
+      Cap generation at two examples per context and 768 output tokens initially;
+      truncated or invalid edits remain rejected, including today's failed edit.
+      A changed limit requires a new manifest, not a repair to the frozen pilot.
+      Keep 20 GB reserved GPU memory, 300 s per operation and 3600 s cumulative
+      compute per run; stop incomplete runs at their cap and preserve failed costs.
+      A resume uses the same ledger. Keep the proxy screen at zero until reviewed
+      quality scores demonstrably predict post-training gain. Reinforce D only from
+      reviewed positive gains with retention intact; resample after policy updates.
+      If C/D do not beat B enough to justify their extra cost, retain ordinary SFT
+      as the specialist method. SEAL and LoRA do not establish faster decoding.
+    - [ ] **S4 — Run the 1B-class challenger as a separate model experiment.** First
+      candidate: [Qwen3 1.7B](https://huggingface.co/Qwen/Qwen3-1.7B), using its
+      pretrained/post-trained checkpoint and explicitly pinned non-thinking mode.
+      This is a candidate, not a claim that it is the best small model or already
+      an audio expert. Before running, verify checkpoint/license/tokenizer/template
+      and existing-environment compatibility; add separately tested model identity
+      support because today's worker deliberately accepts only the pinned 4B.
+      Do not bypass that guard. New model assets or dependencies need the approval
+      required by the existing plan. Compare unchanged and ordinary-tuned 1.7B with
+      unchanged and ordinary-tuned 4B on the same evidence and held-out tasks.
+      Keep comparable context/output limits and record model-specific token counts.
+      Try the winning C/D method on the challenger only after its A/B baseline is
+      useful. A 4B teacher may draft student targets, but every target needs source
+      checking and owner review; teacher size and checker acceptance are not truth.
+      Cross-model distillation needs its own generator/student provenance and is
+      not evidence of a learned self-edit policy. Check retention after sequential
+      updates, including language, calculations, clarification and proposal rules.
+    - [ ] **S5 — Grow only after an independent signal.** If the bounded packet
+      shows a reviewed quality gain, prepare a first larger batch of 200–400 reviewed
+      targets, balanced across the curriculum and actual failure families. Drafting,
+      deduplication and formatting may use the GPU; factual and rights approval do
+      not come from its output. Preserve untouched development/final families and
+      keep retention references independent. Today's pilot permits at most four
+      contexts and 32 tasks per evaluation partition: it is not a bulk trainer or
+      the final specialist benchmark. Design a separately bounded corpus job using
+      existing training code and meaningful isolation tests before that larger run;
+      do not evade pilot ceilings by launching an unbounded series of small jobs.
+      Use the existing qualification harness for the broader independent evaluation.
+    - [ ] **S6 — Qualify useful answers per inference cost on the Mac.** Freeze
+      candidate choice on development data before opening final answers once for
+      blind owner review. Test BF16 adapters offline, then verify any merge and
+      Q4_K_M conversion as separately identified candidate artifacts. Compare the
+      unchanged 4B, best specialist 4B and useful smaller challenger with retrieval,
+      grounding and proposal policy active on M3/16 GB. Use FakeLive for engineering;
+      a Live-open qualification measures coexistence without unsupervised writes.
+      Run on mains power; separate cold, repeated warm and cache-hit conditions.
+      Report correct/useful/supported answers, units, per-family errors, abstentions,
+      fallbacks, truncation, eligible/attempted/delivered counts and uncertainty.
+      Record first-visible and complete-answer p50/p95, all provider calls/tokens,
+      load/prefill/decode, peak memory, pressure and model switches. Count retries
+      and rejected outputs in cost. Also report GPU compute, review time and
+      conversion cost separately; amortization needs comparable cost units and
+      measured serving savings, otherwise it remains unmeasured.
+      Preserve the acceptance targets below: at least 150 independent chat cases,
+      90% useful supported acceptance, 95% sealed correctness and 70% of eligible
+      knowledge requests accepted within 15 s with Live open. Require zero critical
+      device/unit/proposal errors and no material retention regression. As a proposed
+      efficiency screen, require at least 20% lower warm complete-answer p50 or peak
+      serving memory for the smaller model while preserving reviewed quality and
+      those existing targets; this does not replace the first-useful-answer p95
+      target. A tiny packet cannot establish specialist coverage or close C4/C5.
+      Recommend promotion only with reviewed correctness gains over the unchanged
+      production control and no material quality, retention, latency, memory or
+      policy regression. Keep experimental serving disabled until the owner chooses.
 - [ ] **C5 — Reach the quality and timing targets below.** Improve evidence selection
   and useful answers without lowering grounding thresholds. The fixed local model is
   a constraint to measure against, not a reason to label a missed target as passed.
@@ -1451,7 +1570,8 @@ Full backend command for shared entry-point changes, extractions or release:
 ```
 
 Deferred until the sequence justifies them: additional control families; speculative
-native/shared runtimes; fine-tuning beyond the 4B answer work and bounded offline SEAL experiment in C4; broad dataset intake; a second verifier model;
+native/shared runtimes; fine-tuning beyond the staged C4 answer/specialist experiments;
+broad dataset intake outside their reviewed batches; a second verifier model;
 conformal acceptance policies; huge citation captures; source-volume targets;
 autonomous mixing/arrangement and commercial distribution. Existing unfinished
 `live_command`/execution extractions and dead-tool removal need a new reachability
