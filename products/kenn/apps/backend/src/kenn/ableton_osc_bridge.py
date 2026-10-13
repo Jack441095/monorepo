@@ -114,6 +114,12 @@ READ_ENDPOINTS = (
     "/live/song/get/root_note",
     "/live/song/get/scale_name",
     "/live/song/get/tempo",
+    "/live/song/get/metronome",
+    "/live/song/get/loop",
+    "/live/song/get/loop_start",
+    "/live/song/get/loop_length",
+    "/live/track/get/color_index",
+    "/live/track/get/fold_state",
     "/live/view/get/selected_track",
     "/live/view/get/selected_track_kind",
     "/live/kenn/version",
@@ -137,6 +143,8 @@ WRITE_ENDPOINTS = (
     "/live/track/set/solo",
     "/live/track/set/arm",
     "/live/track/set/name",
+    "/live/track/set/color_index",
+    "/live/track/set/fold_state",
     "/live/track/set/send",
     "/live/track/set/output_routing",
     "/live/track/set/input_routing",
@@ -150,6 +158,10 @@ WRITE_ENDPOINTS = (
     "/live/song/start_playing",
     "/live/song/stop_playing",
     "/live/song/set/tempo",
+    "/live/song/set/metronome",
+    "/live/song/set/loop",
+    "/live/song/set/loop_start",
+    "/live/song/set/loop_length",
     "/live/song/set/signature_numerator",
     "/live/song/set/signature_denominator",
     "/live/kenn/set/return_mixer",
@@ -884,6 +896,10 @@ class AbletonOSCClient:
                 ("/live/song/get/scale_name", None),
                 ("/live/song/get/is_playing", None),
                 ("/live/view/get/selected_track", None),
+                ("/live/song/get/metronome", None),
+                ("/live/song/get/loop", None),
+                ("/live/song/get/loop_start", None),
+                ("/live/song/get/loop_length", None),
             ])
         batched_values = self._query_many(batched_requests)
         # Meter packets are advisory and some AbletonOSC/Live combinations do
@@ -962,6 +978,10 @@ class AbletonOSCClient:
         scale_name_args = batched_values[batch_index + 5] or [] if include_mixer else []
         playing_args = batched_values[batch_index + 6] or [] if include_mixer else []
         selected_args = batched_values[batch_index + 7] or [] if include_mixer else []
+        metronome_args = batched_values[batch_index + 8] or [] if include_mixer and len(batched_values) > batch_index + 8 else []
+        loop_args = batched_values[batch_index + 9] or [] if include_mixer and len(batched_values) > batch_index + 9 else []
+        loop_start_args = batched_values[batch_index + 10] or [] if include_mixer and len(batched_values) > batch_index + 10 else []
+        loop_length_args = batched_values[batch_index + 11] or [] if include_mixer and len(batched_values) > batch_index + 11 else []
         selected_index = selected_args[0] if selected_args else None
         selected_kind = None
         if isinstance(selected_index, (int, float)) and int(selected_index) < 0:
@@ -985,6 +1005,10 @@ class AbletonOSCClient:
             "is_playing": bool(playing_args[0]) if playing_args else None,
             "selected_track_index": selected_index,
             "selected_track_kind": selected_kind,
+            "metronome": bool(metronome_args[0]) if metronome_args else None,
+            "loop": bool(loop_args[0]) if loop_args else None,
+            "loop_start": float(loop_start_args[0]) if loop_start_args else None,
+            "loop_length": float(loop_length_args[0]) if loop_length_args else None,
             "return_tracks": [],
             "master_track": None,
         }
@@ -1971,6 +1995,57 @@ class AbletonOSCClient:
         # Two writes; the caller reads both back, so half a change shows up as a failed verification.
         return (self._send_only("/live/song/set/signature_numerator", [int(numerator)])
                 and self._send_only("/live/song/set/signature_denominator", [int(denominator)]))
+
+    def get_metronome(self) -> Optional[bool]:
+        """Query Live's metronome (click track) state."""
+        args = self._query_args("/live/song/get/metronome")
+        return bool(args[0]) if args else None
+
+    def set_metronome(self, enabled: bool) -> bool:
+        """Enable or disable Live's metronome click."""
+        return self._send_only("/live/song/set/metronome", [bool(enabled)])
+
+    def get_loop(self) -> Optional[bool]:
+        """Query whether Live's arrangement loop is active."""
+        args = self._query_args("/live/song/get/loop")
+        return bool(args[0]) if args else None
+
+    def set_loop(self, enabled: bool) -> bool:
+        """Enable or disable Live's arrangement loop."""
+        return self._send_only("/live/song/set/loop", [bool(enabled)])
+
+    def get_loop_bounds(self) -> Optional[tuple[float, float]]:
+        """Query arrangement loop start beat and length in beats."""
+        start_args = self._query_args("/live/song/get/loop_start")
+        len_args = self._query_args("/live/song/get/loop_length")
+        if start_args and len_args:
+            return float(start_args[0]), float(len_args[0])
+        return None
+
+    def set_loop_bounds(self, start_beats: float, length_beats: float) -> bool:
+        """Set arrangement loop start beat and length in beats."""
+        return (
+            self._send_only("/live/song/set/loop_start", [max(0.0, float(start_beats))])
+            and self._send_only("/live/song/set/loop_length", [max(0.25, float(length_beats))])
+        )
+
+    def get_track_color_index(self, track_index: int) -> Optional[int]:
+        """Query Live's track color index (0-69 palette index)."""
+        args = self._track_scalar("/live/track/get/color_index", track_index)
+        return int(args) if args is not None else None
+
+    def set_track_color_index(self, track_index: int, color_index: int) -> bool:
+        """Set Live's track color index (0-69 palette index)."""
+        return self._send_track_property("color_index", track_index, max(0, min(69, int(color_index))))
+
+    def get_track_fold_state(self, track_index: int) -> Optional[bool]:
+        """Query whether a group track is folded (collapsed)."""
+        args = self._track_scalar("/live/track/get/fold_state", track_index)
+        return bool(args) if args is not None else None
+
+    def set_track_fold_state(self, track_index: int, folded: bool) -> bool:
+        """Fold (collapse) or unfold (expand) a group track."""
+        return self._send_track_property("fold_state", track_index, int(1 if folded else 0))
 
     def duplicate_clip_to_arrangement(self, track_index: int, clip_slot_index: int, destination_time_beats: float) -> bool:
         """Duplicate a Session View clip into the Arrangement timeline at the specified beat."""

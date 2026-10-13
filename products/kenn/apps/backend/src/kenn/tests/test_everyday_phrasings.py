@@ -42,7 +42,7 @@ def test_the_everyday_phrasing_means_the_plain_command(snapshot, request_text, a
 
 @pytest.mark.parametrize("request_text", [
     "turn it off",            # no track named; stays with the context rules
-    "metronome off",          # not a track
+    "turn the fan off",       # not a track or song control
     "turn the reverb off",    # a device, not a track mute
     "kick to -9",             # bare number with "to": still asks, as before
     "leave the synth alone",  # "alone" without "hear" is not a solo
@@ -50,6 +50,12 @@ def test_the_everyday_phrasing_means_the_plain_command(snapshot, request_text, a
 def test_look_alikes_are_not_rewritten_into_a_change(snapshot, request_text) -> None:
     parsed = parse_request(request_text, snapshot)
     assert parsed["action"] is None or parsed["missing_fields"], parsed
+
+
+def test_metronome_off_is_a_song_action_not_a_track_change(snapshot) -> None:
+    parsed = parse_request("metronome off", snapshot)
+    assert parsed["action"] == "set_metronome"
+    assert parsed["desired_value"] is False
 
 
 def test_a_marker_placed_here_is_not_named_here(snapshot) -> None:

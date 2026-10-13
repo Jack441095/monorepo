@@ -48,6 +48,8 @@ from kenn.core.live_intent import (
     _named_device_focus,
     _named_scene,
     _tempo_request,
+    _metronome_request,
+    _loop_request,
     _track_to_return_send,
     _time_signature_request,
 )
@@ -164,6 +166,14 @@ def resolve_session_rules(
     tempo = _tempo_request(text, snapshot)
     if tempo is not None:
         base.update(tempo)
+        return base
+    metronome = _metronome_request(text, snapshot)
+    if metronome is not None:
+        base.update(metronome)
+        return base
+    loop = _loop_request(text, snapshot)
+    if loop is not None:
+        base.update(loop)
         return base
     # Scene launch phrasing ("play scene 2") must be checked before the
     # generic transport play/stop match below, since both contain the bare

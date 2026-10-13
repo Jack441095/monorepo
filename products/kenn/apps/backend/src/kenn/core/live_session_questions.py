@@ -19,10 +19,10 @@ _TRACK_NUMBER = re.compile(r"\btrack\s*#?\s*(\d+)\b", re.I)
 # "What's the current pan on the drum bus?" was answered "'Drum Bus' has: Compressor." and "is the bass muted?" got
 # "not sure" (27 Sept 2026): a track's level, pan or mute/solo/arm state is read straight from the set.
 _TRACK_STATE_QUESTION = re.compile(
-    r"\bwhat(?:'s|s|\s+is)\s+(?:the\s+)?(?:current\s+)?(?P<field>pan|panning|volume|level|fader)\s+(?:on|of|for)\s+(?P<name>.+?)\s*\??\s*$"
-    r"|\bwhat(?:'s|s|\s+is)\s+(?:the\s+)?(?P<name2>.+?)(?:'s|s')\s+(?P<field2>pan|panning|volume|level|fader)\s*\??\s*$"
+    r"\bwhat(?:'s|s|\s+is)\s+(?:the\s+)?(?:current\s+)?(?P<field>pan|panning|volume|level|fader|color)\s+(?:on|of|for)\s+(?P<name>.+?)\s*\??\s*$"
+    r"|\bwhat(?:'s|s|\s+is)\s+(?:the\s+)?(?P<name2>.+?)(?:'s|s'|\s+)(?P<field2>pan|panning|volume|level|fader|color)\s*\??\s*$"
     r"|\bhow\s+loud\s+is\s+(?P<name3>.+?)\s*\??\s*$"
-    r"|^\s*(?:is|are)\s+(?P<name4>.+?)\s+(?P<state>muted|soloed|armed|(?:record[\s-]?)?armed|panned|cent(?:red|ered))\s*\??\s*$"
+    r"|^\s*(?:is|are)\s+(?P<name4>.+?)\s+(?P<state>muted|soloed|armed|(?:record[\s-]?)?armed|panned|cent(?:red|ered)|folded|unfolded|collapsed|expanded)\s*\??\s*$"
     # "check the lead vocal volume" as the request itself, not "solo the snare to check its level".
     r"|(?:^|(?:can|could|would)\s+you\s+|\bplease\s+|,\s*)check\s+(?:the\s+)?(?P<name5>(?!its?\b)[^,.?!]+?)\s+(?P<field5>volume|level|pan)\b",
     re.I,
@@ -49,17 +49,33 @@ def _question_kind(question: str) -> str | None:
         return "connection"
     if re.search(r"\bhow many\s+(?:live\s+)?tracks?\b", lower):
         return "track_count"
-    if _TRACK_NUMBER.search(lower) and re.search(r"\b(?:what|which)\s+(?:is|are)\s+track\b|\bwhat(?:'s|s)\s+track\b", lower):
+    # Track identity: recognize "what is track 12 named?", "what is the name of track 12?", "track 12 name".
+    if _TRACK_NUMBER.search(lower) and (
+        re.search(r"\b(?:what|which)\s+(?:is|are)\s+track\b|\bwhat(?:'s|s)\s+track\b", lower)
+        or re.search(r"\b(?:name|called)\s+(?:of\s+)?track\b|\btrack\b.*?\b(?:name|named|called)\b", lower)
+    ):
         return "track_identity"
+    # Metronome and arrangement loop questions: inspect current playback helpers.
+    if not re.search(r"\b(?:set|turn|toggle|enable|disable|switch)\b", lower) and (
+        re.search(r"\b(?:is\s+(?:the\s+)?(?:metronome|click(?:\s+track)?)|metronome\s+status|click\s+status|is\s+click\s+(?:on|off))\b", lower)
+    ):
+        return "metronome_state"
+    if not re.search(r"\b(?:set|turn|toggle|enable|disable|switch)\b", lower) and (
+        re.search(r"\b(?:is\s+(?:the\s+)?(?:(?:arrangement\s+)?loop|looping)\s+(?:on|off|active|enabled)|(?:what|which)(?:'s|\s+is)\s+(?:the\s+)?(?:loop\s+bounds?|loop\s+length|loop\s+start|loop\s+range))\b", lower)
+    ):
+        return "loop_state"
     # Asking what the tempo is, not any sentence with "tempo" in it ("stretch samples to fit my track's tempo" got
     # "The current tempo is 120 BPM", 26 Sept 2026).
     # Tempo and time-signature changes are Live changes now (27 Sept 2026), so only questions land here.
     # "what bpm is good for house music?" is advice, not this set's tempo.
     advice = re.search(r"\b(?:good|best|right|ideal|should|usually|typical(?:ly)?|normal|common|for\s+(?:a\s+)?[\w-]+\s+(?:music|track|song|beat)s?"
                        r"|genre|house|techno|trance|dnb|drum\s+and\s+bass|dubstep|trap|hip\s*hop|garage|ambient|pop)\b", lower)
-    if not advice and not re.search(r"\b(?:set|change|make|put|switch)\b", lower) and (re.search(r"\b(?:what|which)(?:'?s|\s+is|\s+are)?\s+(?:the\s+|my\s+|our\s+|this\s+)?(?:current\s+|song'?s?\s+|set'?s?\s+)?"
-                 r"(?:tempo|bpm|time\s+signature|meter)\b|\bhow\s+fast\s+is\b|^\s*(?:the\s+)?(?:tempo|bpm|time\s+signature)\s*\??\s*$"
-                 r"|\b(?:tempo|bpm)\s+(?:and|&)\s+(?:the\s+)?time\s+signature\b", lower)):
+    if not advice and not re.search(r"\b(?:set|change|make|put|switch)\b", lower) and (
+        re.search(r"\b(?:what|which)(?:'?s|\s+is|\s+are)?\s+(?:the\s+|my\s+|our\s+|this\s+)?(?:current\s+|song'?s?\s+|set'?s?\s+|project'?s?\s+|session'?s?\s+)?"
+                 r"(?:tempo|bpm|time\s+signature|meter|key|scale)\b|\bhow\s+fast\s+is\b|^\s*(?:the\s+)?(?:tempo|bpm|time\s+signature|key|scale)\s*\??\s*$"
+                 r"|\b(?:tempo|bpm)\s+(?:and|&)\s+(?:the\s+)?(?:time\s+signature|meter|key|scale)\b", lower)
+        or re.search(r"\b(?:what\s+key|what's\s+the\s+key|what\s+is\s+the\s+key|what\s+scale|which\s+key)\b", lower)
+    ):
         return "tempo_signature"
     if (
         "selected track" in lower
@@ -78,9 +94,9 @@ def _question_kind(question: str) -> str | None:
     return None
 
 
-def _track_state_answer(question: str, tracks: list[dict[str, Any]]) -> dict[str, Any]:
+def _track_state_answer(question: str, tracks: list[dict[str, Any]], *, service: LiveActionService | None = None) -> dict[str, Any]:
     from kenn.core import volume_law
-    from kenn.core.live_intent import _extract_track_phrase, _find_track
+    from kenn.core.live_intent import _extract_track_phrase, _find_track, _find_numbered_track
 
     match = _TRACK_STATE_QUESTION.search(" ".join(str(question).split()))
     groups = match.groupdict() if match else {}
@@ -89,26 +105,80 @@ def _track_state_answer(question: str, tracks: list[dict[str, Any]]) -> dict[str
     state = str(groups.get("state") or "").lower()
     if groups.get("name3"):
         field = "volume"
-    found = _extract_track_phrase(phrase, tracks)
-    track, ambiguous, error = _find_track(found, tracks) if found else (None, [], "no track")
+
+    # Inspect master bus mixer when requested. Live's master track lives outside the ordinary song.tracks array.
+    lower_phrase = phrase.strip().lower()
+    if lower_phrase in {"master", "the master", "master track", "the master track"} or re.search(r"\bmaster\s+(?:volume|fader|level|pan)\b", question, re.I):
+        client = getattr(service, "client", None)
+        mixer = client.get_bus_mixer("master", -1) if client and hasattr(client, "get_bus_mixer") else {}
+        if mixer and mixer.get("success"):
+            raw = mixer.get("volume")
+            level = volume_law.raw_to_db(float(raw)) if isinstance(raw, (int, float)) and not isinstance(raw, bool) else None
+            shown = "-inf dB" if level == float("-inf") else f"{level:.1f} dB" if level is not None else "an unreadable level"
+            pan = float(mixer.get("panning") or 0.0)
+            where = "centred" if abs(pan) < 0.005 else f"panned {abs(pan) * 100:.0f}% {'left' if pan < 0 else 'right'}"
+            if field in {"pan", "panning"} or state in {"panned", "centred", "centered"}:
+                return {"answer": f"The master track is {where}.", "track": {"kind": "master", "name": "Master"}, "pan": pan}
+            return {"answer": f"The master track is at {shown}.", "track": {"kind": "master", "name": "Master"}, "volume_db": level}
+
+    # Numbered track resolution: musicians frequently address tracks as "track 12" rather than recalling exact names.
+    num_match = re.search(r"\btrack\s*#?\s*(\d+)\b", phrase, re.I) or re.search(r"\btrack\s*#?\s*(\d+)\b", question, re.I)
+    if num_match:
+        track, error = _find_numbered_track(int(num_match.group(1)), tracks)
+        ambiguous = []
+    else:
+        found = _extract_track_phrase(phrase, tracks)
+        track, ambiguous, error = _find_track(found, tracks) if found else (None, [], "no track")
+
     if track is None or ambiguous or error:
         return {"status": "clarification_required", "answer": "Which track do you mean? Nothing changed."}
+
     name = str(track.get("name"))
+    track_idx = track.get("index")
+    label = f"Track {track_idx + 1} ('{name}')" if (num_match and isinstance(track_idx, int)) else f"'{name}'"
+
     if field in {"volume", "level", "fader"} or (not state and not field):
         raw = track.get("volume")
         level = volume_law.raw_to_db(float(raw)) if isinstance(raw, (int, float)) and not isinstance(raw, bool) else None
         if level is None:
-            return {"status": "clarification_required", "answer": f"I can't read '{name}''s level right now."}
+            return {"status": "clarification_required", "answer": f"I can't read {label}'s level right now."}
         shown = "-inf dB" if level == float("-inf") else f"{level:.1f} dB"
-        return {"answer": f"'{name}' is at {shown}.", "track": {"index": track.get("index"), "name": name}, "volume_db": level}
+        return {"answer": f"{label} is at {shown}.", "track": {"index": track.get("index"), "name": name}, "volume_db": level}
     if field in {"pan", "panning"} or state in {"panned", "centred", "centered"}:
         pan = float(track.get("pan") or 0.0)
         where = "centred" if abs(pan) < 0.005 else f"panned {abs(pan) * 100:.0f}% {'left' if pan < 0 else 'right'}"
-        return {"answer": f"'{name}' is {where}.", "track": {"index": track.get("index"), "name": name}, "pan": pan}
+        return {"answer": f"{label} is {where}.", "track": {"index": track.get("index"), "name": name}, "pan": pan}
+    if state in {"folded", "unfolded", "collapsed", "expanded"}:
+        client = getattr(service, "client", None)
+        is_folded = None
+        if client and hasattr(client, "get_track_fold_state") and isinstance(track.get("index"), int):
+            is_folded = client.get_track_fold_state(track["index"])
+        if is_folded is None:
+            is_folded = bool(track.get("fold_state", False))
+        fold_word = "folded" if is_folded else "unfolded"
+        is_state = is_folded if state in {"folded", "collapsed"} else not is_folded
+        return {
+            "answer": f"{'Yes' if is_state else 'No'}, {label} is {fold_word}.",
+            "track": {"index": track.get("index"), "name": name},
+            "folded": is_folded,
+        }
+    if field == "color":
+        client = getattr(service, "client", None)
+        color_idx = None
+        if client and hasattr(client, "get_track_color_index") and isinstance(track.get("index"), int):
+            color_idx = client.get_track_color_index(track["index"])
+        if color_idx is None:
+            color_idx = track.get("color_index")
+        shown_color = f"color palette index {color_idx}" if color_idx is not None else "an unspecified color"
+        return {
+            "answer": f"{label} is set to {shown_color}.",
+            "track": {"index": track.get("index"), "name": name},
+            "color_index": color_idx,
+        }
     key = {"muted": "muted", "soloed": "soloed"}.get(state, "armed")
     on = bool(track.get(key))
     word = {"muted": "muted", "soloed": "soloed"}.get(state, "armed")
-    return {"answer": f"{'Yes' if on else 'No'}, '{name}' is {'' if on else 'not '}{word}.",
+    return {"answer": f"{'Yes' if on else 'No'}, {label} is {'' if on else 'not '}{word}.",
             "track": {"index": track.get("index"), "name": name}, key: on}
 
 
@@ -186,7 +256,7 @@ def answer_live_session_question(
     }
 
     if kind == "track_state":
-        payload.update(_track_state_answer(question, tracks))
+        payload.update(_track_state_answer(question, tracks, service=live))
         return payload
     if kind == "connection":
         backend = str(snapshot.get("backend") or getattr(live.client, "backend_name", "Live backend"))
@@ -216,14 +286,56 @@ def answer_live_session_question(
         tempo = snapshot.get("tempo")
         numerator = snapshot.get("signature_numerator")
         denominator = snapshot.get("signature_denominator")
+        root_note = snapshot.get("root_note")
+        scale_name = snapshot.get("scale_name")
         tempo_text = f"{float(tempo):g} BPM" if isinstance(tempo, (int, float)) else "an unavailable tempo"
         signature_text = f"{numerator}/{denominator}" if numerator is not None and denominator is not None else "an unavailable time signature"
-        answer = f"The current tempo is {tempo_text} and the time signature is {signature_text}."
+
+        # When Live exposes root note (0-11 pitch class) and scale name, incorporate key into the response.
+        pitch_names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        scale_text = ""
+        if isinstance(root_note, int) and 0 <= root_note < 12 and scale_name:
+            scale_text = f" in {pitch_names[root_note]} {scale_name}"
+
+        answer = f"The current tempo is {tempo_text} and the time signature is {signature_text}{scale_text}."
         payload.update({
             "answer": answer,
             "tempo": tempo,
             "signature_numerator": numerator,
             "signature_denominator": denominator,
+            "root_note": root_note,
+            "scale_name": scale_name,
+        })
+    elif kind == "metronome_state":
+        metronome_on = snapshot.get("metronome")
+        if metronome_on is None:
+            client = getattr(live, "client", None)
+            if client and hasattr(client, "get_metronome"):
+                metronome_on = client.get_metronome()
+        state_text = "on" if metronome_on else "off"
+        answer = f"The metronome (click) is currently {state_text}."
+        payload.update({"answer": answer, "metronome": bool(metronome_on)})
+    elif kind == "loop_state":
+        loop_on = snapshot.get("loop")
+        start = snapshot.get("loop_start")
+        length = snapshot.get("loop_length")
+        if loop_on is None or start is None or length is None:
+            client = getattr(live, "client", None)
+            if client:
+                if loop_on is None and hasattr(client, "get_loop"):
+                    loop_on = client.get_loop()
+                if (start is None or length is None) and hasattr(client, "get_loop_bounds"):
+                    bounds = client.get_loop_bounds()
+                    if bounds:
+                        start, length = bounds
+        state_text = "enabled" if loop_on else "disabled"
+        bounds_text = f" (beats {float(start):g} to {float(start) + float(length):g}, length {float(length):g} beats)" if start is not None and length is not None else ""
+        answer = f"The arrangement loop is currently {state_text}{bounds_text}."
+        payload.update({
+            "answer": answer,
+            "loop": bool(loop_on),
+            "loop_start": float(start) if start is not None else None,
+            "loop_length": float(length) if length is not None else None,
         })
     elif kind == "selected_track":
         selected_index = snapshot.get("selected_track_index")

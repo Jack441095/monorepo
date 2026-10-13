@@ -60,11 +60,11 @@ logger = logging.getLogger(__name__)
 
 LLM_PLAN_SCHEMA = "kenn.ableton_llm_plan.v1"
 DEVICE_PARAMETER_ACTIONS = {"set_device_parameter"}
-TRACK_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "rename_track"}
+TRACK_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "rename_track", "set_track_color", "set_track_fold"}
 TRACK_CREATION_ACTIONS = {"create_midi_track", "create_audio_track"}
 RETURN_TRACK_CREATION_ACTIONS = set(SUPPORTED_RETURN_TRACK_CREATION_ACTIONS)
 TRANSPORT_ACTIONS = {"transport_play", "transport_stop"}
-SONG_ACTIONS = {"set_tempo", "set_time_signature"}
+SONG_ACTIONS = {"set_tempo", "set_time_signature", "set_metronome", "set_loop", "set_loop_bounds"}
 VIEW_ACTIONS = {"focus_track", "focus_device"}
 LLM_PLAN_FIELDS = frozenset({
     "schema", "action", "track_index", "track_name", "device_index", "device_name",
@@ -311,9 +311,30 @@ def _track_by_index(snapshot: dict[str, Any], index: int, name: str = "") -> dic
 
 
 def _song_plan(plan: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, Any]:
-    """A planner's tempo in BPM (absolute or relative) or time signature as "3/4", checked against Live's limits."""
+    """A planner's tempo, time signature, metronome, loop toggle, or loop bounds checked against Live's limits."""
+    action = plan.get("action")
     value = plan.get("value")
-    if plan.get("action") == "set_time_signature":
+    if action == "set_metronome":
+        if not isinstance(value, bool):
+            return {"ok": False, "error": "A metronome plan needs a boolean value."}
+        return {"ok": True, "plan": dict(plan, value=value, unit="boolean", relative=False)}
+    if action == "set_loop":
+        if not isinstance(value, bool):
+            return {"ok": False, "error": "A loop plan needs a boolean value."}
+        return {"ok": True, "plan": dict(plan, value=value, unit="boolean", relative=False)}
+    if action == "set_loop_bounds":
+        if isinstance(value, dict):
+            start = float(value.get("loop_start", 0.0))
+            length = float(value.get("loop_length", 16.0))
+        elif isinstance(value, (int, float)) and not isinstance(value, bool):
+            start = 0.0
+            length = float(value)
+        else:
+            return {"ok": False, "error": "A loop bounds plan needs a numeric length or bounds dict."}
+        if start < 0.0 or length <= 0.0:
+            return {"ok": False, "error": "Loop bounds require start >= 0 and length > 0."}
+        return {"ok": True, "plan": dict(plan, value={"loop_start": round(start, 3), "loop_length": round(length, 3)}, unit="beats", relative=False)}
+    if action == "set_time_signature":
         match = re.fullmatch(r"\s*(\d{1,2})\s*/\s*(\d{1,2})\s*", str(value or ""))
         if match is None or plan.get("relative"):
             return {"ok": False, "error": "A time-signature plan needs an absolute value like \"3/4\"."}
@@ -696,8 +717,16 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
             return {"ok": True, "plan": dict(plan)}
         if "value" not in plan or not isinstance(plan.get("value"), (bool, int, float)):
             return {"ok": False, "error": "The LLM plan has no typed track value."}
-        if action in {"set_mute", "set_solo", "set_arm"} and not isinstance(plan.get("value"), bool):
+        if action in {"set_mute", "set_solo", "set_arm", "set_track_fold"} and not isinstance(plan.get("value"), bool):
             return {"ok": False, "error": f"The LLM plan value for {action} must be boolean."}
+        if action == "set_track_color":
+            try:
+                color_idx = int(plan.get("value"))
+            except (TypeError, ValueError):
+                return {"ok": False, "error": "The LLM plan value for set_track_color must be an integer color index."}
+            if not 0 <= color_idx <= 69:
+                return {"ok": False, "error": "The LLM plan value for set_track_color must be within 0 to 69."}
+            return {"ok": True, "plan": dict(plan, value=color_idx, unit="color_index", relative=False)}
         if action in {"set_volume", "set_pan"}:
             if isinstance(plan.get("value"), bool) or not math.isfinite(float(plan.get("value"))):
                 return {"ok": False, "error": f"The LLM plan value for {action} must be finite numeric data."}
@@ -1712,7 +1741,7 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
             "intent": {"action": proposal.get("action"), "track": target, "eq_band": proposal.get("eq_band")},
         })
         return response
-    if kind == "tempo":
+    if kind in {"tempo", "song"}:
         response.update({
             "status": "confirmation_required",
             "answer": (f"I can change the {proposal.get('parameter') or 'tempo'} from {proposal.get('before_display')} to "
@@ -1721,7 +1750,7 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
             "proposal": proposal,
             "confirmation_required": True,
             "proposal_kind": kind,
-            "intent": {"action": proposal.get("action"), "value": proposal.get("after"), "unit": "bpm"},
+            "intent": {"action": proposal.get("action"), "value": proposal.get("after"), "unit": proposal.get("unit", "bpm")},
         })
         return response
     if kind == "scene":
@@ -3886,6 +3915,35 @@ def _handle_command_impl(
         if _values_match_bpm(proposal.get("before"), proposal.get("after")):
             return _clarification(response, intent, f"The tempo is already {float(proposal['after']):g} BPM. Nothing changed.")
         return _proposal_response(response, proposal, kind="tempo")
+    if action == "set_metronome":
+        result = live.propose_metronome_action(bool(intent.get("desired_value")), session_id=response["session_id"])
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a Live metronome proposal."))
+        proposal = result["proposal"]
+        if proposal.get("before") == proposal.get("after"):
+            return _clarification(response, intent, f"The metronome is already {'on' if proposal['after'] else 'off'}. Nothing changed.")
+        return _proposal_response(response, proposal, kind="song")
+    if action == "set_loop":
+        result = live.propose_loop_action(bool(intent.get("desired_value")), session_id=response["session_id"])
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a Live loop proposal."))
+        proposal = result["proposal"]
+        if proposal.get("before") == proposal.get("after"):
+            return _clarification(response, intent, f"The arrangement loop is already {'active' if proposal['after'] else 'inactive'}. Nothing changed.")
+        return _proposal_response(response, proposal, kind="song")
+    if action == "set_loop_bounds":
+        bounds = intent.get("desired_value") or {}
+        result = live.propose_loop_bounds_action(
+            start_beats=bounds.get("loop_start", bounds.get("start")),
+            length_beats=bounds.get("loop_length", bounds.get("length")),
+            session_id=response["session_id"],
+        )
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a Live loop bounds proposal."))
+        proposal = result["proposal"]
+        if proposal.get("before") == proposal.get("after"):
+            return _clarification(response, intent, f"The loop bounds are already {proposal['after_display']}. Nothing changed.")
+        return _proposal_response(response, proposal, kind="song")
     if action == "transport_play" or action == "transport_stop":
         result = live.propose_transport_action(action, session_id=response["session_id"])
         return _proposal_response(response, result["proposal"], kind="transport") if result.get("ok") else _clarification(response, intent, result.get("error", "I could not create a Live proposal."))

@@ -78,6 +78,8 @@ CHAIN_ACTIONS = frozenset({
     "set_mute",
     "set_pan",
     "set_solo",
+    "set_track_color",
+    "set_track_fold",
     # Named by _return_mixer_request, which re-enters this same chain with a
     # stand-in track and renames the three track actions afterwards.
     "set_return_mute",
@@ -176,6 +178,8 @@ REACHABLE = {
     "set_pan": "hats hard left",
     "set_send": "send the lead vocal to A-Reverb at 25%",
     "set_solo": "solo the kick",
+    "set_track_color": "make the kick red",
+    "set_track_fold": "fold the kick",
     "set_volume": "set the hats to -3 dB",
     "stop_clip": "stop clip slot 2 on track 3",
     "transport_play": "play",

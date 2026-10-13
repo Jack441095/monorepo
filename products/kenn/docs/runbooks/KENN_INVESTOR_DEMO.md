@@ -128,6 +128,49 @@ Record a complete successful take only after the sequence passes. Verify video
 playback, readable proposals and Live values, audible before/after and the
 five-minute limit. Reopen the reset set afterwards.
 
+### Record the video
+
+Jack clarified on 12 October that the immediate deliverable is a video and a
+bug-finding walkthrough. The SaaS expansion report supplies the positioning:
+grounded advice, inspected Live changes and exact Undo. Account/billing,
+cloud processing, collaboration and other DAWs remain roadmap claims. The
+video demonstrates the local web UI and Ableton path that actually passes.
+
+During the supervised session, arrange the web UI and Live side by side with
+proposal targets, receipts and Live values readable. Set `KENN_CAPTURE_DIR` to
+an absolute local directory outside every Git checkout. Use a new take name
+each time. The recorder captures the screen and audio; the operator performs
+every command, Apply and Undo in the browser.
+
+First record a ten-second sound check while playing the demo and speaking:
+
+```sh
+python3 tooling/scripts/record_demo_live.py \
+  --out-dir "$KENN_CAPTURE_DIR/sound-check-01" --seconds 10 --microphone
+```
+
+Play back `showcase.mp4` and verify both Live's playback and narration are
+audible, without feedback or clipping. The system-audio and microphone flags
+request both sources; combined audio routing on this Mac still requires that
+playback check. If either source is missing, fix the capture setup before a
+full take. Do not change the producer's audio routing unattended.
+
+For the qualified showcase, run the same recorder with a fresh output directory
+and `--seconds 285 --microphone`. Start the operator script as recording starts;
+the requested 285 s includes response waits, listening and Undo. A run that has
+not finished when recording stops fails. Preserve it and try again after fixing
+the cause; do not shorten the video to hide waiting or errors.
+
+Each directory retains `raw.mov`, the complete encoded `showcase.mp4`, and
+`capture.json` with durations, audio streams and file hashes. The MP4 mixes all
+captured audio into one playback track, preserving each source's start time so
+Live and narration stay aligned; the raw file retains the original streams.
+An audio-free or over-300 s movie fails media checks. A media-valid receipt is
+**unreviewed**: it does not prove audible sound, correct answers, successful Live
+writes or restoration. Link the take to its exact qualified build in the rehearsal log,
+watch it end to end, and record those human checks before accepting the video.
+The older `record_demo_video.py` filename uses this same passive recorder.
+
 ## Twenty-step qualification script
 
 Only text in `code` is typed into KENN. Lines that say Show, Explain or narrate

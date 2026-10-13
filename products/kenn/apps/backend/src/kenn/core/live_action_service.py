@@ -147,11 +147,17 @@ SUPPORTED_TRACK_ACTIONS = {
     "set_solo": ("soloed", "boolean", None),
     "set_arm": ("armed", "boolean", None),
     "rename_track": ("name", "string", None),
+    # Live 12 exposes 70 indexed track colors (0 to 69).
+    "set_track_color": ("color_index", "color_index", (0, 69)),
+    # Live groups and nested tracks can be folded (hidden) or unfolded (visible).
+    "set_track_fold": ("fold_state", "boolean", None),
 }
 SUPPORTED_TRACK_CREATION_ACTIONS = {"create_midi_track", "create_audio_track"}
 SUPPORTED_RETURN_TRACK_CREATION_ACTIONS = {"create_return_track"}
 SUPPORTED_TRANSPORT_ACTIONS = {"transport_play", "transport_stop"}
 SUPPORTED_TEMPO_ACTIONS = {"set_tempo", "set_time_signature"}
+# Song-level session controls: metronome click toggle, arrangement loop toggle, and loop bounds (in beats).
+SUPPORTED_SONG_ACTIONS = {"set_metronome", "set_loop", "set_loop_bounds"}
 # Return-track mixer changes (27 Sept 2026), written through /live/kenn/set/return_mixer and read back through
 # /live/kenn/get/bus_mixer: action -> (Remote Script field, proposal parameter).
 SUPPORTED_RETURN_MIXER_ACTIONS = {"set_return_volume": ("volume", "volume"), "set_return_pan": ("panning", "pan"),
@@ -218,6 +224,15 @@ def _view_text(proposal: dict[str, Any]) -> str:
     )
 
 
+def _normalize_bounds(bounds: Any) -> dict[str, float] | None:
+    """Normalize tuple/list (start, len) or dict into {'loop_start': float, 'loop_length': float}."""
+    if isinstance(bounds, (tuple, list)) and len(bounds) >= 2:
+        return {"loop_start": float(bounds[0]), "loop_length": float(bounds[1])}
+    if isinstance(bounds, dict) and "loop_start" in bounds and "loop_length" in bounds:
+        return {"loop_start": float(bounds["loop_start"]), "loop_length": float(bounds["loop_length"])}
+    return None
+
+
 def _track_structure_fingerprint(state: dict[str, Any]) -> str:
     """Hash the ordered regular-track identity used by structural writes."""
     tracks = [track for track in state.get("tracks", []) if isinstance(track, dict)]
@@ -241,7 +256,7 @@ def _track_creation_text(proposal: dict[str, Any]) -> str:
 def already_there(action: str, track_name: str, before: Any, value: Any) -> str | None:
     """"'Synth' is already centred." when a single request would change nothing ("centre" on a centred synth proposed
     "from centre to centre"). Recipes and undo keep their no-op steps: one step already in place mustn't stop the rest."""
-    if action not in {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm"} or not _values_match(before, value):
+    if action not in {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "set_track_color", "set_track_fold"} or not _values_match(before, value):
         return None
     return f"'{track_name}' is already {_state_words(action, before)}. Nothing to change."
 
@@ -252,6 +267,10 @@ def _state_words(action: str, value: Any) -> str:
         return f"at {level} dB" if level is not None else "at that level"
     if action == "set_pan":
         return "centred" if abs(float(value)) < 0.005 else f"panned {abs(float(value)) * 100:.0f}% {'left' if value < 0 else 'right'}"
+    if action == "set_track_color":
+        return f"color {value}"
+    if action == "set_track_fold":
+        return "folded" if value else "unfolded"
     words = {"set_mute": ("muted", "unmuted"), "set_solo": ("soloed", "not soloed"), "set_arm": ("armed", "not armed")}
     return words[action][0 if value else 1]
 
@@ -339,6 +358,10 @@ def _values_match(expected: Any, actual: Any) -> bool:
         return expected is actual
     if isinstance(expected, (int, float)) and isinstance(actual, (int, float)):
         return math.isclose(float(expected), float(actual), rel_tol=0.0, abs_tol=1e-4)
+    if isinstance(expected, dict) and isinstance(actual, dict):
+        if set(expected.keys()) != set(actual.keys()):
+            return False
+        return all(_values_match(expected[k], actual[k]) for k in expected)
     return expected == actual
 
 
@@ -407,7 +430,7 @@ def _receipt_supports_undo(receipt: dict[str, Any]) -> bool:
     action = str(receipt.get("action", ""))
     undoable = (
         set(SUPPORTED_TRACK_ACTIONS) | set(SUPPORTED_SEND_ACTIONS) | set(SUPPORTED_TRANSPORT_ACTIONS)
-        | set(SUPPORTED_TEMPO_ACTIONS) | set(SUPPORTED_RETURN_MIXER_ACTIONS) | set(SUPPORTED_SCENE_ACTIONS) | set(SUPPORTED_CLIP_ACTIONS) | set(SUPPORTED_LOCATOR_ACTIONS)
+        | set(SUPPORTED_TEMPO_ACTIONS) | set(SUPPORTED_SONG_ACTIONS) | set(SUPPORTED_RETURN_MIXER_ACTIONS) | set(SUPPORTED_SCENE_ACTIONS) | set(SUPPORTED_CLIP_ACTIONS) | set(SUPPORTED_LOCATOR_ACTIONS)
         | set(SUPPORTED_VIEW_ACTIONS)
         | {"set_device_parameter", "set_eq_band_tuning_gain", "insert_device", "insert_device_with_parameter"}
     )
@@ -614,6 +637,13 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 return {"ok": False, "error": "rename_track requires a non-empty track name."}
             if len(value) > 128:
                 return {"ok": False, "error": "Track names may contain at most 128 characters."}
+        elif unit == "color_index":
+            try:
+                value = int(value)
+            except (TypeError, ValueError):
+                return {"ok": False, "error": f"{action} requires an integer color index."}
+            if not valid_range[0] <= value <= valid_range[1]:
+                return {"ok": False, "error": f"Live color indices run from {valid_range[0]} to {valid_range[1]}."}
         else:
             try:
                 value = float(value)
@@ -629,7 +659,12 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 }
         before = track.get(field)
         if before is None:
-            return {"ok": False, "error": f"Live snapshot has no readable '{field}' value for this track."}
+            if action == "set_track_color" and hasattr(self.client, "get_track_color_index"):
+                before = self.client.get_track_color_index(int(track_index))
+            elif action == "set_track_fold" and hasattr(self.client, "get_track_fold_state"):
+                before = self.client.get_track_fold_state(int(track_index))
+            if before is None:
+                return {"ok": False, "error": f"Live snapshot has no readable '{field}' value for this track."}
         if action == "rename_track":
             if str(value).casefold() == str(before).casefold():
                 return {"ok": False, "error": "The new track name is identical to the current name."}
@@ -644,6 +679,15 @@ class LiveActionService(Tier2Tier3ControlMixin):
             )
             if duplicate is not None:
                 return {"ok": False, "error": "The new track name already belongs to another Live track."}
+        extra_fields: dict[str, Any] = {}
+        if action == "set_volume":
+            extra_fields.update(_fader_db_fields(before, value))
+        elif action == "set_track_color":
+            extra_fields["before_display"] = f"Color {before}"
+            extra_fields["after_display"] = f"Color {value}"
+        elif action == "set_track_fold":
+            extra_fields["before_display"] = "Folded" if before else "Unfolded"
+            extra_fields["after_display"] = "Folded" if value else "Unfolded"
         proposal = {
             "schema": PROPOSAL_SCHEMA,
             "action_id": f"action-{uuid.uuid4().hex}",
@@ -659,8 +703,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "valid_range": list(valid_range) if valid_range else None,
             "reason": f"Explicit user request for {action} on track '{track.get('name', '')}'.",
             "evidence": [f"Current Live snapshot value: {field}={before!r}.", f"Target identity: track {track_index} '{track.get('name', '')}'."],
-            # The card showed raw fader values ("0.50 -> 0.45") beside an answer in dB; people read Live in dB.
-            **(_fader_db_fields(before, value) if action == "set_volume" else {}),
+            **extra_fields,
             "confidence": 1.0,
             "risk": "local_mutation",
             "requires_confirmation": True,
@@ -1435,6 +1478,146 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "valid_range": None,
             "reason": f"Explicit user request to set the time signature to {shown(after)}.",
             "evidence": [f"Current Live time signature: {shown(before)}."],
+            "confidence": 1.0,
+            "risk": "local_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_text(proposal))
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
+    def propose_metronome_action(self, enabled: bool, *, session_id: str) -> dict[str, Any]:
+        """Propose toggling Live's metronome click on or off."""
+        _cleanup_memory()
+        state = self.snapshot()
+        if state.get("status") in {"offline", "dispatched"}:
+            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
+        current = state.get("metronome")
+        if current is None and hasattr(self.client, "get_metronome"):
+            current = self.client.get_metronome()
+        if current is None:
+            return {"ok": False, "error": "Live didn't report its metronome state, so there's nothing to compare or undo to."}
+        before = bool(current)
+        after = bool(enabled)
+        proposal = {
+            "schema": PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": "set_metronome",
+            "operation": "set_metronome",
+            "target": "ableton_song_metronome",
+            "parameter": "metronome",
+            "before": before,
+            "after": after,
+            "before_display": "On" if before else "Off",
+            "after_display": "On" if after else "Off",
+            "unit": "boolean",
+            "valid_range": None,
+            "reason": f"Explicit user request to turn {'on' if after else 'off'} the metronome.",
+            "evidence": [f"Current Live metronome: {'on' if before else 'off'}."],
+            "confidence": 1.0,
+            "risk": "local_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_text(proposal))
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
+    def propose_loop_action(self, enabled: bool, *, session_id: str) -> dict[str, Any]:
+        """Propose enabling or disabling Live's arrangement loop."""
+        _cleanup_memory()
+        state = self.snapshot()
+        if state.get("status") in {"offline", "dispatched"}:
+            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
+        current = state.get("loop")
+        if current is None and hasattr(self.client, "get_loop"):
+            current = self.client.get_loop()
+        if current is None:
+            return {"ok": False, "error": "Live didn't report its arrangement loop state, so there's nothing to compare or undo to."}
+        before = bool(current)
+        after = bool(enabled)
+        proposal = {
+            "schema": PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": "set_loop",
+            "operation": "set_loop",
+            "target": "ableton_song_loop",
+            "parameter": "loop",
+            "before": before,
+            "after": after,
+            "before_display": "Active" if before else "Inactive",
+            "after_display": "Active" if after else "Inactive",
+            "unit": "boolean",
+            "valid_range": None,
+            "reason": f"Explicit user request to {'enable' if after else 'disable'} the arrangement loop.",
+            "evidence": [f"Current Live arrangement loop: {'active' if before else 'inactive'}."],
+            "confidence": 1.0,
+            "risk": "local_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_text(proposal))
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
+    def propose_loop_bounds_action(
+        self,
+        start_beats: float | None = None,
+        length_beats: float | None = None,
+        *,
+        session_id: str,
+    ) -> dict[str, Any]:
+        """Propose setting arrangement loop start and/or length in beats."""
+        _cleanup_memory()
+        state = self.snapshot()
+        if state.get("status") in {"offline", "dispatched"}:
+            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
+        current_bounds = _normalize_bounds(self.client.get_loop_bounds() if hasattr(self.client, "get_loop_bounds") else None)
+        if current_bounds is None:
+            # Fall back to snapshot loop_start / loop_length if available
+            cur_s = state.get("loop_start")
+            cur_l = state.get("loop_length")
+            if cur_s is not None and cur_l is not None:
+                current_bounds = {"loop_start": float(cur_s), "loop_length": float(cur_l)}
+        if current_bounds is None:
+            return {"ok": False, "error": "Live didn't report its loop bounds, so there's nothing to compare or undo to."}
+        cur_start = float(current_bounds.get("loop_start", 0.0))
+        cur_len = float(current_bounds.get("loop_length", 16.0))
+        target_start = cur_start if start_beats is None else float(start_beats)
+        target_len = cur_len if length_beats is None else float(length_beats)
+        if target_start < 0.0 or target_len <= 0.0:
+            return {"ok": False, "error": "Loop start must be non-negative and length must be greater than zero."}
+        before = {"loop_start": round(cur_start, 3), "loop_length": round(cur_len, 3)}
+        after = {"loop_start": round(target_start, 3), "loop_length": round(target_len, 3)}
+        shown = lambda b: f"Start: {b['loop_start']:g} beats, Length: {b['loop_length']:g} beats"
+        proposal = {
+            "schema": PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": "set_loop_bounds",
+            "operation": "set_loop_bounds",
+            "target": "ableton_song_loop_bounds",
+            "parameter": "loop bounds",
+            "before": before,
+            "after": after,
+            "before_display": shown(before),
+            "after_display": shown(after),
+            "unit": "beats",
+            "valid_range": None,
+            "reason": f"Explicit user request to set loop bounds to {shown(after)}.",
+            "evidence": [f"Current Live loop bounds: {shown(before)}."],
             "confidence": 1.0,
             "risk": "local_mutation",
             "requires_confirmation": True,
@@ -3809,6 +3992,11 @@ class LiveActionService(Tier2Tier3ControlMixin):
                     return {"ok": False, "error": current_error or "Live track is no longer available."}
                 field_name, _unit, _range = SUPPORTED_TRACK_ACTIONS[action]
                 current_value = current_track.get(field_name)
+                if current_value is None:
+                    if action == "set_track_color" and hasattr(self.client, "get_track_color_index"):
+                        current_value = self.client.get_track_color_index(int(target["track_index"]))
+                    elif action == "set_track_fold" and hasattr(self.client, "get_track_fold_state"):
+                        current_value = self.client.get_track_fold_state(int(target["track_index"]))
                 if not _values_match(receipt.get("readback"), current_value):
                     return {"ok": False, "error": "Live track state changed since the receipt; undo is stale."}
             return self.propose_track_action(
@@ -3867,6 +4055,34 @@ class LiveActionService(Tier2Tier3ControlMixin):
                     or not _values_match(round(float(current), 3), receipt.get("readback")):
                 return {"ok": False, "error": "Live's tempo changed since the receipt; undo is stale."}
             return self.propose_tempo_action(float(receipt.get("before")), session_id=session_id)
+        if action == "set_metronome":
+            current = self.snapshot().get("metronome")
+            if current is None and hasattr(self.client, "get_metronome"):
+                current = self.client.get_metronome()
+            if current is None or bool(current) != bool(receipt.get("requested")):
+                return {"ok": False, "error": "Live metronome state changed since the receipt; undo is stale."}
+            return self.propose_metronome_action(bool(receipt.get("before")), session_id=session_id)
+        if action == "set_loop":
+            current = self.snapshot().get("loop")
+            if current is None and hasattr(self.client, "get_loop"):
+                current = self.client.get_loop()
+            if current is None or bool(current) != bool(receipt.get("requested")):
+                return {"ok": False, "error": "Live arrangement loop state changed since the receipt; undo is stale."}
+            return self.propose_loop_action(bool(receipt.get("before")), session_id=session_id)
+        if action == "set_loop_bounds":
+            bounds = _normalize_bounds(self.client.get_loop_bounds() if hasattr(self.client, "get_loop_bounds") else None)
+            before = receipt.get("before") or {}
+            if not isinstance(bounds, dict) or not isinstance(before, dict):
+                return {"ok": False, "error": "Could not read loop bounds from Live; undo is stale."}
+            readback_bounds = receipt.get("readback") or {}
+            if not _values_match(bounds.get("loop_start"), readback_bounds.get("loop_start")) or \
+               not _values_match(bounds.get("loop_length"), readback_bounds.get("loop_length")):
+                return {"ok": False, "error": "Live loop bounds changed since the receipt; undo is stale."}
+            return self.propose_loop_bounds_action(
+                start_beats=float(before.get("loop_start", 0.0)),
+                length_beats=float(before.get("loop_length", 16.0)),
+                session_id=session_id,
+            )
         if action in SUPPORTED_SCENE_ACTIONS:
             # Firing a scene has no reversible prior state to restore to -
             # unlike a parameter change, there is no single "before" scene
@@ -4297,7 +4513,13 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 _finish_idempotency_key(key)
                 return {"ok": False, "error": error}
             field = SUPPORTED_TRACK_ACTIONS[action][0]
-            if not _values_match(track.get(field), proposal.get("before")):
+            current_field_val = track.get(field)
+            if current_field_val is None:
+                if action == "set_track_color" and hasattr(self.client, "get_track_color_index"):
+                    current_field_val = self.client.get_track_color_index(int(proposal["track_index"]))
+                elif action == "set_track_fold" and hasattr(self.client, "get_track_fold_state"):
+                    current_field_val = self.client.get_track_fold_state(int(proposal["track_index"]))
+            if not _values_match(current_field_val, proposal.get("before")):
                 _finish_idempotency_key(key)
                 return {"ok": False, "error": "Live track state changed since the proposal was created; create a new proposal."}
             writers = {
@@ -4307,6 +4529,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 "set_solo": lambda: self.client.set_track_solo(int(proposal["track_index"]), bool(proposal["after"])),
                 "set_arm": lambda: self.client.set_track_arm(int(proposal["track_index"]), bool(proposal["after"])),
                 "rename_track": lambda: self.client.set_track_name(int(proposal["track_index"]), str(proposal["after"])),
+                "set_track_color": lambda: self.client.set_track_color_index(int(proposal["track_index"]), int(proposal["after"])),
+                "set_track_fold": lambda: self.client.set_track_fold_state(int(proposal["track_index"]), bool(proposal["after"])),
             }
             try:
                 write_ok = bool(writers[action]())
@@ -4360,6 +4584,53 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 return {"ok": False, "error": "Live's tempo changed since the proposal was created; create a new proposal."}
             try:
                 write_ok = bool(self.client.set_tempo(float(proposal["after"])))
+            except Exception as exc:
+                write_ok = False
+                write_error = str(exc)
+            write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
+            timer.mark("write")
+        elif action == "set_metronome":
+            current = state.get("metronome")
+            if current is None and hasattr(self.client, "get_metronome"):
+                current = self.client.get_metronome()
+            if current is not None and bool(current) != bool(proposal.get("before")):
+                _finish_idempotency_key(key)
+                return {"ok": False, "error": "Live's metronome state changed since the proposal was created; create a new proposal."}
+            try:
+                write_ok = bool(self.client.set_metronome(bool(proposal["after"])))
+            except Exception as exc:
+                write_ok = False
+                write_error = str(exc)
+            write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
+            timer.mark("write")
+        elif action == "set_loop":
+            current = state.get("loop")
+            if current is None and hasattr(self.client, "get_loop"):
+                current = self.client.get_loop()
+            if current is not None and bool(current) != bool(proposal.get("before")):
+                _finish_idempotency_key(key)
+                return {"ok": False, "error": "Live's arrangement loop state changed since the proposal was created; create a new proposal."}
+            try:
+                write_ok = bool(self.client.set_loop(bool(proposal["after"])))
+            except Exception as exc:
+                write_ok = False
+                write_error = str(exc)
+            write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
+            timer.mark("write")
+        elif action == "set_loop_bounds":
+            bounds = _normalize_bounds(self.client.get_loop_bounds() if hasattr(self.client, "get_loop_bounds") else None)
+            before = proposal.get("before") or {}
+            if isinstance(bounds, dict) and (
+                not _values_match(bounds.get("loop_start"), before.get("loop_start"))
+                or not _values_match(bounds.get("loop_length"), before.get("loop_length"))
+            ):
+                _finish_idempotency_key(key)
+                return {"ok": False, "error": "Live's loop bounds changed since the proposal was created; create a new proposal."}
+            try:
+                write_ok = bool(self.client.set_loop_bounds(
+                    float(proposal["after"]["loop_start"]),
+                    float(proposal["after"]["loop_length"]),
+                ))
             except Exception as exc:
                 write_ok = False
                 write_error = str(exc)
@@ -4555,6 +4826,11 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 post_name = "" if action == "rename_track" else str(proposal.get("track_name", ""))
                 post_track, _ = _find_track(after_state, int(proposal["track_index"]), post_name)
                 readback = post_track.get(SUPPORTED_TRACK_ACTIONS[action][0]) if post_track else None
+                if readback is None:
+                    if action == "set_track_color" and hasattr(self.client, "get_track_color_index"):
+                        readback = self.client.get_track_color_index(int(proposal["track_index"]))
+                    elif action == "set_track_fold" and hasattr(self.client, "get_track_fold_state"):
+                        readback = self.client.get_track_fold_state(int(proposal["track_index"]))
             elif action in SUPPORTED_RETURN_MIXER_ACTIONS:
                 readback, _ = self._return_mixer_value(int(proposal["return_track_index"]),
                                                        str(proposal.get("return_track_name", "")),
@@ -4564,6 +4840,23 @@ class LiveActionService(Tier2Tier3ControlMixin):
             elif action in SUPPORTED_TEMPO_ACTIONS:
                 tempo = after_state.get("tempo")
                 readback = round(float(tempo), 3) if isinstance(tempo, (int, float)) and not isinstance(tempo, bool) else None
+            elif action == "set_metronome":
+                readback = after_state.get("metronome")
+                if readback is None and hasattr(self.client, "get_metronome"):
+                    readback = self.client.get_metronome()
+                readback = bool(readback) if readback is not None else None
+            elif action == "set_loop":
+                readback = after_state.get("loop")
+                if readback is None and hasattr(self.client, "get_loop"):
+                    readback = self.client.get_loop()
+                readback = bool(readback) if readback is not None else None
+            elif action == "set_loop_bounds":
+                bounds = _normalize_bounds(self.client.get_loop_bounds() if hasattr(self.client, "get_loop_bounds") else None)
+                readback = (
+                    {"loop_start": round(float(bounds["loop_start"]), 3), "loop_length": round(float(bounds["loop_length"]), 3)}
+                    if isinstance(bounds, dict) and bounds.get("loop_start") is not None and bounds.get("loop_length") is not None
+                    else None
+                )
             elif action in SUPPORTED_SCENE_ACTIONS:
                 # Scenes have no stable "is_playing" property of their own; the
                 # transient is_triggered flag is the primary observable evidence
@@ -4704,10 +4997,17 @@ class LiveActionService(Tier2Tier3ControlMixin):
                     "set_solo": lambda: self.client.set_track_solo(track_index, bool(before)),
                     "set_arm": lambda: self.client.set_track_arm(track_index, bool(before)),
                     "rename_track": lambda: self.client.set_track_name(track_index, str(before)),
+                    "set_track_color": lambda: self.client.set_track_color_index(track_index, int(before)),
+                    "set_track_fold": lambda: self.client.set_track_fold_state(track_index, bool(before)),
                 }
                 writers[action]()
                 track, _ = _find_track(self.snapshot(), track_index, "")   # by index: a rename changes the name
                 value = track.get(SUPPORTED_TRACK_ACTIONS[action][0]) if track else None
+                if value is None:
+                    if action == "set_track_color" and hasattr(self.client, "get_track_color_index"):
+                        value = self.client.get_track_color_index(track_index)
+                    elif action == "set_track_fold" and hasattr(self.client, "get_track_fold_state"):
+                        value = self.client.get_track_fold_state(track_index)
         except Exception as exc:
             return {"attempted": True, "restored": False, "error": str(exc)}
         return {"attempted": True, "restored": value is not None and _values_match(value, before), "readback": value}

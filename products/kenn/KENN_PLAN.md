@@ -1,6 +1,6 @@
 # KENN plan
 
-Updated 12 October 2026. This is KENN's sole product roadmap, architecture direction,
+Updated 13 October 2026. This is KENN's sole product roadmap, architecture direction,
 work queue and progress checklist. Start here, then read the named source, tests and
 evidence for the task. `AGENTS.md` governs repository work. Dated reports describe
 their recorded commit and environment; they do not authorize work or prove today's
@@ -31,8 +31,11 @@ product requirement: unsupported measurements, sources and claims must be reject
 
 Decisions already made:
 
-- Local Qwen3 8B chat (`kenn-brain-qwen3-8b`) and Qwen3 4B planner. Keep this model
-  choice; investigate pipeline costs before proposing another model. No hosted brain.
+- Local Qwen3 4B chat (`qwen3:4b-instruct-2507-q4_K_M`) and Qwen3 4B planner.
+  Jack confirmed the current 4B chat choice on 13 October 2026; this supersedes the
+  earlier 8B chat decision. Preserve it in the offline SEAL experiment. The local
+  main checkout's `.env` still names the old 8B, so pin the 4B explicitly in experiment
+  manifests; do not treat that stale file as the running app's configuration. No hosted brain.
 - The Mac target is Apple M3 with 16 GB unified memory. Model residency, context and
   concurrency must fit alongside Live. Do not assume both models can stay resident
   without measuring memory pressure and model switching.
@@ -601,7 +604,7 @@ Needs the route/context audit; fixes may land in small slices while that audit c
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already
   exist; verify the selected model digest and actual response path before blaming
-  hardware. Any MLX comparison must explicitly use the chosen Qwen3 8B lineage,
+  hardware. Any MLX comparison must explicitly use the chosen Qwen3 4B Instruct 2507 lineage,
   rather than the engine's smaller default. Require unchanged safety and a held-out
   quality comparison for each latency change.
   - [x] Reviewed the pinned Ollama runtime, existing cache/attention behavior,
@@ -817,6 +820,49 @@ Needs the route/context audit; fixes may land in small slices while that audit c
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and
   all attempted/accepted/rejected/busy counts. No regenerated expectations that bless
   a new implementation's mistakes; no tuning on sealed cases.
+  - [ ] **Bounded offline SEAL experiment, requested 13 Oct.** Compare unchanged
+    retrieval, reviewed ordinary SFT, reviewed synthetic SFT with a fixed generator,
+    and an explicitly learned self-edit policy on the current Qwen3 4B. This covers
+    conversational answers and follow-ups; planner training is only a code reference.
+    [Paper/upstream findings](docs/research/KENN_SEAL_RESEARCH_2026-10-13.md) and
+    [contracts, commands and baseline](docs/runbooks/KENN_SEAL_OFFLINE_EXPERIMENT.md).
+    - [x] Implemented isolated offline tooling, content-bound source/target review,
+      family splits, numeric/duplicate/leakage guards, fresh GPU 1 trial processes,
+      bounded inner adaptation, filtered context→edit policy SFT, resampling and
+      retention checks. Experimental serving stays disabled. The B.10-derived
+      quality screen records measured gain separately; its default skips no trial.
+    - [x] Pinned the installed 4B Q4_K_M digest, native Ollama 0.40.3, current
+      `v-db8c6334cf63` index, code/tokenizer/prompt/settings hashes and M3/16 GiB
+      hardware by read-only inspection. This is an asset baseline, not an answer
+      benchmark. Synthetic dry run exercises two policy rounds and seven trial
+      adaptations; all scores and missing timings remain explicitly synthetic.
+    - [x] Scoped verification: **79 offline tests + 28 existing grounding tests
+      passed**, byte compilation passed; five isolated numeric, checkpoint-start,
+      delivery, timing and abstention mutations failed their regressions. No production path, model selection,
+      dependency, CI or Live-session changes.
+    - [x] Prepared an 18-card pilot in
+      `.runtime/seal-pilot-2026-10-13`: two training contexts, four ordinary
+      targets, seven reward tasks, two retention checks and seven reserved final
+      tasks. Jack approved the exact displayed packet in chat; the ignored approval
+      receipt binds all 38 source/target records and records the limits of owner
+      acceptance. The approved copy validates; the untouched draft remains rejected.
+      Primary references and arithmetic were checked separately. The latest SSH
+      retry refused connections before authentication. No GPU job or server restart occurred;
+      physical GPU 1 remains the only authorized device for this pilot.
+    - [ ] Expand the tiny pilot into a public licensed corpus with independently
+      reviewed targets and reward/retention references; bind an existing HF checkpoint to the served
+      4B lineage before actual GPU 1 training. The prior 505 gate-kept teacher
+      answers are not owner-reviewed targets. No actual adaptation was run here.
+      Jack's smaller-model question is recorded in the research note: consider
+      a 1.7–2B challenger before a 0.8B trial, with 4B retained as the control.
+      These are candidates, not a model-selection change; the worker currently
+      accepts only the pinned Qwen3 4B architecture.
+    - [ ] Grade sealed answers blind, compare B/C/D across development-only step
+      budgets, check retention and proposal boundaries, then measure grounded
+      M3 product delivery, displayed timing, memory/pressure, model switches and
+      cold/warm/cache conditions. GPU timings cannot close the Mac gate. SEAL's
+      value over ordinary fine-tuning and amortization remain **unmeasured**;
+      no promotion recommendation until these checks support one.
 - [ ] **C5 — Reach the quality and timing targets below.** Improve evidence selection
   and useful answers without lowering grounding thresholds. The fixed local model is
   a constraint to measure against, not a reason to label a missed target as passed.
@@ -1043,8 +1089,8 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   validation, clean-account setup under 15 minutes, supported matrix, feedback channel,
   privacy-preserving diagnostics, tester sign-off and exercised rollback. Do not invite
   testers or publish from a historical “ready” assertion.
-  - [ ] **First-run model download.** The answering model (kenn-brain-qwen3-8b, about
-    5 GB) isn't in the app, so first run fetches it with progress and a resume, checks
+  - [ ] **First-run model download.** The answering model (Qwen3 4B Instruct 2507,
+    Q4_K_M) isn't in the app, so first run fetches it with progress and a resume, checks
     its digest, and says plainly when the Mac can't run it. Until it's there, chat says
     no model is installed rather than falling back to anything smaller. Blocked on
     Jack: where it's hosted (Ollama registry or our own server), the Qwen3 weight
@@ -1162,9 +1208,42 @@ is a target; an unresolved failure keeps the corresponding item open.
 Owners: Codex handles build preparation, fixes, checks and evidence; independent
 reviewers provide code sign-off; Jack supervises all Live mutations,
 grades the demo answers and rehearses/presents. Tuesday's supervised slot is
-20:00 London time; Wednesday's meeting time remains unconfirmed. Nothing here
+20:00 London time. Jack clarified that video preparation and bug finding take
+priority over settling Wednesday's meeting time. Nothing here
 authorizes an unattended Live run. R1–R4, broader answer grading, device coverage
 and beta/release qualification remain separately open.
+
+Video preparation, 12 Oct: the SaaS expansion report informs positioning, not a
+new implementation queue. The short video shows grounded advice, browser Apply,
+Live readback and exact Undo; cloud/billing/collaboration remain roadmap items,
+consolidated in [the long-term SaaS mega plan](docs/KENN_SAAS_LONG_TERM_MEGA_PLAN.md).
+The previous recorders auto-confirmed Python HTTP proposals or launched a plugin
+mutation script, captured no audio, and could print verification while Live was
+offline. `tooling/scripts/record_demo_live.py` now records passively, preserving
+raw takes outside Git, requesting system audio and optional narration, checking
+encoded duration/audio streams, and leaving playback/Live qualification pending.
+`record_demo_video.py` delegates to that entry point. A supervised ten-second
+sound check must prove combined audio routing before the five-minute take.
+
+Recorder review found two playback faults before publication: separate audio
+tracks made normal players choose music or narration, and mixing without input
+padding shifted delayed narration early. The MP4 now uses one normalized mix,
+keeps each source's start time and complete tail, and preserves the raw file.
+Generated-tone regressions failed before each fix. Final scoped verification:
+**41 passed** (17 recorder, 24 exporter); all **10 injected recorder faults**
+were caught. Independent standards/spec review and a separate delayed-source
+reproduction passed. No desktop capture or Live write was used. The media
+receipt remains unreviewed until supervised playback.
+
+Git cleanup, 12 Oct: removed **11 local merged branch-only refs** after checking
+main ancestry, worktree use, live origin refs and open PRs. Full commit tips are
+saved outside Git for recovery; worktrees with local runtime assets and unmerged
+drafts remain. Collaborator reviews are open as draft source PRs
+[citation repair #26](https://github.com/Nite-DSP/monorepo/pull/26) and
+[Stage 2/3 #27](https://github.com/Nite-DSP/monorepo/pull/27), with matching
+`kenn-app` branches. The independent code rechecks are complete under D1;
+supervised Live gates stay open. Unrelated backend/Nite Submit edits and the local
+video deletion remain untouched.
 
 Earlier 12 Oct preparation receipt (fake Live only; D1–D6 were open at capture):
 
@@ -1249,8 +1328,8 @@ Earlier 12 Oct preparation receipt (fake Live only; D1–D6 were open at capture
   the supplied cap cases and 84 additional actual ending variants. Jack's later
   12 Oct decision accepts the fresh independent reviews recorded under D1.
   Owner answer grading, current real-Live transactions, ten consecutive rehearsals
-  and backup capture/playback remain outstanding. Wednesday's meeting time is
-  still unknown.
+  and backup capture/playback remain outstanding. The current focus is the video
+  and bug-finding walkthrough.
 - Git handoff published all four branches with origin upstreams, keeping the three
   fix/candidate drafts separate from main. Main received only bounded demo/sync
   documentation. The guarded exporter verified each source marker and exact tree
@@ -1263,8 +1342,12 @@ Earlier 12 Oct preparation receipt (fake Live only; D1–D6 were open at capture
   follows the same exporter and remote checks. Citation `67921916` now exports
   to `3f79be92`; the current candidate and this receipt follow in the same handoff.
   Preserve unrelated backend/Nite Submit edits and the local video deletion.
-  Test logs, mutation output and the browser screenshot remain outside git under
-  `/tmp/kenn-investor-review-20261012/`.
+  Earlier test logs, mutation output and the browser screenshot were kept outside
+  Git under `/tmp/kenn-investor-review-20261012/`; that temporary directory is no
+  longer available. The recorded results above remain historical evidence, not
+  downloadable captures. Current Git audits and generated-media recorder checks
+  are kept in the persistent external evaluation-data directory. Real-Live video
+  capture and playback are still pending.
 
 ## Acceptance targets and measurement rules
 
@@ -1345,7 +1428,7 @@ Full backend command for shared entry-point changes, extractions or release:
 ```
 
 Deferred until the sequence justifies them: additional control families; speculative
-native/shared runtimes; fine-tuning other than the 4B answer tune at the end of this plan; broad dataset intake; a second verifier model;
+native/shared runtimes; fine-tuning beyond the 4B answer work and bounded offline SEAL experiment in C4; broad dataset intake; a second verifier model;
 conformal acceptance policies; huge citation captures; source-volume targets;
 autonomous mixing/arrangement and commercial distribution. Existing unfinished
 `live_command`/execution extractions and dead-tool removal need a new reachability
