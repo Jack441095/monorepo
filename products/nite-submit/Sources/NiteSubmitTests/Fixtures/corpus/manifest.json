@@ -12,8 +12,8 @@
   },
   "name_project": {
    "template": "{student_id}_{full_name}_{project_title}",
-   "processed": 162,
-   "review_required": 71,
+   "processed": 0,
+   "review_required": 233,
    "collisions": 0,
    "failures": 0
   }

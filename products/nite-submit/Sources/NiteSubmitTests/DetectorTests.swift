@@ -357,6 +357,22 @@ func runDetectorTests() {
         eq(abbreviatedCandidate.candidateNumber.value!, "A12345678",
            "Candidate No. label is detected separately")
 
+        // Cover sheets also use a full stop as the abbreviation's separator.
+        let candidateWithoutColon = detector.detect(in: makeDoc([[
+            "Candidate No. A12345678",
+        ]]))
+        eq(candidateWithoutColon.candidateNumber.value ?? "?", "A12345678",
+           "Candidate No. without a colon remains usable anonymously")
+        check(candidateWithoutColon.candidateNumber.confidence == .high,
+              "a complete candidate label and identifier remain HIGH confidence")
+        check(candidateWithoutColon.studentId.isMissing,
+              "candidate number without a colon does not invent a student number")
+        for prose in ["References Candidate No. A12345678",
+                      "Candidate No. A12345678 is cited in the example"] {
+            check(detector.detect(in: makeDoc([[prose]])).candidateNumber.isMissing,
+                  "candidate abbreviation in prose is not an anonymous identifier")
+        }
+
         let ocr = detector.detect(in: makeDoc([[
             "Student Number: 00361288",
             "Project Title: OCR Cover",
@@ -696,6 +712,89 @@ func runDetectorTests() {
         eq(longTitle.projectTitle.value!,
            "A Temple Unabridged with Priceless Treasure: An Investigation of Yorkshire Public Libraries as Intellectual Sanctuary During the First World War: 1914-1918",
            "long thesis title recombined without truncation")
+
+        // PDFKit reads this public cover's title text box after the byline.
+        // Keep the lowercase final line and exclude the preceding date.
+        let reorderedTitle = detector.detect(in: makeDoc([[
+            "By:", "Gabriela Morales Martinez",
+            "A thesis submitted in partial fulfilment of the requirements for",
+            "the degree of Doctor of Philosophy", "The University of Sheffield",
+            "Faculty of Social Sciences", "Management School", "August 2018",
+            "Knowledge Evolution in Social Media:",
+            "Understanding the Effects of Website Designs on",
+            "the Selection of User-Generated Content",
+        ]]))
+        eq(reorderedTitle.projectTitle.value!,
+           "Knowledge Evolution in Social Media: Understanding the Effects of Website Designs on the Selection of User-Generated Content",
+           "title text box after byline retains every continuation line")
+        eq(reorderedTitle.projectTitle.confidence, .medium,
+           "recombined unlabelled title still requires review")
+
+        let titleAcrossPages = detector.detect(in: makeDoc([[
+            "By:", "Gabriela Morales Martinez", "A thesis submitted for a degree",
+            "Knowledge Evolution in Social Media:",
+        ], ["Understanding the Effects of Website Designs on",
+             "the Selection of User-Generated Content"]]))
+        check(titleAcrossPages.projectTitle.value != reorderedTitle.projectTitle.value,
+              "title continuation never crosses a page boundary")
+
+        // An adviser's job title on the abstract used to outrank the cover
+        // heading. Prior degrees must not select the awarding institution.
+        let staffAndPriorDegree = detector.detect(in: makeDoc([[
+            "Forecasting Demand with Sparse Observations by",
+            "Master of Business Administration, University of Previous, 2014 Alex Morgan",
+            "SUBMITTED IN PARTIAL FULFILLMENT OF THE REQUIREMENTS FOR THE DEGREE OF",
+            "MASTER OF APPLIED SCIENCE", "AT THE",
+            "NORTHBRIDGE INSTITUTE OF TECHNOLOGY", "May 2025",
+        ], ["ABSTRACT", "Capstone Advisor: Dr. Casey Jones", "Title: Research Scientist"]], origin: .ocr))
+        eq(staffAndPriorDegree.projectTitle.value!, "Forecasting Demand with Sparse Observations",
+           "an abstract staff title cannot replace the cover title or retain the byline")
+        eq(staffAndPriorDegree.university.value!, "NORTHBRIDGE INSTITUTE OF TECHNOLOGY",
+           "current awarding institution wins over an author's earlier degree")
+        eq(staffAndPriorDegree.projectTitle.confidence, .medium,
+           "OCR title remains subject to explicit review")
+        eq(staffAndPriorDegree.university.confidence, .medium,
+           "OCR awarding institution remains subject to explicit review")
+
+        let researchTitle = detector.detect(in: makeDoc([[
+            "Project Title: Research Scientists in Urban Planning",
+        ]]))
+        eq(researchTitle.projectTitle.value!, "Research Scientists in Urban Planning",
+           "a project about staff remains a valid title")
+        let earlierDegree = detector.detect(in: makeDoc([[
+            "Master of Engineering, University of Previous, 2016",
+        ]]))
+        check(earlierDegree.university.isMissing,
+              "an earlier qualification alone cannot establish the current institution")
+
+        // OCR wraps a long biographical degree before its year; the following
+        // awarding heading must win just as it does for an unwrapped degree.
+        let wrappedPriorDegree = detector.detect(in: makeDoc([[
+            "Demand Forecasting with Sparse Observations", "by", "Alex Morgan",
+            "Bachelor of Engineering, University of Previous,", "2018",
+            "Submitted in partial fulfillment of the requirements for a degree",
+            "Northbridge Institute of Technology",
+        ]]))
+        eq(wrappedPriorDegree.university.value!, "Northbridge Institute of Technology",
+           "a wrapped qualification year excludes the previous institution")
+
+        // OCR can confuse I and l on a scanned cover. Use the independently
+        // printed title above the abstract, retaining the cover as an alternative.
+        let repeatedOCRTitle = detector.detect(in: makeDoc([[
+            "Al-assisted Demand Forecasting", "by", "Alex Morgan",
+            "A thesis submitted for a degree", "University of Example",
+        ], ["AI-assisted Demand Forecasting", "by", "Alex Morgan", "ABSTRACT",
+             "An unrelated longer opening sentence must not become the work title"]], origin: .ocr))
+        eq(repeatedOCRTitle.projectTitle.value!, "AI-assisted Demand Forecasting",
+           "a repeated OCR heading above the abstract supplies its own spelling")
+        check(repeatedOCRTitle.projectTitle.candidates.contains("Al-assisted Demand Forecasting"),
+              "conflicting OCR cover spelling remains visible for review")
+        let differentAbstractTitle = detector.detect(in: makeDoc([[
+            "Demand Forecasting with Sparse Observations", "by", "Alex Morgan",
+            "A thesis submitted for a degree", "University of Example",
+        ], ["Market Analysis", "by", "Alex Morgan", "ABSTRACT"]], origin: .ocr))
+        eq(differentAbstractTitle.projectTitle.value!, "Demand Forecasting with Sparse Observations",
+           "an unrelated abstract heading cannot replace a cover title")
 
         let groupCover = detector.detect(in: makeDoc([[
             "SMART WATER METERING AND QUALITY MONITORING",

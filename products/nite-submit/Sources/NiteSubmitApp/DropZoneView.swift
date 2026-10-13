@@ -12,6 +12,10 @@ final class DropZoneView: NSView {
         super.init(frame: frame)
         registerForDraggedTypes([.fileURL])
         wantsLayer = true
+        // This view draws its own text, so AppKit cannot infer the browse
+        // action. Expose the same picker to VoiceOver and accessibility clients.
+        setAccessibilityElement(true)
+        setAccessibilityRole(.button)
         setAccessibilityLabel("Drop files or folder to begin")
         setAccessibilityHelp("Drop files or a folder here or click to browse. Documents are read locally and never uploaded.")
     }
@@ -121,6 +125,15 @@ final class DropZoneView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
+        chooseFiles()
+    }
+
+    override func accessibilityPerformPress() -> Bool {
+        chooseFiles()
+        return true
+    }
+
+    private func chooseFiles() {
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
         panel.canChooseDirectories = true

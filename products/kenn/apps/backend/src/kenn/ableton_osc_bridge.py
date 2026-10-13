@@ -118,6 +118,8 @@ READ_ENDPOINTS = (
     "/live/song/get/loop",
     "/live/song/get/loop_start",
     "/live/song/get/loop_length",
+    "/live/song/get/groove_amount",
+    "/live/song/get/record_mode",
     "/live/track/get/color_index",
     "/live/track/get/fold_state",
     "/live/view/get/selected_track",
@@ -162,6 +164,11 @@ WRITE_ENDPOINTS = (
     "/live/song/set/loop",
     "/live/song/set/loop_start",
     "/live/song/set/loop_length",
+    "/live/song/set/groove_amount",
+    "/live/song/set/record_mode",
+    "/live/song/cue_point/jump",
+    "/live/song/jump_to_prev_cue",
+    "/live/song/jump_to_next_cue",
     "/live/song/set/signature_numerator",
     "/live/song/set/signature_denominator",
     "/live/kenn/set/return_mixer",
@@ -900,6 +907,8 @@ class AbletonOSCClient:
                 ("/live/song/get/loop", None),
                 ("/live/song/get/loop_start", None),
                 ("/live/song/get/loop_length", None),
+                ("/live/song/get/groove_amount", None),
+                ("/live/song/get/record_mode", None),
             ])
         batched_values = self._query_many(batched_requests)
         # Meter packets are advisory and some AbletonOSC/Live combinations do
@@ -982,6 +991,8 @@ class AbletonOSCClient:
         loop_args = batched_values[batch_index + 9] or [] if include_mixer and len(batched_values) > batch_index + 9 else []
         loop_start_args = batched_values[batch_index + 10] or [] if include_mixer and len(batched_values) > batch_index + 10 else []
         loop_length_args = batched_values[batch_index + 11] or [] if include_mixer and len(batched_values) > batch_index + 11 else []
+        groove_args = batched_values[batch_index + 12] or [] if include_mixer and len(batched_values) > batch_index + 12 else []
+        record_mode_args = batched_values[batch_index + 13] or [] if include_mixer and len(batched_values) > batch_index + 13 else []
         selected_index = selected_args[0] if selected_args else None
         selected_kind = None
         if isinstance(selected_index, (int, float)) and int(selected_index) < 0:
@@ -1009,6 +1020,8 @@ class AbletonOSCClient:
             "loop": bool(loop_args[0]) if loop_args else None,
             "loop_start": float(loop_start_args[0]) if loop_start_args else None,
             "loop_length": float(loop_length_args[0]) if loop_length_args else None,
+            "groove_amount": float(groove_args[0]) if groove_args else None,
+            "record_mode": bool(record_mode_args[0]) if record_mode_args else None,
             "return_tracks": [],
             "master_track": None,
         }
@@ -2046,6 +2059,38 @@ class AbletonOSCClient:
     def set_track_fold_state(self, track_index: int, folded: bool) -> bool:
         """Fold (collapse) or unfold (expand) a group track."""
         return self._send_track_property("fold_state", track_index, int(1 if folded else 0))
+
+    def get_groove_amount(self) -> Optional[float]:
+        """Query Live's global groove amount (0.0 to 1.0)."""
+        args = self._query_args("/live/song/get/groove_amount")
+        return float(args[0]) if args else None
+
+    def set_groove_amount(self, amount: float) -> bool:
+        """Set Live's global groove amount (0.0 to 1.0)."""
+        clamped = max(0.0, min(1.0, float(amount)))
+        return self._send_only("/live/song/set/groove_amount", [clamped])
+
+    def get_record_mode(self) -> Optional[bool]:
+        """Query whether Live's arrangement record button is engaged."""
+        args = self._query_args("/live/song/get/record_mode")
+        return bool(args[0]) if args else None
+
+    def set_record_mode(self, enabled: bool) -> bool:
+        """Engage or disengage Live's arrangement record button."""
+        return self._send_only("/live/song/set/record_mode", [bool(enabled)])
+
+    def jump_to_cue_point(self, cue_point_index_or_name: str | int) -> bool:
+        """Jump song playhead to a cue point by name or index."""
+        val = int(cue_point_index_or_name) if isinstance(cue_point_index_or_name, int) else str(cue_point_index_or_name)
+        return self._send_only("/live/song/cue_point/jump", [val])
+
+    def jump_to_prev_cue(self) -> bool:
+        """Jump song playhead to previous cue point."""
+        return self._send_only("/live/song/jump_to_prev_cue", [])
+
+    def jump_to_next_cue(self) -> bool:
+        """Jump song playhead to next cue point."""
+        return self._send_only("/live/song/jump_to_next_cue", [])
 
     def duplicate_clip_to_arrangement(self, track_index: int, clip_slot_index: int, destination_time_beats: float) -> bool:
         """Duplicate a Session View clip into the Arrangement timeline at the specified beat."""

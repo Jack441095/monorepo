@@ -6,11 +6,12 @@ import NiteSubmitCore
 /// builds a release and absent everywhere else. These tests mint real signed keys
 /// with it, which is the only way to check the encode/decode pair end to end.
 private func devSigningKey() -> Curve25519.Signing.PrivateKey? {
-    let keyFile = URL(fileURLWithPath: #filePath)
-        .deletingLastPathComponent()   // NiteSubmitTests
-        .deletingLastPathComponent()   // Sources
-        .deletingLastPathComponent()   // nite-submit
-        .appendingPathComponent("tools/license-private-key.base64")
+    // Keygen moved the signer outside the checkout. Use that same location so
+    // packaging cannot report a pass while silently skipping activation checks.
+    let configRoot = ProcessInfo.processInfo.environment["XDG_CONFIG_HOME"]
+        ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config").path
+    let keyFile = URL(fileURLWithPath: configRoot)
+        .appendingPathComponent("nite-submit/license-private-key.base64")
     guard let raw = try? String(contentsOf: keyFile, encoding: .utf8),
           let keyData = Data(base64Encoded: raw.trimmingCharacters(in: .whitespacesAndNewlines)),
           let key = try? Curve25519.Signing.PrivateKey(rawRepresentation: keyData)

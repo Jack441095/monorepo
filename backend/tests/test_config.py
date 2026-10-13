@@ -5,6 +5,17 @@ from nacl.signing import SigningKey
 from app.config import Settings, _validate_production_config, _validate_staging_config
 
 
+def test_hosted_postgres_url_keeps_credentials_and_query_when_normalized():
+    # Fly's legacy scheme stopped the first staging migration before it connected.
+    settings = Settings(database_url="postgres://user:encoded%40password@localhost/db?sslmode=require")
+    assert settings.database_url == "postgresql+psycopg2://user:encoded%40password@localhost/db?sslmode=require"
+
+
+def test_explicit_database_driver_and_sqlite_urls_are_preserved():
+    for url in ("postgresql+psycopg2://localhost/db", "sqlite:///test.db"):
+        assert Settings(database_url=url).database_url == url
+
+
 def _staging_settings(**overrides):
     values = {
         "environment": "staging",

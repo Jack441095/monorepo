@@ -1,0 +1,7 @@
+name = "nite-dsp-staging-api"
+main = "cloudflare/staging-api-worker.mjs"
+compatibility_date = "2026-10-11"
+workers_dev = true
+# Supply STAGING_API_ORIGIN with --var when deploying. Keeping its current
+# value on later deploys avoids committing the remote backend hostname.
+keep_vars = true

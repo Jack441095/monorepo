@@ -9,6 +9,64 @@ one started AMS machine with a passing check and one stopped machine. The live
 Stripe API Keys page now lists only the restricted `NITE DSP backend checkout`
 secret key; the broad legacy key no longer appears. No customer charge was made.
 
+An isolated staging backend and PostgreSQL database were deployed in LHR on
+2026-10-11. The migration completed, both API service checks passed, and public
+`/health` and `/ready` returned HTTP 200 in staging mode. Anonymous admin and
+checkout requests returned HTTP 401; an unsigned Stripe webhook returned HTTP
+400. Checkout remains disabled. Storage is local and temporary, and email uses
+the console provider, so this supports API testing but not customer purchase
+rehearsals. The Cloudflare proxy is prepared; deployment awaits Wrangler consent
+for Account Read, Workers Write, and background access. Backend verification:
+139 tests passed; Worker forwarding and origin-isolation verification: 2 passed.
+
+A signed synthetic `account.updated` event returned HTTP 200 with `ignored`;
+replaying the same event returned HTTP 200 with `already_processed`. This
+verified staging signature acceptance and duplicate handling without creating
+a purchase or charge.
+
+A staging-machine check made 20 local readiness requests over 20 seconds. Used
+guest memory stayed between 131.0 and 131.3 MiB out of 207.3 MiB reported by the
+guest; Fly allocates 256 MiB to the machine. Runtime configuration confirmed
+staging mode and a Stripe test key without printing credentials. This short
+sample does not establish sustained memory headroom or production capacity.
+
+Submit's private-beta release check passed 500 deterministic checks, built the
+1.0.0 app, verified its ad-hoc signature, and produced an archive that passed
+ZIP integrity validation. The complete release gate then failed because
+`real_validation_corpus/manifests/first_wave_manifest_v2.json` is absent. No
+files in that corpus are tracked in the current checkout or available in its
+local Git history. The archive is not cleared for tester distribution; the
+missing validation inputs remain required by the release scripts.
+
+A recovery search on 2026-10-11 found no copies of the six required validation
+manifests in the user's home directory or either mounted external drive. The
+Submit Git bundle was verified and inspected in a separate temporary repository;
+its complete recorded history contains reports but no governed corpus files.
+The mounted Time Machine snapshot directories exposed no backed-up contents,
+and `tmutil listbackups` found no machine directory. This does not rule out an
+offline backup. Tracked provenance records retain public source URLs and hashes,
+but restoring those PDFs alone would not recover the reviewed validation truth.
+
+The 2026-10-11 rebuild recovered 22 exact-hash public PDFs and added 13 separately
+recorded institutional PDFs, 12 controlled field-policy cases and one image-only
+edge case. Nine public covers now have independent title/institution review;
+seven also have author review. All 47 validation inputs were processed and the
+controlled suite passed. One image-based MIT cover still fails title and
+institution accuracy at medium confidence, so the rebuilt check exits 1. A
+PDFKit text-order bug found in another cover was fixed; 503 Swift checks and 22
+Python tool checks passed. The historical release gate remains blocked rather
+than accepting invented manifests. Details and repeatable commands are in
+`products/nite-submit/docs/CORPUS_REBUILD_2026-10-11.md`.
+
+The independent archive-reproducibility check passed. The synthetic batch-write
+check initially failed because its name-bearing template still expected 162
+automatic copies after the shared approval gate began holding detected name
+alternatives. Its generator and both manifests now expect all 233 name-bearing
+rows to remain in review, and the batch check explicitly verifies their name
+choice gap and absence of output files. Both synthetic batch templates passed:
+ID/project processed 172 and held 61; ID/name/project held all 233. Source bytes
+were unchanged and each written copy matched its source.
+
 ## 2026-10-10 deployment update
 
 Vercel production deployment `dpl_8V43GpwAvN9rBqR33AbT2JJwFuJa` is READY and
@@ -185,8 +243,9 @@ choice.
   Public tunnel attempts failed to connect and were stopped. Current DNS checks
   also return no A or AAAA answers for `staging.nitedsp.co.uk` or
   `api-staging.nitedsp.co.uk`. Use a maintained staging API and website with
-  separate test keys and database. The current Fly app inventory contains only
-  the production backend and database; no hosted staging app exists.
+  separate test keys and database. An isolated hosted staging API and database
+  now exist, with checkout disabled. The Cloudflare proxy, durable staging
+  storage, deliverable email, and full browser journey remain unfinished.
 - [ ] **Operations: bring the free Para-phase engine online.** Production
   `PARAPHRASE_ENABLED` is false. Verify the engine's hosting, service authentication,
   streaming, cancellation, privacy behavior, and daily quota before enabling it.
@@ -721,3 +780,48 @@ autonomous-systems/thursday/thursday/registry/system.py
 products/slo/SLO_PRIVATE_BETA_PLAN_V1.md
 products/slo/SLO_PRIVATE_BETA_TEST_PLAN_V1.md
 ```
+
+## Submit shipping completion — 2026-10-11
+
+Submit 1.0.0 is locally verified for a private tester beta. The final app/ZIP/DMG
+passed the complete release gate, including 534 Swift checks, 27 corpus Python
+checks, 5 update-feed checks, deterministic ZIP, dependency/bundle integrity,
+archive/approval/privacy/matrix/acceptance and 233-PDF write checks. Extracted
+ZIP and mounted DMG passed complete bundle parity and all 47 rebuilt cases.
+Exact hashes, commands, scope and evidence are in
+`products/nite-submit/NITE_SUBMIT_RELEASE_REPORT.md`.
+
+Public reviewed coverage is 7/7 authors, 9/9 titles and 9/9 institutions; 26
+public guidance PDFs are layout-only. Controlled coverage is 11/11 IDs, 10/10
+modules and one explicit absent ID. MIT OCR truth remained unchanged and scored.
+Nine historical acquisitions remain unrecovered; rebuilt QA identities do not
+claim historical parity. The refreshed same-drive 48-PDF backup was verified
+byte-for-byte; an independent backup remains outstanding.
+
+Backend scoped and full isolated suites passed 87 and 139 tests. A separate
+final-ZIP integration passed with simulated Stripe test-mode GBP 2 events,
+captured email, a licence matching the client public key, replay/signature
+rejection, magic-link replay rejection and authenticated exact-checksum download.
+No live charge, real message, database write to hosted production or deployment
+was made. This does not substitute for an actual hosted Sandbox purchase.
+
+Current read-only production probes returned HTTP 200 with database, durable
+R2 and configured Resend, and checkout/legal/release false. One preceding 503
+followed by a 200 retry is not an uptime claim. Approved Fly staging returns 200
+but uses local temporary storage and console email; the durable-rehearsal gate
+exits 1. Existing backend/staging and KENN work was preserved. Stripe/Fly/R2 are
+the current path; Paddle and Railway remain obsolete.
+
+Public distribution readiness exits 1: zero Developer ID identities, absent
+NITE_SUBMIT notarisation profile, ad-hoc app and unstapled app/DMG. The prepared
+inside-out signing workflow runs the local gate before notarisation and rechecks
+both final delivery formats after stapling. The offline update key matching the
+existing pin is unavailable; the placeholder appcast was not published.
+
+Outstanding owner actions: supply Apple signing/notarisation and update keys;
+verify UK registered company particulars, legal approval, Stripe business
+classification and current GBP 2 product/price; authorize/configure durable
+staging and real-email Sandbox rehearsal; complete clean-Mac/minimum-macOS checks
+and independent backup. Public publication remains a separate owner decision.
+No commit or push occurred. The verified beta snapshot and SHA256SUMS are under
+`products/nite-submit/artifacts/shipping-2026-10-11/verified-private-beta-1.0.0/`.

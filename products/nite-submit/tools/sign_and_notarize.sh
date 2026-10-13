@@ -44,6 +44,16 @@ if [[ -z "$SIGNING_IDENTITY" ]]; then
   exit 1
 fi
 
+# Check owner credentials before replacing a verified private-beta artifact.
+if ! security find-identity -v -p codesigning | fgrep -F -- "\"$SIGNING_IDENTITY\"" >/dev/null; then
+  echo "Requested signing identity is unavailable; existing artifacts were retained." >&2
+  exit 1
+fi
+if ! xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" --output-format json >/dev/null; then
+  echo "Notarisation profile is unavailable; existing artifacts were retained." >&2
+  exit 1
+fi
+
 echo "======================================================="
 echo " NITE Submit Automated Signing & Notarisation Pipeline"
 echo " Version:  ${VERSION}"
@@ -51,9 +61,18 @@ echo " Identity: ${SIGNING_IDENTITY}"
 echo " Profile:  ${NOTARY_PROFILE}"
 echo "======================================================="
 
-# 1. Package fresh app
-echo "\n[1/6] Packaging fresh application..."
-./tools/package_app.sh
+# Run the same release gate before signing; a previous beta manifest may refer
+# to different source. Its measured counts follow this app through notarisation.
+echo "\n[1/6] Verifying fresh release artifacts..."
+./tools/run_release_checks.sh
+release_manifest="artifacts/Submit-${VERSION}-release-manifest.json"
+checks=$(jq -er '.verification.deterministic_checks' "$release_manifest")
+batch_summary=$(jq -er '.verification.batch_summary' "$release_manifest")
+jq -e '.verification.release_check == "pass"' "$release_manifest" >/dev/null
+# Signing changes the certified bytes. A rejection or interruption must not
+# leave the pre-signing pass beside partially signed artifacts; the final
+# writer recreates it only after notarisation and delivery checks succeed.
+rm -f -- "$release_manifest"
 
 # 2. Code sign with Hardened Runtime (inside-out: embedded binaries first)
 # Apple's rule is strictly innermost first: a dylib has to be signed before the
@@ -86,50 +105,34 @@ codesign --force --options runtime --timestamp \
 
 echo "Verifying code signature..."
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
-# Fail closed. A bundle that signs but is rejected by Gatekeeper is a ship
-# blocker, and swallowing the exit here was how that got shipped once already.
-if ! spctl --assess --type execute --verbose=4 "$APP_PATH"; then
-  echo "ERROR: Gatekeeper rejected the signed app: $APP_PATH" >&2
-  echo "       Do not publish this build. Check the signature above first." >&2
-  exit 1
-fi
+# Gatekeeper requires the notarisation ticket. Assess only after stapling;
+# a correctly signed but unnotarised app is expected to be rejected here.
 
-# 3. Create ZIP and DMG artifacts
-echo "\n[3/6] Packaging signed ZIP and DMG installer..."
-rm -f "$ZIP_PATH"
-(cd artifacts && zip -r "Submit-${VERSION}-macOS.zip" "Submit-${VERSION}-macOS.app")
-./tools/create_release_dmg.sh --app-ready
-
-# Code sign the DMG installer as well
-echo "Signing DMG installer..."
-codesign --force --timestamp --sign "$SIGNING_IDENTITY" "$DMG_PATH"
-
-# 4. Submit for Notarization
-echo "\n[4/6] Submitting DMG to Apple Notary Service..."
-xcrun notarytool submit "$DMG_PATH" \
-  --keychain-profile "$NOTARY_PROFILE" \
-  --wait
-
-# 5. Staple Ticket
-echo "\n[5/6] Stapling notarisation ticket to app and DMG..."
-xcrun stapler staple "$APP_PATH"
-xcrun stapler staple "$DMG_PATH"
-
-echo "Validating stapled ticket..."
-xcrun stapler validate "$APP_PATH"
-xcrun stapler validate "$DMG_PATH"
-
-# Rebuild the customer ZIP from the stapled app, then verify every artifact.
+# The first ZIP is only the notarisation submission. Rebuild both customer
+# containers after stapling, otherwise their app would lack the ticket.
+echo "\n[3/6] Packaging signed app for notarisation..."
 ./tools/package_beta_zip.sh
+
+# Notarise the app first so both customer containers include its stapled ticket.
+xcrun notarytool submit "$ZIP_PATH" --keychain-profile "$NOTARY_PROFILE" --wait
+xcrun stapler staple "$APP_PATH"
+xcrun stapler validate "$APP_PATH"
+./tools/package_beta_zip.sh
+./tools/create_release_dmg.sh --app-ready
+codesign --force --timestamp --sign "$SIGNING_IDENTITY" "$DMG_PATH"
+xcrun notarytool submit "$DMG_PATH" --keychain-profile "$NOTARY_PROFILE" --wait
+xcrun stapler staple "$DMG_PATH"
+xcrun stapler validate "$DMG_PATH"
+spctl --assess --type execute --verbose=4 "$APP_PATH"
 ./tools/verify_release_artifacts.sh
 
 # 6. Re-verify distribution readiness
 echo "\n[6/6] Re-checking distribution readiness..."
 ./tools/check_distribution_readiness.sh --profile "$NOTARY_PROFILE" --require-ready
-./tools/write_release_manifest.sh
+./tools/write_release_manifest.sh --checks "$checks" --batch-summary "$batch_summary"
 
 echo "\n======================================================="
-echo " SUCCESS: NITE Submit ${VERSION} is fully signed, notarised, and ready for public distribution!"
+echo " SUCCESS: NITE Submit ${VERSION} passed signing and notarisation; complete the owner shipping decision before publication."
 echo " Artifacts:"
 echo "   - App: $APP_PATH"
 echo "   - DMG: $DMG_PATH"

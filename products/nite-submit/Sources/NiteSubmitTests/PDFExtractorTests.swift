@@ -1,7 +1,7 @@
 import AppKit
 import CoreText
 import Foundation
-import NiteSubmitCore
+@testable import NiteSubmitCore
 
 /// Draws the given lines as black text on white and returns a JPEG of it. This is
 /// how the tests get a page that looks like a scan: PDFKit finds no text layer in
@@ -98,6 +98,24 @@ func runPDFExtractorTests() {
         let tmp = fm.temporaryDirectory.appendingPathComponent("nite_extract_\(UUID().uuidString)")
         try fm.createDirectory(at: tmp, withIntermediateDirectories: true)
         defer { try? fm.removeItem(at: tmp) }
+
+        // A fixed 2.5% page-height row tolerance merged a title with its byline
+        // and sorted the degree before the author. These boxes mirror that gap.
+        let denseRows: [(bounds: CGRect, text: String)] = [
+            (CGRect(x: 0.24, y: 0.863, width: 0.52, height: 0.017), "Forecasting Demand"),
+            (CGRect(x: 0.49, y: 0.843, width: 0.02, height: 0.013), "by"),
+            (CGRect(x: 0.37, y: 0.822, width: 0.27, height: 0.015), "Alex Morgan"),
+            (CGRect(x: 0.25, y: 0.805, width: 0.51, height: 0.016), "Master of Engineering"),
+        ]
+        eq(PDFExtractor.ocrLines(from: denseRows.reversed()),
+           ["Forecasting Demand", "by", "Alex Morgan", "Master of Engineering"],
+           "nearby OCR baselines remain separate and read top to bottom")
+        let sameRow: [(bounds: CGRect, text: String)] = [
+            (CGRect(x: 0.50, y: 0.81, width: 0.20, height: 0.02), "12345678"),
+            (CGRect(x: 0.10, y: 0.805, width: 0.30, height: 0.03), "Student Number:"),
+        ]
+        eq(PDFExtractor.ocrLines(from: sameRow), ["Student Number: 12345678"],
+           "overlapping OCR fragments on one baseline still join left to right")
 
         // The per-page character budget has to bound the characters, not just the
         // number of lines. The old code took the first maxCharactersPerPage/40
