@@ -10,6 +10,9 @@ from __future__ import annotations
 from typing import Any
 import math
 import time
+import threading
+
+from kenn.core.live_spectrum_contract import validate_fft_spectra, validate_host_timeline
 
 SCHEMA = "kenn.plugin_handoff.v1"
 FEATURE_SCHEMA = "audio_feature_frame.v1"
@@ -18,18 +21,21 @@ _REQUIRED_NUMBERS = ("peak_dbfs", "rms_dbfs", "stereo_correlation", "stereo_widt
 _OPTIONAL_NUMBERS = (
     "crest_db", "transient_ratio", "clipped_samples",
     # These are bounded linear band-energy estimates from the plug-in's
-    # allocation-free realtime core.  They are deliberately not called EQ
+    # analysis engine. They are deliberately not called EQ
     # readings: no reference curve or calibrated spectrum is implied.
     "low_energy", "mid_energy", "high_energy",
+    "audio_age_seconds",
 )
 _FORBIDDEN_AUDIO_FIELDS = frozenset({"audio_samples", "raw_audio", "waveform", "pcm"})
 _CONTEXT_TTL_SECONDS = 30 * 60
 # Retained context can support history, but diagnosis must not treat an old
 # snapshot as the current state of the Ableton session.
 _MAX_CURRENT_DIAGNOSIS_AGE_SECONDS = 15.0
+_MAX_CONTINUOUS_AGE_SECONDS = 1.0  # Two 500 ms publishing intervals; stopped continuous windows retire promptly.
 _LIVE_HISTORY_SECONDS = 2 * 60
 _MAX_LIVE_FRAMES = 12
 _live_contexts: dict[str, dict[str, Any]] = {}
+_live_context_lock = threading.RLock()
 _ASSISTANT_MODES = {"ask", "suggest", "assist", "auto"}
 _SHARED_EVIDENCE_SCHEMA = "kenn.evidence.v1"
 
@@ -199,6 +205,14 @@ def _live_window_summary(frames: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _valid_export_clock(value: Any, received_at: float) -> bool:
+    """Accept finite local epoch seconds up to 50 ms ahead of receipt."""
+    # Check the range before finite conversion: an arbitrary-size JSON integer
+    # must be refused rather than overflow while validating a feature packet.
+    return (not isinstance(value, bool) and isinstance(value, (int, float))
+            and 0 <= value <= received_at + 0.05 and math.isfinite(value))
+
+
 def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(payload, dict) or payload.get("schema") != SCHEMA:
         return {"ok": False, "error": f"Expected {SCHEMA}."}
@@ -211,10 +225,19 @@ def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
         return {"ok": False, "error": f"Expected {SPECTRUM_SCHEMA} when spectrum_schema is supplied."}
     if payload.get("kind") != "mix_review_snapshot":
         return {"ok": False, "error": "Only mix-review snapshots are accepted."}
+    if "exported_at_epoch" in payload and not _valid_export_clock(payload["exported_at_epoch"], time.time()):
+        # Validate individual Ask/file/upload clocks during batch preflight too;
+        # a malformed sibling must not replace another insert's current evidence.
+        return {"ok": False, "error": "exported_at_epoch must be finite non-negative local epoch seconds, no more than 50 ms in the future."}
     if "evidence" in payload:
         valid_evidence, evidence_error = _validate_shared_evidence_packet(payload.get("evidence"), expected_source="plugin_bus_snapshot")
         if not valid_evidence:
             return {"ok": False, "error": evidence_error}
+    # A host name is only a matching hint, never a durable Live track ID.
+    host_track_name = payload.get("host_track_name", "")
+    if not isinstance(host_track_name, str) or len(host_track_name) > 128:
+        # Bound host text to 128 characters, as for the existing owner key, before matching it.
+        return {"ok": False, "error": "host_track_name must be a string of at most 128 characters."}
     values: dict[str, float] = {}
     for key in _REQUIRED_NUMBERS:
         value = payload.get(key)
@@ -238,6 +261,9 @@ def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
         return {"ok": False, "error": "Stereo metrics are outside their valid range."}
     if values["sample_rate"] <= 0 or values["analysed_samples"] <= 0:
         return {"ok": False, "error": "The snapshot has no analysed audio."}
+    if values.get("audio_age_seconds", 0.0) < 0.0:
+        # Future-dated audio would extend the diagnosis window without new playback.
+        return {"ok": False, "error": "audio_age_seconds must be non-negative."}
     if not 0.0 <= values.get("crest_db", 0.0) <= 120.0 or not 0.0 <= values.get("transient_ratio", 0.0) <= 10.0 or not 0.0 <= values.get("clipped_samples", 0.0) <= 1_000_000:
         return {"ok": False, "error": "Dynamics metrics are outside their valid range."}
     if any(not 0.0 <= values.get(key, 0.0) <= 16.0 for key in ("low_energy", "mid_energy", "high_energy")):
@@ -267,6 +293,32 @@ def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
                 return {"ok": False, "error": "spectrum_bands must be sorted by strictly increasing center_hz."}
             previous_center = band["center_hz"]
             spectrum_bands.append(band)
+    window = payload.get("measurement_window")
+    if window is not None:
+        if not isinstance(window, dict) or window.get("schema") != "kenn.continuous_window.v1" or not isinstance(window.get("valid"), bool):
+            return {"ok": False, "error": "Invalid continuous measurement window."}
+        for field in ("sequence", "source_generation", "start_sample", "end_sample", "dropped_samples", "invalid_samples"):
+            value = window.get(field)
+            if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 2**53:
+                return {"ok": False, "error": f"measurement_window.{field} must be a bounded non-negative integer."}
+        duration = window.get("duration_seconds")
+        span = window["end_sample"] - window["start_sample"]
+        if (isinstance(duration, bool) or not isinstance(duration, (int, float)) or not math.isfinite(duration)
+                or span <= 0 or abs(duration - span / values["sample_rate"]) > 1e-6
+                or abs(duration - 0.1) > 1.0 / values["sample_rate"] or window["sequence"] == 0 or window["source_generation"] == 0):
+            # A coherent publication describes exactly one 100 ms window, within one sample of rounding.
+            return {"ok": False, "error": "Continuous window duration/sample bounds disagree."}
+        try:
+            timeline = validate_host_timeline(window.get("host_timeline"), window)
+        except ValueError as error:
+            return {"ok": False, "error": str(error)}  # Contradictory clocks cannot ground cross-insert evidence.
+        window = {key: window[key] for key in ("schema", "valid", "sequence", "source_generation", "start_sample", "end_sample", "duration_seconds", "dropped_samples", "invalid_samples")}
+        if timeline:
+            window["host_timeline"] = timeline
+    try:
+        fft_spectra = validate_fft_spectra(payload.get("fft_spectra"), window, values["sample_rate"])
+    except ValueError as error:
+        return {"ok": False, "error": str(error)}  # Reject malformed calibrated features rather than quietly using them.
     mode = str(payload.get("assistant_mode", "suggest")).strip().lower()
     if mode not in _ASSISTANT_MODES:
         return {"ok": False, "error": "assistant_mode must be ask, suggest, assist, or auto."}
@@ -290,7 +342,41 @@ def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
         return {"ok": False, "error": "plugin_state.assistant_mode must match assistant_mode."}
     plugin_state["assistant_mode"] = mode
     pink_reference = pink_noise_reference_from_spectrum(spectrum_bands) if spectrum_bands else {"status": "abstained", "reason": "No realtime spectrum bands were supplied."}
-    return {"ok": True, "metrics": values, "spectrum_bands": spectrum_bands, "pink_noise_reference": pink_reference, "target_lufs": payload.get("target_lufs"), "assistant_mode": mode, "plugin_state": plugin_state, "evidence": payload.get("evidence")}
+    paired_windows = []
+    raw_history = payload.get("paired_windows", [])
+    if not isinstance(raw_history, list) or len(raw_history) > 6:
+        return {"ok": False, "error": "paired_windows must contain at most six feature windows."}
+    previous_end = -1
+    for raw in raw_history:
+        if not isinstance(raw, dict) or not window or not window["valid"]:
+            return {"ok": False, "error": "Paired history requires a valid continuous publication."}
+        # Only these fields may override the parent. In particular a child
+        # cannot recurse, change track/source identity, or smuggle raw audio.
+        fields = ("measurement_window", "fft_spectra", "peak_dbfs", "rms_dbfs", "stereo_correlation", "stereo_width", "analysed_samples", "audio_age_seconds")
+        if any(key not in fields for key in raw) or any(key not in raw for key in fields):
+            return {"ok": False, "error": "Invalid paired feature window fields."}
+        child = validate_handoff({**payload, **raw, "paired_windows": []})
+        if not child["ok"]:
+            return child  # The same DSP and clock contract applies to history and current audio.
+        child_window = child["measurement_window"] or {}
+        clock, parent_clock = child_window.get("host_timeline") or {}, window.get("host_timeline") or {}
+        if (not child_window.get("valid") or not clock.get("valid") or not parent_clock.get("valid")
+                or child_window["source_generation"] != window["source_generation"]
+                or child_window["dropped_samples"] != window["dropped_samples"] or child_window["invalid_samples"] != window["invalid_samples"]
+                or clock["transport_epoch"] != parent_clock["transport_epoch"]
+                or not previous_end < child_window["end_sample"] <= window["end_sample"]
+                or window["end_sample"] - child_window["end_sample"] > 0.6 * values["sample_rate"]
+                or child_window["sequence"] > window["sequence"]
+                or abs(clock["end_sample"] - parent_clock["end_sample"] - child_window["end_sample"] + window["end_sample"]) > 0
+                or child["metrics"]["audio_age_seconds"] + 0.005 < values.get("audio_age_seconds", 0.0)):
+            return {"ok": False, "error": "Paired history straddles a clock/source change or lies outside its publication."}
+        previous_end = child_window["end_sample"]
+        paired_windows.append({"measurement_window": child_window, "fft_spectra": child["fft_spectra"],
+                               **{key: child["metrics"][key] for key in (*_REQUIRED_NUMBERS, "audio_age_seconds")}})
+    conversation = payload.get("conversation_id", "")
+    if not isinstance(conversation, str) or len(conversation) > 128:
+        return {"ok": False, "error": "conversation_id must be a string of at most 128 characters."}
+    return {"ok": True, "conversation_id": conversation.strip(), "host_track_name": host_track_name.strip(), "metrics": values, "measurement_window": window, "fft_spectra": fft_spectra, "paired_windows": paired_windows, "spectrum_bands": spectrum_bands, "pink_noise_reference": pink_reference, "target_lufs": payload.get("target_lufs"), "assistant_mode": mode, "plugin_state": plugin_state, "evidence": payload.get("evidence")}
 
 
 def review_from_handoff(payload: dict[str, Any]) -> dict[str, Any]:
@@ -342,100 +428,236 @@ def review_from_handoff(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def ingest_live_context(payload: dict[str, Any], *, session_id: str = "") -> dict[str, Any]:
+    """Serialize HTTP publishers so sample progress and source identity stay paired."""
+    with _live_context_lock:
+        return _ingest_live_context(payload, session_id=session_id)
+
+
+def ingest_live_context_batch(payload: dict[str, Any]) -> dict[str, Any]:
+    """Validate up to 64 insert frames before caching any; return compact per-insert acknowledgements."""
+    received_at = time.time()
+    if (payload.get("schema") != "kenn.plugin_handoff_batch.v1" or set(payload) not in
+            ({"schema", "frames"}, {"schema", "frames", "exported_at_epoch"})
+            or not isinstance(payload.get("frames"), list) or not 1 <= len(payload["frames"]) <= 64):
+        # The transport accepts features only; no extra top-level command or unbounded frame list can reach the cache.
+        return {"ok": False, "error": "Expected a feature-only batch of one to 64 insert frames."}
+    age_reference_at = received_at
+    if "exported_at_epoch" in payload:
+        exported = payload["exported_at_epoch"]
+        if not _valid_export_clock(exported, received_at):
+            # A 50 ms future-clock tolerance permits small local clock steps;
+            # reject larger jumps atomically rather than extending evidence life.
+            return {"ok": False, "error": "exported_at_epoch must be finite non-negative local epoch seconds, no more than 50 ms in the future."}
+        age_reference_at = min(received_at, exported)
+    # Older batch clients omit the export clock and retain receipt-relative
+    # ages. New native clients always supply it to qualify transport freshness.
+    identities = set()
+    for frame in payload["frames"]:
+        key = frame.get("session_id") if isinstance(frame, dict) else None
+        if not isinstance(key, str) or not key.strip() or len(key) > 128 or key.strip() in identities:
+            # Reject the whole batch before caching: duplicate or truncated IDs could overwrite another insert.
+            return {"ok": False, "error": "Every batch frame needs a unique non-empty insert ID of at most 128 characters."}
+        checked = validate_handoff(frame)
+        if not checked["ok"]:
+            return checked  # A malformed sibling cannot partially replace other inserts' evidence.
+        identities.add(key.strip())
+    with _live_context_lock:
+        results = []
+        for frame in payload["frames"]:
+            # One receipt clock keeps validation time from making siblings
+            # appear captured at different times or making older audio younger.
+            result = _ingest_live_context(frame, session_id=frame["session_id"], received_at=received_at,
+                                          age_reference_at=age_reference_at)
+            acknowledgement = {"session_id": frame["session_id"].strip(), "ok": result["ok"]}
+            if result["ok"]:
+                acknowledgement["freshness"] = result["live_context"]["freshness"]
+            else:
+                acknowledgement["error"] = result["error"]  # A stale frame is rejected independently; current siblings remain usable.
+            results.append(acknowledgement)
+    return {"ok": all(item["ok"] for item in results), "schema": "kenn.plugin_handoff_batch.v1", "frames": results}
+
+
+def _ingest_live_context(payload: dict[str, Any], *, session_id: str = "", received_at: float | None = None,
+                         age_reference_at: float | None = None) -> dict[str, Any]:
     """Validate and retain one bounded plug-in feature frame.
 
     This is deliberately a compact feature snapshot, not raw audio, and it
     has a short TTL.  The caller owns the session id; an empty id uses the
     local plug-in session to preserve backwards compatibility.
+    Validated frame/batch export clocks anchor audio age independently of receipt.
     """
     review = review_from_handoff(payload)
     if not review["ok"]:
         return review
     key = (session_id or str(payload.get("session_id") or "plugin-local")).strip()[:128]
-    now = time.time()
+    now = time.time() if received_at is None else received_at
+    age_reference = now if age_reference_at is None else age_reference_at
     checked = validate_handoff(payload)
+    if not checked["ok"]:
+        # The local wall clock may step after review. Refuse before reading
+        # validated metrics or mutating the cache if the export clock is now invalid.
+        return checked
+    if "exported_at_epoch" in payload:
+        # Use the older anchor when a frame travels in a batch. Neither path
+        # may grant another lifetime to audio delayed in collection or transit.
+        age_reference = min(age_reference, payload["exported_at_epoch"])
     previous = _live_contexts.get(key, {})
-    frames = [frame for frame in previous.get("frames", []) if isinstance(frame, dict)]
-    frames.append({
-        "received_at": now,
-        "metrics": checked["metrics"],
-        "spectrum_bands": checked["spectrum_bands"],
-        "pink_noise_reference": checked["pink_noise_reference"],
-    })
+    metrics = checked["metrics"]
+    # A reset or host-name change starts a new source history. Count samples,
+    # not HTTP deliveries: a stopped/disabled processor can resend old meters.
+    same_source = (previous.get("conversation_id", "") == checked["conversation_id"]
+                   and previous.get("host_track_name", "") == checked["host_track_name"]
+                   and previous.get("metrics", {}).get("sample_rate") == metrics["sample_rate"]
+                   and (previous.get("measurement_window") or {}).get("source_generation") == (checked["measurement_window"] or {}).get("source_generation"))
+    last_samples = previous.get("metrics", {}).get("analysed_samples", -1)
+    advancing = metrics["analysed_samples"] != last_samples
+    source_pending = bool(previous and not same_source and not advancing) or bool(previous.get("source_pending") and not advancing)
+    old_window, window = previous.get("measurement_window") or {}, checked["measurement_window"] or {}
+    if old_window and window and old_window["source_generation"] == window["source_generation"]:
+        if window["sequence"] < old_window["sequence"] or (window["sequence"] == old_window["sequence"]
+                and window["valid"] and not old_window["valid"]):
+            # Concurrent Ask/publisher requests may arrive out of order; never
+            # roll back to earlier audio or resurrect a frame retired by a gap.
+            return {"ok": False, "error": "Stale continuous publication; wait for a new complete audio window."}
+    gap = bool(window and (not window["valid"] or window["dropped_samples"] != old_window.get("dropped_samples", 0)
+                          or window["invalid_samples"] != old_window.get("invalid_samples", 0)
+                          or (window.get("host_timeline") or {}).get("transport_epoch") != (old_window.get("host_timeline") or {}).get("transport_epoch")))
+    frames = list(previous.get("frames", [])) if same_source and metrics["analysed_samples"] >= last_samples and not gap else []
+    if advancing and (not window or window["valid"]):
+        frames.append({
+            "received_at": now,
+            "metrics": metrics,
+            "spectrum_bands": checked["spectrum_bands"],
+            "pink_noise_reference": checked["pink_noise_reference"],
+        })
     cutoff = now - _LIVE_HISTORY_SECONDS
     frames = [frame for frame in frames if float(frame.get("received_at", 0.0)) >= cutoff][- _MAX_LIVE_FRAMES:]
-    _live_contexts[key] = {"received_at": now, "metrics": checked["metrics"], "spectrum_bands": checked["spectrum_bands"], "pink_noise_reference": checked["pink_noise_reference"], "assistant_mode": checked["assistant_mode"], "plugin_state": checked["plugin_state"], "review": review, "frames": frames}
+    paired_windows = []
+    for entry in checked["paired_windows"]:
+        observed = age_reference - entry["audio_age_seconds"]
+        if same_source and not gap:
+            for old in previous.get("paired_windows", []):
+                if old["measurement_window"] == entry["measurement_window"]:
+                    observed = min(observed, old["observed_at_epoch"])  # HTTP retries cannot make cached audio younger.
+        paired_windows.append({**entry, "observed_at_epoch": observed})
+    reported_state = dict(checked["plugin_state"])
+    requests = dict(previous.get("parameter_requests", {})) if previous.get("conversation_id") == checked["conversation_id"] else {}
+    requests = {name: value for name, value in requests.items() if reported_state.get(name) != value}
+    # A frame already in flight may follow Pause. Retain the requested state
+    # until a native frame acknowledges it; reassignment must not inherit it.
+    effective_state = {**reported_state, **requests}
+    _live_contexts[key] = {
+        "received_at": now if advancing else previous["received_at"],
+        "audio_observed_at": (age_reference - metrics.get("audio_age_seconds", 0.0) if advancing else
+                              min(previous.get("audio_observed_at", previous["received_at"]), age_reference - metrics.get("audio_age_seconds", 0.0))),
+        "host_track_name": checked["host_track_name"], "metrics": metrics,
+        "conversation_id": checked["conversation_id"],
+        "source_pending": source_pending, "measurement_window": checked["measurement_window"],
+        "fft_spectra": checked["fft_spectra"],
+        "paired_windows": paired_windows,
+        "spectrum_bands": checked["spectrum_bands"], "pink_noise_reference": checked["pink_noise_reference"],
+        "assistant_mode": effective_state["assistant_mode"], "plugin_state": effective_state,
+        # Queued controls may change plugin_state before the host consumes them.
+        # Keep the published state separate so the UI cannot claim a host acknowledgement.
+        "reported_plugin_state": reported_state, "parameter_requests": requests,
+        "review": review, "frames": frames,
+    }
     for stale_key, item in list(_live_contexts.items()):
         if now - float(item.get("received_at", 0)) > _CONTEXT_TTL_SECONDS:
             _live_contexts.pop(stale_key, None)
 
-    # Bridge native VST3 bus metrics into KENN Real-time Audio Telemetry Manager
-    try:
-        from kenn.audio_telemetry import get_telemetry_manager
-        m = checked["metrics"]
-        sb = checked.get("spectrum_bands", [])
-
-
-        # Approximate 4-band spectral distribution from VST3 spectrum bands or band energy
-        sub_e = float(m.get("low_energy", 0.25))
-        low_mid_e = float(m.get("mid_energy", 0.25))
-        high_mid_e = float(m.get("high_energy", 0.25))
-        air_e = 0.25
-        if sb:
-            for b in sb:
-                c = float(b.get("center_hz", 1000.0))
-                e = float(b.get("energy", 0.25))
-                if c <= 80:
-                    sub_e = e
-                elif 80 < c <= 500:
-                    low_mid_e = e
-                elif 500 < c <= 6000:
-                    high_mid_e = e
-                else:
-                    air_e = e
-
-
-        total_e = max(0.01, sub_e + low_mid_e + high_mid_e + air_e)
-        telemetry_payload = {
-            "integrated_lufs": round(float(m.get("rms_dbfs", -14.0)) - 3.0, 1),
-            "short_term_lufs": round(float(m.get("rms_dbfs", -14.0)), 1),
-            "true_peak_dbtp": round(float(m.get("peak_dbfs", -1.0)), 2),
-            "spectral_energy": {
-                "sub_20_60hz": round(sub_e / total_e, 3),
-                "low_mid_200_500hz": round(low_mid_e / total_e, 3),
-                "high_mid_2_6khz": round(high_mid_e / total_e, 3),
-                "air_10_20khz": round(air_e / total_e, 3),
-            },
-            "phase_correlation": round(float(m.get("stereo_correlation", 0.9)), 2),
-            "crest_factor_db": round(float(m.get("crest_db", 10.0)), 1),
-            "timestamp": now,
-        }
-        get_telemetry_manager().ingest(telemetry_payload)
-    except Exception:
-        pass
-
+    # Keep per-insert evidence scoped to its owner. RMS is not LUFS and sample
+    # peak is not true peak; neither may be bridged into global master telemetry.
     live_context = live_context_summary(key)
     from kenn.plugin_actions import proposals_from_live_context
-    proposals = [] if checked["assistant_mode"] == "ask" else proposals_from_live_context(live_context, target_lufs=float(payload.get("target_lufs", -14.0)))
+    may_propose = bool(live_context and live_context["freshness"]["current_for_diagnosis"])
+    # Expired or invalid frames may remain useful as labelled history, but
+    # cannot justify even a delivery-target suggestion.
+    proposals = [] if checked["assistant_mode"] == "ask" or not may_propose else proposals_from_live_context(live_context, target_lufs=float(payload.get("target_lufs", -14.0)))
     return {**review, "session_id": key, "assistant_mode": checked["assistant_mode"], "live_context": live_context, "action_proposals": proposals}
 
 
 def live_context_summary(session_id: str) -> dict[str, Any] | None:
+    """Read a consistent feature history; the native audio thread never calls here."""
+    with _live_context_lock:
+        return _live_context_summary(session_id)
+
+
+def _audio_currentness(item: dict[str, Any], now: float) -> tuple[float, bool]:
+    """Return audio age in seconds and whether queued controls still permit diagnosis."""
+    age = max(0.0, now - item.get("audio_observed_at", item["received_at"]))
+    window = item.get("measurement_window")
+    maximum = _MAX_CONTINUOUS_AGE_SECONDS if window else _MAX_CURRENT_DIAGNOSIS_AGE_SECONDS
+    state = item["plugin_state"]
+    return age, bool(age <= maximum and state.get("analysis_enabled", True)
+                     and state.get("live_context_enabled", True) and not item.get("source_pending")
+                     and (not window or window["valid"]))
+
+
+def plugin_insert_sources(conversation_id: str, selected_insert: str = "") -> dict[str, Any]:
+    """List up to 64 retained inserts for an explicit conversation, without selecting one.
+
+    An unpublished launch insert remains selectable so its owner can opt into
+    publishing. A known insert owned by another conversation is refused.
+    """
+    owner = str(conversation_id or "").strip()
+    selected = str(selected_insert or "").strip()
+    if not owner or len(owner) > 128 or len(selected) > 128:
+        # Malformed launch identities must not fall back to a global insert list.
+        return {"ok": False, "error": "A conversation ID of at most 128 characters is required."}
+    with _live_context_lock:
+        now = time.time()
+        items = {key: item for key, item in _live_contexts.items()
+                 if now - item["received_at"] <= _CONTEXT_TTL_SECONDS}
+        selected_item = items.get(selected)
+        if selected_item and selected_item.get("conversation_id") != owner:
+            # Knowing an insert ID does not associate its audio with this chat.
+            return {"ok": False, "error": "Selected insert belongs to another conversation. Open KENN from that insert."}
+        owned = [(key, item) for key, item in items.items() if item.get("conversation_id") == owner]
+        owned.sort(key=lambda entry: (entry[0] != selected, -entry[1]["received_at"], entry[0]))
+        sources = []
+        for key, item in owned[:64]:  # Match the native publisher's 64-insert batch limit.
+            age, current = _audio_currentness(item, now)
+            sources.append({"insert_id": key, "host_track_name": item.get("host_track_name", ""),
+                            "audio_age_seconds": round(age, 2), "current_for_diagnosis": current,
+                            "requested_parameters": dict(item["plugin_state"]),
+                            "reported_parameters": dict(item.get("reported_plugin_state", item["plugin_state"]))})
+        return {"ok": True, "conversation_id": owner, "sources": sources,
+                "selected_status": "known" if selected_item else "waiting_for_publication"}
+
+
+def queue_owned_plugin_parameters(insert: str, conversation_id: str, updates: dict[str, Any]) -> dict[str, Any]:
+    """Queue browser controls for its launch insert; never resolve a conversation to a sibling."""
+    with _live_context_lock:
+        ownership = plugin_insert_sources(conversation_id, insert)
+        if not insert or not ownership.get("ok"):
+            # Before first publication the explicit launch ID can bootstrap opt-in;
+            # once published, conflicting ownership always blocks the request.
+            return {"ok": False, "error": ownership.get("error", "Select an insert before changing audio analysis.")}
+        return set_plugin_parameters(insert, updates, direct_insert=True)
+
+
+def _live_context_summary(session_id: str) -> dict[str, Any] | None:
     item = _live_contexts.get(session_id)
     now = time.time()
     if not item or now - float(item.get("received_at", 0)) > _CONTEXT_TTL_SECONDS:
+        # Expired features cannot ground a current-session answer; callers request new playback.
         _live_contexts.pop(session_id, None)
         return None
     metrics = item["metrics"]
-    age_seconds_raw = max(0.0, now - item["received_at"])
+    # Include native audio age even on the first HTTP delivery after a stop.
+    age_seconds_raw, current_for_diagnosis = _audio_currentness(item, now)
     age_seconds = round(age_seconds_raw, 2)
-    current_for_diagnosis = age_seconds_raw <= _MAX_CURRENT_DIAGNOSIS_AGE_SECONDS
+    window = item.get("measurement_window")
+    max_age = _MAX_CONTINUOUS_AGE_SECONDS if window else _MAX_CURRENT_DIAGNOSIS_AGE_SECONDS
     result = {
         "schema": "kenn.live_mix_context.v1",
         "age_seconds": age_seconds,
         "assistant_mode": item["assistant_mode"],
         "plugin_state": item["plugin_state"],
         "scope": "plugin_bus",
+        "conversation_id": item.get("conversation_id", ""),
+        "host_track_name": item.get("host_track_name", ""),
         "peak_dbfs": metrics["peak_dbfs"],
         "rms_dbfs": metrics["rms_dbfs"],
         "stereo_correlation": metrics["stereo_correlation"],
@@ -446,6 +668,11 @@ def live_context_summary(session_id: str) -> dict[str, Any] | None:
     for key in _OPTIONAL_NUMBERS:
         if key in metrics:
             result[key] = metrics[key]
+    if window:
+        result["measurement_window"] = dict(window)
+    if item.get("fft_spectra"):
+        result["fft_spectra"] = item["fft_spectra"]
+    result["paired_windows"] = [{**entry, "age_seconds": max(0.0, now - entry["observed_at_epoch"])} for entry in item.get("paired_windows", [])]
     result["spectrum_schema"] = SPECTRUM_SCHEMA
     result["spectrum_bands"] = item.get("spectrum_bands", [])
     result["pink_noise_reference"] = item.get("pink_noise_reference", {"status": "abstained", "reason": "No realtime spectrum bands were supplied."})
@@ -453,14 +680,15 @@ def live_context_summary(session_id: str) -> dict[str, Any] | None:
     live_window = _live_window_summary(frames)
     result["live_window"] = live_window
     result["freshness"] = {
-        "observed_at_epoch": float(item.get("received_at", now)),
+        "observed_at_epoch": float(item.get("audio_observed_at", item["received_at"])),
+        "received_at_epoch": float(item["received_at"]),
         "age_seconds": result["age_seconds"],
         "ttl_seconds": _CONTEXT_TTL_SECONDS,
         "expires_at_epoch": float(item.get("received_at", now)) + _CONTEXT_TTL_SECONDS,
         "frame_count": live_window["sample_count"],
         "status": "current" if current_for_diagnosis else "stale_or_unknown",
         "current_for_diagnosis": current_for_diagnosis,
-        "max_current_age_seconds": _MAX_CURRENT_DIAGNOSIS_AGE_SECONDS,
+        "max_current_age_seconds": max_age,
     }
     from kenn.core.evidence import from_plugin_context
     packet = from_plugin_context(result)
@@ -503,9 +731,25 @@ def live_review_summary(session_id: str) -> dict[str, Any]:
 _pending_parameter_updates: dict[str, dict[str, Any]] = {}
 
 
+def _parameter_key(session_id: str) -> str:
+    """Resolve a single insert for older conversation-keyed parameter callers."""
+    key = str(session_id or "plugin-local").strip()[:128]
+    with _live_context_lock:
+        if key in _live_contexts or key in _pending_parameter_updates:
+            return key
+        matches = [insert for insert, item in _live_contexts.items() if item.get("conversation_id") == key
+                   and time.time() - item["received_at"] <= _CONTEXT_TTL_SECONDS]
+        if len(matches) > 1:
+            raise ValueError("This conversation has multiple inserts; select the insert ID before changing its parameters.")
+        return matches[0] if matches else key  # Preserve pre-publication and legacy parameter queues.
+
+
 def get_plugin_parameters(session_id: str) -> dict[str, Any]:
     """Return the active parameters and any pending host updates for a session."""
-    key = str(session_id or "plugin-local").strip()[:128]
+    try:
+        key = _parameter_key(session_id)
+    except ValueError as error:
+        return {"ok": False, "error": str(error)}  # An ambiguous conversation cannot select an audio instance.
     item = _live_contexts.get(key)
     state = dict(item.get("plugin_state", {})) if item else {}
     if not state:
@@ -513,7 +757,7 @@ def get_plugin_parameters(session_id: str) -> dict[str, Any]:
             "assistant_mode": "suggest",
             "target_lufs": -14.0,
             "analysis_enabled": True,
-            "live_context_enabled": True,
+            "live_context_enabled": False,  # Native publishing requires explicit opt-in.
         }
     pending = dict(_pending_parameter_updates.get(key, {}))
     return {
@@ -524,9 +768,12 @@ def get_plugin_parameters(session_id: str) -> dict[str, Any]:
     }
 
 
-def set_plugin_parameter(session_id: str, parameter: str, value: Any) -> dict[str, Any]:
+def set_plugin_parameter(session_id: str, parameter: str, value: Any, *, direct_insert: bool = False) -> dict[str, Any]:
     """Queue a parameter update originating from Web UI to synchronize to host automation."""
-    key = str(session_id or "plugin-local").strip()[:128]
+    try:
+        key = session_id if direct_insert else _parameter_key(session_id)
+    except ValueError as error:
+        return {"ok": False, "error": str(error)}  # Never queue the update for whichever insert published last.
     param_name = str(parameter or "").strip().lower()
     if param_name == "target_lufs":
         try:
@@ -552,6 +799,7 @@ def set_plugin_parameter(session_id: str, parameter: str, value: Any) -> dict[st
         if "plugin_state" not in _live_contexts[key]:
             _live_contexts[key]["plugin_state"] = {}
         _live_contexts[key]["plugin_state"][param_name] = val
+        _live_contexts[key].setdefault("parameter_requests", {})[param_name] = val
         if param_name == "assistant_mode":
             _live_contexts[key]["assistant_mode"] = val
 
@@ -566,7 +814,10 @@ def set_plugin_parameter(session_id: str, parameter: str, value: Any) -> dict[st
 
 def pop_pending_parameter_updates(session_id: str) -> dict[str, Any]:
     """Retrieve and clear queued parameter updates for the native DAW plug-in instance."""
-    key = str(session_id or "plugin-local").strip()[:128]
+    try:
+        key = _parameter_key(session_id)
+    except ValueError as error:
+        return {"ok": False, "error": str(error)}  # Ambiguous callers cannot consume another insert's pending update.
     pending = _pending_parameter_updates.pop(key, {})
     return {
         "ok": True,
@@ -575,14 +826,14 @@ def pop_pending_parameter_updates(session_id: str) -> dict[str, Any]:
     }
 
 
-def set_plugin_parameters(session_id: str, updates: dict[str, Any]) -> dict[str, Any]:
+def set_plugin_parameters(session_id: str, updates: dict[str, Any], *, direct_insert: bool = False) -> dict[str, Any]:
     """Queue multiple parameter updates originating from Web UI to synchronize to host automation."""
     key = str(session_id or "plugin-local").strip()[:128]
     if not isinstance(updates, dict) or not updates:
         return {"ok": False, "error": "updates must be a non-empty dictionary."}
     applied: dict[str, Any] = {}
     for param, val in updates.items():
-        res = set_plugin_parameter(key, param, val)
+        res = set_plugin_parameter(key, param, val, direct_insert=direct_insert)
         if not res.get("ok"):
             return res
         applied[res["parameter"]] = res["value"]

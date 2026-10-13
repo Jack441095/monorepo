@@ -33,6 +33,7 @@ export const API_PATHS = {
     revokeConfirmation: '/kenn/api/ableton/confirmation/revoke',
     undo: '/kenn/api/ableton/osc/undo',
     parameters: '/kenn/api/plugin/parameters',
+    pluginInserts: '/kenn/api/plugin/inserts',
     racks: '/kenn/api/racks',
     synthesizeRack: '/kenn/api/racks/synthesize',
     worldModel: '/kenn/api/session/world_model',

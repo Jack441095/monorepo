@@ -28,6 +28,18 @@ def test_requests_within_the_limit_are_allowed():
         assert retry_after == 0
 
 
+def test_feature_batch_budget_is_bounded_without_spending_live_control_budget():
+    # Per-insert HTTP exhausted Live's mutation bucket at 32 inserts. One
+    # shared 2 Hz budget must neither spend nor raise the 60/min control limit.
+    assert server_rate_limit.RATE_LIMITS["mutation"] == (60, 60)
+    for _ in range(120):
+        assert server_rate_limit.rate_allowed("studio", "plugin_handoff_batch")[0]
+    assert not server_rate_limit.rate_allowed("studio", "plugin_handoff_batch")[0]
+    for _ in range(60):
+        assert server_rate_limit.rate_allowed("studio", "mutation")[0]
+    assert not server_rate_limit.rate_allowed("studio", "mutation")[0]
+
+
 def test_exceeding_the_limit_is_rejected_with_a_retry_after():
     limit, _window = server_rate_limit.RATE_LIMITS["ask"]
     for _ in range(limit):

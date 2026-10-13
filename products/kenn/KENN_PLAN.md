@@ -141,6 +141,416 @@ answer, retrieved note, audio finding or model plan cannot grant write permissio
 
 ### Context and identity contract
 
+Current-insert analysis (2026-10-13): native Ask can supply bounded DSP features
+and audio age; [the analysis route](apps/backend/src/kenn/core/live_track_analysis.py)
+separates measurements, fresh Live context, interpretations, and missing evidence.
+[The host adapter](apps/backend/src/kenn/core/live_analysis_host.py) resolves one
+track from a fresh snapshot and uniquely matches its host-provided name before
+offering a confirmation-gated fader reduction. This connects the previously
+separate plug-in bus review and Live Apply/readback/Undo paths. Sample peak/RMS
+are no longer relabelled as true peak/LUFS in the native handoff or republished as
+global master telemetry. Stopped or repeated sample counters cannot refresh
+diagnosis; source changes reset history. No raw audio, automatic writes, or new
+control authority is introduced.
+
+The slice covers a measured insert on any uniquely named regular track. Master
+and unbound inserts provide scoped observations/manual advice. Continuous insert
+measurement now runs on one shared worker: coherent 100 ms peak/RMS/crest,
+near-full-scale frame counts, correlation/width, stereo-power filter-bank bands,
+and fast/sustain envelopes. The callback only copies into fixed queue storage;
+overflow discards measurement blocks without changing playback. Validity,
+generation, sequence, sample bounds, capture age and drop/invalid counts travel
+together. Gaps retire evidence until a complete window recovers; continuous
+audio older than 1 second cannot ground advice. Opt-in publishing sends changed
+features on one shared publisher, at most two batches per second per companion
+for up to 64 inserts, with editors closed and no raw audio transfer. Compact
+feature batches retain the 1 MiB request cap, use a separate 120/minute budget,
+and leave Live's 60/minute control limit and endpoint permissions unchanged.
+Malformed batches replace no evidence. All siblings share one receipt clock;
+validation time counts toward age rather than shifting their capture timestamps.
+Native batches and individual Ask/file/upload snapshots now carry a local epoch
+export clock. Collection, serialization and stalled HTTP count toward audio age;
+the older frame/batch anchor wins. Invalid clocks reject the packet atomically,
+and offsets up to 50 ms ahead of receipt clamp to receipt. Cache retention still
+uses actual receipt time. Legacy clients without export clocks cannot qualify
+transport-delay freshness. Each macOS publisher tick drains an autorelease pool
+instead of retaining temporary feature/HTTP objects until thread shutdown.
+
+Explicit **"bind this insert to track 1"** associations are scoped to the
+conversation/insert, expire after five minutes, and recheck names/order, source
+generation, sample rate and counter resets. **"unbind this insert"** requires no
+running audio. Conflicting host names are refused; a declaration alone cannot
+unlock a fader whose host name is missing or duplicated. This is a short-lived
+revision check: no durable project/track ID is available, and switching between
+identical set topologies still requires the producer to re-bind.
+
+Cached 2,048/8,192-sample stereo Hann-power FFTs now supply bounded frequency
+features with their own capture intervals. Two explicitly bound inserts in one
+conversation can compare low-frequency band-power shapes only on matching
+host-timed windows, with a six-window native feature history bridging publisher
+phase offsets. Native insert IDs are independent of conversation ownership;
+reopened processors need new bindings. This establishes a measured spectral
+comparison, not audible masking or causal sidechain behavior. Routing/settings,
+gain reduction, true peak/LUFS, durable project identity and delay-compensation
+qualification remain unavailable. Active synthetic HTTP profiling now covers
+1/8/32/64 inserts, including shared-publisher destruction/restart. Next:
+controlled, matched bypass evidence and sustained host profiling before any
+ducking conclusion or faster publication. Host qualification in an owner-scheduled
+disposable set remains separate from offline synthetic DSP and FakeLive HTTP
+verification. See the [plug-in contract](plugins/kenn-vst3-au/README.md) for
+windowing and controls.
+
+Execution plan for efficient continuous analysis (2026-10-13):
+
+- [x] Move insert analysis behind a preallocated, single-producer/single-consumer
+  queue. Overflow drops measurements, never waits for playback; a shared worker
+  serves instances even with their editors closed.
+- [x] Publish coherent 100 ms windows with sample positions, capture age, source
+  generation and drop counts. Measure stereo energy before summing channels;
+  use envelope time constants in milliseconds rather than callback counts.
+- [x] Carry that contract through the feature-only companion handoff. Abstain on
+  gaps/stale audio and provide explicit, revision-checked insert associations.
+- [x] Verify synthetic signal correctness, queue overflow/recovery, callback
+  allocations, pass-through, instance isolation, and average/p99/max timings at
+  multiple rates/buffer sizes and 1/8/32/64 instances. Update this plan with evidence.
+- [x] Add cached 2,048/8,192-sample FFTs, qualified power units, host-sample grid
+  alignment, seek/loop/clock-loss retirement and bounded paired feature history.
+  Connect two native inserts through independent insert IDs and owner-scoped
+  explicit bindings; verify matching kick/bass spectra through FakeLive HTTP.
+- [x] Profile real native publishers against an isolated FakeLive HTTP companion.
+  Replace per-insert HTTP threads with one shared feature-batch publisher; verify
+  64-insert freshness, payload caps, independent control limits, atomic validation,
+  shared receipt timing, bounded responses and last-insert shutdown/restart.
+- [x] Count transit time in both native batch and explicit Ask evidence. Verify
+  a 1.05-second HTTP stall expires continuous audio and later windows recover;
+  malformed/future clocks cannot partially overwrite a batch or renew a snapshot.
+  A clock step during validation refuses the snapshot without a server exception.
+- [x] Add a 15-second native retained-memory regression and per-tick macOS
+  autorelease pools. Removing the pool fails the regression. Record current
+  private footprint, live allocator bytes and peak RSS separately; keep synthetic
+  instrumentation and host-process memory qualification distinct.
+- [x] Qualify 64 native publishers for 65 seconds against isolated FakeLive HTTP,
+  crossing the full 60-second rate bucket with fresh evidence, bounded request
+  sizes, no one-second delivery gap and passing current-private-memory growth.
+- [x] Profile optional LUFS/true-peak reuse offline across 44.1/48/96 kHz,
+  400 ms/3-second clips and 1/8/32/64 inserts. Record installed-binary identity,
+  process CPU, serial wall time and numerical parity. Reject the existing
+  stateless integrated-LUFS/LRA clip API for live momentary/short-term metering.
+- [x] Build a disabled streaming loudness/true-peak candidate with persistent
+  K-weighting, ungated 400 ms/3-second energy and fixed FIR history. Verify
+  retirement/warm-up, generated calibration/peak cases, continuous numerical
+  references and combined worker cost across 44.1/48/96 kHz and 1/8/32/64 inserts.
+- [ ] Connect web chat to explicitly associated native inserts before showing
+  this continuous analysis in the browser. Carry the chosen insert identity and
+  conversation ownership through `/api/ask`; never choose the latest insert
+  implicitly. Verify current evidence, wrong/stale/unbound insert refusals,
+  paired-insert ownership and an analysis proposal's Apply/readback/Undo through
+  the actual browser against FakeLive. Native Ask tests do not close this gate.
+- [ ] Complete meter qualification before exposing live LUFS/dBTP: resolve 44.1 kHz
+  interpolation accuracy and delayed peak interval semantics, cover temporal and
+  transient conformance cases, and measure sustained shared-worker/publisher/model
+  contention. Investigate the intermittent callback/freshness tails recorded below.
+  Keep the candidate disabled and its 10 Hz measurement cadence separate from 2 Hz
+  HTTP publication until those gates pass.
+- [ ] Qualify controlled, matched sidechain bypass comparisons before reporting
+  causal ducking. Routing/trigger audio and gain-reduction settings are still
+  unavailable.
+- [ ] Schedule a producer-supervised disposable Live soak for transport changes,
+  UI-closed operation and companion contention. Measure process CPU/RSS, callback
+  tails and transport/HTTP latency with opt-in publishers active. Repeat sustained
+  tests with the local model resident before increasing publication frequency. Offline timings alone
+  cannot close the host-performance gate.
+
+Final offline verification for this execution (2026-10-13, Apple M3, JUCE 8.0.2):
+**214 scoped backend checks passed**, including the compiled native Ask/bind/unbind
+client, a host-timed two-insert FFT comparison, and confirmed FakeLive
+apply/readback/Undo, plus both offline meter profiling tools and existing loudness
+analysis. The scoped run skips the four separately executed native
+publisher profiles. The final profiles passed with at least four deliveries in the short
+case, expired-then-fresh recovery in the delayed case, 21 fresh deliveries per
+insert over 15 seconds and 92 over 65 seconds.
+AU/VST3 built; **nine functional native CTest checks passed**. The latest callback
+matrix repeat passed all 60 cells; its preceding run failed freshness in two cells,
+and both runs contained callback deadline overruns, detailed below. Synthetic tests cover analytic RMS/crest and FFT
+power, signed preroll, different insert start times, seeks/loops/clock loss,
+overflow/recovery, invalid input, callback C++ allocations, transparent pass-through,
+zero declared latency, instance isolation and editor-closed operation.
+Mutation probes caught missing native overflow/epoch retirement, FFT normalization,
+companion validity/clock matching, attribution, batch-wide validation, export-age
+anchoring and the publisher autorelease-pool guards;
+the original guards were restored. No producer session was written, and no work
+was committed, installed or distributed.
+
+The streaming-meter follow-up's full backend run returned
+**5,173 passes, 16 skips and two pre-existing failures** in untouched
+`test_mixing_doctor.py`:
+`test_low_end_name_and_fader_overlap_is_an_advisory_candidate` and
+`test_near_ceiling_track_meter_creates_track_specific_headroom_advisory`.
+Both discard the pure audit function's return value and expect shared-store
+updates; they were independently reproduced before this implementation.
+Verification from `apps/backend` used `KENN_LIVE_BACKEND=fake KENN_LLM_ENABLED=0
+.venv/bin/python -m pytest -q src/kenn/tests`. The focused eight-file and full runs also set
+`KENN_NATIVE_COMMAND_TEST_BINARY=/tmp/kenn-live-analysis-arm64/TestCommandIntegration`
+and `KENN_STREAMING_METER_TEST_BINARY=/tmp/kenn-live-analysis-arm64/TestStreamingMeter`.
+Native functional verification used `KENN_TEST_OFFLINE_ONLY=1 ctest --test-dir
+/tmp/kenn-live-analysis-arm64 -E 'KENN.ServerIntegration|KENN.RealtimePerformance'
+--output-on-failure`, followed by the actual `TestRealtimePerformance` executable;
+the excluded check expects an external server, while the Python fixture above
+qualifies the actual native HTTP client against its own isolated FakeLive server.
+
+The FFT-enabled 60-cell wall-paced callback matrix runs at **44.1/48/96 kHz**, **64/128/256/
+512/1,024 samples**, and **1/8/32/64 inserts**, using the actual processor and shared
+worker without editors. Each cell runs for 400 ms, excluding its first 100 ms
+from callback statistics; opt-in HTTP publishing is disabled in this benchmark.
+
+| Recorded metric | Local result | Limit of the evidence |
+|---|---|---|
+| Mean callback time across cells, latest repeat | 0.394–8.958 µs; 0.007–0.204% of each insert's block budget | Per insert, synthetic input; does not include all DAW processing. |
+| Per-cell p99 callback time, latest repeat | 0.792–13.333 µs | Short cells have limited tail samples; this is not a deadline guarantee. |
+| Largest individual callback, latest repeat | 4,164.792 µs at 96 kHz / 256 samples / 8 inserts | Exceeds that cell's 2,666.667 µs block deadline. The preceding run reached 5,260.458 µs; sustained publishing reached 7,157.958 µs. |
+| Oldest capture age at cell completion, latest repeat | 0.677–126.819 ms | Includes window cadence/backlog; excludes HTTP/model delivery latency. The preceding run failed two cells at 1,747.733–1,781.263 ms. |
+| Dropped measurement samples | 0 in all 60 cells | Separate overflow tests qualify the bounded drop/recovery path. |
+| Shared worker elapsed DSP work, latest repeat | 1.170–133.393 ms per 400 ms cell | Elapsed work, not process CPU accounting; up to 33.3% of one core's wall-time budget. |
+| Fixed queue storage | 145,976 bytes per insert; 8.910 MiB for 64 | Queue storage only, not total process RSS. |
+
+After adding the disabled candidate, the first matrix run returned **58/60 passing
+cells**. Freshness failed at 44.1 kHz / 128 samples / 8 inserts and 48 kHz / 256
+samples / 64 inserts, with no measurement drops. An unchanged immediate repeat
+passed **60/60**. The cause of those intermittent stalls is unresolved; this is
+recovery evidence, not a fix. Both runs leave the host-performance gate open.
+Logs: `/tmp/kenn-streaming-meter-callback-matrix.log` and
+`/tmp/kenn-streaming-meter-callback-repeat.log`. These run-local logs are outside
+the repository; preserve them with release qualification evidence if needed.
+
+The final short transport profile ran the compiled processors for **three seconds each
+at 48 kHz / 128 samples with 1/8/32/64 inserts**, without editors, against one
+isolated loopback companion. The old per-insert transport exhausted the shared
+mutation bucket after 60 uploads and left later sources without fresh evidence.
+The shared compact batch transport passed these gates:
+
+| Recorded metric | Local result | Limit of the evidence |
+|---|---|---|
+| Delivery | 17 HTTP 200 requests; 421 acknowledged frames; at least four fresh deliveries for each of 105 insert lifetimes | Short synthetic cells, one process/companion; not a sustained multi-host soak. |
+| Request size | 13,337–902,007 bytes | Full-precision FFTs and six history windows; 1 MiB cap remains enforced. |
+| Handler latency | p99 86.37 ms; maximum 87.24 ms | Handler duration, not full capture-to-answer or model latency. |
+| Maximum acknowledged audio age | 0.23 seconds | Includes native age and validation; capture age expires at 1 second. |
+| Native callback means with HTTP active | 0.543–1.550 µs; 0.020–0.058% per-insert block budget | Maximum callback 146.625 µs; no drops in these four cells. |
+| Native process CPU | 2.155 CPU seconds across the four three-second cells | Includes DSP, callbacks, serialization, HTTP and lifetime setup/teardown; not a 64-insert per-cell CPU result. |
+| Native maximum RSS | 63,127,552 bytes (60.20 MiB) | Child-process high-water mark across the whole profile, not queue memory or total Live memory. |
+| Companion process CPU | 0.692 CPU seconds across the profile | Includes isolated HTTP handling/fixture logging; excludes a resident language model and normal app traffic. |
+
+Run this profile alone from `apps/backend` with `KENN_LIVE_BACKEND=fake
+KENN_LLM_ENABLED=0 KENN_NATIVE_PUBLISH_TEST_BINARY=/tmp/kenn-live-analysis-arm64/TestRealtimePerformance
+.venv/bin/python -m pytest -q -s
+src/kenn/tests/test_live_track_analysis.py::test_native_feature_publishers_remain_fresh_with_64_inserts -k short`.
+The fixture creates its own server and records process CPU/RSS; no producer
+companion is contacted. Normal callback benchmarking leaves publishing disabled.
+
+The follow-up memory profile ran 64 native inserts for 15 seconds at 48 kHz /
+128 samples. All 21 requests returned HTTP 200, acknowledging 1,344 fresh frames;
+maximum capture age was 0.24 seconds and maximum delivery gap 0.776 seconds.
+Requests peaked at 902,617 bytes, handler p99 at 91.49 ms and maximum at 108.82 ms.
+Native process CPU was 4.296 CPU seconds and companion CPU 1.878 CPU seconds.
+Callback mean/p99/maximum were 0.475/1.250/53.667 µs, with no measurement drops.
+Peak RSS was 75,333,632 bytes (71.84 MiB); current private footprint was
+57,426,688 bytes (54.77 MiB). After five seconds of warm-up, private footprint
+grew by 10,076,160 bytes, including 1,919,488 bytes of newly touched timing-vector
+pages; live allocator bytes grew by 223,568 bytes. The local memory gate permits
+those touched pages plus 8 MiB for bounded request temporaries. Removing the
+pool grew private footprint by 15,974,400 bytes over the same interval and failed.
+Live allocator bytes alone missed that regression, so they remain diagnostic;
+macOS current private footprint supplies the gate and peak RSS remains reported.
+Other operating systems still need their own current-footprint profiler.
+
+The final sustained profile ran **64 inserts for 65 seconds** at 48 kHz /
+128 samples, crossing a full 60-second feature rate bucket. All 92 requests
+returned HTTP 200; every insert received 92 fresh acknowledgements. No producer
+companion, real session or model was involved.
+
+| Recorded metric | Final sustained result | Limit of the evidence |
+|---|---|---|
+| Delivery and age | 5,888 acknowledged frames; maximum delivery gap 0.7775 s; maximum capture age 0.27 s | Synthetic input and one local companion; one-second freshness gate passed. |
+| Request size | 676,930–906,021 bytes | Full-precision FFTs/history remain below the 1 MiB cap. |
+| Handler latency | p99 110.61 ms; maximum 147.71 ms | Excludes model and full capture-to-answer latency. |
+| Callback timing | mean 0.503 µs; p99 1.250 µs; maximum 7,157.958 µs; no measurement drops | Per insert. Mean is 0.019% of the block budget; the maximum exceeds the 2.667 ms deadline. |
+| Shared worker elapsed work | 14,515.637 ms over 65 s | Elapsed work, not CPU accounting. |
+| Process CPU | native 19.0094 CPU seconds; companion 8.5162 CPU seconds | Includes native setup/teardown and HTTP fixture logging; excludes Live/model workloads. |
+| Native peak RSS | 83,853,312 bytes (79.97 MiB), versus 163,659,776 bytes (156.08 MiB) before the pool fix | Separate synthetic runs and allocator high-water marks; includes the benchmark timing vector. |
+| Current private footprint | 59,163,392 bytes (56.42 MiB); post-warm-up growth 11,010,048 bytes | Newly touched timing pages account for 11,519,488 bytes; the retained-memory gate passed. |
+| Live allocator bytes | 39,343,056 bytes; post-warm-up growth 221,008 bytes | Full timing-vector capacity was allocated before warm-up; this counter alone missed the original VM-backed retention. |
+
+Run each profile in its own pytest process using the command above and `-k
+short`, `-k delayed` or `-k memory`; add `KENN_NATIVE_PUBLISH_SUSTAINED=1` and
+`-k sustained` for the 65-second case. The final delayed fixture held its first upload
+for 1.05 seconds, below the native 1.2-second timeout but beyond the evidence
+lifetime. Its first 64 frames expired at up to 1.28 seconds of age; the remaining
+four 64-frame batches recovered fresh evidence. No callback samples were dropped.
+The macOS regression counter uses current private footprint rather than peak
+RSS: OS/allocator high-water growth alone cannot establish retained objects.
+
+Offline LUFS/true-peak reuse follow-up (13 October): **29 scoped checks passed**
+for the new profiling tool and existing loudness analysis. The installed opt-in
+native clip API was profiled in **24 batch cells**, with three untimed warm-ups
+and 20 timed batches per cell: 44.1/48/96 kHz, 400 ms/3-second stereo clips and
+1/8/32/64 distinct input buffers. All six rate/window numerical comparisons passed
+against the existing pyloudnorm/scipy algorithms; maximum LUFS/peak delta was
+8.1e-12 dB. This proves synthetic clip parity, not EBU/ITU conformance. The
+[receipt](docs/research/live_loudness_reuse_profile_2026-10-13.json) records fixture,
+tool, installed-binary and current native-source hashes, plus dependency versions.
+The source hash alone does not establish the installed binary's build provenance.
+
+| Clip input / 64 inserts | Mean serial batch | Projected process CPU at 10 batches/second |
+|---|---|---|
+| 44.1 kHz / 400 ms | 22.098 ms | 22.1% of one core |
+| 44.1 kHz / 3 seconds | 187.074 ms | 187.1% of one core |
+| 48 kHz / 400 ms | 25.101 ms | 25.1% of one core |
+| 48 kHz / 3 seconds | 206.013 ms | 206.0% of one core |
+| 96 kHz / 400 ms | 50.531 ms | 50.5% of one core |
+| 96 kHz / 3 seconds | 440.025 ms | 440.0% of one core |
+
+These are short serial-kernel measurements extrapolated to 10 Hz, not sustained
+worker CPU or deadline qualification. Buffer preparation is outside the timer;
+native per-call allocations and Python/native dispatch are included. The existing
+native call also computes LRA and appends 1.5 seconds of zero-valued LRA workspace.
+The Python reference timing covers integrated LUFS and 4x peak only, so it cannot
+support an equal-work speedup claim. Capture, current FFT/filterbank analysis,
+publication, host scheduling and model contention are outside this profile.
+
+The decision is to keep the stateless clip kernel out of the live worker. Its
+3-second result is gated integrated loudness: a controlled 400 ms loud segment
+followed by 2.6 seconds of quiet measured -22.08 LUFS there, versus -28.79 LUFS
+for ungated 3-second energy, a 6.71 dB difference. A constant-DC probe also showed
+that resetting the weighting filters manufactures startup energy absent from a
+continuous filtered window. [EBU Tech 3341, sections 2.2–2.3](https://tech.ebu.ch/docs/tech/tech3341.pdf)
+specifies ungated 400 ms/3-second windows; short-term live metering updates at
+least 10 Hz. The streaming candidate below retains calibrated filter state,
+rolling energy and FIR history; its initial reset/warm-up qualification does not
+yet authorize live LUFS/dBTP output. Existing sample-peak/RMS claims stay as qualified.
+
+Reproduce from `products/kenn` with `KENN_LIVE_BACKEND=fake KENN_LLM_ENABLED=0
+apps/backend/.venv/bin/python tooling/scripts/profile_live_loudness.py --repeats 20
+--json-out /tmp/kenn-live-loudness-reuse.json`. The optional native module and
+existing NumPy/pyloudnorm/scipy dependencies must already be available; the tool
+refuses a missing kernel instead of timing a fallback. It leaves runtime flags
+unchanged. No DSP runtime path, dependency, permission or CI setting changed in
+this clip-profiling follow-up.
+
+Offline streaming meter follow-up (13 October): the native candidate is built,
+**disabled in ordinary plug-in calls**, and absent from the HTTP feature contract.
+It processes each stereo frame once, retaining K-weighting and four-phase FIR
+state, with 30 fixed 100 ms energy bins. Momentary energy becomes available after
+400 ms and short-term after 3 seconds; both remain ungated. Ready silence carries
+zero linear energy and no finite logarithmic reading. Source changes, seeks,
+overflow and invalid input retire the candidate alongside the owning analysis
+passage; a new passage warms from complete host-aligned bins.
+
+**64 native checks, 41 profiling-tool checks and 33 generated signal comparisons
+passed.** Native preparation, processing and synchronous worker capture/drain
+showed zero instrumented C++ heap allocations. The meter itself occupies
+**1,024 bytes per insert**, excluding owning snapshots, queues and FFT storage.
+Continuous SciPy filtering uses a separate coefficient-remapping method; full
+causal FIR convolution checks the native phase ring. Exact sample/readiness
+metadata matched. Maximum loudness delta above the numerical-check floor was
+3.31e-10 dB; generated -23/-33 LUFS calibration error stayed below 0.008 LU.
+Changing-level, antiphase, single-channel, DC, silence and seeded-noise cases
+protect history and channel semantics. No downloaded EBU audio was used.
+
+The [qualification receipt](docs/research/streaming_meter_qualification_2026-10-13.json)
+records all signals, 36 timing cells, raw samples, dependency/compiler versions
+and source/tool/binary hashes. This is an Apple M3 arm64 Release build using
+Apple LLVM 21.0.0 and JUCE 8.0.2. Each cell uses 32 untimed 100 ms warm-up ticks
+and 20 timed ticks, at 44.1/48/96 kHz and 1/8/32/64 inserts. Worker modes drain
+the real capture/FFT/filterbank path synchronously in 128-frame blocks and
+reject lost, queued or unready evidence. Process CPU is measured separately
+from serial wall time.
+
+| 64 inserts | Baseline worker CPU at 10 Hz | Meter alone CPU at 10 Hz | Combined worker CPU at 10 Hz | Combined maximum serial 100 ms tick |
+|---|---|---|---|---|
+| 44.1 kHz | 11.56% of one core | 4.43% | 16.18% | 20.51 ms |
+| 48 kHz | 11.98% of one core | 4.80% | 17.01% | 21.28 ms |
+| 96 kHz | 17.69% of one core | 9.61% | 27.74% | 32.02 ms |
+
+These percentages project measured process CPU per synthetic 100 ms batch to
+10 Hz. They exclude thread scheduling, HTTP, the model and Ableton; they do not
+qualify sustained host CPU or callback deadlines. The old stateless clip API
+also calculates integrated loudness and LRA, so this table cannot support an
+equal-work speedup claim against that API.
+
+Generated descriptions of [Tech 3341 cases 1/2 and 15–19](https://tech.ebu.ch/docs/tech/tech3341.pdf)
+passed their calibration and selected tone-peak tolerances. This is a subset,
+not complete EBU/ITU conformance. The 100 ms peak intervals describe causal FIR
+output delayed by 5.875 input frames, rather than peaks exactly aligned with
+loudness input windows. Fixed 4x interpolation produces 176.4 kHz at 44.1 kHz,
+below [BS.1770-5 Annex 2's 192 kHz guideline](https://www.itu.int/rec/R-REC-BS.1770-5-202311-I/en),
+and has frequency-dependent under-read. Resolve these limits, test temporal
+loudness and transient peak cases, and run sustained combined-worker contention
+before promoting live LUFS/dBTP. Integrated loudness, LRA and maximum M/S displays
+are outside this candidate; it is not an EBU Mode meter.
+
+Reproduce from `products/kenn` with `KENN_LIVE_BACKEND=fake KENN_LLM_ENABLED=0
+apps/backend/.venv/bin/python tooling/scripts/profile_streaming_meter.py
+--binary /tmp/kenn-live-analysis-arm64/TestStreamingMeter --repeats 20
+--json-out /tmp/kenn-streaming-meter.json`. This uses already installed NumPy/SciPy
+and the configured native target. No dependency, permission or CI setting changed;
+no plug-in was installed or distributed, and no producer session was accessed.
+
+Jack selected **keep the next work offline** on 13 October. Continue the streaming
+meter qualification above; the prepared supervised Live qualification remains open.
+In a disposable set, use synthetic audio and one companion at 48 kHz / 128 samples;
+close every plug-in editor. Record an analysis-disabled baseline, then five minutes each
+with 1/8/32/64 inserts and opt-in publishing. Record native/companion/Live CPU,
+current and peak memory, callback tails, audio dropouts, measured queue drops,
+capture age, HTTP size/latency and delivery gaps. Repeat the 64-insert cell with
+the local model resident and ordinary companion traffic; do not increase the
+publication cadence without measuring that contention.
+
+Exercise transport start/stop, seeking, loop wraps, insert removal/recreation and
+companion disconnect/reconnect. Require pass-through audio, no added plug-in
+latency, retired stale/gapped evidence, fresh recovery and no unapproved writes.
+Only during Jack's scheduled session, bind a uniquely named disposable track,
+review one measured headroom proposal, approve it, verify readback and Undo.
+Record a failed cell and its recovery before considering release. Long synthetic
+callback tails already exceed a 2.667 ms block deadline, so a mean-time pass
+cannot qualify Ableton playback. This protocol does not claim routing/settings,
+gain-reduction, causal sidechain behavior or delay compensation were verified.
+
+Changed files for this execution (all relative to `products/kenn`):
+
+- Native implementation: `plugins/kenn-vst3-au/Source/ContinuousAnalysis.h`,
+  `plugins/kenn-vst3-au/Source/ContinuousAnalysis.cpp`,
+  `plugins/kenn-vst3-au/Source/CachedSpectrum.h`,
+  `plugins/kenn-vst3-au/Source/StreamingMeter.h`,
+  `plugins/kenn-vst3-au/Source/PluginProcessor.h`,
+  `plugins/kenn-vst3-au/Source/PluginProcessor.cpp`,
+  `plugins/kenn-vst3-au/Source/PluginEditor.cpp`,
+  `plugins/kenn-vst3-au/Source/MeterAnalyzer.h`,
+  `plugins/kenn-vst3-au/CMakeLists.txt`.
+- Companion implementation: `apps/backend/src/kenn/core/live_analysis_host.py`,
+  `apps/backend/src/kenn/core/live_analysis_binding.py`,
+  `apps/backend/src/kenn/core/live_spectrum_contract.py`,
+  `apps/backend/src/kenn/core/live_paired_analysis.py`,
+  `apps/backend/src/kenn/core/live_track_analysis.py`,
+  `apps/backend/src/kenn/plugin_handoff.py`, `apps/backend/src/kenn/server.py`,
+  `apps/backend/src/kenn/server_rate_limit.py`.
+- Verification: `plugins/kenn-vst3-au/Source/test_continuous_analysis_main.cpp`,
+  `plugins/kenn-vst3-au/Source/test_command_integration_main.cpp`,
+  `plugins/kenn-vst3-au/Source/test_numerical_parity_main.cpp`,
+  `plugins/kenn-vst3-au/Source/test_realtime_performance_main.cpp`,
+  `plugins/kenn-vst3-au/Source/test_streaming_meter_main.cpp`,
+  `apps/backend/src/kenn/tests/test_live_track_analysis.py`,
+  `apps/backend/src/kenn/tests/test_live_paired_analysis.py`,
+  `apps/backend/src/kenn/tests/test_plugin_handoff.py`,
+  `apps/backend/src/kenn/tests/test_audio_ai_features.py`,
+  `apps/backend/src/kenn/tests/test_server_rate_limit.py`,
+  `apps/backend/src/kenn/tests/test_profile_live_loudness.py`,
+  `apps/backend/src/kenn/tests/test_profile_streaming_meter.py`,
+  `apps/frontend/e2e/demo_path.e2e.ts`,
+  `tooling/scripts/profile_live_loudness.py`,
+  `tooling/scripts/profile_streaming_meter.py`.
+- Documentation: `plugins/kenn-vst3-au/README.md`, `KENN_PLAN.md`.
+- Synthetic profiling receipts: `docs/research/live_loudness_reuse_profile_2026-10-13.json`,
+  `docs/research/streaming_meter_qualification_2026-10-13.json`.
+
 Every fact needs its origin and scope: Live observation, manual/note excerpt,
 measured audio, generated artifact or explicit preference. Include time/version,
 applicability and uncertainty. A stale observation remains stale; a predicted track
@@ -999,8 +1409,13 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       candidate notes, predominantly checked against the Live 12 manual, starting
       from observed failure families rather than note count. Record source URL/author,
       content hash, license and shared-weight permission, review, Live version and
-      manual/observed/measured status. Approved note status is not permission for
-      every derived answer. Public availability is not a training-rights finding.
+      manual/observed/measured status. Jack delegates factual note corrections,
+      derived-target review and knowledge decisions to the agent/Gemini workflow;
+      do not wait for owner sign-off. Record evidence, uncertainty and hashes.
+      This delegation does not grant rights to third-party source material: use
+      only sources with a documented basis for the intended training, and exclude
+      sources whose reuse rights remain unknown. Public availability alone is
+      not a training-rights finding.
       Use the [official Live 12 manual](https://www.ableton.com/en/live-manual/12/)
       to check version applicability; the indexed Live 11 PDF cannot settle a
       Live 12 control question. Exclude private audio, session facts, preferences
@@ -1010,18 +1425,41 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       **13 October resume:** [20 notes corrected against primary evidence](docs/research/KENN_SEAL_SOURCE_AUDIT_2026-10-13.md),
       17 primarily Live 12 manual-backed, with exact before/after hashes and five
       four-note review pages. The 807-note inventory has 118 flagged records and
-      347 “ableton” filenames; no purge or index rebuild. Owner factual review,
-      shared-weight rights and derived-target approval remain pending. Read-only
-      assets were re-frozen after pulling cloud main `ab63cd33`; paired retrieval
+      347 “ableton” filenames; no purge or index rebuild at that point. The
+      initial owner factual-review gate was pending; Jack's later delegation and
+      the remaining source-rights boundary are recorded below. Read-only assets
+      were re-frozen after pulling cloud main `ab63cd33`; paired retrieval
       and full condition manifests remain pending. S1 stays open.
-      **MiMo batch 1 correction pass, 13 Oct:** seven independently corroborated
-      corrections were applied to the ignored local note library after reviewing
-      the model's 20-note ledger. Ten other proposed findings were not adopted;
-      MiMo's ten “no issue” classifications were not freshly claim-audited in this
-      pass. Hash and inventory checks account for all 807 notes; the seven edits
-      remain factual-owner-review-pending, with rights and derived-target approval
-      unresolved. No index rebuild, note approval or training occurred. Receipt:
-      `.runtime/mimo-note-review-validation-2026-10-13/REVIEW.md`.
+      **MiMo batch 1 correction pass, 13 Oct:** seven evidence-supported note
+      corrections were applied and Jack delegated factual and knowledge approval
+      to the agent/Gemini evidence-review process; no further owner sign-off is
+      required. Ten other proposed findings were not adopted; MiMo's ten “no issue”
+      classifications were not freshly claim-audited. Third-party training rights
+      still need a documented basis; unknown sources stay out of shared-weight
+      training. Receipt: `.runtime/mimo-note-review-validation-2026-10-13/REVIEW.md`.
+      A shadow index was rebuilt from 752 local sources into 3,906 chunks
+      (`v-d1788545da5c`) using the CPU ONNX embedder capped at one inference
+      thread because the configured GPU host was unreachable. The active index
+      remains `v-db8c6334cf63`. The candidate passed all 16 available Live 11
+      manual-grounding checks and abstained on an unsupported official-manual
+      question; the Live 12 manual is not available locally, so this does not
+      qualify Live 12 claims. The separate sound-stage note that called “Pro-D2”
+      a compressor was corrected against FabFilter's product catalog and replaced
+      by a searchable correction distinguishing Pro-C 3 compression, Pro-R 2
+      reverb and unsupported former settings. Two pending Batch 2 notes, mastering
+      streaming loudness and phase/polarity, were also checked against primary
+      sources and approved. The complete 20-note Batch 2 review remains open;
+      approval of these two is not a pass for the other 18. Jack delegated factual
+      note corrections and derived-target decisions to the agent/Gemini evidence
+      review process; no per-item owner approval is required. Source rights remain
+      a separate gate: unknown or unsupported rights keep material out of
+      shared-weight training. Rebuild the shadow candidate with these accepted
+      changes, rerun the targeted product-name retrieval checks, and keep it
+      inactive until those checks and applicable manual-grounding checks pass.
+      The 44-case
+      1.7B probe remains
+      ungraded and mostly cut off at its 128-token response cap, so it is latency
+      and format diagnostics only, not a quality result.
     - [ ] **S2 — Build a harder, reviewed packet within today's limits.** Start with
       four training source families and two ordinary targets per context: eight
       reviewed examples, including concise explanations and follow-ups. Prepare
@@ -1039,8 +1477,11 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       **13 October resume:** the [source-checked draft](docs/research/KENN_SEAL_PACKET_SOURCES_2026-10-13.md)
       was emitted locally as version 1: four contexts, eight ordinary targets,
       24 reward, 12 retention and 24 reserved final questions, on 23 four-card
-      pages. Split aliases, exact hashes and lexical guards passed; semantic
-      review and rights remain pending, approvals empty and training disabled.
+      pages. Split aliases, exact hashes and lexical guards passed; independent
+      semantic review remains pending and source rights must be checked before any
+      shared-weight training. Jack has delegated factual/target decisions, so no
+      owner-approval field is required; training remains disabled until evidence
+      gates pass.
       Final wording stays reserved. Preparation/SEAL checks pass 101 tests and
       ten isolated guard mutations were caught. Paired KENN retrieval and the
       harder unchanged-4B baseline await exact-content review. S2 stays open.
@@ -1415,9 +1856,9 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
 
 ### Investor walkthrough
 
-The owner's Mac drives KENN's web UI to control Ableton Live. When the current
-work is ready for a showing, Jack requests a short, bug-finding walkthrough; no
-fixed date or length is committed here. The
+The owner's Mac drives KENN's web UI to control Ableton Live. Jack is preparing
+a demo video for 14 October 2026. A supervised qualification slot and video length
+have not been agreed. The
 [five-minute showcase](docs/runbooks/KENN_INVESTOR_DEMO.md#five-minute-ableton-showcase)
 in the runbook is the presentation template, not a bound target. The existing
 20-step operator script and its ten consecutive complete runs remain the internal
@@ -1426,7 +1867,53 @@ qualify the October candidate.
 
 The first milestone is a browser-driven real-Live Apply/readback/Undo round trip
 on the exact candidate. The final milestone is the full scripted presentation,
-recovery, display/audio checks and a verified backup recording. Items below stay open until their checks pass; no schedule is committed.
+recovery, display/audio checks and a verified backup recording. Items below stay
+open until their checks pass; the qualification window remains unscheduled.
+
+Demo-readiness audit on 13 October, for Jack's planned 14 October video:
+the existing web chat and action cards are connected, but the new continuous
+insert analysis is not yet connected to browser requests. `askKenn` in
+`apps/frontend/src/api/kenn.ts` sends a page-created conversation `session_id`
+without `plugin_session_id` or a plug-in handoff. Native Ask carries both identities
+and compact measurements; native/backend integration tests exercise that separate
+client. The web flow needs an explicit insert association and browser coverage
+before it can show these live measurements. Streaming LUFS/dBTP remains disabled
+pending the meter gates above. The native build is not installed, and D2–D5 below
+remain open for the exact recording build. Recorded-WAV analysis must retain its
+actual source label.
+
+Fresh offline checks for this audit: **86 frontend unit tests passed**, frontend
+type checking and a production build passed, and **21 demo preflight/script-gate
+unit tests passed**. The build went to `/tmp/kenn-demo-readiness-2026-10-13`;
+the served production assets and running producer session were not changed.
+The actual-browser `demo_path.e2e.ts` run against that build and an isolated FakeLive
+companion returned **eight passes and one failure**. Session questions, Compressor
+Apply/readback/card Undo, EQ/chat Undo, Dismiss, refusals, device inspection and
+MIDI generation passed. The failure waited for Dismiss on an already-centred Synth:
+the product correctly replied "Nothing to change" without a card. Updated that
+test to assert the no-op answer and absence of Apply/Dismiss; its scoped browser
+rerun passed, as did the existing backend no-op regression. No product code changed
+in this audit. The unmodified eight browser cases were not rerun after this test-only
+correction.
+
+Commands from `apps/frontend`: `npm test -- --reporter=dot`,
+`./node_modules/.bin/vue-tsc -b`,
+`./node_modules/.bin/vite build --outDir /tmp/kenn-demo-readiness-2026-10-13`,
+and `KENN_E2E_PORT=18931 ./node_modules/.bin/playwright test e2e/demo_path.e2e.ts
+--output /tmp/kenn-demo-readiness-playwright-2026-10-13`.
+The corrected case used `--grep 'centering an already centred Synth'` and a separate
+`/tmp/kenn-demo-readiness-pan-recheck-2026-10-13` output directory. The companion
+served the temporary build via `KENN_STATIC_ROOT`; its initial automatic launch
+selected x86_64 Python against arm64 NumPy, so the isolated companion was explicitly
+launched under `arch -arm64` using the existing backend virtualenv. No dependencies
+were changed. Initial failure traces remain outside git.
+
+The FakeLive companion also returned **503 from `/kenn/api/slo/classifications`**
+because its configured classification cache could not be read. This library path
+is not qualified by the chat/action passes; inspect the candidate's cache before
+including it in the video. Browser checks here do not qualify the recording build's
+model configuration, live audio, new insert bridge or real Ableton writes. D2–D5
+remain open.
 
 - [x] **D1 — Review the fixes.** Fresh independent Standards and
   Spec reviews covered citation repair `67921916`, the Stage 2/3 integration and

@@ -56,12 +56,13 @@ test('a typed card label gets a short prompt, not a tutorial', async ({ page }) 
   await expect(reply.getByRole('button', { name: 'Apply to Live 12' })).toHaveCount(0)
 })
 
-test('"Pan the Synth center." proposes pan centre and Dismiss changes nothing', async ({ page }) => {
+test('centering an already centred Synth offers no action card', async ({ page }) => {
   await openKenn(page)
   const reply = await ask(page, 'Pan the Synth center.')
-  await expect(reply).toContainText('Synth')
-  await reply.getByRole('button', { name: 'Dismiss' }).click()
-  await expect(reply).toContainText('No Changes Made')
+  // FakeLive starts Synth at centre; a no-op must not manufacture a confirmation card.
+  await expect(reply).toContainText("'Synth' is already centred. Nothing to change.")
+  await expect(reply.getByRole('button', { name: 'Apply to Live 12' })).toHaveCount(0)
+  await expect(reply.getByRole('button', { name: 'Dismiss' })).toHaveCount(0)
 })
 
 test('world-model questions answer returns and parameters in chat', async ({ page }) => {

@@ -57,8 +57,11 @@ from kenn.core.response_contract import augment_payload
 from kenn.plugin_handoff import (
     get_plugin_parameters,
     ingest_live_context,
+    ingest_live_context_batch,
     live_context_summary,
     live_review_summary,
+    plugin_insert_sources,
+    queue_owned_plugin_parameters,
     pop_pending_parameter_updates,
     set_plugin_parameter,
     set_plugin_parameters,
@@ -909,16 +912,20 @@ class Handler(BaseHTTPRequestHandler):
         allowed, retry_after = rate_allowed(client_key(self), scope)
         if allowed:
             return True
-        self.send_response(429)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Retry-After", str(retry_after))
-        self.send_cors_headers()
-        self.end_headers()
         payload = {
             "error": "Too many requests. Please wait before trying again.",
             "retry_after_seconds": retry_after,
         }
-        self._write_body(json.dumps(payload, indent=2).encode("utf-8"))
+        body = json.dumps(payload, indent=2).encode("utf-8")
+        self.send_response(429)
+        self.send_header("Content-Type", "application/json")
+        # Content-Length is essential: without it, HTTP/1.1 keep-alive clients
+        # cannot determine the response boundary on 429 and reset the socket.
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Retry-After", str(retry_after))
+        self.send_cors_headers()
+        self.end_headers()
+        self._write_body(body, flush=True)
         return False
 
     def do_OPTIONS(self) -> None:
@@ -1112,6 +1119,12 @@ class Handler(BaseHTTPRequestHandler):
                     "advisory_only": True,
                     "live_mutation_authorized": False,
                 })
+            return
+        if parsed.path == "/api/plugin/inserts":
+            query = parse_qs(parsed.query)
+            result = plugin_insert_sources(str(query.get("conversation_id", [""])[0]),
+                                           str(query.get("plugin_session_id", [""])[0]))
+            self.send_json(200 if result.get("ok") else 400, result)
             return
         if parsed.path == "/api/plugin-live-review":
             query = parse_qs(parsed.query)
@@ -2214,6 +2227,7 @@ class Handler(BaseHTTPRequestHandler):
             "/api/audiogen/midi-proposal",
             "/api/audiogen/audio-compare",
             "/api/plugin-handoff",
+            "/api/plugin-handoff-batch",
             "/api/plugin/parameters",
             "/api/knowledge/ask",
             "/api/ableton/audition_delta",
@@ -2273,7 +2287,10 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(404, {"error": "Not found"})
             return
         if endpoint_policy("kenn", "POST", parsed.path).mutates:
-            if not self.enforce_rate_limit("mutation"):
+            # Batched DSP evidence only updates the feature cache. Its own
+            # bounded budget cannot spend or raise the Live-control budget.
+            scope = "plugin_handoff_batch" if parsed.path == "/api/plugin-handoff-batch" else "mutation"
+            if not self.enforce_rate_limit(scope):
                 return
         try:
             length = int(self.headers.get("Content-Length", "0"))
@@ -2376,6 +2393,10 @@ class Handler(BaseHTTPRequestHandler):
                 correlation_id=self.request_id(),
             )
             self.send_json(200, {"ok": True, **result})
+            return
+        if parsed.path == "/api/plugin-handoff-batch":
+            result = ingest_live_context_batch(payload)
+            self.send_json(200 if "frames" in result else 400, result)
             return
         if parsed.path == "/api/plugin-handoff":
             # Local plug-ins submit an opt-in bus snapshot, never DAW control
@@ -2571,7 +2592,10 @@ class Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/api/plugin/parameters":
             session_id = str(payload.get("session_id", "")).strip()
-            if "parameters" in payload and isinstance(payload["parameters"], dict):
+            if "conversation_id" in payload:
+                updates = payload.get("parameters") if "parameters" in payload else {str(payload.get("parameter", "")): payload.get("value")}
+                result = queue_owned_plugin_parameters(session_id, str(payload.get("conversation_id") or ""), updates)
+            elif "parameters" in payload and isinstance(payload["parameters"], dict):
                 result = set_plugin_parameters(session_id, payload["parameters"])
             elif "parameter" in payload:
                 result = set_plugin_parameter(session_id, str(payload.get("parameter", "")), payload.get("value"))
@@ -2900,6 +2924,31 @@ class Handler(BaseHTTPRequestHandler):
                 )
             self.send_json(200, result)
 
+        from kenn.core.live_track_analysis import answer_track_analysis, wants_track_analysis
+        from kenn.core.live_analysis_binding import wants_insert_binding
+
+        if (wants_track_analysis(question) or wants_insert_binding(question)) and "plugin_handoff" in payload:
+            # An explicit native Ask may carry fresh compact features. The
+            # handoff validator rejects raw audio and keeps the same owner key.
+            handoff = ingest_live_context(payload["plugin_handoff"], session_id=plugin_session_id or session_id)
+            if not handoff.get("ok"):
+                self.send_json(400, {"error": handoff.get("error", "Invalid plug-in analysis snapshot.")})
+                return
+        analysis_reply = answer_track_analysis(
+            question, session_id=session_id, plugin_session_id=plugin_session_id,
+        )
+        if analysis_reply is not None:
+            token = analysis_reply.get("confirmation_token")
+            if token:
+                _PENDING_PROPOSALS[token] = analysis_reply["proposal"]
+            augmented = augment_payload(
+                analysis_reply, question=question, session_id=session_id,
+                correlation_id=self.request_id(),
+            )
+            for key in ("proposal", "confirmation_token", "requires_confirmation"):
+                augmented[key] = analysis_reply[key]
+            send_shortcut_reply(augmented)
+            return
         live_inspection_reply = self._maybe_handle_live_inspection(
             question, str(payload.get("session_id", "")).strip()
         )

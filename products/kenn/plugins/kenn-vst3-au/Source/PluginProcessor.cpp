@@ -4,16 +4,39 @@
 #include "LocalAbletonOscProbe.h"
 #include "LocalLivePlan.h"
 #include "LocalAbletonOscWriter.h"
+#include <vector>
 
 class KENNLiveContextPublisherThread final : public juce::Thread
 {
 public:
-    explicit KENNLiveContextPublisherThread(KENNMixAssistantAudioProcessor& processor)
-        : juce::Thread("KENN Live Context Publisher"), owner(processor) {}
+    static KENNLiveContextPublisherThread& instance() { static KENNLiveContextPublisherThread publisher; return publisher; }
+    void add(KENNMixAssistantAudioProcessor& owner)
+    {
+        const juce::ScopedLock lifetime(lifetimeLock);
+        {
+            const juce::ScopedLock lock(registryLock);
+            entries.push_back({ &owner });
+        }
+        if (! isThreadRunning()) startThread(juce::Thread::Priority::low);
+    }
+    void remove(KENNMixAssistantAudioProcessor& owner)
+    {
+        const juce::ScopedLock lifetime(lifetimeLock);
+        bool empty;
+        {
+            const juce::ScopedLock lock(registryLock);
+            entries.erase(std::remove_if(entries.begin(), entries.end(), [&owner](const Entry& entry) { return entry.owner == &owner; }), entries.end());
+            empty = entries.empty();
+        }
+        // Finish the last request/autorelease pool while JUCE networking is
+        // alive. Leaving a polling singleton until static teardown crashed
+        // the 2026-10-13 active HTTP profile on macOS at thread pool cleanup.
+        if (empty) stopThread(-1);
+    }
 
     void run() override
     {
-        constexpr int intervalMs = 8000;
+        constexpr int intervalMs = 500; // At most two feature-only batches per second for up to 64 inserts on one companion.
         while (! threadShouldExit())
         {
             // A false return means the timed wait expired, which is the
@@ -22,18 +45,79 @@ public:
             // after each ordinary timeout.
             wait(intervalMs);
             if (threadShouldExit()) break;
-            const auto* enabled = owner.apvts.getRawParameterValue("live_context_enabled");
-            if (enabled == nullptr || enabled->load() < 0.5f) continue;
-
-            // The handoff is feature-only and advisory.  It is intentionally
-            // sent from this low-priority worker, never from processBlock().
-            juce::String ignored;
-            owner.sendHandoffToKenn(ignored);
+            // JUCE's outer macOS autorelease pool lives until run() exits.
+            // Keep all feature collection and HTTP temporaries within one tick;
+            // the companion can remain connected for hours without retaining them.
+            JUCE_AUTORELEASEPOOL
+            {
+                // The local companion shares this machine's wall clock. Anchor
+                // ages before collection so serialization and stalled HTTP cannot
+                // give already-exported audio a new diagnosis lifetime on receipt.
+                const auto exportedAt = juce::Time::getCurrentTime().toMilliseconds() / 1000.0;
+                std::vector<Batch> batches;
+                {
+                    const juce::ScopedLock lock(registryLock);
+                    for (auto& entry : entries)
+                    {
+                        auto& owner = *entry.owner;
+                        if (owner.apvts.getRawParameterValue("live_context_enabled")->load() < 0.5f)
+                        {
+                            entry.lastSequence = 0;
+                            continue; // Re-enabling publication sends the latest frame once.
+                        }
+                        const auto frame = owner.analysisSnapshot();
+                        const bool enabled = owner.apvts.getRawParameterValue("analysis_enabled")->load() >= 0.5f;
+                        if (frame.sequence == 0 || (frame.sequence == entry.lastSequence && frame.generation == entry.lastGeneration
+                            && frame.valid == entry.lastValid && enabled == entry.lastEnabled))
+                            continue; // Stopped audio never consumes bandwidth or rejuvenates evidence.
+                        entry.lastSequence = frame.sequence; entry.lastGeneration = frame.generation;
+                        entry.lastValid = frame.valid; entry.lastEnabled = enabled;
+                        const auto endpoint = owner.getKennEndpoint();
+                        auto batch = std::find_if(batches.begin(), batches.end(), [&endpoint](const Batch& candidate) {
+                            return candidate.endpoint == endpoint && candidate.frames.size() < 64; // Bounded frame count, matching the companion contract.
+                        });
+                        if (batch == batches.end()) { batches.push_back({ endpoint, {} }); batch = batches.end() - 1; }
+                        batch->frames.add(owner.handoffPayload());
+                    }
+                }
+                // Own the JSON before releasing the registry: destruction can now
+                // remove an insert while HTTP waits, with no dangling processor access.
+                for (const auto& batch : batches)
+                {
+                    auto payload = std::make_unique<juce::DynamicObject>();
+                    payload->setProperty("schema", "kenn.plugin_handoff_batch.v1");
+                    payload->setProperty("exported_at_epoch", exportedAt);
+                    payload->setProperty("frames", batch.frames);
+                    // Multiline indentation alone pushed the 64-insert profile
+                    // over 1 MiB. Omit whitespace without rounding measured power
+                    // or dropping the history needed to pair asynchronous inserts.
+                    const auto body = juce::JSON::toString(juce::var(payload.release()),
+                        juce::JSON::FormatOptions().withSpacing(juce::JSON::Spacing::none));
+                    if (body.getNumBytesAsUTF8() > 1024 * 1024) continue; // The companion's 1 MiB limit also bounds native transport; oversized evidence expires.
+                    const auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inPostData)
+                        .withConnectionTimeoutMs(1200).withNumRedirectsToFollow(0); // 1,200 ms local timeout, with no redirect to another destination.
+                    auto response = juce::URL(batch.endpoint + "/api/plugin-handoff-batch").withPOSTData(body).createInputStream(options);
+                    if (response == nullptr) continue; // A missing companion cannot delay playback; a newer window retries on the next tick.
+                    juce::MemoryBlock acknowledgement;
+                    response->readIntoMemoryBlock(acknowledgement, 64 * 1024); // 64 KiB acknowledgement cap; no response audio/body can grow native memory without bound.
+                }
+            }
         }
     }
 
 private:
-    KENNMixAssistantAudioProcessor& owner;
+    struct Entry
+    {
+        KENNMixAssistantAudioProcessor* owner;
+        uint64_t lastSequence = 0, lastGeneration = 0;
+        bool lastValid = false, lastEnabled = false;
+    };
+    struct Batch { juce::String endpoint; juce::Array<juce::var> frames; };
+    KENNLiveContextPublisherThread() : juce::Thread("KENN Live Context Publisher") {}
+    ~KENNLiveContextPublisherThread() override { stopThread(-1); } // Owned payloads must finish before the shared transport disappears.
+    juce::CriticalSection registryLock; // Lifetime and JSON collection only; never held during HTTP or from processBlock().
+    juce::CriticalSection lifetimeLock; // Serialize final join/restart without holding the registry needed by run().
+    std::vector<Entry> entries;
 };
 
 namespace
@@ -144,21 +228,15 @@ KENNMixAssistantAudioProcessor::KENNMixAssistantAudioProcessor()
                                       .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
       apvts(*this, nullptr, "PARAMS", createParameterLayout())
 {
-    // Avoid silently merging different plug-in instances into one companion
-    // context. This value is persisted with the DAW project and can be
-    // replaced with a KENN chat session ID when the user explicitly wants it.
+    // Start with separate conversation ownership. Producers may explicitly
+    // share this persisted ID; the independent insert ID still owns audio.
     kennSessionId = "plugin-" + juce::Uuid().toString();
-    liveContextPublisher = std::make_unique<KENNLiveContextPublisherThread>(*this);
-    liveContextPublisher->startThread(juce::Thread::Priority::low);
+    KENNLiveContextPublisherThread::instance().add(*this);
 }
 
 KENNMixAssistantAudioProcessor::~KENNMixAssistantAudioProcessor()
 {
-    if (liveContextPublisher != nullptr)
-    {
-        liveContextPublisher->signalThreadShouldExit();
-        liveContextPublisher->stopThread(2000);
-    }
+    KENNLiveContextPublisherThread::instance().remove(*this);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout KENNMixAssistantAudioProcessor::createParameterLayout()
@@ -177,7 +255,10 @@ juce::String KENNMixAssistantAudioProcessor::getAssistantMode() const
     return juce::StringArray { "ask", "suggest", "assist", "auto" }[index];
 }
 
-void KENNMixAssistantAudioProcessor::prepareToPlay(double sampleRate, int) { realtimeCore.reset(sampleRate); }
+void KENNMixAssistantAudioProcessor::prepareToPlay(double sampleRate, int)
+{
+    continuousAnalysis.prepare(sampleRate);
+}
 
 bool KENNMixAssistantAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
@@ -190,21 +271,121 @@ bool KENNMixAssistantAudioProcessor::isBusesLayoutSupported(const BusesLayout& l
 void KENNMixAssistantAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     juce::ScopedNoDenormals noDenormals;
-    if (apvts.getRawParameterValue("analysis_enabled")->load() >= 0.5f) realtimeCore.analyse(buffer);
+    KENNHostPosition host;
+    // JUCE reports the start of this block, only from processBlock. Missing
+    // sample time or a stopped transport cannot align separate inserts.
+    if (auto* playHead = getPlayHead())
+        if (const auto position = playHead->getPosition())
+            if (const auto samples = position->getTimeInSamples(); samples && position->getIsPlaying())
+                host = { *samples, true };
+    continuousAnalysis.push(buffer, apvts.getRawParameterValue("analysis_enabled")->load() >= 0.5f, host);
     // Intentional transparent pass-through.  AutoMix rendering is offline and
     // stem-based, therefore no processing is silently applied to this bus.
 }
 
+void KENNMixAssistantAudioProcessor::updateTrackProperties(const TrackProperties& properties)
+{
+    const juce::ScopedLock lock(hostTrackLock);
+    // A host may omit or stop reporting the name. An empty name clears the
+    // previous association so another track cannot inherit its measurements.
+    const auto name = properties.name.trim();
+    if (name != hostTrackName)
+        continuousAnalysis.invalidate(); // Require a new complete window before binding a changed host name.
+    hostTrackName = name;
+}
+
+juce::String KENNMixAssistantAudioProcessor::getHostTrackName() const
+{
+    const juce::ScopedLock lock(hostTrackLock);
+    return hostTrackName;
+}
+
 juce::var KENNMixAssistantAudioProcessor::handoffPayload() const
 {
-    const auto data = meterSnapshot();
+    const juce::ScopedLock sourceLock(hostTrackLock);
+    // Ask, file export and single uploads can wait independently of the shared
+    // publisher. Their audio ages must also include collection/transport delay.
+    const auto exportedAt = juce::Time::getCurrentTime().toMilliseconds() / 1000.0;
+    // Rename and publication generations are checked together; all scalar
+    // metrics and bands below come from one worker publication.
+    const auto frame = continuousAnalysis.snapshot();
+    const auto& features = frame.features;
+    const KENNMeterSnapshot data { features.peakDbfs, features.rmsDbfs, features.correlation,
+        features.stereoWidth, features.crestDb, features.transientRatio, features.clippedSamples,
+        features.sampleRate, features.analysedSamples };
     auto message = std::make_unique<juce::DynamicObject>();
     message->setProperty("schema", "kenn.plugin_handoff.v1");
+    message->setProperty("exported_at_epoch", exportedAt);
     message->setProperty("audio_feature_schema", "audio_feature_frame.v1");
     message->setProperty("kind", "mix_review_snapshot");
     message->setProperty("plugin", "KENN Mix Assistant");
     message->setProperty("assistant_mode", getAssistantMode());
-    message->setProperty("session_id", getKennSessionId());
+    message->setProperty("session_id", getKennInsertId());
+    message->setProperty("conversation_id", getKennSessionId());
+    message->setProperty("host_track_name", hostTrackName);
+    const auto lastTicks = frame.capturedTicks;
+    if (lastTicks > 0)
+        message->setProperty("audio_age_seconds", juce::jmax(0.0, juce::Time::highResolutionTicksToSeconds(
+            juce::Time::getHighResolutionTicks() - lastTicks)));
+    const auto encodeWindow = [](const KENNAnalysisSnapshot& captured) -> juce::var
+    {
+        auto window = std::make_unique<juce::DynamicObject>();
+        window->setProperty("schema", "kenn.continuous_window.v1");
+        window->setProperty("valid", captured.valid);
+        window->setProperty("sequence", static_cast<juce::int64>(captured.sequence));
+        window->setProperty("source_generation", static_cast<juce::int64>(captured.generation));
+        window->setProperty("start_sample", captured.firstSample); window->setProperty("end_sample", captured.endSample);
+        window->setProperty("duration_seconds", captured.windowSeconds);
+        window->setProperty("dropped_samples", static_cast<juce::int64>(captured.droppedSamples));
+        window->setProperty("invalid_samples", static_cast<juce::int64>(captured.invalidSamples));
+        auto timeline = std::make_unique<juce::DynamicObject>();
+        timeline->setProperty("schema", "kenn.host_timeline.v1");
+        timeline->setProperty("valid", captured.valid && captured.hostTimelineValid);
+        timeline->setProperty("transport_epoch", static_cast<juce::int64>(captured.transportEpoch));
+        timeline->setProperty("start_sample", captured.hostTimelineValid ? juce::var(captured.hostFirstSample) : juce::var());
+        timeline->setProperty("end_sample", captured.hostTimelineValid ? juce::var(captured.hostEndSample) : juce::var());
+        window->setProperty("host_timeline", juce::var(timeline.release()));
+        return juce::var(window.release());
+    };
+    message->setProperty("measurement_window", encodeWindow(frame));
+    auto fftSpectra = std::make_unique<juce::DynamicObject>();
+    fftSpectra->setProperty("schema", "kenn.fft_spectra.v1");
+    const auto encodeFFT = [](const KENNFFTSnapshot& fft, const KENNAnalysisSnapshot& captured) -> juce::var
+    {
+        if (! captured.valid || ! fft.valid) return {}; // Gaps and warm-up cannot publish a completed spectrum.
+        auto fftData = std::make_unique<juce::DynamicObject>();
+        fftData->setProperty("size_samples", fft.size);
+        fftData->setProperty("start_sample", static_cast<juce::int64>(fft.firstSample));
+        fftData->setProperty("end_sample", static_cast<juce::int64>(fft.endSample));
+        fftData->setProperty("bin_hz", captured.features.sampleRate / fft.size);
+        fftData->setProperty("mean_square", fft.meanSquare); fftData->setProperty("peak_hz", fft.peakHz);
+        juce::Array<juce::var> energy;
+        for (const auto value : fft.energy) energy.add(value);
+        fftData->setProperty("band_power", energy); // 32 fixed log groups, 20 Hz–20 kHz; stereo mean-square power.
+        return juce::var(fftData.release());
+    };
+    fftSpectra->setProperty("fast", encodeFFT(frame.fastSpectrum, frame));
+    fftSpectra->setProperty("low", encodeFFT(frame.lowSpectrum, frame));
+    message->setProperty("fft_spectra", juce::var(fftSpectra.release()));
+    juce::Array<juce::var> pairedWindows;
+    if (frame.valid)
+        for (const auto& captured : continuousAnalysis.recentSnapshots())
+        {
+            if (! captured.valid || ! captured.hostTimelineValid || captured.generation != frame.generation
+                || captured.transportEpoch != frame.transportEpoch || captured.endSample > frame.endSample) continue; // Retired or newer windows cannot belong to this handoff.
+            auto entry = std::make_unique<juce::DynamicObject>();
+            entry->setProperty("measurement_window", encodeWindow(captured));
+            auto spectra = std::make_unique<juce::DynamicObject>();
+            spectra->setProperty("schema", "kenn.fft_spectra.v1");
+            spectra->setProperty("low", encodeFFT(captured.lowSpectrum, captured));
+            entry->setProperty("fft_spectra", juce::var(spectra.release()));
+            entry->setProperty("peak_dbfs", captured.features.peakDbfs); entry->setProperty("rms_dbfs", captured.features.rmsDbfs);
+            entry->setProperty("stereo_correlation", captured.features.correlation); entry->setProperty("stereo_width", captured.features.stereoWidth);
+            entry->setProperty("analysed_samples", captured.features.analysedSamples);
+            entry->setProperty("audio_age_seconds", juce::jmax(0.0, juce::Time::highResolutionTicksToSeconds(juce::Time::getHighResolutionTicks()-captured.capturedTicks)));
+            pairedWindows.add(juce::var(entry.release()));
+        }
+    message->setProperty("paired_windows", pairedWindows); // Six feature windows bridge the 500 ms publisher phase offset.
     message->setProperty("target_lufs", apvts.getRawParameterValue("target_lufs")->load());
     auto pluginState = std::make_unique<juce::DynamicObject>();
     pluginState->setProperty("assistant_mode", getAssistantMode());
@@ -215,11 +396,10 @@ juce::var KENNMixAssistantAudioProcessor::handoffPayload() const
     message->setProperty("peak_dbfs", data.peakDb); message->setProperty("rms_dbfs", data.rmsDb);
     message->setProperty("stereo_correlation", data.correlation); message->setProperty("stereo_width", data.stereoWidth);
     message->setProperty("sample_rate", data.sampleRate); message->setProperty("analysed_samples", data.analysedSamples);
-    const auto features = realtimeCore.snapshot();
     message->setProperty("low_energy", features.lowEnergy); message->setProperty("mid_energy", features.midEnergy); message->setProperty("high_energy", features.highEnergy);
     message->setProperty("crest_db", features.crestDb); message->setProperty("transient_ratio", features.transientRatio); message->setProperty("clipped_samples", features.clippedSamples);
-    message->setProperty("true_peak_dbtp", data.peakDb);
-    message->setProperty("integrated_lufs", data.rmsDb);
+    // Sample peak and window RMS cannot stand in for oversampled true peak
+    // or gated, K-weighted LUFS. Keep their actual units in the handoff.
 
     // Keep a compact, language-neutral evidence packet alongside the
     // backwards-compatible plugin handoff fields.  The audio callback never
@@ -229,7 +409,7 @@ juce::var KENNMixAssistantAudioProcessor::handoffPayload() const
     auto evidence = std::make_unique<juce::DynamicObject>();
     evidence->setProperty("schema", "kenn.evidence.v1");
     evidence->setProperty("source", "plugin_bus_snapshot");
-    evidence->setProperty("captured_at_age_seconds", 0.0);
+    evidence->setProperty("captured_at_age_seconds", lastTicks > 0 ? message->getProperty("audio_age_seconds") : juce::var());
     evidence->setProperty("observed_at_epoch", juce::var());
     juce::Array<juce::var> evidenceFacts;
     const auto addEvidenceFact = [&evidenceFacts](const char* name, const juce::var& value, const char* unit)
@@ -244,8 +424,6 @@ juce::var KENNMixAssistantAudioProcessor::handoffPayload() const
     };
     addEvidenceFact("peak_dbfs", data.peakDb, "dBFS");
     addEvidenceFact("rms_dbfs", data.rmsDb, "dBFS");
-    addEvidenceFact("true_peak_dbtp", data.peakDb, "dBTP");
-    addEvidenceFact("integrated_lufs", data.rmsDb, "LUFS");
     addEvidenceFact("stereo_correlation", data.correlation, "correlation");
     addEvidenceFact("stereo_width", data.stereoWidth, "ratio");
     addEvidenceFact("sample_rate", data.sampleRate, "Hz");
@@ -264,7 +442,7 @@ juce::var KENNMixAssistantAudioProcessor::handoffPayload() const
     evidence->setProperty("limitations", juce::var(std::move(evidenceLimitations)));
     message->setProperty("evidence", juce::var(evidence.release()));
 
-    const auto spectrum = realtimeCore.spectrumSnapshot();
+    const auto& spectrum = frame.spectrum;
     juce::Array<juce::var> spectrumBands;
     const auto nyquist = data.sampleRate * 0.5;
     for (size_t index = 0; index < AudioTooRealtimeSpectrumBandCount; ++index)
@@ -377,13 +555,19 @@ bool KENNMixAssistantAudioProcessor::sendHandoffToKenn(juce::String& result) con
 
 juce::String KENNMixAssistantAudioProcessor::localDiagnosticSummary() const
 {
-    const auto data = meterSnapshot();
+    const auto frame = continuousAnalysis.snapshot();
+    const auto& f = frame.features;
+    const KENNMeterSnapshot data { f.peakDbfs, f.rmsDbfs, f.correlation, f.stereoWidth,
+        f.crestDb, f.transientRatio, f.clippedSamples, f.sampleRate, f.analysedSamples };
     juce::StringArray lines;
     lines.add("Local KENN Mix Check (no companion required)");
     lines.add("Measured from the current plug-in bus; audio is not sent anywhere.");
-    if (data.analysedSamples <= 0 || data.sampleRate <= 0.0)
+    const auto ageSeconds = juce::Time::highResolutionTicksToSeconds(juce::Time::getHighResolutionTicks()-frame.capturedTicks);
+    if (! frame.valid || data.analysedSamples <= 0 || ageSeconds > 1.0
+        || apvts.getRawParameterValue("analysis_enabled")->load() < 0.5f) // 1 second matches continuous companion diagnosis.
     {
-        lines.add("No audio has been analysed yet. Play audio through this bus, then run the check again.");
+        // Gaps, disabled analysis and stopped playback cannot justify current local advice.
+        lines.add("No current complete audio window. Play audio through this bus with analysis enabled, then run the check again.");
         lines.add("Available locally: peak, RMS, correlation, width, crest, transient, and clipping meters.");
         return lines.joinIntoString("\n");
     }
@@ -393,18 +577,18 @@ juce::String KENNMixAssistantAudioProcessor::localDiagnosticSummary() const
         + " dBFS | Correlation " + juce::String(data.correlation, 2)
         + " | Width " + juce::String(data.stereoWidth, 2));
     lines.add("Crest " + juce::String(data.crestDb, 1) + " dB | Transient "
-        + juce::String(data.transientRatio, 2) + " | Clipped samples in latest block "
+        + juce::String(data.transientRatio, 2) + " | Near-full-scale frames in latest 100 ms window "
         + juce::String(data.clippedSamples));
 
     bool finding = false;
     if (data.clippedSamples > 0)
     {
-        lines.add("Finding: near-full-scale clipping was detected in the latest analysed block.");
+        lines.add("Finding: sample frames reached |sample| >= 0.999 in the latest 100 ms window; check upstream gain.");
         finding = true;
     }
     if (data.peakDb > -1.0f)
     {
-        lines.add("Finding: peak headroom is below the 1 dB safety margin.");
+        lines.add("Finding: sample headroom is below 1 dB; audition upstream gain reduction before judging overload.");
         finding = true;
     }
     if (data.correlation < -0.5f)
@@ -430,6 +614,15 @@ bool KENNMixAssistantAudioProcessor::askKenn(const juce::String& question, juce:
     auto payload = std::make_unique<juce::DynamicObject>();
     payload->setProperty("question", cleanQuestion);
     payload->setProperty("session_id", getKennSessionId());
+    payload->setProperty("plugin_session_id", getKennInsertId());
+    // An explicit analysis question opts into a compact feature snapshot.
+    // The chat worker builds it here; no audio or network work reaches the callback.
+    const auto lowered = cleanQuestion.toLowerCase();
+    if (lowered.contains("analys") || lowered.contains("analyz")
+        || lowered.contains("masking") || lowered.contains("overlap") || lowered.contains("sidechain")
+        || lowered.startsWith("bind this insert to ")
+        || lowered.contains("what should i change"))
+        payload->setProperty("plugin_handoff", handoffPayload());
     // Asking KENN is an explicit user action. Include the latest cached Live
     // session structure for questions that actually refer to the current set;
     // generic mix-engineering questions stay on the fast retrieval path and
@@ -1184,7 +1377,7 @@ void KENNMixAssistantAudioProcessor::setStateInformation(const void* data, int s
 
 bool KENNMixAssistantAudioProcessor::syncWebParameters()
 {
-    const auto url = juce::URL(getKennEndpoint() + "/api/plugin/parameters?session_id=" + getKennSessionId() + "&pop_pending=1");
+    const auto url = juce::URL(getKennEndpoint() + "/api/plugin/parameters?session_id=" + getKennInsertId() + "&pop_pending=1");
     const auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
         .withConnectionTimeoutMs(200)
         .withNumRedirectsToFollow(0);

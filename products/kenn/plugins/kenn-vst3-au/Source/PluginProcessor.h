@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "MeterAnalyzer.h"
+#include "ContinuousAnalysis.h"
 
 class KENNLiveContextPublisherThread;
 
@@ -11,9 +12,11 @@ public:
     KENNMixAssistantAudioProcessor();
     ~KENNMixAssistantAudioProcessor() override;
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
-    void releaseResources() override {}
+    void releaseResources() override { continuousAnalysis.release(); }
     bool isBusesLayoutSupported(const BusesLayout& layouts) const override;
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void updateTrackProperties(const TrackProperties&) override;
+    juce::String getHostTrackName() const;
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
     const juce::String getName() const override { return JucePlugin_Name; }
@@ -29,7 +32,8 @@ public:
     void getStateInformation(juce::MemoryBlock&) override;
     void setStateInformation(const void*, int) override;
 
-    KENNMeterSnapshot meterSnapshot() const { const auto f = realtimeCore.snapshot(); return { f.peakDbfs, f.rmsDbfs, f.correlation, f.stereoWidth, f.crestDb, f.transientRatio, f.clippedSamples, f.sampleRate, f.analysedSamples }; }
+    KENNMeterSnapshot meterSnapshot() const { const auto f = continuousAnalysis.snapshot().features; return { f.peakDbfs, f.rmsDbfs, f.correlation, f.stereoWidth, f.crestDb, f.transientRatio, f.clippedSamples, f.sampleRate, f.analysedSamples }; }
+    KENNAnalysisSnapshot analysisSnapshot() const { return continuousAnalysis.snapshot(); }
     bool writeHandoffFile(juce::String& error) const;
     bool sendHandoffToKenn(juce::String& result) const;
     juce::String localDiagnosticSummary() const;
@@ -47,6 +51,7 @@ public:
     juce::String getAssistantMode() const;
     juce::String getKennEndpoint() const;
     juce::String getKennSessionId() const;
+    juce::String getKennInsertId() const { return kennInsertId; }
     bool setKennConnection(const juce::String& endpoint, const juce::String& sessionId, juce::String& error);
     void recordTargetAction(const juce::String& event, float before, float after, const juce::String& reason);
     juce::String latestTargetActionSummary() const;
@@ -54,16 +59,23 @@ public:
     juce::AudioProcessorValueTreeState apvts;
 
 private:
+    friend class KENNLiveContextPublisherThread;
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::var handoffPayload() const;
     static bool validateLocalEndpoint(const juce::String& endpoint, juce::String& normalised, juce::String& error);
-    AudioTooRealtimeCore realtimeCore;
+    KENNContinuousAnalysis continuousAnalysis;
+    // JUCE delivers host names on the message thread; only the handoff worker
+    // shares this state. processBlock() never touches this lock.
+    mutable juce::CriticalSection hostTrackLock;
+    juce::String hostTrackName;
     mutable juce::CriticalSection connectionLock;
     struct TargetActionLog { juce::String timestamp, event, reason; float before = 0.0f, after = 0.0f; };
     mutable juce::CriticalSection actionLogLock;
     juce::Array<TargetActionLog> targetActionLog;
     juce::String kennEndpoint { "http://127.0.0.1:8090" };
     juce::String kennSessionId { "plugin-local" };
-    std::unique_ptr<KENNLiveContextPublisherThread> liveContextPublisher;
+    // Conversation ownership may be shared by paired inserts. Audio identity
+    // is unique per processor lifetime and is deliberately not saved in a set.
+    const juce::String kennInsertId { "insert-" + juce::Uuid().toString() };
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(KENNMixAssistantAudioProcessor)
 };

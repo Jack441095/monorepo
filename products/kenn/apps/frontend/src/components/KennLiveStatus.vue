@@ -7,10 +7,10 @@
         type="button"
         class="live-status__toggle-btn"
         :class="{ 'is-active': realtimeAnalysisEnabled }"
-        :title="realtimeAnalysisEnabled ? 'Pause realtime analysis to eliminate OSC latency & CPU load' : 'Resume realtime analysis'"
+        :title="realtimeAnalysisEnabled ? 'Pause Live session polling' : 'Resume Live session polling'"
         @click="toggleRealtimeAnalysis()"
       >
-        {{ realtimeAnalysisEnabled ? 'Realtime ON' : 'Paused' }}
+        {{ realtimeAnalysisEnabled ? 'Live sync ON' : 'Live sync paused' }}
       </button>
       <button type="button" class="live-status__refresh-btn" :disabled="refreshing" title="Refresh Live status" @click="refresh">
         {{ refreshing ? 'Checking…' : 'Refresh' }}
@@ -22,6 +22,25 @@
       <span><small>Mode</small>{{ realtimeAnalysisEnabled ? 'Live Sync' : 'Paused' }}</span>
       <span><small>Action</small>{{ lastActionLabel }}</span>
     </div>
+    <div v-if="pluginInsertId" class="live-status__audio" role="region" aria-label="Insert audio analysis">
+      <label>
+        Audio source
+        <select :value="pluginInsertId" :disabled="pluginAudioBusy" @change="selectSource">
+          <option v-if="!selectedPluginSource" :value="pluginInsertId">Launch insert · {{ pluginInsertId.slice(-8) }}</option>
+          <option v-for="source in pluginSources" :key="source.insert_id" :value="source.insert_id">
+            {{ source.host_track_name || 'Unnamed insert' }} · {{ source.insert_id.slice(-8) }}
+          </option>
+        </select>
+      </label>
+      <span role="status">{{ pluginAudioStatus }}<template v-if="selectedPluginSource"> · {{ selectedPluginSource.audio_age_seconds.toFixed(1) }} s old</template></span>
+      <button type="button" class="live-status__refresh-btn" :disabled="pluginAudioBusy || !!pluginSourceError"
+        @click="setPluginAudioEnabled(!pluginAudioRequestedEnabled)">
+        {{ pluginAudioBusy ? 'Requesting…' : pluginAudioRequestedEnabled ? 'Pause audio analysis' : 'Start audio analysis' }}
+      </button>
+      <small v-if="pluginSourceError" role="alert">{{ pluginSourceError }}</small>
+      <small v-else>Measurements from this insert; raw audio stays local. Keep its editor open to receive Start/Pause requests.</small>
+    </div>
+    <small v-else class="live-status__audio-hint">Open KENN from a plug-in insert to analyse its live audio.</small>
   </section>
 </template>
 
@@ -29,8 +48,22 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useKenn } from '../composables/useKenn'
 
-const { project, lastActionAt, refreshSessionCard, realtimeAnalysisEnabled, toggleRealtimeAnalysis } = useKenn()
+const { project, lastActionAt, refreshSessionCard, realtimeAnalysisEnabled, toggleRealtimeAnalysis,
+  pluginInsertId, pluginSources, selectedPluginSource, pluginAudioStatus, pluginAudioRequestedEnabled,
+  pluginSourceError, pluginAudioBusy, refreshPluginSources, selectPluginInsert, setPluginAudioEnabled } = useKenn()
 const refreshing = ref(false)
+let sourceRefreshing = false
+
+async function refreshSources() {
+  if (sourceRefreshing) return // Slow companion responses cannot accumulate overlapping polls.
+  sourceRefreshing = true
+  try { await refreshPluginSources() } finally { sourceRefreshing = false }
+}
+
+function selectSource(event: Event) {
+  selectPluginInsert((event.target as HTMLSelectElement).value)
+  void refreshSources()
+}
 
 const lastActionLabel = computed(() => {
   if (!lastActionAt.value) return 'None yet'
@@ -41,14 +74,19 @@ async function refresh() {
   if (refreshing.value) return
   refreshing.value = true
   try {
-    await refreshSessionCard()
+    await Promise.all([refreshSessionCard(), refreshSources()])
   } finally {
     refreshing.value = false
   }
 }
 
 let refreshTimer: number | undefined
+let sourceTimer: number | undefined
 onMounted(() => {
+  void refreshSources()
+  if (pluginInsertId.value) sourceTimer = window.setInterval(() => {
+    if (!document.hidden) void refreshSources()
+  }, 1000) // One status read per second; native feature publishing stays at 2 Hz.
   refreshTimer = window.setInterval(() => {
     if (realtimeAnalysisEnabled.value) {
       void refresh()
@@ -57,6 +95,7 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   if (refreshTimer != null) window.clearInterval(refreshTimer)
+  if (sourceTimer != null) window.clearInterval(sourceTimer)
 })
 </script>
 
@@ -66,6 +105,22 @@ onBeforeUnmount(() => {
   padding: 0.09rem 0.14rem 0.1rem;
   border-bottom: 1px solid var(--floating-border);
   background: color-mix(in srgb, var(--floating-bg) 88%, #0d1117);
+
+  &__audio {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.06rem;
+    margin-top: 0.08rem;
+    font-size: 0.11rem;
+
+    label { display: flex; align-items: center; gap: 0.06rem; }
+    select { max-width: 1.9rem; background: var(--floating-bg); color: var(--text-color); font: inherit; }
+    small { flex-basis: 100%; color: var(--muted-text); }
+    [role='alert'] { color: #ef6461; }
+  }
+
+  &__audio-hint { display: block; margin-top: 0.08rem; font-size: 0.1rem; color: var(--muted-text); }
 
   &__connection {
     display: flex;

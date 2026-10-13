@@ -32,6 +32,8 @@ RATE_LIMITS = {
     "stem_separate_status": (120, 60),
     "report": (60, 60),
     "mutation": (60, 60),
+    # Two 64-insert feature batches per second; Live controls retain 60/min.
+    "plugin_handoff_batch": (120, 60),
 }
 RATE_BUCKETS: dict[tuple[str, str], deque[float]] = defaultdict(deque)
 RATE_LOCK = threading.Lock()

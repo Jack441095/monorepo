@@ -6,6 +6,9 @@ import {
   revokeKennConfirmation,
   undoKennAction,
   fetchKennSessionCard,
+  fetchPluginSources,
+  requestPluginAudio,
+  type KennPluginSource,
   type KennActionProposal,
   type KennActionReceipt,
   type KennAdviceFinding,
@@ -13,6 +16,7 @@ import {
   type KennSource,
 } from '../api/kenn'
 import { userFacingKennError } from '../api/client'
+import { readPluginLaunch } from './pluginLaunch'
 
 export type KennUserMessage = {
   id: string
@@ -112,8 +116,8 @@ function newId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
-// One session per page load: chat cards are not persisted across reloads, so
-// reusing a stored ID would surface receipts the visible chat no longer shows.
+// Ordinary pages get a fresh chat. A native launch deliberately shares its
+// conversation so bindings, confirmation tokens and Undo retain the same owner.
 function newSessionId(): string {
   try {
     return crypto.randomUUID()
@@ -184,7 +188,64 @@ const project = ref<KennProjectInfo>(useMock.value ? { ...MOCK_PROJECT } : { ...
 const sending = ref(false)
 const error = ref('')
 const lastActionAt = ref<Date | null>(null)
-const sessionId = newSessionId()
+const pluginLaunch = readPluginLaunch(typeof window !== 'undefined' ? window.location.search : '')
+const sessionId = pluginLaunch?.sessionId ?? newSessionId()
+const pluginInsertId = ref(pluginLaunch?.pluginSessionId ?? '')
+const pluginSources = ref<KennPluginSource[]>([])
+const pluginSourceError = ref('')
+const pluginAudioBusy = ref(false)
+const pluginAudioRequest = ref<{ insert: string; enabled: boolean } | null>(null)
+const selectedPluginSource = computed(() => pluginSources.value.find(source => source.insert_id === pluginInsertId.value))
+const pluginAudioRequestedEnabled = computed(() => pluginAudioRequest.value?.insert === pluginInsertId.value
+  ? pluginAudioRequest.value.enabled : selectedPluginSource.value?.requested_parameters.live_context_enabled === true)
+const pluginAudioStatus = computed(() => {
+  if (pluginSourceError.value) return 'Source unavailable'
+  const request = pluginAudioRequest.value
+  const source = selectedPluginSource.value
+  if (request?.insert === pluginInsertId.value && !request.enabled) return 'Pause requested'
+  if (source?.current_for_diagnosis) return 'Fresh audio'
+  if (request?.insert === pluginInsertId.value && request.enabled) return 'Waiting for audio'
+  return source ? 'Audio stale or paused' : 'Waiting for publication'
+})
+
+export function selectPluginInsert(insert: string) {
+  if (!pluginSources.value.some(source => source.insert_id === insert)) return // Never select a global/latest source.
+  pluginInsertId.value = insert
+  pluginAudioRequest.value = null
+}
+
+export async function refreshPluginSources() {
+  if (!pluginLaunch) return // Standalone chat has no declared native conversation.
+  const selected = pluginInsertId.value
+  try {
+    const sources = await fetchPluginSources(sessionId, selected)
+    if (selected !== pluginInsertId.value) return // A slow previous selection must not replace the current status.
+    pluginSources.value = sources
+    pluginSourceError.value = ''
+    const source = selectedPluginSource.value
+    if (source?.current_for_diagnosis && pluginAudioRequest.value?.enabled
+        && source.reported_parameters.live_context_enabled === true) pluginAudioRequest.value = null
+  } catch (e) {
+    if (selected !== pluginInsertId.value) return // Ignore a retired selection's response.
+    pluginSources.value = []
+    pluginSourceError.value = userFacingKennError(e, 'Audio source status is unavailable. Refresh before analysing.')
+  }
+}
+
+export async function setPluginAudioEnabled(enabled: boolean) {
+  if (!pluginLaunch || !pluginInsertId.value || pluginAudioBusy.value || pluginSourceError.value) return // A source error blocks controls until a successful refresh.
+  const insert = pluginInsertId.value
+  pluginAudioBusy.value = true
+  try {
+    await requestPluginAudio(sessionId, insert, enabled)
+    pluginAudioRequest.value = { insert, enabled }
+    await refreshPluginSources()
+  } catch (e) {
+    pluginSourceError.value = userFacingKennError(e, 'Audio analysis request failed. Refresh and try again.')
+  } finally {
+    pluginAudioBusy.value = false
+  }
+}
 let answerTurn = 0
 
 // Safe storage access guards against undefined localStorage in headless tests and SSR
@@ -333,6 +394,7 @@ async function sendMessage(text: string) {
     const { answer, suggestions, sources, findings, proposal, raw, answerUpgrade } = await askKenn({
       question,
       sessionId,
+      pluginSessionId: pluginInsertId.value || undefined,
       history: history.slice(0, -1),
     })
     const assistantId = newId('assistant')
@@ -516,6 +578,16 @@ export function useKenn() {
     sending,
     error,
     lastActionAt,
+    pluginInsertId,
+    pluginSources,
+    selectedPluginSource,
+    pluginAudioStatus,
+    pluginAudioRequestedEnabled,
+    pluginSourceError,
+    pluginAudioBusy,
+    refreshPluginSources,
+    selectPluginInsert,
+    setPluginAudioEnabled,
     realtimeAnalysisEnabled,
     toggleRealtimeAnalysis,
     chatSide,

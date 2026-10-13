@@ -74,38 +74,43 @@ def test_mix_planner_dag_generation() -> None:
         assert plan.steps[i].depends_on == [plan.steps[i - 1].id]
 
 
-def test_vst3_handoff_bridging_to_telemetry() -> None:
-    """Verify that VST3 plugin handoff metrics bridge directly into AudioTelemetryManager."""
-    from kenn.plugin_handoff import ingest_live_context
-    from kenn.audio_telemetry import get_telemetry_manager
+def test_vst3_insert_features_preserve_units_and_leave_master_telemetry_untouched(monkeypatch) -> None:
+    """An insert's RMS and sample peak must never become master LUFS or dBTP."""
+    import kenn.audio_telemetry as telemetry
+    import kenn.plugin_handoff as handoff
+
+    manager = AudioTelemetryManager()
+    master = manager.ingest({"integrated_lufs": -16.0, "true_peak_dbtp": -1.2})
+    monkeypatch.setattr(telemetry, "_telemetry_manager", manager)
+    monkeypatch.setattr(handoff, "_live_contexts", {})
 
     handoff_payload = {
         "schema": "kenn.plugin_handoff.v1",
         "kind": "mix_review_snapshot",
         "session_id": "test_vst3_session",
-        "peak_dbfs": -0.15,  # High peak
+        "peak_dbfs": -0.15,
         "rms_dbfs": -11.5,
-        "stereo_correlation": 0.22,  # Low correlation warning
+        "stereo_correlation": 0.22,
         "stereo_width": 0.85,
         "sample_rate": 48000,
         "analysed_samples": 48000,
         "crest_db": 11.35,
         "low_energy": 1.2,
-        "mid_energy": 2.5,  # High mid/low-mid
+        "mid_energy": 2.5,
         "high_energy": 0.8,
         "assistant_mode": "suggest",
         "plugin_state": {"assistant_mode": "suggest"},
     }
 
-    res = ingest_live_context(handoff_payload, session_id="test_vst3_session")
+    res = handoff.ingest_live_context(handoff_payload, session_id="test_vst3_session")
     assert res.get("ok") is True
-
-    telemetry = get_telemetry_manager().get_latest()
-    assert telemetry is not None
-    assert telemetry.true_peak_dbtp == -0.15
-    assert telemetry.phase_correlation == 0.22
-    anomalies = get_telemetry_manager().diagnose_anomalies(telemetry)
-    assert any("Mono Cancellation Risk" in a for a in anomalies)
+    context = res["live_context"]
+    assert context["peak_dbfs"] == -0.15
+    assert context["rms_dbfs"] == -11.5
+    assert context["stereo_correlation"] == 0.22
+    assert "integrated_lufs" not in context
+    assert "true_peak_dbtp" not in context
+    assert manager.get_latest() is master
 
 
 def test_live_telemetry_poller_lifecycle() -> None:

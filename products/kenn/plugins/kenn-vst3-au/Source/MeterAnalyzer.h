@@ -3,9 +3,8 @@
 #include <JuceHeader.h>
 #include "../../../packages/common/AudioTooRealtimeCore.h"
 
-// This analyser is deliberately allocation-free in processBlock.  Values are
-// published atomically for the editor and handoff exporter; it never sends
-// network traffic from the audio thread.
+// Plug-in-facing meter shape. ContinuousAnalysis publishes these values from
+// complete worker windows; the audio callback only enqueues its own input.
 struct KENNMeterSnapshot
 {
     float peakDb = -100.0f;
@@ -18,8 +17,3 @@ struct KENNMeterSnapshot
     double sampleRate = 0.0;
     juce::int64 analysedSamples = 0;
 };
-
-// The plugin's single realtime owner is AudioTooRealtimeCore in the shared
-// package. This snapshot remains as the plugin-facing evidence shape; the old
-// duplicate KENNMeterAnalyzer implementation was removed so the callback has
-// one authoritative DSP path.

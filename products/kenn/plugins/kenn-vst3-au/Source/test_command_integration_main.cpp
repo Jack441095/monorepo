@@ -8,9 +8,41 @@
 // offline response is still a valid command-boundary result: the client must
 // receive and display it rather than treating it as a transport failure.
 
+class PairedTestPlayHead final : public juce::AudioPlayHead
+{
+public:
+    juce::Optional<PositionInfo> getPosition() const override
+    {
+        PositionInfo position; position.setTimeInSamples(sample); position.setIsPlaying(true);
+        return position;
+    }
+    juce::int64 sample = 0;
+};
+
 int main()
 {
     KENNMixAssistantAudioProcessor processor;
+    juce::AudioProcessor::TrackProperties track;
+    track.name = " Kick ";
+    processor.updateTrackProperties(track);
+    if (processor.getHostTrackName() != "Kick")
+    {
+        std::cerr << "FAIL: host track name did not reach the handoff worker state.\n";
+        return 1;
+    }
+    track.name.clear();
+    processor.updateTrackProperties(track);
+    if (processor.getHostTrackName().isNotEmpty())
+    {
+        std::cerr << "FAIL: an unknown host name retained a previous track association.\n";
+        return 1;
+    }
+    // Offline qualification must never contact an owner's running companion.
+    if (juce::SystemStats::getEnvironmentVariable("KENN_TEST_OFFLINE_ONLY", "0") == "1")
+    {
+        std::cout << "SUCCESS: host-name callback set and cleared insert attribution. HTTP checks skipped in offline mode.\n";
+        return 0;
+    }
     const auto endpoint = juce::SystemStats::getEnvironmentVariable("KENN_TEST_ENDPOINT", "http://127.0.0.1:8090");
     juce::String error;
     if (!processor.setKennConnection(endpoint, "vst3-command-integration-test", error))
@@ -23,6 +55,72 @@ int main()
     if (!processor.testKennConnection(health))
     {
         std::cout << "SKIP: no KENN server reachable at " << endpoint << std::endl;
+        return 0;
+    }
+
+    const auto analysisTrack = juce::SystemStats::getEnvironmentVariable("KENN_TEST_ANALYSIS_TRACK", "");
+    if (analysisTrack.isNotEmpty())
+    {
+        // The Python HTTP fixture supplies an isolated fake track and endpoint.
+        // This exercises the actual native serializer and Ask client, without
+        // qualifying or writing to a producer's Live session.
+        processor.prepareToPlay(48000.0, 480); // 10 ms blocks at 48 kHz.
+        track.name = analysisTrack;
+        processor.updateTrackProperties(track);
+        KENNMixAssistantAudioProcessor bass;
+        if (! bass.setKennConnection(endpoint, processor.getKennSessionId(), error)) return 1; // The fixture already validated the same endpoint.
+        bass.prepareToPlay(48000.0, 480);
+        track.name = "Bass"; bass.updateTrackProperties(track);
+        PairedTestPlayHead clock; processor.setPlayHead(&clock); bass.setPlayHead(&clock);
+        if (processor.getKennInsertId() == bass.getKennInsertId()) return 1; // Shared chat ownership must never merge audio identity.
+        juce::AudioBuffer<float> audio(2, 480);
+        juce::MidiBuffer midi;
+        for (int block = 0; block < 40; ++block)
+        {
+            clock.sample = block * 480;
+            for (int channel = 0; channel < 2; ++channel)
+                for (int sample = 0; sample < 480; ++sample)
+                    audio.setSample(channel, sample, static_cast<float>(0.99 * std::sin(
+                        2.0 * juce::MathConstants<double>::pi * 60.0 * static_cast<double>(clock.sample+sample)/48000.0))); // 60 Hz sine, same host interval in both inserts.
+            processor.processBlock(audio, midi); bass.processBlock(audio, midi);
+            juce::Thread::sleep(10); // Pace 10 ms input blocks so the test qualifies the accepting queue path.
+        }
+        juce::String analysis;
+        if (!processor.askKenn("Analyse " + analysisTrack, analysis)
+            || !analysis.contains("sample peak") || !analysis.contains("Proposed Live fader")
+            || !analysis.contains("Nothing has changed"))
+        {
+            std::cerr << "FAIL: native insert analysis did not produce measured, approval-gated advice: " << analysis << '\n';
+            return 1;
+        }
+        std::cout << "SUCCESS: native insert analysis reached the fake HTTP companion and returned a guarded fader proposal.\n";
+        juce::String association;
+        if (! processor.askKenn("bind this insert to track 1", association) || ! association.contains("Associated this insert"))
+        {
+            std::cerr << "FAIL: native binding did not reach the fake companion: " << association << '\n';
+            return 1;
+        }
+        if (! bass.askKenn("bind this insert to track 2", association) || ! association.contains("Associated this insert"))
+        {
+            std::cerr << "FAIL: second native insert could not bind independently: " << association << '\n';
+            return 1;
+        }
+        if (! processor.askKenn("Is the bass masking the kick?", analysis) || ! analysis.contains("shape similarity")
+            || ! analysis.contains("does not prove audible masking"))
+        {
+            std::cerr << "FAIL: paired native features did not produce a qualified comparison: " << analysis << '\n';
+            return 1;
+        }
+        std::cout << "SUCCESS: two native inserts with shared conversation ownership retained separate audio identities and matching FFT intervals.\n";
+        bass.releaseResources();
+        if (! bass.askKenn("unbind this insert", association)) return 1; // Metadata must remain clearable after playback stops.
+        processor.releaseResources();
+        if (! processor.askKenn("unbind this insert", association) || ! association.contains("Cleared this insert"))
+        {
+            std::cerr << "FAIL: clearing native metadata required running audio: " << association << '\n';
+            return 1;
+        }
+        std::cout << "SUCCESS: native binding and offline unbinding reached the fake HTTP companion.\n";
         return 0;
     }
 

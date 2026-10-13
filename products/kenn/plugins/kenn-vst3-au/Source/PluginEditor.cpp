@@ -266,7 +266,8 @@ KENNMixAssistantAudioProcessorEditor::KENNMixAssistantAudioProcessorEditor(KENNM
     actionAudit.setColour(juce::Label::textColourId, secondaryForeground);
     guidance.setText("Local meters and Mix Check work without the companion. Chat, handoff, proposals, and AutoMix use the optional local KENN Companion.", juce::dontSendNotification);
     endpointLabel.setText("KENN Companion (optional)", juce::dontSendNotification);
-    sessionLabel.setText("Session ID", juce::dontSendNotification);
+    sessionLabel.setText("Conversation ID", juce::dontSendNotification);
+    sessionLabel.setTooltip("Use the same conversation ID in both KENN inserts when comparing two tracks.");
     modeLabel.setText("Mode", juce::dontSendNotification);
     addAndMakeVisible(modeSelector);
     modeSelector.addItemList({ "Ask", "Suggest", "Assist", "Auto" }, 1);
@@ -696,7 +697,8 @@ void KENNMixAssistantAudioProcessorEditor::timerCallback()
             {
                 if (! webViewLoaded && webView != nullptr)
                 {
-                    const auto targetUrl = kennProcessor.getKennEndpoint() + "/?session_id=" + kennProcessor.getKennSessionId();
+                        const auto targetUrl = kennProcessor.getKennEndpoint() + "/?session_id=" + juce::URL::addEscapeChars(kennProcessor.getKennSessionId(), true)
+                        + "&plugin_session_id=" + kennProcessor.getKennInsertId();
                     webView->goToURL(targetUrl);
                     webViewLoaded = true;
                 }

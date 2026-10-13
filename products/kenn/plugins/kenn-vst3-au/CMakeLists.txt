@@ -63,6 +63,7 @@ juce_add_plugin(KENNMixAssistant
 juce_generate_juce_header(KENNMixAssistant)
 
 target_sources(KENNMixAssistant PRIVATE
+    Source/ContinuousAnalysis.cpp
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
     Source/LocalCommandLanguage.cpp
@@ -231,6 +232,27 @@ add_test(NAME KENN.NumericalParity COMMAND TestNumericalParity)
 add_test(NAME KENN.RealtimeThreadSafety COMMAND TestRealtimeThreadSafety)
 add_test(NAME KENN.RealtimePerformance COMMAND TestRealtimePerformance)
 
+# Exact offline windows/overflow checks use the same worker implementation as
+# the plug-in, with its consumer drained deterministically by the test.
+add_executable(TestContinuousAnalysis Source/test_continuous_analysis_main.cpp)
+target_include_directories(TestContinuousAnalysis PRIVATE Source
+    "${CMAKE_CURRENT_BINARY_DIR}/KENNMixAssistant_artefacts/JuceLibraryCode")
+target_link_libraries(TestContinuousAnalysis PRIVATE KENNMixAssistant
+    juce::juce_audio_utils juce::juce_gui_extra juce::juce_recommended_config_flags
+    juce::juce_recommended_warning_flags)
+add_test(NAME KENN.ContinuousAnalysis COMMAND TestContinuousAnalysis)
+
+# Exercise the disabled-by-default meter through both its own interface and
+# the actual worker, including retirement. The same binary traces synthetic
+# float32 fixtures and profiles combined worker cost without opening Live.
+add_executable(TestStreamingMeter Source/test_streaming_meter_main.cpp)
+target_include_directories(TestStreamingMeter PRIVATE Source
+    "${CMAKE_CURRENT_BINARY_DIR}/KENNMixAssistant_artefacts/JuceLibraryCode")
+target_link_libraries(TestStreamingMeter PRIVATE KENNMixAssistant
+    juce::juce_audio_utils juce::juce_gui_extra juce::juce_recommended_config_flags
+    juce::juce_recommended_warning_flags)
+add_test(NAME KENN.StreamingMeter COMMAND TestStreamingMeter)
+
 # The plug-in bundles are intentionally universal, but these local test
 # executables do not need a second architecture.  Leaving the global
 # arm64;x86_64 setting on them makes the Makefile lipo wrapper race/fail on
@@ -248,5 +270,7 @@ if (APPLE)
         TestLocalLivePlan
         TestNumericalParity
         TestRealtimePerformance
+        TestContinuousAnalysis
+        TestStreamingMeter
         PROPERTIES OSX_ARCHITECTURES "")
 endif()

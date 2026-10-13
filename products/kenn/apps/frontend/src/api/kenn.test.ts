@@ -1,5 +1,32 @@
 import { describe, expect, it, vi } from 'vitest'
-import { confirmKennAction, getAnswerUpgrade, parseAdviceFindings, revokeKennConfirmation, summarizeAdviceAnswer } from './kenn'
+import { askKenn, confirmKennAction, fetchPluginSources, getAnswerUpgrade, parseAdviceFindings, requestPluginAudio, revokeKennConfirmation, summarizeAdviceAnswer } from './kenn'
+
+describe('native browser audio association', () => {
+  it('sends the selected insert with the conversation instead of a feature snapshot or latest-source request', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ answer: 'Measured' })))
+    vi.stubGlobal('fetch', fetchMock)
+    try {
+      await askKenn({ question: 'Analyse Kick', sessionId: 'owner', pluginSessionId: 'insert' })
+      const call = fetchMock.mock.calls.find(([, options]) => options?.method === 'POST')!
+      expect(JSON.parse(String(call[1].body))).toMatchObject({ session_id: 'owner', plugin_session_id: 'insert' })
+      expect(JSON.parse(String(call[1].body))).not.toHaveProperty('plugin_handoff')
+    } finally { vi.unstubAllGlobals() }
+  })
+
+  it('scopes discovery and opt-in to the same explicit owner and insert', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ ok: true, sources: [] })))
+    vi.stubGlobal('fetch', fetchMock)
+    try {
+      await fetchPluginSources('owner & one', 'insert')
+      const get = fetchMock.mock.calls.find(([url]) => String(url).includes('/plugin/inserts'))!
+      expect(new URL(String(get[0]), 'http://localhost').searchParams.get('conversation_id')).toBe('owner & one')
+      await requestPluginAudio('owner & one', 'insert', true)
+      const post = fetchMock.mock.calls.find(([, options]) => options?.method === 'POST')!
+      expect(JSON.parse(String(post[1].body))).toEqual({ session_id: 'insert', conversation_id: 'owner & one',
+        parameters: { analysis_enabled: true, live_context_enabled: true } })
+    } finally { vi.unstubAllGlobals() }
+  })
+})
 
 describe('getAnswerUpgrade', () => {
   it('polls with the originating chat identifier', async () => {

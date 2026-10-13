@@ -275,6 +275,7 @@ function parseSources(data: Record<string, unknown>): KennSource[] {
 export async function askKenn(params: {
   question: string
   sessionId: string
+  pluginSessionId?: string
   history?: Array<{ role: string; content: string }>
 }): Promise<KennAskResult> {
   await ensureAuthSession()
@@ -288,6 +289,7 @@ export async function askKenn(params: {
       limit: 8,
       history: params.history ?? [],
       session_id: params.sessionId,
+      plugin_session_id: params.pluginSessionId || undefined,
       stream: false,
       ground_in_set: true,
     }),
@@ -509,6 +511,37 @@ export type KennPluginParameters = {
   target_lufs: number
   analysis_enabled: boolean
   live_context_enabled: boolean
+}
+
+export type KennPluginSource = {
+  insert_id: string
+  host_track_name: string
+  audio_age_seconds: number
+  current_for_diagnosis: boolean
+  requested_parameters: Partial<KennPluginParameters>
+  reported_parameters: Partial<KennPluginParameters>
+}
+
+/** Read compact source status for this native conversation, without choosing a source. */
+export async function fetchPluginSources(conversationId: string, selectedInsert: string): Promise<KennPluginSource[]> {
+  await ensureAuthSession()
+  const query = new URLSearchParams({ conversation_id: conversationId, plugin_session_id: selectedInsert })
+  const res = await fetch(`${getApiBase()}${API_PATHS.kenn.pluginInserts}?${query}`, { credentials: 'include' })
+  const data = await parseJson(res)
+  if (!res.ok || !data.ok) throw new ApiError(parseApiErrorMessage(data, 'Audio source status is unavailable.'), res.status)
+  return (Array.isArray(data.sources) ? data.sources : []) as KennPluginSource[]
+}
+
+/** Request local KENN analysis controls; only a subsequent feature frame confirms host state. */
+export async function requestPluginAudio(conversationId: string, insert: string, enabled: boolean): Promise<void> {
+  await ensureAuthSession()
+  const res = await fetch(`${getApiBase()}${API_PATHS.kenn.parameters}`, {
+    method: 'POST', credentials: 'include', headers: withCsrf({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ session_id: insert, conversation_id: conversationId,
+      parameters: enabled ? { analysis_enabled: true, live_context_enabled: true } : { live_context_enabled: false } }),
+  })
+  const data = await parseJson(res)
+  if (!res.ok || !data.ok) throw new ApiError(parseApiErrorMessage(data, 'Audio analysis request failed.'), res.status)
 }
 
 /** GET 插件参数 (via GET /kenn/api/plugin/parameters) */
