@@ -115,6 +115,7 @@ export interface MixMetrics {
   bands?: BandMap
   perceptual_bands?: BandMap
   log_bands_40?: number[]
+  peaks?: number[]
   perceptual_summary?: {
     dominant_band?: string
     presence_share?: number

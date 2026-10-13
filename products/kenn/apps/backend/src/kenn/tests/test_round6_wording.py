@@ -94,9 +94,17 @@ def test_a_muted_track_can_be_turned_on(say, text) -> None:
     assert result["proposal"]["action"] == "set_mute" and result["proposal"]["track_name"] == "Hi-Hats" and result["proposal"]["after"] is False
 
 
-@pytest.mark.parametrize("text", ["metronome on", "turn the reverb on", "click on", "turn it on"])
+@pytest.mark.parametrize("text", ["turn the reverb on", "turn it on", "speakers on"])
 def test_on_for_something_that_is_not_a_track_changes_nothing(say, text) -> None:
     assert say(text)["status"] == "clarification_required"
+
+
+@pytest.mark.parametrize("text", ["metronome on", "click on"])
+def test_metronome_on_is_supported_song_action(say, text) -> None:
+    res = say(text)
+    assert res["status"] == "confirmation_required"
+    assert res["proposal"]["action"] == "set_metronome"
+    assert res["proposal"]["after"] is True
 
 
 @pytest.mark.parametrize("text", ["solo the sixth one", "call the bass Sub Bass", "solo the track with the EQ Eight"])

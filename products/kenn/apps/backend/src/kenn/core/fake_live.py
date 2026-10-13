@@ -64,6 +64,10 @@ class FakeLiveBackend:
         self._lock = threading.RLock()
         self._session = copy.deepcopy(fixture["session"])
         self._session.update({"status": "connected", "backend": "fake", "host": "fake", "port": 0})
+        self._session.setdefault("metronome", False)
+        self._session.setdefault("loop", False)
+        self._session.setdefault("loop_start", 0.0)
+        self._session.setdefault("loop_length", 16.0)
         self._returns = copy.deepcopy(fixture.get("return_tracks") or [])
         # Return-track mixers, for the fixtures that didn't record them: -14 dB (fader 0.5), centre, unmuted.
         self._return_mixers = {int(r.get("index", i)): {"volume": 0.5, "panning": 0.0, "mute": False}
@@ -430,6 +434,34 @@ class FakeLiveBackend:
             self.writes.append(("send", int(track_index), int(send_index), float(value)))
             return True
 
+    def get_track_color_index(self, track_index: int) -> int:
+        with self._lock:
+            track = self._track(track_index)
+            return int(track.get("color_index", 13)) if track else 13
+
+    def set_track_color_index(self, track_index: int, color_index: int) -> bool:
+        with self._lock:
+            track = self._track(track_index)
+            if track is None:
+                return False
+            track["color_index"] = max(0, min(69, int(color_index)))
+            self.writes.append(("set_track_color_index", int(track_index), int(color_index)))
+            return True
+
+    def get_track_fold_state(self, track_index: int) -> bool:
+        with self._lock:
+            track = self._track(track_index)
+            return bool(track.get("fold_state", False)) if track else False
+
+    def set_track_fold_state(self, track_index: int, folded: bool) -> bool:
+        with self._lock:
+            track = self._track(track_index)
+            if track is None:
+                return False
+            track["fold_state"] = bool(folded)
+            self.writes.append(("set_track_fold_state", int(track_index), bool(folded)))
+            return True
+
     def set_selected_track(self, index: int) -> bool:
         with self._lock:
             if self._track(index) is None:
@@ -600,6 +632,40 @@ class FakeLiveBackend:
         with self._lock:
             self._session["tempo"] = max(20.0, min(999.0, float(bpm)))  # the real bridge clamps the same way
             self.writes.append(("set_tempo", float(bpm)))
+            return True
+
+    def get_metronome(self) -> bool:
+        with self._lock:
+            return bool(self._session.get("metronome", False))
+
+    def set_metronome(self, enabled: bool) -> bool:
+        with self._lock:
+            self._session["metronome"] = bool(enabled)
+            self.writes.append(("set_metronome", bool(enabled)))
+            return True
+
+    def get_loop(self) -> bool:
+        with self._lock:
+            return bool(self._session.get("loop", False))
+
+    def set_loop(self, enabled: bool) -> bool:
+        with self._lock:
+            self._session["loop"] = bool(enabled)
+            self.writes.append(("set_loop", bool(enabled)))
+            return True
+
+    def get_loop_bounds(self) -> tuple[float, float]:
+        with self._lock:
+            return (
+                float(self._session.get("loop_start", 0.0)),
+                float(self._session.get("loop_length", 16.0)),
+            )
+
+    def set_loop_bounds(self, start_beats: float, length_beats: float) -> bool:
+        with self._lock:
+            self._session["loop_start"] = max(0.0, float(start_beats))
+            self._session["loop_length"] = max(0.25, float(length_beats))
+            self.writes.append(("set_loop_bounds", float(start_beats), float(length_beats)))
             return True
 
 

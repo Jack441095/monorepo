@@ -2091,6 +2091,129 @@ def _tempo_request(text: str, snapshot: dict[str, Any] | None) -> dict[str, Any]
     return fields
 
 
+LIVE_COLOR_PALETTE = {
+    "red": 13,
+    "dark red": 14,
+    "bright red": 60,
+    "orange": 9,
+    "bright orange": 10,
+    "amber": 8,
+    "yellow": 12,
+    "lime": 16,
+    "green": 15,
+    "dark green": 17,
+    "mint": 19,
+    "teal": 20,
+    "cyan": 21,
+    "light blue": 24,
+    "sky blue": 25,
+    "blue": 27,
+    "navy": 29,
+    "indigo": 34,
+    "purple": 38,
+    "violet": 37,
+    "magenta": 41,
+    "pink": 42,
+    "hot pink": 43,
+    "white": 56,
+    "light grey": 57,
+    "grey": 58,
+    "gray": 58,
+    "dark grey": 59,
+    "dark gray": 59,
+    "charcoal": 59,
+    "brown": 4,
+}
+
+_METRONOME_ON = re.compile(
+    r"\b(?:turn|switch|put)\s+(?:the\s+)?(?:metronome|click(?:\s+track)?)\s+on\b|"
+    r"\b(?:turn|switch|put)\s+on\s+(?:the\s+)?(?:metronome|click(?:\s+track)?)\b|"
+    r"\b(?:enable|start|activate)\s+(?:the\s+)?(?:metronome|click(?:\s+track)?)\b|"
+    r"^\s*(?:metronome|click)\s+on\s*[.!]?\s*$",
+    re.I,
+)
+_METRONOME_OFF = re.compile(
+    r"\b(?:turn|switch|put|take)\s+(?:the\s+)?(?:metronome|click(?:\s+track)?)\s+off\b|"
+    r"\b(?:turn|switch|put)\s+off\s+(?:the\s+)?(?:metronome|click(?:\s+track)?)\b|"
+    r"\b(?:disable|stop|deactivate)\s+(?:the\s+)?(?:metronome|click(?:\s+track)?)\b|"
+    r"^\s*(?:metronome|click)\s+off\s*[.!]?\s*$",
+    re.I,
+)
+
+
+def _metronome_request(text: str, snapshot: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    """A song metronome click enable/disable request."""
+    if _METRONOME_ON.search(text):
+        return {"mode": "assist", "action": "set_metronome", "desired_value": True, "unit": "boolean", "confirmation_required": True, "confidence": 0.98}
+    if _METRONOME_OFF.search(text):
+        return {"mode": "assist", "action": "set_metronome", "desired_value": False, "unit": "boolean", "confirmation_required": True, "confidence": 0.98}
+    return None
+
+
+_LOOP_ON = re.compile(
+    r"\b(?:turn|switch|put)\s+(?:the\s+)?(?:(?:arrangement\s+)?loop|looping)\s+on\b|"
+    r"\b(?:turn|switch|put)\s+on\s+(?:the\s+)?(?:(?:arrangement\s+)?loop|looping)\b|"
+    r"\b(?:enable|activate)\s+(?:the\s+)?(?:(?:arrangement\s+)?loop|looping)\b|"
+    r"^\s*(?:loop|looping)\s+on\s*[.!]?\s*$",
+    re.I,
+)
+_LOOP_OFF = re.compile(
+    r"\b(?:turn|switch|put)\s+(?:the\s+)?(?:(?:arrangement\s+)?loop|looping)\s+off\b|"
+    r"\b(?:turn|switch|put)\s+off\s+(?:the\s+)?(?:(?:arrangement\s+)?loop|looping)\b|"
+    r"\b(?:disable|deactivate)\s+(?:the\s+)?(?:(?:arrangement\s+)?loop|looping)\b|"
+    r"^\s*(?:loop|looping)\s+off\s*[.!]?\s*$",
+    re.I,
+)
+_LOOP_BOUNDS = re.compile(
+    r"\b(?:set|make|change)\s+(?:the\s+)?(?:arrangement\s+)?loop\s+(?:length\s+)?to\s+(?P<length>\d+(?:\.\d+)?)\s*(?P<unit>bars?|beats?)\b|"
+    r"\b(?:set|make)\s+(?:the\s+)?(?:arrangement\s+)?loop\s+from\s+(?:bar|beat)\s+(?P<start>\d+(?:\.\d+)?)\s+to\s+(?:bar|beat)?\s*(?P<end>\d+(?:\.\d+)?)\b",
+    re.I,
+)
+
+
+def _loop_request(text: str, snapshot: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    """An arrangement loop enable/disable or bounds request."""
+    bounds_match = _LOOP_BOUNDS.search(text)
+    if bounds_match:
+        length_val = bounds_match.group("length")
+        start_val = bounds_match.group("start")
+        end_val = bounds_match.group("end")
+        unit_val = (bounds_match.group("unit") or "bars").lower()
+        num = (snapshot or {}).get("signature_numerator", 4) if isinstance(snapshot, dict) else 4
+        beats_per_bar = float(num) if isinstance(num, (int, float)) and num > 0 else 4.0
+
+        if length_val:
+            val = float(length_val)
+            length_beats = val * beats_per_bar if "bar" in unit_val else val
+            current_start = float((snapshot or {}).get("loop_start", 0.0) or 0.0)
+            return {
+                "mode": "assist",
+                "action": "set_loop_bounds",
+                "desired_value": {"loop_start": current_start, "loop_length": length_beats, "start": current_start, "length": length_beats},
+                "unit": "beats",
+                "confirmation_required": True,
+                "confidence": 0.97,
+            }
+        elif start_val and end_val:
+            s = float(start_val)
+            e = float(end_val)
+            start_beats = max(0.0, (s - 1.0) * beats_per_bar)
+            length_beats = max(0.25, (e - s) * beats_per_bar)
+            return {
+                "mode": "assist",
+                "action": "set_loop_bounds",
+                "desired_value": {"loop_start": start_beats, "loop_length": length_beats, "start": start_beats, "length": length_beats},
+                "unit": "beats",
+                "confirmation_required": True,
+                "confidence": 0.97,
+            }
+    if _LOOP_ON.search(text):
+        return {"mode": "assist", "action": "set_loop", "desired_value": True, "unit": "boolean", "confirmation_required": True, "confidence": 0.98}
+    if _LOOP_OFF.search(text):
+        return {"mode": "assist", "action": "set_loop", "desired_value": False, "unit": "boolean", "confirmation_required": True, "confidence": 0.98}
+    return None
+
+
 _FOCUS_DEVICE_BY_NAME = re.compile(
     r"^\s*(?:show(?:\s+me)?|open(?:\s+up)?|focus|select|go\s+to|jump\s+to|take\s+me\s+to)\s+(?:the\s+)?(?P<phrase>.+?)\s*[.!]?\s*$",
     re.I,

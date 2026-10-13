@@ -16,6 +16,7 @@ from typing import Any
 
 from kenn.core import volume_law
 from kenn.core.live_intent import (
+    LIVE_COLOR_PALETTE,
     _COMMA_SECOND_ACTION,
     _NUMBER,
     _RELATIVE_VOLUME_EXCLUDE,
@@ -74,6 +75,44 @@ def resolve_track_values(base: dict[str, Any], track: dict[str, Any], lower: str
             if arm_off or arm_on:
                 action = "set_arm"
                 base.update({"desired_value": not bool(arm_off), "unit": "boolean"})
+            else:
+                # Group / folder track fold state in Live 12. Must avoid colliding with
+                # device choosers (e.g. Compressor Model -> Expand) or synth parameters.
+                device_param_cue = re.search(
+                    r"\b(?:device|plugin|plug-in|compressor|model|mode|threshold|ratio|attack|release)\b|\bto\s+expand\b",
+                    lower,
+                )
+                if not device_param_cue:
+                    fold_off = re.search(
+                        r"\b(?:un-?fold)\b|\b(?:turn|switch|take)\s+off\s+(?:the\s+)?fold\b|"
+                        r"\bexpand\s+(?:the\s+)?(?:track|group|bus|folder)\b|"
+                        r"^\s*(?:expand|unfold)\b",
+                        lower,
+                    )
+                    fold_on = re.search(
+                        r"\b(?:fold|collapse)\b|\b(?:turn|switch|take)\s+on\s+(?:the\s+)?fold\b|"
+                        r"^\s*(?:fold|collapse)\b",
+                        lower,
+                    )
+                    if fold_off or fold_on:
+                        action = "set_track_fold"
+                        base.update({"desired_value": not bool(fold_off), "unit": "boolean"})
+    if action is None:
+        # If device keywords are present, require explicit "color" or "paint" word so
+        # we do not swallow device parameters that happen to contain a palette word.
+        device_word = bool(re.search(r"\b(?:device|plugin|plug-in|compressor|eq|reverb|delay|model|mode|cutoff)\b", lower))
+        if not device_word or re.search(r"\b(?:color|paint)\b", lower):
+            color_match = re.search(
+                r"\b(?:color|paint|make|set)\b.*?\b(?P<color>dark\s+red|bright\s+red|red|bright\s+orange|orange|amber|yellow|lime|dark\s+green|green|mint|teal|cyan|light\s+blue|sky\s+blue|navy|blue|indigo|purple|violet|magenta|hot\s+pink|pink|white|light\s+gr[ea]y|dark\s+gr[ea]y|gr[ea]y|charcoal|brown)\b|"
+                r"\b(?P<color2>dark\s+red|bright\s+red|red|bright\s+orange|orange|amber|yellow|lime|dark\s+green|green|mint|teal|cyan|light\s+blue|sky\s+blue|navy|blue|indigo|purple|violet|magenta|hot\s+pink|pink|white|light\s+gr[ea]y|dark\s+gr[ea]y|gr[ea]y|charcoal|brown)\s+color\b",
+                lower,
+            )
+            if color_match and re.search(r"\b(?:color|paint|make|set|turn)\b", lower):
+                raw_c = (color_match.group("color") or color_match.group("color2") or "").lower().replace("gray", "grey")
+                c_name = " ".join(raw_c.split())
+                if c_name in LIVE_COLOR_PALETTE:
+                    action = "set_track_color"
+                    base.update({"desired_value": LIVE_COLOR_PALETTE[c_name], "color_name": c_name, "unit": "color_index"})
     if action is None:
         volume_match = re.search(r"(?:volume|level)\s+(?:(?:to|at)\s+)?" + _NUMBER + r"\s*(db)?", lower)
         if volume_match is None:

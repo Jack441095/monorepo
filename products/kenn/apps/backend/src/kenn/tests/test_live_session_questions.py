@@ -276,3 +276,105 @@ def test_whats_in_the_mix_is_not_a_chain_question() -> None:
     reply = handle_command("what's in the mix that makes it muddy?", session_id="returns",
                            service=LiveActionService(FakeLiveBackend()), allow_llm=False)
     assert "has:" not in str(reply.get("answer")) and "Which track, return" not in str(reply.get("answer"))
+
+
+def test_track_state_and_identity_by_number() -> None:
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+
+    fake = FakeLiveBackend()
+    service = LiveActionService(fake)
+
+    # Phrasing: "what is the name of track 1"
+    name_res = answer_live_session_question("What is the name of track 1?", service=service)
+    assert name_res is not None and name_res["status"] == "inspected"
+    assert "Track 1 is 'Kick'" in name_res["answer"]
+
+    # Phrasing: "what is the volume of track 1?"
+    vol_res = answer_live_session_question("What is the volume of track 1?", service=service)
+    assert vol_res is not None and vol_res["status"] == "inspected"
+    assert "Track 1 ('Kick') is at -14.0 dB." in vol_res["answer"]
+
+    # Phrasing: "is track 2 muted?"
+    mute_res = answer_live_session_question("Is track 2 muted?", service=service)
+    assert mute_res is not None and mute_res["status"] == "inspected"
+    assert "No, Track 2 ('Snare / Clap') is not muted." in mute_res["answer"]
+
+
+def test_project_tempo_and_musical_scale_grounding() -> None:
+    live = SessionLive()
+    live.state["root_note"] = 1
+    live.state["scale_name"] = "Minor"
+
+    # "What is the project tempo and key?"
+    res = answer_live_session_question("What is the project tempo and key?", service=Service(live))
+    assert res is not None and res["status"] == "inspected"
+    assert "120 BPM and the time signature is 4/4 in C# Minor." in res["answer"]
+    assert res["root_note"] == 1
+    assert res["scale_name"] == "Minor"
+
+    # "What is the session tempo?"
+    res_session = answer_live_session_question("What is the session tempo?", service=Service(live))
+    assert res_session is not None and res_session["status"] == "inspected"
+    assert "120 BPM" in res_session["answer"]
+
+
+def test_master_bus_mixer_reading(tmp_path) -> None:
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.tests.test_live_world_model import _fixture_with_world
+
+    fake = FakeLiveBackend(_fixture_with_world(tmp_path))
+    service = LiveActionService(fake)
+
+    res = answer_live_session_question("What is the master volume?", service=service)
+    assert res is not None and res["status"] == "inspected"
+    assert "The master track is at" in res["answer"]
+
+
+def test_metronome_and_loop_and_fold_queries() -> None:
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+
+    fake = FakeLiveBackend()
+    service = LiveActionService(fake)
+
+    # 1. Metronome state inspection
+    metro_res = answer_live_session_question("Is the metronome on?", service=service)
+    assert metro_res is not None and metro_res["status"] == "inspected"
+    assert metro_res["answer"] == "The metronome (click) is currently off."
+    assert metro_res["metronome"] is False
+
+    fake.set_metronome(True)
+    metro_on_res = answer_live_session_question("Is click on?", service=service)
+    assert metro_on_res is not None and metro_on_res["status"] == "inspected"
+    assert metro_on_res["answer"] == "The metronome (click) is currently on."
+    assert metro_on_res["metronome"] is True
+
+    # 2. Arrangement loop inspection
+    loop_res = answer_live_session_question("Is loop on?", service=service)
+    assert loop_res is not None and loop_res["status"] == "inspected"
+    assert "The arrangement loop is currently disabled" in loop_res["answer"]
+    assert loop_res["loop"] is False
+
+    fake.set_loop(True)
+    fake.set_loop_bounds(0.0, 16.0)
+    loop_on_res = answer_live_session_question("Is the arrangement loop active?", service=service)
+    assert loop_on_res is not None and loop_on_res["status"] == "inspected"
+    assert "The arrangement loop is currently enabled (beats 0 to 16, length 16 beats)." in loop_on_res["answer"]
+    assert loop_on_res["loop"] is True
+
+    # 3. Track folding inspection
+    fold_res = answer_live_session_question("Is track 1 folded?", service=service)
+    assert fold_res is not None and fold_res["status"] == "inspected"
+    assert "No, Track 1 ('Kick') is unfolded." in fold_res["answer"]
+
+    fake.set_track_fold_state(0, True)
+    fold_on_res = answer_live_session_question("Is track 1 folded?", service=service)
+    assert fold_on_res is not None and fold_on_res["status"] == "inspected"
+    assert "Yes, Track 1 ('Kick') is folded." in fold_on_res["answer"]
+
+    # 4. Track color inspection
+    color_res = answer_live_session_question("What is the color of track 1?", service=service)
+    assert color_res is not None and color_res["status"] == "inspected"
+    assert "Track 1 ('Kick') is set to color palette index 13." in color_res["answer"]

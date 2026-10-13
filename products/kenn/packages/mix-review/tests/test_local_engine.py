@@ -485,3 +485,41 @@ def test_a_long_stereo_mix_is_measured_in_bounded_time() -> None:
     assert report["ok"] is True
     assert report["input_context"]["duration_seconds"] == pytest.approx(180.0, abs=0.1)
     assert elapsed < 60.0
+
+
+def test_waveform_and_spectral_analysis_metrics_emitted() -> None:
+    """Verifies that waveform peaks, 7-band spectrum, 40-band LTAS, and correlation timeline are emitted."""
+    payload = _healthy_stereo_wav(seconds=2.0)
+    report = local_engine.analyze_wav(payload, filename="mix.wav")
+    assert report["ok"] is True
+    metrics = report["metrics"]
+
+    # 1. Waveform peaks envelope
+    peaks = metrics.get("peaks")
+    assert isinstance(peaks, list) and len(peaks) > 0
+    assert all(0.0 <= p <= 1.0 for p in peaks)
+
+    # 2. 7-band spectral energy
+    bands = metrics.get("bands")
+    assert isinstance(bands, dict)
+    expected_bands = {"sub", "bass", "low_mids", "mids", "presence", "sibilance", "air"}
+    assert set(bands.keys()) == expected_bands
+    assert pytest.approx(sum(bands.values()), abs=0.01) == 1.0
+
+    # 3. 7-band perceptual energy
+    perc_bands = metrics.get("perceptual_bands")
+    assert isinstance(perc_bands, dict)
+    assert set(perc_bands.keys()) == expected_bands
+    assert pytest.approx(sum(perc_bands.values()), abs=0.01) == 1.0
+
+    # 4. 40-band logarithmic LTAS profile
+    log40 = metrics.get("log_bands_40")
+    assert isinstance(log40, list) and len(log40) == 40
+    assert all(isinstance(v, (int, float)) for v in log40)
+
+    # 5. Sliding-window correlation timeline
+    timeline = metrics.get("correlation_timeline")
+    assert isinstance(timeline, dict)
+    assert "timestamps" in timeline and "correlation" in timeline and "balance" in timeline
+    assert len(timeline["timestamps"]) == len(timeline["correlation"]) == len(timeline["balance"])
+

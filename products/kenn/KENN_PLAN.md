@@ -1231,9 +1231,42 @@ is a target; an unresolved failure keeps the corresponding item open.
 Owners: Codex handles build preparation, fixes, checks and evidence; independent
 reviewers provide code sign-off; Jack supervises all Live mutations,
 grades the demo answers and rehearses/presents. Tuesday's supervised slot is
-20:00 London time; Wednesday's meeting time remains unconfirmed. Nothing here
+20:00 London time. Jack clarified that video preparation and bug finding take
+priority over settling Wednesday's meeting time. Nothing here
 authorizes an unattended Live run. R1–R4, broader answer grading, device coverage
 and beta/release qualification remain separately open.
+
+Video preparation, 12 Oct: the SaaS expansion report informs positioning, not a
+new implementation queue. The short video shows grounded advice, browser Apply,
+Live readback and exact Undo; cloud/billing/collaboration remain roadmap items,
+consolidated in [the long-term SaaS mega plan](docs/KENN_SAAS_LONG_TERM_MEGA_PLAN.md).
+The previous recorders auto-confirmed Python HTTP proposals or launched a plugin
+mutation script, captured no audio, and could print verification while Live was
+offline. `tooling/scripts/record_demo_live.py` now records passively, preserving
+raw takes outside Git, requesting system audio and optional narration, checking
+encoded duration/audio streams, and leaving playback/Live qualification pending.
+`record_demo_video.py` delegates to that entry point. A supervised ten-second
+sound check must prove combined audio routing before the five-minute take.
+
+Recorder review found two playback faults before publication: separate audio
+tracks made normal players choose music or narration, and mixing without input
+padding shifted delayed narration early. The MP4 now uses one normalized mix,
+keeps each source's start time and complete tail, and preserves the raw file.
+Generated-tone regressions failed before each fix. Final scoped verification:
+**41 passed** (17 recorder, 24 exporter); all **10 injected recorder faults**
+were caught. Independent standards/spec review and a separate delayed-source
+reproduction passed. No desktop capture or Live write was used. The media
+receipt remains unreviewed until supervised playback.
+
+Git cleanup, 12 Oct: removed **11 local merged branch-only refs** after checking
+main ancestry, worktree use, live origin refs and open PRs. Full commit tips are
+saved outside Git for recovery; worktrees with local runtime assets and unmerged
+drafts remain. Collaborator reviews are open as draft source PRs
+[citation repair #26](https://github.com/Nite-DSP/monorepo/pull/26) and
+[Stage 2/3 #27](https://github.com/Nite-DSP/monorepo/pull/27), with matching
+`kenn-app` branches. The independent code rechecks are complete under D1;
+supervised Live gates stay open. Unrelated backend/Nite Submit edits and the local
+video deletion remain untouched.
 
 Earlier 12 Oct preparation receipt (fake Live only; D1–D6 were open at capture):
 
@@ -1318,8 +1351,8 @@ Earlier 12 Oct preparation receipt (fake Live only; D1–D6 were open at capture
   the supplied cap cases and 84 additional actual ending variants. Jack's later
   12 Oct decision accepts the fresh independent reviews recorded under D1.
   Owner answer grading, current real-Live transactions, ten consecutive rehearsals
-  and backup capture/playback remain outstanding. Wednesday's meeting time is
-  still unknown.
+  and backup capture/playback remain outstanding. The current focus is the video
+  and bug-finding walkthrough.
 - Git handoff published all four branches with origin upstreams, keeping the three
   fix/candidate drafts separate from main. Main received only bounded demo/sync
   documentation. The guarded exporter verified each source marker and exact tree
@@ -1332,8 +1365,12 @@ Earlier 12 Oct preparation receipt (fake Live only; D1–D6 were open at capture
   follows the same exporter and remote checks. Citation `67921916` now exports
   to `3f79be92`; the current candidate and this receipt follow in the same handoff.
   Preserve unrelated backend/Nite Submit edits and the local video deletion.
-  Test logs, mutation output and the browser screenshot remain outside git under
-  `/tmp/kenn-investor-review-20261012/`.
+  Earlier test logs, mutation output and the browser screenshot were kept outside
+  Git under `/tmp/kenn-investor-review-20261012/`; that temporary directory is no
+  longer available. The recorded results above remain historical evidence, not
+  downloadable captures. Current Git audits and generated-media recorder checks
+  are kept in the persistent external evaluation-data directory. Real-Live video
+  capture and playback are still pending.
 
 ## Acceptance targets and measurement rules
 

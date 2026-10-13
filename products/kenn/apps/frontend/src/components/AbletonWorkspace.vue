@@ -71,7 +71,7 @@
               </div>
               <MixReviewWaveform
                 class="mix-lab__view-chart"
-                :peaks="decoded?.peaks"
+                :peaks="activePeaks"
                 :empty-text="t('mixReview.emptyWaveform')"
               />
             </div>
@@ -541,6 +541,15 @@ const {
 } = useMixReview()
 // The review's suggested next step goes straight into the chat, as if the producer had typed it.
 const { sendMessage, sending } = useKenn()
+
+/** Returns decoded audio peaks from client Web Audio or server-measured peaks from Mix Review metrics */
+const activePeaks = computed<Float32Array | null>(() => {
+  if (decoded.value?.peaks && decoded.value.peaks.length > 0) return decoded.value.peaks
+  if (metrics.value?.peaks && Array.isArray(metrics.value.peaks) && metrics.value.peaks.length > 0) {
+    return new Float32Array(metrics.value.peaks)
+  }
+  return null
+})
 
 const tabs: Array<{ id: MixReviewView; labelKey: string }> = [
   { id: 'waveform', labelKey: 'mixReview.viewWaveform' },

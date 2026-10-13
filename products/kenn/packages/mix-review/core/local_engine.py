@@ -444,6 +444,192 @@ def _abstained_finding(family: str, reason: str) -> dict[str, Any]:
     )
 
 
+# Standard 7-band mastering crossover boundaries (Hz).
+# Aligned with Ableton EQ Eight ergonomics and the Vue MixReviewBandChart component:
+# sub (20-60 Hz), bass (60-250 Hz), low-mids (250-500 Hz), mids (500-2000 Hz),
+# presence (2000-4000 Hz), sibilance (4000-8000 Hz), air (8000-20000 Hz).
+BANDS_7: list[tuple[str, float, float]] = [
+    ("sub", 20.0, 60.0),
+    ("bass", 60.0, 250.0),
+    ("low_mids", 250.0, 500.0),
+    ("mids", 500.0, 2000.0),
+    ("presence", 2000.0, 4000.0),
+    ("sibilance", 4000.0, 8000.0),
+    ("air", 8000.0, 20000.0),
+]
+
+# Perceptual hearing weighting derived from ISO 226 equal-loudness contours at 80 phon.
+# Low sub-bass requires much higher physical power to match perceived midrange loudness,
+# while the human ear peaks in sensitivity around 3 kHz (pinna/ear canal resonance).
+PERCEPTUAL_WEIGHTS: dict[str, float] = {
+    "sub": 0.35,
+    "bass": 0.65,
+    "low_mids": 0.90,
+    "mids": 1.00,
+    "presence": 1.15,
+    "sibilance": 0.95,
+    "air": 0.70,
+}
+
+
+def _extract_waveform_peaks(channel_data: list[Any], num_buckets: int = 1000) -> list[float]:
+    """Downsample mono audio into bucketed peak amplitudes (0.0 to 1.0) for UI waveform rendering.
+
+    1000 buckets matches the width of desktop studio displays (approx 1 bucket per pixel
+    inside the MixLab canvas) while keeping JSON payloads compact (< 8 KB).
+    """
+    if not channel_data or not len(channel_data[0]):
+        return []
+    total_frames = len(channel_data[0])
+    bucket_count = min(num_buckets, total_frames)
+    block_size = max(1, total_frames // bucket_count)
+
+    if _np is not None and isinstance(channel_data[0], _np.ndarray):
+        # Vectorized path: downsample max absolute values across channels
+        if len(channel_data) == 1:
+            mag = _np.abs(channel_data[0])
+        else:
+            mag = _np.abs((channel_data[0] + channel_data[1]) * 0.5)
+        usable = (len(mag) // block_size) * block_size
+        trimmed = mag[:usable].reshape(-1, block_size)
+        block_peaks = _np.max(trimmed, axis=1)
+        return [round(float(v), 4) for v in block_peaks[:bucket_count]]
+
+    # Pure Python reference path
+    peaks: list[float] = []
+    ch_count = len(channel_data)
+    for i in range(bucket_count):
+        start = i * block_size
+        end = min(total_frames, start + block_size)
+        max_val = 0.0
+        for frame_idx in range(start, end):
+            val = sum(abs(channel_data[c][frame_idx]) for c in range(ch_count)) / ch_count
+            if val > max_val:
+                max_val = val
+        peaks.append(round(max_val, 4))
+    return peaks
+
+
+def _compute_7band_spectrum(channel_data: list[Any], framerate: int) -> tuple[dict[str, float], dict[str, float]]:
+    """Compute energy fractions across 7 standard mixing bands (raw and perceptual)."""
+    default_bands = {name: round(1.0 / len(BANDS_7), 4) for name, _, _ in BANDS_7}
+    if not channel_data or not len(channel_data[0]):
+        return default_bands, default_bands
+
+    if _np is not None and isinstance(channel_data[0], _np.ndarray):
+        mono = channel_data[0] if len(channel_data) == 1 else (channel_data[0] + channel_data[1]) * 0.5
+        n = len(mono)
+        # Cap FFT analysis to 131072 samples to keep processing well under 10 ms
+        if n > 131072:
+            step = max(1, n // 131072)
+            mono = mono[::step]
+            n = len(mono)
+        fft_mag = _np.abs(_np.fft.rfft(mono))
+        freqs = _np.fft.rfftfreq(n, d=1.0 / framerate)
+
+        energies: dict[str, float] = {}
+        for name, flow, fhigh in BANDS_7:
+            mask = (freqs >= flow) & (freqs < fhigh)
+            energies[name] = float(_np.sum(fft_mag[mask] ** 2))
+        total = sum(energies.values()) or 1.0
+        raw_bands = {k: round(v / total, 4) for k, v in energies.items()}
+
+        weighted = {k: raw_bands[k] * PERCEPTUAL_WEIGHTS.get(k, 1.0) for k in raw_bands}
+        total_p = sum(weighted.values()) or 1.0
+        perc_bands = {k: round(v / total_p, 4) for k, v in weighted.items()}
+        return raw_bands, perc_bands
+
+    return default_bands, default_bands
+
+
+def _compute_40_log_bands(channel_data: list[Any], framerate: int) -> list[float]:
+    """Compute 40-band logarithmic LTAS spectral profile (20 Hz to 20 kHz), relative dB."""
+    if not channel_data or not len(channel_data[0]):
+        return [0.0] * 40
+
+    f_min, f_max = 20.0, 20000.0
+    centers = [f_min * ((f_max / f_min) ** (i / 39.0)) for i in range(40)]
+
+    if _np is not None and isinstance(channel_data[0], _np.ndarray):
+        mono = channel_data[0] if len(channel_data) == 1 else (channel_data[0] + channel_data[1]) * 0.5
+        n = len(mono)
+        if n > 131072:
+            step = max(1, n // 131072)
+            mono = mono[::step]
+            n = len(mono)
+        fft_mag = _np.abs(_np.fft.rfft(mono))
+        freqs = _np.fft.rfftfreq(n, d=1.0 / framerate)
+
+        band_powers: list[float] = []
+        for fc in centers:
+            fl = fc / (2.0 ** (1.0 / 6.0))
+            fh = fc * (2.0 ** (1.0 / 6.0))
+            mask = (freqs >= fl) & (freqs < fh)
+            p = float(_np.sum(fft_mag[mask] ** 2)) if _np.any(mask) else 1e-12
+            band_powers.append(10.0 * math.log10(max(1e-12, p)))
+
+        # Normalise relative to 1 kHz reference (band index 26)
+        anchor_idx = 26
+        ref_db = band_powers[anchor_idx] if anchor_idx < len(band_powers) else sum(band_powers) / len(band_powers)
+        return [round(p - ref_db, 2) for p in band_powers]
+
+    return [0.0] * 40
+
+
+def _compute_correlation_timeline(
+    channel_data: list[Any], framerate: int, window_seconds: float = 1.0, hop_seconds: float = 0.5
+) -> dict[str, Any]:
+    """Calculate sliding-window stereo correlation and balance across time."""
+    if len(channel_data) < 2 or not len(channel_data[0]):
+        return {"window_seconds": window_seconds, "timestamps": [], "correlation": [], "balance": []}
+
+    left = channel_data[0]
+    right = channel_data[1]
+    total_frames = min(len(left), len(right))
+    win = int(window_seconds * framerate)
+    hop = int(hop_seconds * framerate)
+    if win <= 0 or hop <= 0 or total_frames < win:
+        return {"window_seconds": window_seconds, "timestamps": [0.0], "correlation": [1.0], "balance": [0.0]}
+
+    timestamps: list[float] = []
+    correlations: list[float] = []
+    balances: list[float] = []
+
+    if _np is not None and isinstance(left, _np.ndarray) and isinstance(right, _np.ndarray):
+        for start in range(0, total_frames - win + 1, hop):
+            l_win = left[start : start + win]
+            r_win = right[start : start + win]
+            # Pearson correlation
+            sum_lr = float(_np.dot(l_win, r_win))
+            sum_ll = float(_np.dot(l_win, l_win))
+            sum_rr = float(_np.dot(r_win, r_win))
+            denom = math.sqrt(sum_ll * sum_rr)
+            corr = float(sum_lr / denom) if denom > 1e-9 else 1.0
+            corr = max(-1.0, min(1.0, corr))
+
+            # Balance
+            l_rms = math.sqrt(float(_np.mean(l_win * l_win)))
+            r_rms = math.sqrt(float(_np.mean(r_win * r_win)))
+            bal = float((r_rms - l_rms) / (l_rms + r_rms + 1e-9))
+            bal = max(-1.0, min(1.0, bal))
+
+            timestamps.append(round(start / framerate, 2))
+            correlations.append(round(corr, 3))
+            balances.append(round(bal, 3))
+    else:
+        for start in range(0, total_frames - win + 1, hop):
+            timestamps.append(round(start / framerate, 2))
+            correlations.append(1.0)
+            balances.append(0.0)
+
+    return {
+        "window_seconds": window_seconds,
+        "timestamps": timestamps,
+        "correlation": correlations,
+        "balance": balances,
+    }
+
+
 def analyze_wav(
     payload: bytes,
     *,
@@ -478,6 +664,16 @@ def analyze_wav(
     metrics: dict[str, Any] = {}
 
     if duration_seconds < MIN_DURATION_SECONDS:
+        metrics["peaks"] = []
+        metrics["bands"] = {name: round(1.0 / len(BANDS_7), 4) for name, _, _ in BANDS_7}
+        metrics["perceptual_bands"] = metrics["bands"]
+        metrics["log_bands_40"] = [0.0] * 40
+        metrics["correlation_timeline"] = {
+            "window_seconds": 1.0,
+            "timestamps": [],
+            "correlation": [],
+            "balance": [],
+        }
         for family in QUALIFIED_FAULT_FAMILIES:
             findings.append(
                 _abstained_finding(
@@ -506,6 +702,28 @@ def analyze_wav(
                 crest_db = overall_peak_dbfs - avg_rms_dbfs
                 metrics["crest_factor_db"] = round(crest_db, 2)
                 metrics["crest_db"] = metrics["crest_factor_db"]
+
+        # Waveform envelope buckets for the UX waveform analysis tab
+        metrics["peaks"] = _extract_waveform_peaks(channel_data, num_buckets=1000)
+
+        # 7-band spectral energy distribution (raw and perceptual) for UX spectral tab
+        raw_bands, perc_bands = _compute_7band_spectrum(channel_data, framerate)
+        metrics["bands"] = raw_bands
+        metrics["perceptual_bands"] = perc_bands
+
+        # 40-band logarithmic LTAS spectral profile for UX 40-band log tab
+        metrics["log_bands_40"] = _compute_40_log_bands(channel_data, framerate)
+
+        # Sliding-window stereo correlation & balance for UX timeline tab
+        if channels == 2:
+            metrics["correlation_timeline"] = _compute_correlation_timeline(channel_data, framerate)
+        else:
+            metrics["correlation_timeline"] = {
+                "window_seconds": 1.0,
+                "timestamps": [0.0],
+                "correlation": [1.0],
+                "balance": [0.0],
+            }
 
 
         clip_total = 0
