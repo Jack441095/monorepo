@@ -589,3 +589,73 @@ def test_five_turn_knowledge_to_apply_uses_registered_http_routes(target, tmp_pa
     }).json()
     assert applied["receipt"]["verified"] is True
     assert backend.writes == [("addressed_parameter", address, 4, 0.75)]
+
+
+# The Stage 2/3 review left "the handler refuses quantized values that the fake accepts" unchecked (12 Oct). Checked
+# 13 Oct: the handler refuses any quantized value other than the current one, min or max, and never sends chooser
+# options; the backend refuses the same set for addressed writes because its callers pass no device name, so no
+# measured profile is consulted. The fake only accepts an in-between value when a test hands it `choices`, which
+# real Live never sends. These pin both halves, so the parity cannot slip unnoticed.
+class _Chooser:
+    name = original_name = "Detector"
+    min, max, is_quantized, is_enabled, state, automation_state = 2.0, 11.0, True, True, 0, 0
+    value_items = ("Peak", "RMS", "Auto")
+
+    def __init__(self):
+        self.value = 2.0
+
+    def str_for_value(self, value):
+        return str(value)
+
+
+def _live_writer():
+    import importlib.util
+
+    # Loaded by file path: the Remote Script package is not importable from the backend's own path.
+    path = Path(__file__).resolve().parents[5] / "integrations/ableton-osc/abletonosc/parameter_target.py"
+    spec = importlib.util.spec_from_file_location("kenn_parameter_target_parity", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    chooser = _Chooser()
+    track = SimpleNamespace(name="Bus", devices=[SimpleNamespace(name="Test Filter", class_name="Test",
+                                                                 parameters=[chooser], chains=[])])
+    return module.ParameterTargets(SimpleNamespace(tracks=[track], return_tracks=[track], master_track=track)), chooser
+
+
+ADDRESS = {"kind": "track", "index": 0, "device_path": [0]}
+
+
+def test_the_live_writer_never_sends_chooser_options():
+    # The contract's `choices` branch accepts in-between raw values. It is safe only while this stays None,
+    # because the writer below would refuse those values anyway.
+    writer, _chooser = _live_writer()
+    assert writer.read(ADDRESS, 0)["parameters"][0]["choices"] is None
+
+
+@pytest.mark.parametrize("raw", [2.0, 7.0, 11.0])
+def test_the_backend_refuses_exactly_the_chooser_values_the_live_writer_refuses(raw):
+    writer, chooser = _live_writer()
+    observed = writer.read(ADDRESS, 0)
+    backend_accepts = validate_parameter(observed["parameters"][0], raw) is None
+    try:
+        writer.write(ADDRESS, 0, raw, observed)
+        writer_accepts = True
+    except ValueError:
+        writer_accepts = False
+    assert backend_accepts is writer_accepts
+    assert chooser.value == (raw if writer_accepts else 2.0)
+
+
+@pytest.mark.parametrize("value, unit", [(7, "raw"), ("RMS", "choice")])
+def test_a_measured_chooser_profile_does_not_unlock_an_in_between_addressed_write(target, monkeypatch, value, unit):
+    # A device_units profile can list raw 7 as "RMS", but the live writer would refuse 7 at Apply, after the
+    # producer confirmed the card. Addressed proposals therefore refuse it up front, profile or not.
+    from kenn.core import device_units
+
+    backend, service = target
+    parameter = backend._addressed_buses[0]["devices"][1]["parameters"][0]
+    parameter.update(quantized=True, value=2, min=2, max=11)
+    monkeypatch.setattr(device_units, "find_choice",
+                        lambda *args: SimpleNamespace(options=((2, "Peak"), (7, "RMS"), (11, "Auto"))))
+    assert not candidate(service, value=value, unit=unit)["ok"]
+    assert backend.writes == []

@@ -1187,6 +1187,13 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   - Not checked yet: the handler refuses quantized values that the fake accepts (`parameter_target.py:113`).
     Whether the Remote Script's `is` identity check holds in real Live is also unknown, because the branch has no
     real-Live qualification.
+    - Checked 13 Oct (cloud, stand-in Live objects, no real Live): no gap for anything real Live sends. The handler
+      refuses any quantized value but the current one, min or max, and always sends `choices: None`; addressed
+      proposals and their Apply re-check pass no device name, so a measured chooser profile is never consulted and
+      the backend refuses the same values. The fake accepts an in-between value only when a test supplies
+      `choices`, which real Live never does. Four guards in `test_parameter_targets.py` pin this; making the
+      handler send options, accept in-between values, or letting the planner consult a profile each fail them.
+      The `is` identity check in real Live is still unknown.
   - Evidence doc line 15 is stale. Freshly prepared recipes, compound EQ and setup now run guarded; only cards in
     the legacy format refuse.
   - Fixes finished and verified on the draft, 12 Oct: `adb0d4c4`, `b0056599`, `65c6dc46`. **Not merged.**
