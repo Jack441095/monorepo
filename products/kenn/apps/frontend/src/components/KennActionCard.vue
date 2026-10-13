@@ -20,7 +20,7 @@
       <!-- 1. Pro Rack Synthesis Proposal -->
       <div v-if="proposal.is_rack_synthesis" class="kenn-action-card__pro-section">
         <div class="kenn-action-card__pro-title-row">
-          <strong class="kenn-action-card__pro-title">{{ proposal.rack_key?.replace(/_/g, ' ').toUpperCase() }}</strong>
+          <strong class="kenn-action-card__pro-title">{{ (proposal.rack_key ?? '').replace(/_/g, ' ').toUpperCase() || 'RACK' }}</strong>
           <span class="kenn-action-card__tag">8 Macros Auto-Mapped</span>
         </div>
         <div v-if="proposal.variations && proposal.variations.length" class="kenn-action-card__variations-row">
@@ -34,7 +34,7 @@
       <!-- 2. Surgical Doctor Remediation Proposal -->
       <div v-else-if="proposal.is_doctor_remediation" class="kenn-action-card__pro-section">
         <div class="kenn-action-card__pro-title-row">
-          <strong class="kenn-action-card__pro-title">{{ proposal.remedy_type?.replace(/_/g, ' ').toUpperCase() }}</strong>
+          <strong class="kenn-action-card__pro-title">{{ (proposal.remedy_type ?? '').replace(/_/g, ' ').toUpperCase() || 'REMEDY' }}</strong>
           <span class="kenn-action-card__tag">EQ Eight Surgical Carve</span>
         </div>
         <div v-if="proposal.predicted_metrics" class="kenn-action-card__metrics-row">
@@ -215,6 +215,24 @@ const formattedActionName = computed(() => {
       return 'SURGICAL MASKING REMEDY'
     case 'generate_midi_bassline':
       return 'NEURAL MIDI GENERATION'
+    case 'set_groove_amount':
+      return 'SET GROOVE AMOUNT'
+    case 'set_record_mode':
+      return 'ARRANGEMENT RECORD'
+    case 'jump_to_locator':
+      return 'JUMP TO LOCATOR'
+    case 'jump_to_relative_cue':
+      return 'NAVIGATE LOCATOR'
+    case 'set_track_color':
+      return 'TRACK COLOR'
+    case 'set_track_fold':
+      return 'FOLD TRACK'
+    case 'set_loop_state':
+      return 'LOOP TOGGLE'
+    case 'set_tempo':
+      return 'SET TEMPO'
+    case 'set_metronome':
+      return 'METRONOME TOGGLE'
     default:
       return act.replace(/_/g, ' ').toUpperCase()
   }
@@ -230,6 +248,17 @@ const paramLabel = computed(() => {
   if (p === 'remove_device' || props.proposal.action === 'remove_device') return 'Device'
   if (p === 'gain_staging' || props.proposal.action === 'gain_staging') return 'Gain Staging'
   if (p === 'group_tracks' || props.proposal.action === 'group_tracks') return 'Bus Group'
+  if (p === 'groove_amount') return 'Groove Amount'
+  if (p === 'record_mode') return 'Arrangement Record'
+  if (p === 'cue_point' || props.proposal.action === 'jump_to_locator') return 'Locator'
+  if (p === 'song_time') return 'Playhead Position'
+  if (p === 'folded') return 'Fold State'
+  if (p === 'color') return 'Track Color'
+  if (p === 'loop_state') return 'Loop State'
+  if (p === 'loop_start') return 'Loop Start'
+  if (p === 'loop_length') return 'Loop Length'
+  if (p === 'tempo') return 'Tempo'
+  if (p === 'metronome') return 'Metronome'
   return p
 })
 
@@ -238,6 +267,9 @@ function formatVal(v: unknown, param?: string): string {
   if (typeof v === 'number') {
     if (param === 'volume') return v.toFixed(2)
     if (param === 'pan') return v === 0 ? 'Center' : v > 0 ? `R ${Math.round(v * 100)}` : `L ${Math.round(Math.abs(v) * 100)}`
+    if (param === 'groove_amount') return `${Math.round(v * 100)}%`
+    if (param === 'tempo') return `${v} BPM`
+    if (param === 'song_time' || param === 'loop_start' || param === 'loop_length') return `${v} beats`
     return v.toString()
   }
   return String(v ?? '—')
