@@ -89,6 +89,12 @@ approval they were installed into a throwaway virtualenv in the session scratchp
 
 ## Commands for the local session
 
+The guided version is `tooling/scripts/c1_supervised_session.sh`: it runs the same passes in order (stream cold and
+warm twice each, foreground twice, background twice, one Live-open background run), asks for the Live set, buffer,
+sample rate and dropout count, and writes `manifest.json`, `owner-notes.json` and one receipt per run into
+`.runtime/c1-<date>/`. It never starts or restarts the companion; it tells you which settings to start it with and
+checks that it answers. The commands below are the manual equivalent.
+
 Run from the main checkout on the Mac (the index under `apps/backend/src/kenn/data/` is git-ignored). Plug in
 power first; the 4 and 5 Oct probe runs on battery were unusable. Keep receipts outside git unless they are being
 committed as evidence, and keep `--capture-answers`/`--review-capture` files out of git.
