@@ -614,8 +614,17 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
   - [x] FabFilter Saturn 2 multiband saturation (manual pp.3-4, 9-12, 27), Pro-R 2 vocal reverb (pp.7-11; the manual
     gives two Decay Rate ranges, flagged), Timeless 3 tempo delay (pp.3-4, 9-11) and Pro-Q 4 dynamic/spectral
     de-essing (pp.3, 13, 15-18), drafted 13 Oct with check sheets.
-  - [ ] The rest of the FabFilter bundle (Pro-MB, Pro-G, Volcano 3, Twin 3 and the smaller ones), then iZotope,
-    Soundtoys, Kilohearts and Damage.
+  - [x] FabFilter Pro-MB one-band control (manual pp.3-4, 9-12, 16) and Pro-G drum gating (pp.3, 8-12, 32), drafted
+    13 Oct. Pro-C 3's Live side-chain step now follows FabFilter's own Live instructions (Pro-C 3 manual p.42).
+  - [ ] The rest of the FabFilter bundle (Volcano 3, Twin 3 and the smaller ones), then iZotope, Soundtoys,
+    Kilohearts and Damage.
+- [ ] **Ableton stock devices, the same way** (Jack, 13 Oct). The 2 Oct L1a audit found a dedicated corpus note for 77 of
+  78 stock devices, so this is gaps and accuracy, not rewriting: from Ableton's Live 12 manual, every claim cited.
+  - [ ] Drum Synth, the one device with no note.
+  - [ ] Devices added in Live 12 updates that the 78-device list does not include (Granulator III is one), checked
+    against Ableton's release notes.
+  - [ ] Check the existing 77 device notes against the Live 12 manual (ranges, control names, version). The notes live
+    only on the Mac, so this waits for it or for the files to be shared.
 - [ ] **Audio calculators** on `draft/audio-calculators` (`dc97516`, not merged): note lengths at a tempo (straight,
   dotted, triplet, as ms and LFO Hz), buffer latency, frequency to note and back, dB to gain factor. The figures go in
   as tool readings, so the gate accepts them. [Draft receipt](docs/evidence/KENN_AUDIO_CALCULATORS_DRAFT_2026-10-13.md),
