@@ -601,6 +601,15 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     rejections are now accepted; the 15 s gate is still failed. C1 stays open. Same evidence note.
   - [x] Every rejected background upgrade now carries the check that rejected it, and the probe counts them by cause
     (`fcd2914f`, `2be6a7c6`, reviewed 5 Oct). Before this, 34 rejected rows in the 4 Oct runs said nothing about why.
+  - Measurement accounting, 13 Oct (cloud, tooling only): `measure_chat_latency.py` booked a stopped companion as
+    a timeout and a superseded reply as a template, dropped the companion's stage timings and the delivered
+    template on a polling timeout, and hard-coded memory pressure and swap to unknown. It now reports `error` and
+    `cancelled`, keeps `server_timing_ms`, `server_upgrade_seconds` and `initial_reply_seconds`, resolves
+    response-cache state and per-task models, samples swap and pressure per row on the Mac, and keeps audio
+    dropouts explicitly unmeasured. Scoped checks: 265 passes; full backend: 4795 passes, 137 skips, the pre-existing typo-routing failure (also red
+    on clean main) and a 2 ms timing check that passes alone. No model or Live run, so no
+    latency, memory or quality result; C1 stays open pending the local 30-question stream/foreground/background
+    repeats in the [return packet](docs/evidence/KENN_C1_HTTP_ACCOUNTING_AND_LOCAL_PACKET_2026-10-13.md).
 - [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already

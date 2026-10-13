@@ -124,3 +124,16 @@ def test_captured_packets_are_scored_on_the_same_criteria_and_bars_as_the_chat_p
     # The captured builder keeps its own copy so it never imports the engine; this is what stops the copies drifting.
     assert CRITERIA == build_human_review_packet.CRITERIA
     assert RELEASE_THRESHOLDS == build_human_review_packet.RELEASE_THRESHOLDS
+
+
+def test_cancelled_and_errored_captures_stay_in_the_packet_denominator():
+    # measure_chat_latency began writing these two outcomes on 13 Oct 2026; an unknown-outcome refusal
+    # would have made a run that hit one stopped companion unreviewable.
+    data = capture()
+    for outcome in ("cancelled", "error"):
+        data["cases"].append({**data["cases"][-1], "case_id": f"private-{outcome}", "delivery": outcome,
+                              "question": f"Synthetic question {outcome}", "candidate_available": False})
+    packet, key = build_captured(data)
+    assert len(packet["cases"]) == 7
+    assert {"cancelled", "error"} <= {row["capture"]["delivery"] for row in key["cases"]}
+    assert '"delivery"' not in json.dumps(packet)

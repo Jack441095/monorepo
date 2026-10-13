@@ -348,3 +348,159 @@ def test_the_committed_receipts_have_the_shape_the_plan_quotes(tool):
         for key in ("all_median", "all_p95", "accepted_median", "accepted_p95"):
             assert key in report["seconds"], f"{path.name} missing {key}"
         assert tool.render(report), path.name
+
+
+class _FakeCompanion:
+    """A scripted loopback companion: post() and get() replay fixed replies or raise, no socket opened."""
+
+    def __init__(self, post, gets=()):
+        self._post, self._gets = post, list(gets)
+
+    def __call__(self, *args, **kwargs):
+        return self
+
+    def post(self, path, body):
+        if isinstance(self._post, BaseException):
+            raise self._post
+        return dict(self._post)
+
+    def get(self, path, query):
+        reply = self._gets.pop(0) if len(self._gets) > 1 else self._gets[0]
+        if isinstance(reply, BaseException):
+            raise reply
+        return dict(reply)
+
+
+def _transport_error(cause):
+    from kenn.core.mcp_facade import KennTransportError
+
+    try:
+        raise KennTransportError("KENN companion request did not complete") from cause
+    except KennTransportError as error:
+        return error
+
+
+def _measure_http(tool, monkeypatch, companion, surface="background", timeout=1.0):
+    from kenn.core import mcp_facade
+
+    monkeypatch.setattr(mcp_facade, "KennHTTPClient", companion)
+    return tool.measure([{"id": "fixture", "question": "Synthetic"}], surface=surface,
+                        endpoint="http://127.0.0.1:1", cache_condition="warm", timeout=timeout)["rows"][0]
+
+
+@pytest.mark.parametrize("surface", ["foreground", "background"])
+def test_a_companion_that_is_not_running_is_an_error_not_a_timeout(tool, monkeypatch, surface):
+    # Before 13 Oct 2026 every KennTransportError matched "did not complete" and was booked as a timeout,
+    # so a stopped companion read as 30 slow answers rather than zero measured ones.
+    row = _measure_http(tool, monkeypatch, _FakeCompanion(_transport_error(ConnectionRefusedError(61, "refused"))),
+                        surface=surface)
+    assert row["delivery"] == "error"
+    assert "ConnectionRefusedError" in row["error"]
+
+
+@pytest.mark.parametrize("cause", [TimeoutError("timed out"), __import__("urllib.error").error.URLError(TimeoutError())])
+def test_a_read_that_ran_out_of_time_is_still_a_timeout(tool, monkeypatch, cause):
+    row = _measure_http(tool, monkeypatch, _FakeCompanion(_transport_error(cause)), surface="foreground")
+    assert row["delivery"] == "timeout"
+
+
+@pytest.mark.parametrize("surface", ["foreground", "background"])
+def test_a_reply_discarded_for_a_newer_turn_is_cancelled_not_unattempted(tool, monkeypatch, surface):
+    # server.py answers a superseded turn with status "cancelled"; that is neither a template nor a skipped model.
+    row = _measure_http(tool, monkeypatch, _FakeCompanion(
+        {"answer": "", "status": "cancelled", "answer_delivery_discarded": True, "inference_aborted": False}),
+        surface=surface)
+    assert row["delivery"] == "cancelled"
+    assert row["attempted"] is False
+
+
+def test_a_background_row_keeps_the_server_timings_and_the_template_reply_time(tool, monkeypatch):
+    timing = {"total_ms": 412.0, "context_build_ms": 3.1, "answer_pipeline_ms": 380.2, "augment_ms": 20.0}
+    row = _measure_http(tool, monkeypatch, _FakeCompanion(
+        {"answer": "Template", "timing": timing, "answer_upgrade": {"id": "job"}},
+        [{"status": "pending"}, {"status": "accepted", "answer": "Model answer", "seconds": 12.3}]))
+    assert row["delivery"] == "accepted"
+    assert row["server_timing_ms"] == timing
+    assert row["server_upgrade_seconds"] == 12.3
+    assert row["initial_reply_seconds"] is not None and row["initial_reply_seconds"] <= row["seconds"]
+    # "accepted" used to be written into warnings, which read as a reason on an answer that had none.
+    assert row["warnings"] == []
+    # The paint time and the useful-answer time stay unknown: receiving a reply is not seeing it.
+    assert row["first_useful_answer_seconds"] is None and row["final_displayed_answer_seconds"] is None
+
+
+def test_a_rejected_background_job_keeps_the_gate_reason(tool, monkeypatch):
+    row = _measure_http(tool, monkeypatch, _FakeCompanion(
+        {"answer": "Template", "answer_upgrade": {"id": "job"}},
+        [{"status": "rejected", "reason": "unsupported measurements", "seconds": 9.0}]))
+    assert row["delivery"] == "rejected"
+    assert row["warnings"] == ["unsupported measurements"]
+    assert row["server_upgrade_seconds"] == 9.0
+
+
+def test_a_polling_timeout_keeps_the_template_that_was_already_delivered(tool, monkeypatch):
+    row = _measure_http(tool, monkeypatch, _FakeCompanion(
+        {"answer": "Template", "timing": {"total_ms": 5.0}, "answer_upgrade": {"id": "job"}}, [{"status": "pending"}]),
+        timeout=0.12)
+    assert row["delivery"] == "timeout"
+    assert row["answer"] == "Template"
+    assert row["server_timing_ms"] == {"total_ms": 5.0}
+    assert row["server_upgrade_seconds"] is None
+
+
+def test_the_response_cache_state_is_resolved_in_process_and_unknown_over_http(tool, monkeypatch):
+    # KENN_LLM_CACHE unset means the response cache is ON, which the raw env echo (None) did not say.
+    monkeypatch.delenv("KENN_LLM_CACHE", raising=False)
+    assert tool.run_provenance()["cache_settings"]["response_cache_enabled"] is True
+    monkeypatch.setenv("KENN_LLM_CACHE", "0")
+    assert tool.run_provenance()["cache_settings"]["response_cache_enabled"] is False
+    monkeypatch.delenv("KENN_LLM_CACHE", raising=False)
+    from kenn.core import mcp_facade
+    monkeypatch.setattr(mcp_facade, "KennHTTPClient", _FakeCompanion({"answer": "Template"}))
+    row_report = tool.measure([{"id": "fixture", "question": "Synthetic"}], surface="foreground",
+                              endpoint="http://127.0.0.1:1", cache_condition="warm")
+    assert row_report["provenance"]["cache_settings"]["response_cache_enabled"] is None
+
+
+def test_the_console_summary_shows_every_delivery_outcome(tool, monkeypatch):
+    from kenn.core import mcp_facade
+    monkeypatch.setattr(mcp_facade, "KennHTTPClient", _FakeCompanion(_transport_error(ConnectionRefusedError())))
+    report = tool.measure([{"id": "a", "question": "Synthetic"}], surface="foreground",
+                          endpoint="http://127.0.0.1:1", cache_condition="warm")
+    assert "delivery           error 1" in tool.render(report)
+
+
+def test_swap_and_memory_pressure_are_parsed_from_the_mac_sysctls(tool, monkeypatch):
+    # Every C1 row carried memory_pressure=None and swap_bytes=None however it was run, so a Mac session
+    # could not record what C1 asks for. Output strings below are the macOS 14 formats.
+    replies = {"vm.swapusage": "total = 2048.00M  used = 1186.25M  free = 861.75M  (encrypted)",
+               "kern.memorystatus_vm_pressure_level": "2"}
+    monkeypatch.setattr(tool, "_sysctl", lambda name: replies.get(name))
+    sample = tool.memory_sample()
+    assert sample == {"swap_bytes": int(1186.25 * 1024 ** 2), "memory_pressure": "warn"}
+
+
+def test_memory_readings_stay_unknown_where_the_sysctls_do_not_exist(tool, monkeypatch):
+    monkeypatch.setattr(tool, "_sysctl", lambda name: None)
+    assert tool.memory_sample() == {"swap_bytes": None, "memory_pressure": None}
+    monkeypatch.setattr(tool, "_sysctl", lambda name: "garbled")
+    assert tool.memory_sample() == {"swap_bytes": None, "memory_pressure": None}
+
+
+def test_each_row_carries_its_memory_sample_and_dropouts_stay_unmeasured(tool, monkeypatch):
+    monkeypatch.setattr(tool, "memory_sample", lambda: {"swap_bytes": 42, "memory_pressure": "normal"})
+    monkeypatch.setattr(tool, "_ask_http", lambda *a, **k: ({"answer": "Template"}, 0, None))
+    row = tool.measure([{"id": "a", "question": "Synthetic"}], surface="foreground",
+                       endpoint="http://127.0.0.1:1", cache_condition="warm")["rows"][0]
+    assert row["swap_bytes"] == 42 and row["memory_pressure"] == "normal"
+    # No tool here can see Live's audio engine, so the field exists and says so rather than reading zero.
+    assert row["audio_dropouts"] is None
+
+
+def test_provenance_names_the_model_each_task_resolves_to(tool, monkeypatch):
+    # KENN_LLM_MODEL alone missed per-task overrides, and read None when only KENN_LLM_MODEL_REWRITE was set.
+    monkeypatch.delenv("KENN_LLM_MODEL", raising=False)
+    monkeypatch.setenv("KENN_LLM_MODEL_REWRITE", "fixture-rewrite-model")
+    models = tool.run_provenance()["resolved_models"]
+    assert models["rewrite"] == "fixture-rewrite-model"
+    assert set(models) == {"rewrite", "route", "paraphrase", "followups"}

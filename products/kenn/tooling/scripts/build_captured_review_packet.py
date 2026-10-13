@@ -73,7 +73,9 @@ def build_captured(capture: dict) -> tuple[dict, dict]:
             raise ValueError(f"Incomplete capture case {identity}")
         if any(not isinstance(case[field], str) or not case[field].strip() for field in ("question", "family", "split")) or not isinstance(case["answer"], str):
             raise ValueError("Capture question, family and split need text; missing answers remain an empty string")
-        if case["delivery"] not in {"accepted", "rejected", "busy", "timeout", "not_attempted"}:
+        # "cancelled" (reply discarded for a newer turn) and "error" (nothing measured, e.g. the companion was
+        # down) come from measure_chat_latency since 13 Oct 2026; they stay in the denominator like the rest.
+        if case["delivery"] not in {"accepted", "rejected", "busy", "timeout", "not_attempted", "cancelled", "error"}:
             raise ValueError("Unknown delivery outcome")
         rows.append(case)
     if len({case["split"] for case in rows}) != 1:

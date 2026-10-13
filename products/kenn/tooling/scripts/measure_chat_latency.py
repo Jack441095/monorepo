@@ -265,6 +265,53 @@ def _ask(chat_answer, question: str, *, allow_llm: bool, surface: str) -> tuple[
     ), 0, None
 
 
+def _sysctl(name: str) -> str | None:
+    """One read-only sysctl value, or None where the key or the command does not exist (Linux, CI)."""
+    try:
+        result = subprocess.run(["sysctl", "-n", name], capture_output=True, text=True, timeout=5, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return result.stdout.strip() if result.returncode == 0 and result.stdout.strip() else None
+
+
+# kern.memorystatus_vm_pressure_level is the kernel's own level, the same one Activity Monitor colours its memory
+# graph by: 1 normal, 2 warn, 4 critical. Anything else is recorded as unknown rather than guessed at.
+_PRESSURE_LEVELS = {"1": "normal", "2": "warn", "4": "critical"}
+_SWAP_UNITS = {"K": 1024, "M": 1024 ** 2, "G": 1024 ** 3}
+
+
+def memory_sample() -> dict:
+    """Swap in use (bytes) and the kernel memory-pressure level at this instant; None where unreadable.
+
+    Taken once at the end of each answer, so it is a snapshot beside the answer, not the peak during it. A
+    swap figure that grows across a run is the signal C1 asks for; one reading on its own says little.
+    """
+    swap = None
+    usage = _sysctl("vm.swapusage") or ""
+    # macOS prints "total = 2048.00M  used = 1186.25M  free = 861.75M  (encrypted)".
+    marker = usage.find("used = ")
+    if marker >= 0:
+        figure = (usage[marker + len("used = "):].split() or [""])[0]
+        try:
+            swap = int(float(figure[:-1]) * _SWAP_UNITS[figure[-1]])
+        except (ValueError, KeyError, IndexError):
+            swap = None  # an unfamiliar format is unknown, not zero swap
+    return {"swap_bytes": swap,
+            "memory_pressure": _PRESSURE_LEVELS.get(_sysctl("kern.memorystatus_vm_pressure_level") or "")}
+
+
+def _resolved_models() -> dict:
+    from kenn.llm.llm_rewrite import config
+
+    return {task: config(task)["model"] or None for task in ("rewrite", "route", "paraphrase", "followups")}
+
+
+def _response_cache_enabled() -> bool:
+    from kenn.llm.llm_rewrite import cache_enabled
+
+    return cache_enabled()
+
+
 def run_provenance(manifest: dict | None = None) -> dict:
     """Identify this checkout; externally measured model, corpus and hardware fields stay unknown."""
     def git(*arguments):
@@ -284,12 +331,20 @@ def run_provenance(manifest: dict | None = None) -> dict:
         "dirty_diff_sha256": hashlib.sha256(git("diff", "HEAD", "--", ".")).hexdigest(),
         "source_files_sha256": sources.hexdigest(),
         "model_name": os.environ.get("KENN_LLM_MODEL") or None,
+        # What each chat task would actually call in this process, per-task overrides included. A digest still
+        # has to come from --build-manifest: the model name says nothing about which weights sit behind it.
+        "resolved_models": _resolved_models(),
         "model_digest": None, "resolved_prompt_sha256": None,
         "index_version": _index_version() or None, "index_sha256": None, "corpus_sha256": None,
         "hardware": {"architecture": platform.machine(), "processor": None, "memory_bytes": None},
         "cache_settings": {"KENN_LLM_CACHE": os.environ.get("KENN_LLM_CACHE"),
                            "KENN_LLM_CACHE_SIZE": os.environ.get("KENN_LLM_CACHE_SIZE"),
-                           "KENN_LLM_CACHE_TTL": os.environ.get("KENN_LLM_CACHE_TTL")},
+                           "KENN_LLM_CACHE_TTL": os.environ.get("KENN_LLM_CACHE_TTL"),
+                           # The raw echo above reads None when the variable is unset, which is the cache being
+                           # ON (llm_rewrite defaults it to "1"). Resolved here so a "cold" receipt cannot look
+                           # clean while replaying responses. measure() blanks it for HTTP runs, where this
+                           # process's environment says nothing about the companion's.
+                           "response_cache_enabled": _response_cache_enabled()},
         "manifest": manifest or {},
     }
     # The manifest supplements measured identities rather than replacing this checkout's code hash.
@@ -297,33 +352,73 @@ def run_provenance(manifest: dict | None = None) -> dict:
 
 
 def _ask_http(question: str, *, surface: str, endpoint: str, timeout: float) -> tuple[dict, int, None]:
-    """Measure actual HTTP delivery; receiving an answer does not prove browser paint or usefulness."""
+    """Measure actual HTTP delivery; receiving an answer does not prove browser paint or usefulness.
+
+    The returned payload carries two harness-only keys beside the companion's reply: `initial_reply_seconds`
+    (when the /api/ask reply arrived, so the background template and its upgrade are timed apart) and
+    `server_upgrade_seconds` (answer_upgrades' own clock for the model run, free of our 50 ms polling step).
+    """
     from kenn.core.mcp_facade import KennHTTPClient
 
     client = KennHTTPClient(endpoint, timeout=timeout)
     session = f"latency-{uuid.uuid4().hex}"
+    started = time.perf_counter()
     initial = client.post("/api/ask", {"question": question, "session_id": session})
+    initial["initial_reply_seconds"] = round(time.perf_counter() - started, 3)
+    if initial.get("answer_delivery_discarded"):
+        # server.py swaps a reply whose turn was superseded mid-answer for status "cancelled". Nothing was
+        # delivered and the inference it may have started is not aborted (inference_aborted is False), so this
+        # is neither a template answer nor a skipped model call.
+        return {**initial, "delivery_outcome": "cancelled", "fallback_reason": "Reply discarded for a newer turn"}, 0, None
     if surface == "foreground":
         return initial, 0, None
     job = initial.get("answer_upgrade") or {}
     if not job.get("id"):
         # No job can mean busy, superseded or ineligible. The current HTTP contract does not distinguish them.
         return {**initial, "delivery_outcome": "not_attempted", "fallback_reason": "No background job; admission reason unavailable"}, 0, None
+    # The polling deadline starts after the template arrived, so a background row can take up to twice
+    # --timeout in total. The template is already on screen by then; the deadline bounds the upgrade alone.
     deadline = time.perf_counter() + timeout
     while time.perf_counter() < deadline:
         result = client.get("/api/ask/upgrade", {"id": job["id"], "session_id": session})
         if result.get("status") != "pending":
             status = result.get("status")
+            timed = {"initial_reply_seconds": initial["initial_reply_seconds"],
+                     "timing": initial.get("timing"), "server_upgrade_seconds": result.get("seconds")}
             if status not in {"accepted", "rejected", "failed"}:
-                # Missing, cancelled and expired jobs do not establish that inference was attempted.
-                return {**result, "delivery_outcome": "not_attempted", "fallback_reason": status or "Unknown job state"}, 0, None
+                # Missing and expired jobs do not establish that inference was attempted. A job discarded for a
+                # newer turn also reads "expired" (answer_upgrades.get), so cancellation cannot be told apart here.
+                return {**result, **timed, "delivery_outcome": "not_attempted", "fallback_reason": status or "Unknown job state"}, 0, None
             accepted = status == "accepted" and not result.get("abstained")
-            return {**result, "delivery_outcome": "accepted" if accepted else "rejected",
+            # Only a rejection carries a reason; writing "accepted" into warnings made it read like one.
+            reason = [] if status == "accepted" else [result.get("reason") or result.get("error") or status]
+            return {**result, **timed, "delivery_outcome": "accepted" if accepted else "rejected",
                     "generation_validation": {"attempted": True, "accepted": accepted,
                                               "abstained": bool(result.get("abstained")),
-                                              "warnings": [result.get("reason") or result.get("error") or status]}}, 0, None
+                                              "warnings": reason}}, 0, None
         time.sleep(0.05)  # 50 ms polling is a harness setting, never a service inference setting.
-    return {"delivery_outcome": "timeout", "fallback_reason": "Background polling deadline"}, 0, None
+    # The template was delivered before the deadline started, so it stays the row's answer.
+    return {**initial, "answer_upgrade": job, "delivery_outcome": "timeout",
+            "fallback_reason": "Background polling deadline"}, 0, None
+
+
+def _timed_out(exc: BaseException) -> bool:
+    """Whether a failed ask ran out of time rather than failing to connect or crashing.
+
+    KennTransportError wraps every socket failure in the same "did not complete" message, so matching on the
+    text (as this did until 13 Oct 2026) booked a stopped companion as a timeout. We walk the cause chain
+    instead: TimeoutError covers socket reads, URLError carries it as .reason, and httpx names its own
+    ReadTimeout/ConnectTimeout classes without subclassing TimeoutError.
+    """
+    seen: set[int] = set()
+    while exc is not None and id(exc) not in seen:
+        seen.add(id(exc))
+        if isinstance(exc, TimeoutError) or "Timeout" in type(exc).__name__:
+            return True
+        if isinstance(getattr(exc, "reason", None), TimeoutError):
+            return True
+        exc = exc.__cause__ or exc.__context__
+    return False
 
 
 def answer_capture(report: dict) -> dict:
@@ -352,6 +447,10 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
         raise ValueError("Cases require unique IDs")
     provenance = run_provenance(manifest)
     provenance.update(surface=surface, cache_condition=cache_condition)
+    if endpoint:
+        # Both describe this process, not the companion answering over HTTP.
+        provenance["cache_settings"]["response_cache_enabled"] = None
+        provenance["resolved_models"] = None
     rows: list[dict] = []
     for case in cases:
         question = str(case.get("question") or "").strip()
@@ -373,10 +472,17 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
                 payload, tokens, ttft = (_ask_http(question, surface=surface, endpoint=endpoint, timeout=timeout)
                                         if surface in {"foreground", "background"} else
                                         _ask(chat_answer, question, allow_llm=allow_llm, surface=surface))
-                error = None
+                error, timed_out = None, False
             except Exception as exc:  # a failure is a measurement, not a crash
                 payload, error, tokens, ttft = {}, f"{type(exc).__name__}: {exc}", 0, None
+                cause = exc.__cause__ or exc.__context__
+                if cause is not None:
+                    # KennTransportError's own text says nothing about what failed; the cause does.
+                    error += f" (caused by {type(cause).__name__}: {cause})"
+                timed_out = _timed_out(exc)
         seconds = time.perf_counter() - started
+        # Sampled after the clock stops so the two sysctl calls (a few ms) never land inside the answer time.
+        memory = memory_sample()
         validation = dict(payload.get("generation_validation") or {})
         # The gate is skipped when the streaming prefix guard trips, so those answers never reach the capture
         # wrapper above. They still happened and still reject, and they are the unsupported-measurement class,
@@ -407,7 +513,9 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
                 "claim_citations": {},
             })
         delivery = payload.get("delivery_outcome") or (
-            "timeout" if error and ("Timeout" in error or "did not complete" in error) else
+            "timeout" if timed_out else
+            # Anything else that raised measured nothing, so it is not booked as a skipped model call either.
+            "error" if error else
             "accepted" if validation.get("accepted") and not validation.get("abstained") else
             "rejected" if validation.get("attempted") else "not_attempted")
         calls = [usage.to_dict() for usage in provider_calls]
@@ -424,7 +532,18 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             "fallback_reason": payload.get("fallback_reason") or error or validation.get("warnings"),
             "first_useful_answer_seconds": None, "final_displayed_answer_seconds": None,
             "final_received_answer_seconds": round(seconds, 3),
-            "memory_pressure": None, "swap_bytes": None,
+            # HTTP only. When the /api/ask reply arrived: on the background surface that is the template, timed
+            # apart from the upgrade that may replace it. None in-process, where there is no separate reply.
+            "initial_reply_seconds": payload.get("initial_reply_seconds"),
+            # The companion's own stage split (context build, answer pipeline, augment), kept verbatim rather
+            # than mapped onto phase_seconds: context_build_ms is plug-in/session context, not retrieval, and
+            # the server does not split retrieval from generation on this path.
+            "server_timing_ms": payload.get("timing") if isinstance(payload.get("timing"), dict) else None,
+            "server_upgrade_seconds": payload.get("server_upgrade_seconds"),
+            "memory_pressure": memory["memory_pressure"], "swap_bytes": memory["swap_bytes"],
+            # Nothing this harness can read sees Live's audio engine. C1 asks for dropouts at a fixed buffer, so
+            # the owner records them during the supervised session; None here means "not measured", never zero.
+            "audio_dropouts": None,
             "phase_seconds": {"admission": None, "queue": None, "context_retrieval": None,
                               "prefill": native_seconds("prompt_eval_duration_ns"),
                               "generation": native_seconds("eval_duration_ns"), "verification": None},
@@ -527,6 +646,9 @@ def render(report: dict) -> str:
         f"  brain abstained    {counts.get('llm_abstained', 0)}",
         f"  brain rejected     {counts['llm_rejected']}",
         f"  errors             {counts['errors']}",
+        # Every outcome, so a run full of timeouts or a stopped companion is visible without opening the receipt.
+        # .get: v1 receipts predate the per-row delivery field.
+        "  delivery           " + (", ".join(f"{k} {v}" for k, v in sorted(counts.get("delivery", {}).items())) or "(not recorded)"),
         f"  all answers        median {seconds['all_median']}s   p95 {seconds['all_p95']}s",
     ]
     if seconds.get("ttft_median") is not None:
