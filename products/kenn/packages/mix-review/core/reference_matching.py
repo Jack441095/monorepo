@@ -293,6 +293,103 @@ def export_eq8_preset_adv(matching_gains: dict[str, float]) -> bytes:
     return gzip.compress(xml_str.encode("utf-8"))
 
 
+# Reference-match part of the E2 grade (40 points). Every tolerance below is a design choice made on
+# 14 Oct 2026, not a measurement: the first two reuse thresholds this module already coaches with, and the rest
+# are placeholders to be checked against the owner's ears under E9. Change them in one place, here.
+REFERENCE_MATCH_POINTS: dict[str, float] = {"tonal_balance": 20.0, "dynamics": 10.0, "low_end_mono": 5.0, "stereo_width": 5.0}
+TONAL_TOLERANCE_DB = 1.0  # same 1.0 dB at which compare_mix_to_reference starts suggesting an EQ move
+TONAL_FULL_LOSS_DB = 6.0  # compute_eq_matching_curve clamps at +/-6 dB, so a band cannot read worse than this
+CREST_TOLERANCE_DB = 2.5  # same 2.5 dB at which the dynamics coaching switches from "matches" to a compressor tip
+CREST_FULL_LOSS_DB = 7.5  # 5 dB past the tolerance
+LOW_CORR_TOLERANCE = 0.05  # correlation below 120 Hz may sit this far under the reference's before it costs anything
+LOW_CORR_FULL_LOSS = 0.50  # a shortfall this large is a full loss
+WIDTH_TOLERANCE_DB = 3.0  # side/mid ratio difference we do not charge for
+WIDTH_FULL_LOSS_DB = 9.0
+
+
+def _loss_fraction(gap: float, tolerance: float, full_loss: float) -> float:
+    """0.0 inside the tolerance, rising in a straight line to 1.0 at full_loss and staying there."""
+    return min(1.0, max(0.0, gap - tolerance) / (full_loss - tolerance))
+
+
+def score_reference_match(comparison: dict[str, Any]) -> dict[str, Any]:
+    """Score a `compare_mix_to_reference` result out of 40, from the producer's own reference only.
+
+    Every point lost names the measured gap and that the source is the supplied reference. A part we could not
+    compare (a mono file has no stereo width to match) is listed in `unscored` and its points come off
+    `points_available`; the score is never rescaled up to 40.
+    """
+    parts: list[dict[str, Any]] = []
+    unscored: list[str] = []
+
+    def add(name: str, gap: float, unit: str, tolerance: float, full_loss: float, detail: str) -> None:
+        available = REFERENCE_MATCH_POINTS[name]
+        lost = available * _loss_fraction(abs(gap), tolerance, full_loss)
+        parts.append({
+            "part": name,
+            "points": round(available - lost, 1),
+            "points_available": available,
+            "gap": round(gap, 2),
+            "unit": unit,
+            "detail": detail,
+            "source": "the reference track you supplied",
+        })
+
+    bands = comparison.get("matching_gains_db") or {}
+    if bands:
+        # The matching gain is how far each band is from the reference, so the mean of its size is the tonal gap.
+        # Per-band losses are averaged rather than summed so one bad band cannot zero the whole part by itself.
+        losses = [_loss_fraction(abs(g), TONAL_TOLERANCE_DB, TONAL_FULL_LOSS_DB) for g in bands.values()]
+        available = REFERENCE_MATCH_POINTS["tonal_balance"]
+        worst = max(bands, key=lambda b: abs(bands[b]))
+        parts.append({
+            "part": "tonal_balance",
+            "points": round(available * (1.0 - sum(losses) / len(losses)), 1),
+            "points_available": available,
+            "gap": round(abs(bands[worst]), 2),
+            "unit": "dB (largest band)",
+            "detail": f"largest band gap is {worst} at {bands[worst]:+.1f} dB of suggested correction",
+            "source": "the reference track you supplied",
+        })
+    else:
+        unscored.append("tonal_balance")
+
+    dynamics = comparison.get("dynamics") or {}
+    crest_delta = dynamics.get("crest_factor_delta_db")
+    if crest_delta is None:
+        unscored.append("dynamics")
+    else:
+        add("dynamics", crest_delta, "dB crest factor", CREST_TOLERANCE_DB, CREST_FULL_LOSS_DB,
+            f"crest factor differs from the reference by {crest_delta:+.1f} dB")
+
+    stereo = comparison.get("stereo") or {}
+    mix_st, ref_st = stereo.get("mix") or {}, stereo.get("reference") or {}
+    if "low_mono_correlation" in mix_st and "low_mono_correlation" in ref_st:
+        shortfall = max(0.0, ref_st["low_mono_correlation"] - mix_st["low_mono_correlation"])
+        add("low_end_mono", shortfall, "correlation below the reference", LOW_CORR_TOLERANCE, LOW_CORR_FULL_LOSS,
+            f"correlation below 120 Hz is {mix_st['low_mono_correlation']:.2f} against {ref_st['low_mono_correlation']:.2f}")
+    else:
+        unscored.append("low_end_mono")
+
+    # A mono file reports a side/mid ratio of -90 dB as a placeholder, which is not a width we can compare.
+    if (mix_st and ref_st and not mix_st.get("is_mono") and not ref_st.get("is_mono")
+            and "side_mid_ratio_db" in mix_st and "side_mid_ratio_db" in ref_st):
+        width_gap = mix_st["side_mid_ratio_db"] - ref_st["side_mid_ratio_db"]
+        add("stereo_width", width_gap, "dB side/mid", WIDTH_TOLERANCE_DB, WIDTH_FULL_LOSS_DB,
+            f"side/mid ratio is {width_gap:+.1f} dB from the reference")
+    else:
+        unscored.append("stereo_width")
+
+    points_available = sum(p["points_available"] for p in parts)
+    return {
+        "points": round(sum(p["points"] for p in parts), 1),
+        "points_available": points_available,
+        "full_marks": sum(REFERENCE_MATCH_POINTS.values()),
+        "parts": parts,
+        "unscored": unscored,
+    }
+
+
 def compare_mix_to_reference(
     mix_bytes: bytes,
     ref_bytes: bytes,
@@ -426,7 +523,7 @@ def compare_mix_to_reference(
     preset_adv_bytes = export_eq8_preset_adv(matching_gains)
     preset_b64 = base64.b64encode(preset_adv_bytes).decode("ascii")
 
-    return {
+    result = {
         "ok": True,
         "schema": "kenn.mix_review.reference_match.v1",
         "mix_name": mix_name,
@@ -452,3 +549,5 @@ def compare_mix_to_reference(
         "recommendations": recommendations,
         "eq8_preset_adv_base64": preset_b64,
     }
+    result["reference_match_score"] = score_reference_match(result)
+    return result

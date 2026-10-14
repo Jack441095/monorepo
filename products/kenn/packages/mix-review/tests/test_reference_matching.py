@@ -115,3 +115,75 @@ def test_compare_mix_to_reference_full_pipeline():
     raw_adv = base64.b64decode(result["eq8_preset_adv_base64"])
     xml_str = gzip.decompress(raw_adv).decode("utf-8")
     assert "Eq8Band" in xml_str
+
+
+# E2 reference-match part (14 Oct 2026): scored only from the supplied reference, never rescaled.
+from reference_matching import score_reference_match  # noqa: E402
+
+
+def _comparison(gains=None, crest_delta=0.0, mix_stereo=None, ref_stereo=None):
+    stereo = {"low_mono_correlation": 0.95, "side_mid_ratio_db": -9.0, "is_mono": False}
+    return {
+        "matching_gains_db": gains if gains is not None else {b: 0.0 for b in ("sub", "bass", "mids", "air")},
+        "dynamics": {"crest_factor_delta_db": crest_delta},
+        "stereo": {"mix": {**stereo, **(mix_stereo or {})}, "reference": {**stereo, **(ref_stereo or {})}},
+    }
+
+
+def test_a_mix_that_matches_its_reference_gets_all_forty():
+    score = score_reference_match(_comparison())
+
+    assert score["points"] == 40.0
+    assert score["points_available"] == 40.0
+    assert score["unscored"] == []
+
+
+def test_a_mix_compared_with_itself_scores_full_marks():
+    wav = _make_wav(duration_s=0.5, freq_left=220.0, freq_right=330.0)
+
+    score = compare_mix_to_reference(wav, wav)["reference_match_score"]
+
+    assert score["points"] == 40.0
+
+
+def test_a_gap_inside_the_tolerance_costs_nothing():
+    score = score_reference_match(_comparison(gains={"bass": 1.0, "mids": -1.0}, crest_delta=2.5))
+
+    assert score["points"] == 40.0
+
+
+def test_a_tonal_gap_costs_points_and_names_the_band_and_the_source():
+    score = score_reference_match(_comparison(gains={"sub": 0.0, "bass": 6.0, "mids": 0.0, "air": 0.0}))
+
+    tonal = next(p for p in score["parts"] if p["part"] == "tonal_balance")
+    assert tonal["points"] == 15.0  # one of four bands fully lost: 20 * (1 - 1/4)
+    assert "bass" in tonal["detail"]
+    assert tonal["source"] == "the reference track you supplied"
+
+
+def test_a_squashed_mix_loses_dynamics_points():
+    score = score_reference_match(_comparison(crest_delta=-7.5))
+
+    dynamics = next(p for p in score["parts"] if p["part"] == "dynamics")
+    assert dynamics["points"] == 0.0
+
+
+def test_a_mono_file_has_no_width_to_match_and_the_score_is_not_rescaled():
+    score = score_reference_match(_comparison(mix_stereo={"is_mono": True, "side_mid_ratio_db": -90.0}))
+
+    assert "stereo_width" in score["unscored"]
+    assert score["points_available"] == 35.0
+    assert score["points"] == 35.0  # out of 35, not stretched to 40
+
+
+def test_the_same_comparison_always_gets_the_same_score():
+    comparison = _comparison(gains={"bass": 3.3, "air": -2.2}, crest_delta=4.1)
+
+    assert score_reference_match(comparison) == score_reference_match(comparison)
+
+
+def test_a_missing_comparison_section_is_unscored_not_assumed_good():
+    score = score_reference_match({})
+
+    assert set(score["unscored"]) == {"tonal_balance", "dynamics", "low_end_mono", "stereo_width"}
+    assert score["points_available"] == 0.0
