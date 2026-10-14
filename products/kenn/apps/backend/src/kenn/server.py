@@ -155,30 +155,15 @@ from kenn.core.live_imperative import (
 )
 
 
-def _continues_live_turn(question: str, session_id: str) -> bool:
-    """A follow-up, correction or short reply to the Live change this chat is in the middle of.
-
-    "Do that on the snare too", "no, I meant the kick" and "3 dB" don't start with a command verb, so until
-    26 Sept 2026 the chat sent them to the notes even though the command gateway knows what they mean.
-    """
-    from kenn.core.live_command import _CORRECTION, _FOLLOW_UP_MARKER
-    from kenn.core.session_context import live_conversation_context
-
-    context = live_conversation_context(session_id)
-    text = " ".join(str(question or "").split())
-    if context.get("pending_question") and 0 < len(text.split()) <= 6:
-        return True
-    return bool(context.get("last_command")) and bool(_FOLLOW_UP_MARKER.search(text) or _CORRECTION.match(text))
-
-
-_SAYS_YES = re.compile(r"^\s*(?:yes|yeah|yep|yup|ok(?:ay)?|sure|do\s+it|go\s+ahead|apply(?:\s+(?:it|that|the\s+change))?|"
-                       r"confirm(?:\s+it)?|sounds\s+good|please\s+do|go\s+for\s+it)\s*(?:please)?\s*[.!]*\s*$", re.I)
-
-
-def _proposal_waiting(session_id: str) -> bool:
-    from kenn.core.confirmation import pending_confirmation_count
-
-    return pending_confirmation_count(session_id=session_id) > 0
+# Turn and confirmation state lives in kenn.core.live_turn so server.py stays
+# a thin dispatcher; the names below are compat aliases for callers that
+# reached into server (see tests/test_confirmation_cancellation_routes.py,
+# tests/test_server_smoke.py).
+from kenn.core.live_turn import (
+    SAYS_YES as _SAYS_YES,
+    continues_live_turn as _continues_live_turn,
+    proposal_waiting as _proposal_waiting,
+)
 
 
 def _chat_wants_live(question: str) -> bool:
