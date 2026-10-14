@@ -2102,6 +2102,14 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       This is one development diagnostic, not a controlled 4B comparison or a
       qualifying session; correctness, retention and Live coexistence remain
       unmeasured. S4/S6 stay open and the production control remains 4B.
+      **Still testing Qwen sizes for the most efficient model.** The 1.7B looks good so far
+      (median 3.80 s against 6.65 s for the 4B, 81.8% of eligible answers within 15 s) but it
+      is not proven: nearly every answer hit the token cap, memory pressure warned, and
+      correctness and retention are unmeasured. It needs more testing before it is anything
+      but a candidate. The sweep stays open for the other sizes in the family (0.6B, 8B) and later
+      candidates. Same bar for each: reviewed correctness, retention, grounding, memory and
+      first-answer time on mains power with a quiet machine, and the 4B stays the production
+      control until one beats it on that bar.
     - [ ] **S5: Grow only after an independent signal.** If the bounded packet
       shows a reviewed quality gain, prepare a first larger batch of 200–400 reviewed
       targets, balanced across the curriculum and actual failure families. Drafting,
@@ -2372,8 +2380,12 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     Decided 14 Oct, details in [the E2 grade note](docs/research/e2_grade_proposal_2026-10-14.md): 30 technical health, 30 declared target, 40 reference match. With no reference the grade is shown out of 60 and labelled, never rescaled. Targets are a short cited list of streaming loudness targets plus the -1 dBTP ceiling, overridden by what I state. The five-dimension score becomes the technical-health part. The grade is a number with a one-line meaning, no S/A/B letter.
   - [x] Stop `mix_doctor` turning a missing meter into a healthy number. A missing reading now stays missing, its check is skipped, and a dimension with nothing measured is left out of the total and the grade reads UNRATED (tests in test_mix_doctor.py).
   - [x] Reference-match part (40): `score_reference_match` in `packages/mix-review/core/reference_matching.py` scores a comparison out of 40 (tonal 20, dynamics 10, low-end mono 5, width 5). Tolerances are design choices, to be checked against my ears under E9. A part that cannot be compared comes off the points available instead of being rescaled. Not yet shown in chat or the plug-in.
+  - [ ] Prove the meters the grade quotes before it deducts on them, from [the engineering candidates note](docs/research/kenn_engineering_candidates_2026-10-14.md). Add EBU Tech 3341/3342 conformance tests for LUFS, LRA and true peak, using signals generated from the spec (the download URL is unverified), against both the plug-in `StreamingMeter` and `core/loudness_analysis.py`. The 14 Oct receipt in [audio analysis reuse](docs/research/audio_analysis_reuse_2026-10-14.md) has the plug-in's 4x true peak failing 28 of 98 tones where an 8x filter passes all 98, and decided to keep 8x as a reference only because of its CPU cost. That cost against an under-read at the -1 dBTP line is my call. The Python path is a separate 4x `resample_poly`, and it imports librosa, which needs soxr (LGPL): settle that before shipping.
   - [ ] Declared-target part (30): loudness within tolerance and true-peak ceiling against the cited list or my stated target.
   - [ ] Rework the technical-health part (30) so every deduction names its source, and drop the letter grade from the report.
+  - [ ] Put each deduction's source and tier (standard, corpus or judgement) in the payload, with threshold bands and a short legend, as the two best comparables do.
+  - [ ] Reference-free tonal-bump detector for the no-reference case, then a spread of references (Wilson and Fazenda 2016, read the paper before citing numbers) in place of one target curve.
+  - [ ] Stem significance gate: a metric from a silent or near-silent source is withheld, not shown with a caveat.
   - [ ] Benchmark offline: compare the current mix-review code with cheaper variants, pick the reference, and write down why (see docs/research and the reuse comparison receipts).
   - [ ] Build the grading in the existing mix-review module. Grade only against authorized references, declared conventions and the producer's own target, and never invent a number.
   - [ ] Check the grade is deterministic for the same inputs, and that it moves when the underlying analysis changes.
