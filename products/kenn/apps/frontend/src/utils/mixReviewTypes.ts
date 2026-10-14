@@ -123,8 +123,31 @@ export interface MixMetrics {
     description?: string
   }
   correlation_timeline?: CorrelationTimeline
-  technical_score?: number
-  technical_rating?: string
+}
+
+/** One scored part of the grade, as the backend's core/grade.py builds it. */
+export interface MixGradePart {
+  part: 'technical_health' | 'declared_target' | 'reference_match'
+  points: number
+  /** Points this part could award given what was measured; below `full_marks` when a check had no reading. */
+  points_available: number
+  full_marks: number
+  left_out?: string[]
+  note?: string
+}
+
+/**
+ * The grade out of 100. `points` is out of `points_available`, never rescaled, so a review with parts missing
+ * reads "17.5 of 22" and not a made-up percentage. There is no verdict word on purpose.
+ */
+export interface MixGrade {
+  points: number
+  points_available: number
+  full_marks: number
+  /** One line from the backend that says what the number covers and what was not graded. */
+  meaning: string
+  parts: MixGradePart[]
+  ungraded: { part: string; reason: string }[]
 }
 
 export interface MixComparison {
@@ -154,6 +177,8 @@ export interface MixReview {
   ok?: boolean
   error?: string
   metrics?: MixMetrics
+  /** Absent when the backend could not grade this review (older server, or nothing was measured). */
+  grade?: MixGrade
   flags?: MixReviewFlag[]
   summary?: string
   action_plan?: MixReviewAction[]

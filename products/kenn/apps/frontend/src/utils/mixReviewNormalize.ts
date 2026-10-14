@@ -2,6 +2,8 @@
 
 import type {
   MixComparison,
+  MixGrade,
+  MixGradePart,
   MixMetrics,
   MixReview,
   MixReviewFlag,
@@ -38,6 +40,24 @@ function asActions(v: unknown): MixReviewAction[] {
   return v.filter((item) => item && typeof item === 'object') as MixReviewAction[]
 }
 
+/**
+ * Keeps the backend's grade only if it has the numbers the card needs. A half-formed grade is dropped rather than
+ * patched up: the card would otherwise show a score the server never computed.
+ */
+function asGrade(value: unknown): MixGrade | undefined {
+  const g = asRecord(value)
+  const points = g ? asNumber(g.points) : undefined
+  const available = g ? asNumber(g.points_available) : undefined
+  const fullMarks = g ? asNumber(g.full_marks) : undefined
+  if (!g || points === undefined || available === undefined || fullMarks === undefined) return undefined
+  const parts = (Array.isArray(g.parts) ? g.parts : []).filter((p) => asRecord(p)) as MixGradePart[]
+  const ungraded = (Array.isArray(g.ungraded) ? g.ungraded : [])
+    .map((u) => asRecord(u))
+    .filter((u): u is Record<string, unknown> => !!u)
+    .map((u) => ({ part: String(u.part ?? ''), reason: String(u.reason ?? '') }))
+  return { points, points_available: available, full_marks: fullMarks, meaning: asString(g.meaning) ?? '', parts, ungraded }
+}
+
 /** 兼容 `{ review }` 包装，或直接返回 review 本体 */
 function asNextStep(value: unknown): MixReviewNextStep | undefined {
   const step = asRecord(value)
@@ -61,7 +81,7 @@ export function extractReviewPayload(raw: unknown): Record<string, unknown> | nu
 
 /**
  * 映射 Jack/KENN 报告 → 左侧工作区用的 MixReview。
- * 顶层缺少 score/rating/summary/flags 时，从 judgment 回填。
+ * 顶层缺少 summary/flags 时，从 judgment 回填。分数只取后端给的 grade，不在前端估算。
  */
 export function normalizeMixReview(raw: unknown): MixReview {
   const review = extractReviewPayload(raw)
@@ -78,26 +98,6 @@ export function normalizeMixReview(raw: unknown): MixReview {
   const mixStyleIn = asRecord(review.mix_style)
   const flags = topFlags.length ? topFlags : asFlags(judgment.flags)
 
-  if (metrics.technical_score == null) {
-    const rawScore = asNumber(judgment.technical_score) ?? asNumber(review.technical_score)
-    if (rawScore !== undefined) {
-      metrics.technical_score = rawScore
-    } else if (metrics.peak_dbfs !== undefined || flags.length) {
-      let penalty = 0
-      for (const f of flags) {
-        const sev = String(f.severity || '').toLowerCase()
-        penalty += sev === 'critical' ? 25 : sev === 'high' ? 15 : sev === 'medium' ? 8 : 3
-      }
-      metrics.technical_score = Math.max(50, Math.min(98, 100 - penalty))
-    }
-  }
-  if (!metrics.technical_rating) {
-    metrics.technical_rating =
-      asString(judgment.technical_rating) ??
-      asString(review.technical_rating) ??
-      (metrics.technical_score != null && metrics.technical_score >= 80 ? 'Solid with checks' : 'Needs attention')
-  }
-
   // 即使接口偶发省略，也尽量保留 bands 对象形态
   if (!metrics.bands && asRecord(metricsIn.bands)) {
     metrics.bands = metricsIn.bands as MixMetrics['bands']
@@ -105,9 +105,13 @@ export function normalizeMixReview(raw: unknown): MixReview {
 
   let summary = asString(review.summary) || asString(judgment.summary)
   if (!summary && flags.length) {
-    const peakNum = typeof metrics.peak_dbfs === 'number' ? metrics.peak_dbfs : -0.07
-    const lufsVal = typeof metrics.integrated_lufs === 'number' ? `${metrics.integrated_lufs.toFixed(1)} LUFS` : '-11.7 LUFS'
-    summary = `Mix evaluated at ${peakNum.toFixed(2)} dBFS peak and ${lufsVal} integrated loudness. Found ${flags.length} area(s) for engineering review.`
+    // Only quote figures the analyser actually returned. Falling back to a made-up peak or LUFS here once put
+    // numbers on screen that no file had produced, so a missing reading is left out of the sentence.
+    const readings: string[] = []
+    if (typeof metrics.peak_dbfs === 'number') readings.push(`${metrics.peak_dbfs.toFixed(2)} dBFS peak`)
+    if (typeof metrics.integrated_lufs === 'number') readings.push(`${metrics.integrated_lufs.toFixed(1)} LUFS integrated loudness`)
+    const measured = readings.length ? `Mix measured at ${readings.join(' and ')}. ` : ''
+    summary = `${measured}Found ${flags.length} area(s) for engineering review.`
   }
 
   return {
@@ -119,6 +123,7 @@ export function normalizeMixReview(raw: unknown): MixReview {
     ok: Boolean(review.ok ?? true),
     error: asString(review.error),
     metrics: Object.keys(metrics).length ? metrics : undefined,
+    grade: asGrade(review.grade),
     flags,
     summary,
     advice: topAdvice.length ? topAdvice : asAdvice(judgment.advice),

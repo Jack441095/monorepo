@@ -24,6 +24,8 @@ from threading import Lock
 import uuid
 from typing import Any
 
+from kenn.core.grade import grade_session
+from kenn.core.mix_doctor import MixDoctor
 from kenn.paths import PACKAGES_ROOT
 
 
@@ -107,6 +109,36 @@ def _safe_flag(finding: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
+def _finite(value: Any) -> float | None:
+    number = _number(value)
+    return number if number is not None and number == number and abs(number) != float("inf") else None
+
+
+def _grade_from_report(report: dict[str, Any]) -> dict[str, Any]:
+    """The E2 grade for one uploaded file, from the readings the analyser actually took.
+
+    Only integrated loudness, true peak, crest factor and (for stereo files) the mean windowed correlation are handed
+    to the Mix Doctor. The 7-band shares are not the Doctor's 20-60 / 200-500 / 2-6k / 10-20k Hz bands, so spectral
+    balance is left unscored instead of guessed. A mono file has no correlation to read: the engine fills its timeline
+    with 1.0, which would read as a perfect stereo image.
+    """
+    metrics = report.get("metrics") if isinstance(report.get("metrics"), dict) else {}
+    meters: dict[str, float] = {}
+    for key in ("integrated_lufs", "true_peak_dbtp", "crest_factor_db"):
+        value = _finite(metrics.get(key))
+        if value is not None:
+            meters[key] = value
+    layout = (report.get("input_context") or {}).get("channel_layout")
+    timeline = metrics.get("correlation_timeline")
+    windows = [v for v in (timeline.get("correlation") if isinstance(timeline, dict) else None) or [] if _finite(v) is not None]
+    if layout == "stereo" and windows:
+        meters["phase_correlation"] = sum(windows) / len(windows)
+    # No session behind an uploaded file, so there are no tracks for the Doctor's name and fader advice to read.
+    technical = MixDoctor().audit_session({"tracks": []}, meters=meters).to_dict()
+    # Reference match is not scored here: compare_reference_audio runs only when a reference is uploaded.
+    return grade_session(technical, meters)
+
+
 def _review_from_report(
     report: dict[str, Any],
     *,
@@ -133,6 +165,7 @@ def _review_from_report(
         "flags": findings,
         "action_plan": report.get("action_plan", []) if isinstance(report.get("action_plan"), list) else [],
         "technical_rating": _text(report.get("technical_rating"), 128),
+        "grade": _grade_from_report(report),
         "limitations": report.get("limitations", ""),
         "qualified_fault_families": report.get("qualified_fault_families", []),
         "not_evaluated_fault_families": report.get("not_evaluated_fault_families", []),

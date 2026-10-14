@@ -1550,7 +1550,7 @@ class KennAutonomousAgent:
             more = f"; and {len(left_out) - 5} more" if len(left_out) > 5 else ""
             answer += f"\n\nNot included ({len(left_out)}): " + "; ".join(shown) + more + "."
         answer += (
-            f"\n\n🛡️ **Safety Clamped**: All fader moves strictly $\\le \\pm 3.0\\text{{ dB}}$, master fader protected.\n"
+            f"\n\n🛡️ **Safety Clamped**: All fader moves within ±3 dB, master fader protected.\n"
             f"Nothing has changed yet. Confirm this recipe to apply with 1-click undo."
         )
 

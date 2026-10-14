@@ -62,12 +62,12 @@ def test_mix_doctor_audit_synthetic_session():
 
     report = doctor.audit_session(session, meters=meters)
 
-    assert 21.0 <= report.mqm_score <= 30.0
-    assert report.points_available == 30.0
+    assert 18.0 <= report.mqm_score <= 24.0
+    assert report.points_available == 24.0  # four meter-judged dimensions; stem separation is never scored
     assert "dynamic_health" in report.dimension_scores
     assert "low_end_control" in report.dimension_scores
     assert "spectral_balance" in report.dimension_scores
-    assert "stem_separation" in report.dimension_scores
+    assert report.dimension_scores["stem_separation"] is None
     assert "stereo_imaging" in report.dimension_scores
     assert report.dimension_scores["dynamic_health"] == 6.0
     assert report.dimension_scores["stereo_imaging"] == 6.0
@@ -145,13 +145,13 @@ def test_mix_doctor_mono_correlation_penalty():
 def test_a_session_with_no_meters_is_not_graded():
     report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters=None)
 
-    assert "only 1 of 5 checks had a meter reading" in report.meaning
+    assert "only 0 of 5 checks had a meter reading" in report.meaning
     assert report.dimension_scores["dynamic_health"] is None
     assert report.dimension_scores["spectral_balance"] is None
     assert report.dimension_scores["stereo_imaging"] is None
-    # Only the fader-based dimension could be judged, so only its 6 points are on offer.
-    assert report.points_available == 6.0
-    assert report.mqm_score <= report.points_available
+    # Nothing could be judged: the fader-based dimension is advice only now, so no points are on offer at all.
+    assert report.points_available == 0.0
+    assert report.mqm_score == 0.0
 
 
 def test_a_missing_reading_stays_missing_in_the_telemetry():
@@ -182,19 +182,19 @@ def test_a_bad_reading_still_costs_points_when_the_rest_are_missing():
     report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters={"phase_correlation": -0.4})
 
     assert report.dimension_scores["stereo_imaging"] == 1.5
-    assert report.points_available == 12.0  # stereo + stem separation, 6 each
+    assert report.points_available == 6.0  # only the stereo dimension had a reading
     assert any(i.severity == "CRITICAL" for i in report.critical_issues)
 
 
-def test_a_full_set_of_meters_is_scored_out_of_30():
+def test_a_full_set_of_meters_is_scored_out_of_24():
     meters = {
         "integrated_lufs": -13.8, "true_peak_dbtp": -1.2, "phase_correlation": 0.88,
         "spectral_energy": {"sub_20_60hz": 0.25, "low_mid_200_500hz": 0.26, "high_mid_2_6khz": 0.25, "air_10_20khz": 0.24},
     }
     report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters=meters)
 
-    assert report.points_available == 30.0
-    assert "checks had a meter reading" not in report.meaning
+    assert report.points_available == 24.0
+    assert "only 4 of 5 checks had a meter reading" in report.meaning  # stem separation has no meter to read
     assert report.unmeasured == ["crest_factor_db"]  # reported, but no check scores on it today
 
 
@@ -205,7 +205,7 @@ def test_tracks_without_fader_or_device_data_cost_nothing():
 
     report = MixDoctor().audit_session(session, meters=None)
 
-    assert report.dimension_scores["stem_separation"] == 6.0
+    assert report.dimension_scores["stem_separation"] is None
     assert not [i for i in report.all_issues if i.category == "low_end"]
 
 

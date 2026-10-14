@@ -126,7 +126,8 @@ class MixDoctor:
         s_dynamic, dynamic_issues, dynamic_recs = self._audit_dynamic_health(tracks, master, telemetry)
         s_low_end, low_end_issues, low_end_recs = self._audit_low_end_control(tracks, telemetry)
         s_spectral, spectral_issues, spectral_recs = self._audit_spectral_balance(tracks, telemetry)
-        # Stem separation reads fader levels from the session snapshot, not a meter, so it always scores.
+        # Stem separation is never scored: its only checks guess from track names and fader positions, and they
+        # are advice-only now, so a score here would be 6 points nobody could lose.
         s_unmasking, unmasking_issues, unmasking_recs = self._audit_stem_separation(tracks, telemetry)
         s_stereo, stereo_issues, stereo_recs = self._audit_stereo_imaging(tracks, telemetry)
 
@@ -468,8 +469,7 @@ class MixDoctor:
         tracks: List[Dict[str, Any]],
         telemetry: Dict[str, Optional[float]],
     ) -> Tuple[Optional[float], List[MixIssue], List[Dict[str, Any]]]:
-        """Audit Pairwise Stem Separation & Collisions (Max 20 pts)."""
-        score = 20.0
+        """Flag likely stem collisions from names and faders. Advice only: always returns an unscored (None) dimension."""
         issues: List[MixIssue] = []
         recs: List[Dict[str, Any]] = []
 
@@ -526,7 +526,9 @@ class MixDoctor:
                     message=f"Midrange competition between '{vocal_track.get('name')}' and '{mid_track.get('name')}'. Consider a subtle 1-2 kHz pocket.",
                 ))
 
-        return max(0.0, score), issues, recs
+        # None, not full marks: nothing above can cost points, and a dimension that cannot lose would hand out its 6
+        # points for free. Measured masking (core/stem_unmasking.py) can score this dimension once it is wired in.
+        return None, issues, recs
 
     def _audit_stereo_imaging(
         self,

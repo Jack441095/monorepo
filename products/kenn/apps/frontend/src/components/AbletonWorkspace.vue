@@ -639,17 +639,29 @@
           </div>
           <div class="mix-lab__card-body">
             <div class="mix-lab__card-main">
-              <div class="mix-lab__score">
-                <strong>{{ metrics?.technical_score ?? '—' }}</strong>
-                <span>/ 100</span>
+              <div v-if="review?.grade" class="mix-lab__score">
+                <strong>{{ review.grade.points }}</strong>
+                <span>
+                  {{ t('mixReview.gradeOutOf', { available: review.grade.points_available, total: review.grade.full_marks }) }}
+                </span>
               </div>
+              <div v-else class="mix-lab__score">
+                <strong>—</strong>
+                <span>{{ t('mixReview.gradeNone') }}</span>
+              </div>
+              <ul v-if="review?.grade?.parts.length" class="mix-lab__grade-parts">
+                <li v-for="part in review.grade.parts" :key="part.part">
+                  <span>{{ t(`mixReview.gradePart.${part.part}`) }}</span>
+                  <span>{{ part.points }} / {{ part.points_available }}</span>
+                </li>
+              </ul>
               <div v-if="review?.comparison" class="mix-lab__delta">
                 <h5>{{ t('mixReview.referenceComparison') }}</h5>
                 <MixReviewBandChart :bands="review.comparison.band_delta || {}" mode="raw" />
               </div>
             </div>
             <div class="mix-lab__card-foot">
-              <div v-if="metrics?.technical_rating" class="mix-lab__rating">{{ metrics.technical_rating }}</div>
+              <p v-if="review?.grade?.meaning" class="mix-lab__grade-meaning">{{ review.grade.meaning }}</p>
               <p v-if="review?.comparison">
                 {{
                   t('mixReview.comparisonDelta', {
@@ -1964,14 +1976,19 @@ onBeforeUnmount(() => {
     }
   }
 
-  &__rating {
-    display: inline-block;
-    padding: 0.04rem 0.1rem;
-    border-radius: 0.06rem;
-    background: rgba(50, 209, 143, 0.16);
-    color: var(--mr-ok);
-    font-size: 0.13rem;
-    font-weight: 600;
+  // Plain list, no colour coding: a green or red badge would read as a verdict, and the grade has none.
+  &__grade-parts {
+    list-style: none;
+    margin: 0.08rem 0 0;
+    padding: 0;
+    font-size: 0.12rem;
+    color: var(--muted-text);
+    li {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.08rem;
+      padding: 0.02rem 0;
+    }
   }
 
   &__delta {

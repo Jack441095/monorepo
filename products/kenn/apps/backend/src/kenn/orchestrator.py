@@ -1144,6 +1144,21 @@ def _dispatch_surgical_masking(**kwargs: Any) -> Dict[str, Any]:
     metrics = prop.get("predicted_metrics", {})
     steps = prop.get("steps", [])
 
+    # An empty recipe has nothing to confirm. Without this we still handed out a token and an "Apply" button for a
+    # change set of zero moves (seen in the browser on 14 Oct). We return no proposal at all so no client can offer it.
+    if not steps:
+        return {
+            "agent": "surgical_masking_doctor",
+            "status": "completed",
+            "message": (
+                "🩺 **KENN Surgical Masking & Acoustic Doctor**\n\n"
+                f"{res.get('audit_summary', '')}\n\n"
+                "I found nothing here that I can fix with a fader, pan or EQ move, so there is no recipe to confirm "
+                "and nothing has changed."
+            ),
+            "requires_confirmation": False,
+        }
+
     step_lines = []
     for i, s in enumerate(steps[:5], 1):
         act = s.get("action")
@@ -1151,16 +1166,26 @@ def _dispatch_surgical_masking(**kwargs: Any) -> Dict[str, Any]:
         reason = s.get("reason", "")
         step_lines.append(f"  {i}. **{act}** on `{tgt}`: {reason}")
 
+    # These come from per-move rules of thumb in SessionDoctor, not from a re-measurement, so we call them estimates
+    # and skip any that are zero rather than print "+0.00 alignment" for a fix that never touches that axis.
+    estimates = []
+    if metrics.get("masking_reduction_percent"):
+        estimates.append(f"• **Masking Clashes Resolved**: about {metrics['masking_reduction_percent']}% less psychoacoustic competition")
+    if metrics.get("headroom_reclaimed_db"):
+        estimates.append(f"• **Dynamic Headroom Reclaimed**: about {metrics['headroom_reclaimed_db']} dB for summing")
+    if metrics.get("mono_correlation_delta"):
+        estimates.append(f"• **Mono Phase Correlation**: about +{metrics['mono_correlation_delta']:.2f} alignment")
+    estimate_block = (
+        "✦ **Estimated Improvements** (rules of thumb, not re-measured):\n" + "\n".join(estimates) + "\n\n"
+    ) if estimates else ""
+
     msg = (
         f"🩺 **KENN Closed-Loop Surgical Masking & Acoustic Doctor**\n\n"
         f"{res.get('audit_summary', '')}\n\n"
-        f"✦ **Predicted Acoustic Improvements**:\n"
-        f"• **Masking Clashes Resolved**: -{metrics.get('masking_reduction_percent', 0.0)}% psychoacoustic competition\n"
-        f"• **Dynamic Headroom Reclaimed**: +{metrics.get('headroom_reclaimed_db', 0.0)} dB for summing\n"
-        f"• **Mono Phase Correlation**: +{metrics.get('mono_correlation_delta', 0.0):.2f} alignment\n\n"
-        f"✦ **Proposed Surgical Recipe** ({len(steps)} actions):\n"
+        + estimate_block
+        + f"✦ **Proposed Surgical Recipe** ({len(steps)} actions):\n"
         + "\n".join(step_lines) + "\n\n"
-        f"🛡️ Confirmation token issued (`{token}`). All changes strictly $\\le \\pm 3.0\\text{{ dB}}$, master fader protected.\n"
+        f"🛡️ Confirmation token issued (`{token}`). All changes within ±3 dB, master fader protected.\n"
         f"Confirm to apply atomically with 1-click rollback."
     )
 

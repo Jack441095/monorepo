@@ -2,6 +2,7 @@
 
 from kenn.core.declared_target import score_declared_target
 from kenn.core.grade import combine_grade, grade_session, stated_target_from_text
+from kenn.core.local_mix_review_service import _grade_from_report
 from kenn.core.mix_doctor import MixDoctor
 
 
@@ -15,8 +16,8 @@ def test_without_a_reference_the_grade_is_out_of_sixty_and_says_so():
     declared = score_declared_target(-14.0, -1.5, target="spotify")
     grade = combine_grade(technical=_technical(), declared_target=declared)
 
-    assert grade["points_available"] == 60.0 and grade["full_marks"] == 100.0
-    assert grade["points"] <= 60.0  # never rescaled up toward 100
+    assert grade["points_available"] == 54.0 and grade["full_marks"] == 100.0  # 24 technical (no stem score) + 30 target
+    assert grade["points"] <= 54.0  # never rescaled up toward 100
     assert [u["part"] for u in grade["ungraded"]] == ["reference_match"]
     assert "not graded: reference match (no reference track supplied)" in grade["meaning"]
 
@@ -38,7 +39,7 @@ def test_the_parts_add_up_and_the_same_inputs_give_the_same_grade():
     second = combine_grade(technical=_technical(), declared_target=declared, reference_match=reference)
 
     assert first["points"] == round(sum(p["points"] for p in first["parts"]), 1)
-    assert first["points_available"] == 30.0 + 30.0 + 35.0  # the reference part had 5 of its 40 left out
+    assert first["points_available"] == 24.0 + 30.0 + 35.0  # stem separation is unscored; the reference part had 5 of 40 left out
     assert first == second
     assert first["parts"][2]["left_out"] == ["stereo_width"]
     assert first["ungraded"] == []
@@ -65,3 +66,27 @@ def test_a_session_grade_scores_the_default_ceiling_when_no_target_was_given():
     assert declared["points_available"] == 10.0  # the ceiling part only; loudness had no target to score against
     assert declared["points"] == 10.0
     assert [u["part"] for u in grade["ungraded"]] == ["reference_match"]
+
+
+def _file_report(layout):
+    return {
+        "metrics": {"integrated_lufs": -18.7, "true_peak_dbtp": -0.64, "crest_factor_db": 14.0,
+                    "correlation_timeline": {"correlation": [1.0]}},
+        "input_context": {"channel_layout": layout},
+    }
+
+
+def test_an_uploaded_file_is_graded_only_on_what_the_analyser_measured():
+    grade = _grade_from_report(_file_report("stereo"))
+    technical = next(p for p in grade["parts"] if p["part"] == "technical_health")
+
+    # Dynamics and stereo image had readings (6 each). Low end, spectral balance and stem separation did not.
+    assert technical["points_available"] == 12.0
+    assert [u["part"] for u in grade["ungraded"]] == ["reference_match"]
+
+
+def test_a_mono_files_placeholder_correlation_is_not_read_as_a_perfect_stereo_image():
+    # The engine fills a mono file's timeline with 1.0; scoring it would give the stereo dimension free points.
+    technical = next(p for p in _grade_from_report(_file_report("mono"))["parts"] if p["part"] == "technical_health")
+
+    assert technical["points_available"] == 6.0

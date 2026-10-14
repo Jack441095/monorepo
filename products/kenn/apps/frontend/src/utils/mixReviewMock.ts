@@ -38,9 +38,8 @@ const MOCK_COPY = {
   'zh-CN': {
     defaultTitle: '午夜混音',
     summary:
-      '整体扎实，需留意（82/100）。中频清晰；注意临场感/齿音附近的能量堆积。此为 UI 测试用模拟数据。',
+      '中频清晰；注意临场感/齿音附近的能量堆积。此为 UI 测试用模拟数据。',
     perceptualDescription: '感知焦点集中在中频（模拟）。',
-    rating: '扎实，需检查',
     flags: [
       {
         severity: 'high' as const,
@@ -68,9 +67,8 @@ const MOCK_COPY = {
   'en-US': {
     defaultTitle: 'Midnight Session',
     summary:
-      'Solid with checks (82/100). Mid-range is clear; watch energy build-up around presence/sibilance. Mock data for UI testing.',
+      'Mid-range is clear; watch energy build-up around presence/sibilance. Mock data for UI testing.',
     perceptualDescription: 'Perceived focus around mids (mock).',
-    rating: 'Solid with checks',
     flags: [
       {
         severity: 'high' as const,
@@ -161,8 +159,18 @@ export function createMockMixReview(title?: string, locale: LocaleCode = 'en-US'
         ],
         vectorscope_points,
       },
-      technical_score: 82,
-      technical_rating: copy.rating,
+    },
+    // Demo numbers in the shape core/grade.py returns: no reference track, so the third part is not graded.
+    grade: {
+      points: 17.5,
+      points_available: 22,
+      full_marks: 100,
+      meaning: '17.5 of 22 points available, out of a possible 100; not graded: reference match (no reference track supplied).',
+      parts: [
+        { part: 'technical_health' as const, points: 7.5, points_available: 12, full_marks: 30, left_out: [] },
+        { part: 'declared_target' as const, points: 10, points_available: 10, full_marks: 30, left_out: [] },
+      ],
+      ungraded: [{ part: 'reference_match', reason: 'no reference track supplied' }],
     },
     flags: copy.flags.map((f) => ({ ...f })),
     advice: [...copy.advice],

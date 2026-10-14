@@ -112,7 +112,7 @@ def grade_session(
 
     `request` is whatever the producer typed; any target they named or stated in it is scored, otherwise only the
     default ceiling is. `reference_match` stays None until a reference track is supplied (the scorer lives in the
-    mix-review package, which the backend does not import), so today the grade reads out of 60 at most.
+    mix-review package, which the backend does not import), so today the grade reads out of 54 at most.
     """
     meters = meters or {}
     declared = score_declared_target(
