@@ -193,26 +193,9 @@ def _chat_wants_live(question: str) -> bool:
 _RETURNS_CACHE: tuple[float, list] | None = None
 
 
-def _cached_ableton_health() -> dict[str, Any]:
-    """Return a non-blocking Ableton subsystem summary for ``/api/health``.
-
-    Health is a liveness endpoint for the KENN process itself.  It must not
-    synchronously compete with the Mixing Doctor or a command request for the
-    shared AbletonOSC exchange lock: doing so can make a healthy HTTP server
-    appear dead whenever Live is offline or slow.  The background auditor owns
-    the periodic OSC poll; health reports its latest bounded cache instead.
-    ``unknown`` is honest before that first poll has completed.
-    """
-    try:
-        from kenn.mixing_doctor import get_latest_session_state
-
-        snapshot = get_latest_session_state()
-        status = str(snapshot.get("status") or "unknown") if isinstance(snapshot, dict) else "unknown"
-        if status not in {"connected", "offline", "dispatched", "unknown"}:
-            status = "unknown"
-        return {"status": status, "connected": status == "connected"}
-    except Exception as exc:
-        return {"status": "error", "connected": False, "error": str(exc)[:256]}
+# Health reporting lives in kenn.core.live_health so server.py stays a thin
+# dispatcher; the name below is a compat alias for the /api/health handler.
+from kenn.core.live_health import cached_ableton_health as _cached_ableton_health
 
 
 _PENDING_PROPOSALS: dict[str, dict] = {}
