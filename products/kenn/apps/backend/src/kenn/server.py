@@ -931,7 +931,12 @@ class Handler(BaseHTTPRequestHandler):
                 meters = get_telemetry_manager().get_latest()
                 m_dict = meters.to_dict() if meters else None
                 report = get_mix_doctor().audit_session(snap, meters=m_dict)
-            self.send_json(200, {"ok": True, "scorecard": report.to_dict()})
+            from kenn.audio_telemetry import get_telemetry_manager
+            from kenn.core.grade import grade_session
+            latest_meters = get_telemetry_manager().get_latest()
+            scorecard = report.to_dict()
+            scorecard["grade"] = grade_session(scorecard, latest_meters.to_dict() if latest_meters else None)
+            self.send_json(200, {"ok": True, "scorecard": scorecard})
             return
         if parsed.path == "/api/guardian/events":
             from kenn.core.ambient_guardian import get_ambient_guardian

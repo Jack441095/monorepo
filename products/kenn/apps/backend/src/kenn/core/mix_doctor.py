@@ -29,7 +29,8 @@ class MixIssue:
     track_name: Optional[str] = None
     remediation_proposal: Optional[Dict[str, Any]] = None
     # What this finding cost, in points of the final technical-health score, and where its threshold comes from.
-    # An advisory that costs nothing leaves both at their defaults.
+    # Advice-only findings (name and fader guesses) cost 0 but still name their source, so a reader can see
+    # why they carry no points.
     points_lost: float = 0.0
     source: str = ""
     # How much weight the source can bear, set from `source` in audit_session; see TIER_LEGEND.
@@ -286,13 +287,12 @@ class MixDoctor:
             # No fader reading means no verdict on this track. The old 0.85 default also fed the kick/bass and
             # vocal/synth collision checks, so a snapshot without volumes could be docked for collisions.
             if vol is not None and vol > 1.0:
-                cost = 4.0
-                score -= cost
+                # Advice only, no points: a fader above unity is a gain choice, and without a meter on that
+                # track we cannot say it clips (summing headroom is what the master true-peak reading judges).
                 excess_db = 20.0 * math.log10(vol) if vol > 0 else 0.0
                 issues.append(MixIssue(
-                    points_lost=cost,
                     source=HOUSE_RULE,
-                    severity="WARNING",
+                    severity="ADVISORY",
                     category="dynamic",
                     track_index=idx,
                     track_name=name,
@@ -368,10 +368,9 @@ class MixDoctor:
             has_eq = any("eq" in d or "filter" in d for d in devices)
 
             if is_non_bass and not has_eq:
-                cost = 1.5
-                score -= cost
+                # Advice only, no points: the verdict rests on a track name and a device name, and plenty of
+                # tracks (a pad, a sub-heavy FX hit) are meant to carry low end. The low-end meter judges it.
                 issues.append(MixIssue(
-                    points_lost=cost,
                     source=HOUSE_RULE,
                     severity="ADVISORY",
                     category="low_end",
@@ -482,12 +481,11 @@ class MixDoctor:
             kick_vol = _number(kick_track.get("volume"))
             bass_vol = _number(bass_track.get("volume"))
             if kick_vol is not None and bass_vol is not None and kick_vol > 0.80 and bass_vol > 0.80:
-                cost = 4.0
-                score -= cost
+                # Advice only, no points: two high faders say nothing about whether the kick and bass collide,
+                # since the faders ignore each track's own level, EQ and sidechain. Names pick the tracks too.
                 issues.append(MixIssue(
-                    points_lost=cost,
                     source=HOUSE_RULE,
-                    severity="WARNING",
+                    severity="ADVISORY",
                     category="unmasking",
                     track_name=f"{kick_track.get('name')} & {bass_track.get('name')}",
                     message=f"Potential sub collision between '{kick_track.get('name')}' and '{bass_track.get('name')}'. Both have high fader levels.",
@@ -519,10 +517,8 @@ class MixDoctor:
             v_vol = _number(vocal_track.get("volume"))
             m_vol = _number(mid_track.get("volume"))
             if v_vol is not None and m_vol is not None and v_vol > 0.80 and m_vol > 0.80:
-                cost = 3.0
-                score -= cost
+                # Advice only, no points, for the same reason as the kick/bass check above.
                 issues.append(MixIssue(
-                    points_lost=cost,
                     source=HOUSE_RULE,
                     severity="ADVISORY",
                     category="unmasking",
@@ -588,12 +584,11 @@ class MixDoctor:
             pan = float(t.get("panning", t.get("pan", 0.0)))
             idx = int(t.get("index", 0))
             if any(em in name for em in essential_mono) and abs(pan) > 0.4:
-                cost = 3.0
-                score -= cost
+                # Advice only, no points: a hard-panned bass or vocal is sometimes the idea (double-tracked
+                # parts, a wide sub layer), and we only know the track from its name.
                 issues.append(MixIssue(
-                    points_lost=cost,
                     source=HOUSE_RULE,
-                    severity="WARNING",
+                    severity="ADVISORY",
                     category="stereo",
                     track_index=idx,
                     track_name=t.get("name"),

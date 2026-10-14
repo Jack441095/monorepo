@@ -95,7 +95,11 @@ def test_mix_doctor_detects_clipping_and_boxiness():
 
     report = doctor.audit_session(session, meters=meters)
 
-    assert report.mqm_score < 22.5
+    # Only the meters cost points now: true peak, squashed crest, and low-mid mud. The fader above unity at 1.25
+    # is still reported, but as advice with no points attached (it used to cost 4 of 20 working points).
+    assert report.mqm_score < 26.0
+    fader = next(i for i in report.all_issues if "above unity" in i.message)
+    assert fader.severity == "ADVISORY" and fader.points_lost == 0.0
     assert report.dimension_scores["dynamic_health"] <= 3.0
     assert report.dimension_scores["spectral_balance"] <= 4.5
 

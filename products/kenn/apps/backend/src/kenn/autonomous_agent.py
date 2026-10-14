@@ -1254,16 +1254,20 @@ class KennAutonomousAgent:
         # -------------------------------------------------------------
         if any(w in objective.lower() for w in ["audit", "mix doctor", "mqm", "mix quality", "scorecard", "check session"]):
             from kenn.core.mix_doctor import get_mix_doctor
+            from kenn.core.grade import grade_session
             mix_report = get_mix_doctor().audit_session(snap, meters=telemetry.to_dict() if telemetry else None)
+            # The request text is where a producer says "for Spotify" or "-14 LUFS"; that is what the target part scores.
+            grade = grade_session(mix_report.to_dict(), telemetry.to_dict() if telemetry else None, objective)
             trajectory.append({
                 "iteration": 1.8,
                 "phase": "mix_doctor_audit",
                 "thought": f"Ran Full-Session Mix Doctor. {mix_report.meaning[0].upper()}{mix_report.meaning[1:]} Found {len(mix_report.critical_issues)} critical issues.",
                 "action": "audit_full_session",
-                "observation": mix_report.to_dict(),
+                "observation": {**mix_report.to_dict(), "grade": grade},
                 "reflection": "Incorporating Mix Doctor remediation DAG into surgical recipe.",
             })
             advice_lines.append(f"• **Mix Doctor**: {mix_report.meaning} {len(mix_report.critical_issues)} critical issues detected.")
+            advice_lines.append(f"• **Grade**: {grade['meaning']}")
             if mix_report.remediation_dag:
                 for r in mix_report.remediation_dag:
                     if not any(existing.get("action") == r.get("action") and existing.get("track") == r.get("track") for existing in steps):

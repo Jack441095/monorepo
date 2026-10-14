@@ -708,6 +708,11 @@ def _live_context_summary(session_id: str) -> dict[str, Any] | None:
                 "meaning": report.meaning,
                 "critical_issues": len(report.critical_issues),
             }
+            # The plug-in has no request text, so only the default -1 dBTP ceiling is scored for the target part.
+            from kenn.audio_telemetry import get_telemetry_manager
+            from kenn.core.grade import grade_session
+            latest = get_telemetry_manager().get_latest()
+            result["grade"] = grade_session(report.to_dict(), latest.to_dict() if latest else None)
     except Exception:
         pass
     return result

@@ -8,7 +8,10 @@ of the 100 it was judged against, and what was left out.
 
 from __future__ import annotations
 
+import re
 from typing import Any, Optional
+
+from kenn.core.declared_target import score_declared_target
 
 # The 30/30/40 split was decided with the owner on 14 Oct 2026 (docs/research/e2_grade_proposal_2026-10-14.md).
 FULL_MARKS: dict[str, float] = {"technical_health": 30.0, "declared_target": 30.0, "reference_match": 40.0}
@@ -70,3 +73,49 @@ def combine_grade(
         "parts": parts,
         "ungraded": ungraded,
     }
+
+
+# Loudness and ceiling are always negative in practice, so we only accept a figure with its minus sign. That keeps
+# "give me 2 dBTP of headroom" or "a 3 LUFS boost" from being read as a stated target.
+_STATED_LUFS = re.compile(r"(?<![\w.])(-\s?\d{1,2}(?:\.\d+)?)\s*lufs", re.IGNORECASE)
+_STATED_CEILING = re.compile(r"(?<![\w.])(-\s?\d{1,2}(?:\.\d+)?)\s*dbtp", re.IGNORECASE)
+
+
+def stated_target_from_text(text: str) -> dict[str, Any]:
+    """Read the target a producer named or stated in plain words; returns kwargs for `score_declared_target`.
+
+    Only Spotify and the AES figure are named targets (see STREAMING_TARGETS). An unnamed target with no figures
+    gives {}, which scores the default -1 dBTP ceiling and leaves loudness ungraded.
+    """
+    lowered = (text or "").lower()
+    found: dict[str, Any] = {}
+    if "spotify" in lowered:
+        found["target"] = "spotify"
+    elif re.search(r"\baes\b", lowered):
+        found["target"] = "aes_streaming_music"
+    loudness = _STATED_LUFS.search(text or "")
+    if loudness:
+        found["stated_lufs"] = float(loudness.group(1).replace(" ", ""))
+    ceiling = _STATED_CEILING.search(text or "")
+    if ceiling:
+        found["stated_ceiling_dbtp"] = float(ceiling.group(1).replace(" ", ""))
+    return found
+
+
+def grade_session(
+    technical: dict[str, Any],
+    meters: Optional[dict[str, Any]] = None,
+    request: str = "",
+    reference_match: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    """The combined grade for one audit: `technical` is `MixAuditReport.to_dict()`, `meters` a telemetry frame dict.
+
+    `request` is whatever the producer typed; any target they named or stated in it is scored, otherwise only the
+    default ceiling is. `reference_match` stays None until a reference track is supplied (the scorer lives in the
+    mix-review package, which the backend does not import), so today the grade reads out of 60 at most.
+    """
+    meters = meters or {}
+    declared = score_declared_target(
+        meters.get("integrated_lufs"), meters.get("true_peak_dbtp"), **stated_target_from_text(request)
+    )
+    return combine_grade(technical=technical, declared_target=declared, reference_match=reference_match)

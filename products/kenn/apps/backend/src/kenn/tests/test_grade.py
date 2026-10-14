@@ -1,7 +1,7 @@
 """The combined E2 grade: parts add up, and what was not graded is named instead of rescaled."""
 
 from kenn.core.declared_target import score_declared_target
-from kenn.core.grade import combine_grade
+from kenn.core.grade import combine_grade, grade_session, stated_target_from_text
 from kenn.core.mix_doctor import MixDoctor
 
 
@@ -42,3 +42,26 @@ def test_the_parts_add_up_and_the_same_inputs_give_the_same_grade():
     assert first == second
     assert first["parts"][2]["left_out"] == ["stereo_width"]
     assert first["ungraded"] == []
+
+
+def test_a_target_the_producer_names_or_states_is_read_from_their_words():
+    assert stated_target_from_text("audit this for Spotify") == {"target": "spotify"}
+    assert stated_target_from_text("I'm aiming for -9.5 LUFS with a -0.5 dBTP ceiling") == {
+        "stated_lufs": -9.5, "stated_ceiling_dbtp": -0.5,
+    }
+    assert stated_target_from_text("check the mix") == {}
+
+
+def test_an_unsigned_figure_is_not_taken_as_a_stated_target():
+    # "2 dBTP of headroom" and "a 3 LUFS boost" are not targets; both are negative in a real target.
+    assert stated_target_from_text("leave 2 dBTP of headroom and give it a 3 LUFS boost") == {}
+
+
+def test_a_session_grade_scores_the_default_ceiling_when_no_target_was_given():
+    meters = {"integrated_lufs": -9.0, "true_peak_dbtp": -2.0}
+    grade = grade_session(_technical(), meters, "check session")
+    declared = next(p for p in grade["parts"] if p["part"] == "declared_target")
+
+    assert declared["points_available"] == 10.0  # the ceiling part only; loudness had no target to score against
+    assert declared["points"] == 10.0
+    assert [u["part"] for u in grade["ungraded"]] == ["reference_match"]
