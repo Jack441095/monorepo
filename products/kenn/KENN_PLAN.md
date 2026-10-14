@@ -1,21 +1,22 @@
 # KENN plan
 
-Updated 14 October 2026. This is KENN's sole product roadmap, architecture direction,
-work queue and progress checklist. Start here, then read the named source, tests and
-evidence for the task. `AGENTS.md` governs repository work. Dated reports describe
-their recorded commit and environment; they do not authorize work or prove today's
-build. Component specifications and runbooks explain contracts and procedures.
+Updated 14 October 2026. This is the one KENN roadmap: product direction, architecture,
+the work queue and the progress checklist. Start here, then read the source, tests and
+evidence for whatever task you pick up. `AGENTS.md` covers how we work in the repo.
+Dated reports describe the commit and machine they were run on. They don't authorize
+work and they don't prove today's build. Specs and runbooks explain contracts and
+procedures.
 
-The previous North Star, mega plan, beta plans, trackers and execution prompts are
-retired. Their history remains in Git; the consolidation record is
+The old North Star, mega plan, beta plans, trackers and execution prompts are retired.
+Their history is in Git, and the consolidation record is
 [the planning audit](docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md).
-Update this file instead of creating another roadmap, handoff prompt or progress log.
+Update this file rather than starting another roadmap, handoff prompt or progress log.
 
 The [2 October product and open-source research](docs/research/KENN_PRODUCT_AND_OPEN_SOURCE_RESEARCH_2026-10-02.md)
-informs C1–C2, L2–L3 and B1–B4 below. Its three experiment protocols supply candidate
-methods for local delivery, passage reranking and audio measurements; their proposed
-thresholds do not replace this plan's acceptance targets. Product references inform
-interface choices; new dependencies and model assets still require approval.
+feeds C1-C2, L2-L3 and B1-B4 below. Its three experiment protocols are candidate
+methods for local delivery, passage reranking and audio measurements. The thresholds
+they propose don't replace this plan's acceptance targets. Other products inform
+interface choices, but any new dependency or model asset still needs approval.
 
 ## Purpose and decisions
 
@@ -32,8 +33,8 @@ product requirement: unsupported measurements, sources and claims must be reject
 Decisions already made:
 
 - Current baseline: local Qwen3 4B chat (`qwen3:4b-instruct-2507-q4_K_M`) and Qwen3 4B planner.
-  Jack confirmed the current 4B chat choice on 13 October 2026; this supersedes the
-  earlier 8B chat decision. Model choice stays open per Jack's 13 October request:
+  I confirmed the current 4B chat choice on 13 October 2026; this supersedes the
+  earlier 8B chat decision. Model choice stays open per my 13 October request:
   4B is the control, not a permanent size requirement. Compare alternatives under S4/S6
   and choose from reviewed quality, retention, M3 latency and memory measurements.
   Preserve the control's identity in the offline SEAL experiment. The local
@@ -54,7 +55,7 @@ Decisions already made:
 
 ### Standing open-source reuse check
 
-Jack requested this on 14 October 2026 for all later audio-analysis work. Before
+I requested this on 14 October 2026 for all later audio-analysis work. Before
 implementing or extending an audio measurement, check the existing KENN DSP and
 suitable open-source tools against current upstream documentation, source and
 licences. Prefer reuse when it meets KENN's requirements and saves development time.
@@ -627,7 +628,22 @@ This follow-up changes `KENN_PLAN.md`,
 `tooling/native/peak_compare/main.cpp`, `tooling/scripts/profile_peak_reuse.py`,
 and `apps/backend/src/kenn/tests/test_profile_peak_reuse.py`.
 
-Jack selected **keep the next work offline** on 13 October. Continue the streaming
+Offline delayed peak interval follow-up (14 October): **70 streaming meter checks
+passed with zero failures; all 11 native CTest targets passed (100%) in 28.34 s;
+all 128 scoped test checks across `test_profile_streaming_meter.py` and
+`test_profile_peak_reuse.py` passed.**
+`KENNStreamingMeterSnapshot` now explicitly provides `peakIntervalStartSample`
+and `peakIntervalEndSample` in input-frame coordinates, accounting for causal
+polyphase FIR upsampling delay (`interpolationDelaySamples = 5.875` input frames).
+The 100 ms peak interval is defined exactly as $[t_{\text{end}} - \text{samplesPerBin} - \text{delay},\ t_{\text{end}} - \text{delay}]$,
+resolving interval ambiguity between continuous loudness windows and delayed peak output.
+Comparative benchmarks on generated Tech 3341 cases 15–19 show that the shortlisted
+8x lower-quality FIR variants (`juce8_low` and `juce8_low_float`) reduce maximum
+underreading error from -0.313 dB (case 17) to -0.021 dB across all sample rates,
+while maintaining zero dynamic allocations in processing loops. Live streaming candidate
+remains disabled by default in production.
+
+I selected **keep the next work offline** on 13 October. Continue the streaming
 meter qualification above; the prepared supervised Live qualification remains open.
 In a disposable set, use synthetic audio and one companion at 48 kHz / 128 samples;
 close every plug-in editor. Record an analysis-disabled baseline, then five minutes each
@@ -640,7 +656,7 @@ publication cadence without measuring that contention.
 Exercise transport start/stop, seeking, loop wraps, insert removal/recreation and
 companion disconnect/reconnect. Require pass-through audio, no added plug-in
 latency, retired stale/gapped evidence, fresh recovery and no unapproved writes.
-Only during Jack's scheduled session, bind a uniquely named disposable track,
+Only during my scheduled session, bind a uniquely named disposable track,
 review one measured headroom proposal, approve it, verify readback and Undo.
 Record a failed cell and its recovery before considering release. Long synthetic
 callback tails already exceed a 2.667 ms block deadline, so a mean-time pass
@@ -764,23 +780,23 @@ to the stated implementation and evidence; they do not imply release qualificati
 The [2 October capability baseline](docs/evidence/KENN_CAPABILITY_BASELINE_2026-10-02.md)
 records implemented features, current limits and qualification boundaries.
 
-- [x] **V1 — Query embedding overhead reduced.** Same fp32 model and index, CPU ONNX
+- [x] **V1: Query embedding overhead reduced.** Same fp32 model and index, CPU ONNX
   1.14–1.15 ms p50 versus CoreML 12.43–12.72 ms in two 40-query runs; identical
   ordered top-four results on 240 questions. [Evidence](docs/evidence/KENN_QUERY_EMBEDDING_LATENCY_2026-10-02.md).
-- [x] **V2 — Displayed track choices retain the unfinished request.** Exactly two
+- [x] **V2: Displayed track choices retain the unfinished request.** Exactly two
   fresh choices support “the other one” after selecting one, including after Apply.
   The 300 s window, identity checks, ambiguous model refusal and session isolation
   have 20 tests and seven caught mutations. [Evidence](docs/evidence/KENN_TRACK_CHOICES_2026-10-02.md).
-- [x] **V3 — Query-echo sections filtered before candidate limits.** Implemented in
+- [x] **V3: Query-echo sections filtered before candidate limits.** Implemented in
   `f0ebeba6`; regression tests cover Related-questions chunks. This does not certify
   an index rebuild or a new retrieval-quality result.
-- [x] **V4 — Preference history and restore implemented.** Existing API/service and
+- [x] **V4: Preference history and restore implemented.** Existing API/service and
   tests cover superseded values, transactional restore and session boundaries.
   Human UI qualification remains open.
-- [x] **V5 — Source excerpt boundary fixes implemented.** Existing
+- [x] **V5: Source excerpt boundary fixes implemented.** Existing
   `test_source_excerpt_boundaries.py` covers word, fence and tag truncation. Retired
   unchecked boxes for this fix and preference history were stale.
-- [x] **V6 — Existing monthly reporting and release qualifier identified.** Preserve
+- [x] **V6: Existing monthly reporting and release qualifier identified.** Preserve
   their measurements and gate semantics; update their document paths during cleanup.
 
 The last full backend run at V2: **3,109 passed, 12 skipped, one known failure** in
@@ -806,11 +822,11 @@ mock, an agent reviewer or an unrelated receipt.
 
 ### 1. Consolidate planning and audit architecture
 
-- [x] **A1 — Consolidate navigation.** Retired 45 competing or superseded files,
+- [x] **A1: Consolidate navigation.** Retired 45 competing or superseded files,
   preserved evidence and recovery procedures, repaired active references and release
   artifact checks. 57 introduced local links resolve; 64 scoped tests pass and both
   missing-document checks fail as required. [Audit and exact files](docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md).
-- [x] **A2 — Trace every request and write route.** Inventory UI/HTTP/stream/background/
+- [x] **A2: Trace every request and write route.** Inventory UI/HTTP/stream/background/
   voice/MCP entry points through routing, context, proposal, Apply, readback and Undo.
   Compare function/registry bindings, not names alone. Record each bypass or duplicate
   owner with a source symbol and reproducible fixture. Finish the reachability trace
@@ -821,7 +837,7 @@ mock, an agent reviewer or an unrelated receipt.
   (no concurrent-stream guard, unauthenticated local `reload-index`, a dead MCP field, caller-less
   `LiveExecutor`, track-0 fallbacks in snapshot reads, the missing `demo_feedback`) are listed
   with symbols and carried forward. [Route map](docs/evidence/KENN_A2_ROUTE_MAP_2026-10-02.md).
-- [x] **A3 — Resolve scoped delivery defects first.** Audit memory/cache isolation,
+- [x] **A3: Resolve scoped delivery defects first.** Audit memory/cache isolation,
   project switching, upgrade polling ownership, stale-turn replacement and
   cancellation; fix verified defects with cross-session and late-job tests.
   Preserve the rule against recording the question twice.
@@ -1018,7 +1034,7 @@ mock, an agent reviewer or an unrelated receipt.
     `bass-processing` ([evidence](docs/evidence/KENN_EVAL_ROWS_RELATED_QUESTION_ECHO_2026-10-02.md)).
     Closing them is a decision on the rows' expected sources or a note rewrite and index rebuild, not a
     retrieval tweak. `harsh-after-mastering` and `upgrade-buffer-recording` fail either way.
-    Jack chose to write answer text: step 7 was added to `thin-vocal-body.md` and
+    I chose to write answer text: step 7 was added to `thin-vocal-body.md` and
     `arrangement-energy-and-transitions.md` (git-ignored, text kept in the evidence). Verified on the GPU box with a
     fresh CPU build of an isolated copy: coverage goes from 125 to 128 of 128, after a third note
     (`mastering-prep-and-headroom.md`) turned out to be echo-dependent too
@@ -1026,10 +1042,10 @@ mock, an agent reviewer or an unrelated receipt.
     same six rows before and after, so this parent item stays open. The Mac's live index is not rebuilt.
     Each of the six is traced to a cause (ranking behind long transcript notes, answer built from the wrong note, or a
     corpus gap) in [the held-out rows receipt](docs/evidence/KENN_WRAPPER_HELDOUT_ROWS_FRESH_INDEX_2026-10-02.md).
-    They are held-out rows, so they are not tuned against. Jack chose on 2 Oct to re-scope: the six rows move to C5
+    They are held-out rows, so they are not tuned against. I chose on 2 Oct to re-scope: the six rows move to C5
     (below) as its known failing set, and this item is ticked with that receipt as its limit, not as a pass. For
     `harsh-after-mastering` a draft note, `harsh-after-mastering-limiting.md` (local, git-ignored, Status: Draft so it
-    is not indexed), awaits his review.
+    is not indexed), awaits my review.
   - [x] Measured what a cancelled answer does to the model slot, on the real Qwen3-4B bridge on the GPU box:
     after the client gives up at 2 s the generation runs on and the slot stays busy another 45.5 s (a 58 s
     generation), refusing 30 retries with 429; an idle short request takes about 1.2 s. KENN's cancel still
@@ -1050,7 +1066,7 @@ mock, an agent reviewer or an unrelated receipt.
     `studio/kenn/kenn/...` callers expect. Of the 27 test files that use it, passes went from 22 to 126;
     the Audio_Too suite still does not run green here and no image or CI run was done.
     [Evidence](docs/evidence/KENN_AUDIO_TOO_SYMLINK_RETARGET_2026-10-02.md).
-- [x] **A4 — Replace unconditional status claims with observed status.** Audit
+- [x] **A4: Replace unconditional status claims with observed status.** Audit
   `chat_answer._short_circuit_evaluator`, including its MLX/OSC status text and cancel
   reply, against actual selected inference backend, connection and pending actions.
   Transport branches propose through the action service; trace their validation path
@@ -1072,7 +1088,7 @@ mock, an agent reviewer or an unrelated receipt.
     cases, the old sentence fails two, full backend run is 3,524 passed, 12 skipped. This
     closes the `_short_circuit_evaluator` audit (status, cancel, transport).
     [Evidence and exact files](docs/evidence/KENN_TRANSPORT_SHORTCUT_REASONS_2026-10-02.md).
-- [x] **A5 — Establish the clean test baseline.** Scoped collection-time model policy
+- [x] **A5: Establish the clean test baseline.** Scoped collection-time model policy
   to individual tests and the offline replay CLI without changing planner assertions
   or production enablement precedence. Eight import and four CLI guards pass; seven
   mutations are caught. Full backend: 3,171 passed, 12 optional-dependency skips,
@@ -1119,12 +1135,12 @@ Scope correction, 3 Oct: Thursday is a separate
 product; its compatibility fallback is removed from KENN's work queue.
 [Remaining source trace](docs/evidence/KENN_A2_REMAINING_OWNER_AUDIT_2026-10-03.md).
 
-At Jack's request, a [Claude Cloud handoff](docs/evidence/KENN_CLAUDE_CLOUD_HANDOFF_2026-10-03.md)
-is prepared for work while his Mac is off. It summarizes this queue and existing
+At my request, a [Claude Cloud handoff](docs/evidence/KENN_CLAUDE_CLOUD_HANDOFF_2026-10-03.md)
+is prepared for work while my Mac is off. It summarizes this queue and existing
 evidence; it does not start a cloud task or replace this plan. Refresh it when
-Jack asks to hand over. Cloud fake-Live checks cannot qualify the local delivery gate.
+I ask to hand over. Cloud fake-Live checks cannot qualify the local delivery gate.
 
-Sharing request, 3 Oct: Jack approved a one-way, matching-branch `kenn-app`
+Sharing request, 3 Oct: I approved a one-way, matching-branch `kenn-app`
 mirror, its GitHub workflow and repository-scoped write credential. He also
 requested Mac catch-up for pushed cloud work: fetch at login and every five
 minutes while awake; fast-forward only a clean checked-out branch. Dirty files
@@ -1138,7 +1154,7 @@ by setup. Local runtime engineering remains paused; C1/C2/C3 remain unticked.
 
 Needs the route/context audit; fixes may land in small slices while that audit continues.
 
-Decisions, 13 Oct, made under Jack's delegation ("go with the best way of doing it, your choice"). These settle
+Decisions, 13 Oct, made under my delegation ("go with the best way of doing it, your choice"). These settle
 what to do; they do not supply owner grades, and each still runs only when its own gate is met.
 
 - **Reranker (C5, abstentions):** build it as a trial that is off by default. It is served only if it clears the
@@ -1148,7 +1164,7 @@ what to do; they do not supply owner grades, and each still runs only when its o
   added: the spike's own config named L-12 while the fetched repo path was L-6.
 - **Note-served answers do not count as model answers** for the 15 s / 70% gate. If notes are served they get their
   own delivery class, reported beside model answers the way abstentions are; C5 forbids relabelling a missed
-  target as passed. Whether to serve them at all still waits on Jack grading the ~40-question pack.
+  target as passed. Whether to serve them at all still waits on me grading the ~40-question pack.
 - **MLX and speculative decoding: parked.** The speed item was opened because v4 had 8 late answers; v7 (11 Oct,
   Live open, mains) had 0 model answers over 15 s and a 6 s median in all six runs. Speed is not what keeps the
   gate open now; owner-graded correctness is. Reopen only if the C1 receipts or a later bench show late answers
@@ -1156,14 +1172,14 @@ what to do; they do not supply owner grades, and each still runs only when its o
   with held-out quality unchanged. Compare a change of model separately from a change of runtime.
 - **Reference-numbers and precedence-effect notes: held, then done together.** The 11 Oct check found the reference
   figures already indexed and the misses to be retrieval, and any rebuild makes the next bench incomparable with
-  v7 while its grading is pending. After Jack grades v7, write both notes from cited sources, check each figure
+  v7 while its grading is pending. After I grade v7, write both notes from cited sources, check each figure
   against its source, and rebuild once on a GPU box per L2, never on the Mac.
 - **Cool-down between runs: none fixed.** v7 ran six back to back without slowing; v4's 29 to 20 tok/s fall did not
   recur. Instead the C1 session prints each run's median decode rate so throttling shows up, rather than a pause
   whose length nobody measured.
 - **128-token cap:** keep it until the C1 receipts are in, then compare truncation and timely acceptance against the
   384-token ceiling on the same 30 questions before changing it.
-- **Scope, 13 Oct (Jack): KENN is a music-production and audio-engineering specialist,** so third-party plug-ins are in
+- **Scope, 13 Oct (me): KENN is a music-production and audio-engineering specialist,** so third-party plug-ins are in
   scope, under the existing rule of real control names from the maker's documentation and no invented controls.
   First draft: a FabFilter Pro-Q 3 de-essing note from FabFilter's manual, delivered with the precedence-effect note.
   The local order for the knowledge work (measure the retrieval draft, grade v7, review notes, one GPU-box rebuild,
@@ -1171,15 +1187,15 @@ what to do; they do not supply owner grades, and each still runs only when its o
 
 Knowledge work from 13 Oct (each item's evidence is linked where it is done):
 
-- [ ] **Third-party plug-in notes** for the plug-ins Jack named: FabFilter, iZotope, Soundtoys, Kilohearts and Damage
+- [ ] **Third-party plug-in notes** for the plug-ins I named: FabFilter, iZotope, Soundtoys, Kilohearts and Damage
   (to confirm: Heavyocity's Damage for Kontakt). Each from the maker's own manual, version-checked, every claim cited,
   delivered outside git with a check sheet, and a matching "with Ableton's own devices" note where it helps.
   - [x] FabFilter Pro-Q 3 de-essing with a dynamic band, drafted 13 Oct from FabFilter's Pro-Q 3 manual pp.13-15
-    (Pro-Q 3 has no attack/release knobs; Pro-Q 4 does). With Jack for review; when it lands, decide whether the
+    (Pro-Q 3 has no attack/release knobs; Pro-Q 4 does). With me for review; when it lands, decide whether the
     `trap-third-party-plugin` probe row becomes an `answer` row.
   - [x] FabFilter Pro-DS de-essing, drafted 13 Oct from the Pro-DS manual pp.8-12 (one major version, no split).
   - [x] FabFilter Pro-C 3 styles and setup, drafted 13 Oct from the Pro-C 3 manual pp.3-15, with what Pro-C 2 lacks;
-    "Pro-C 2 has eight styles" is an inference marked for Jack.
+    "Pro-C 2 has eight styles" is an inference marked for me.
   - [x] FabFilter Pro-L 2 mastering limiter, drafted 13 Oct from the Pro-L 2 manual pp.10-13 and 24-25; one listening
     tip is marked as KENN's own advice rather than FabFilter's.
   - [x] FabFilter Saturn 2 multiband saturation (manual pp.3-4, 9-12, 27), Pro-R 2 vocal reverb (pp.7-11; the manual
@@ -1189,7 +1205,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     13 Oct. Pro-C 3's Live side-chain step now follows FabFilter's own Live instructions (Pro-C 3 manual p.42).
   - [ ] The rest of the FabFilter bundle (Volcano 3, Twin 3 and the smaller ones), then iZotope, Soundtoys,
     Kilohearts and Damage.
-- [ ] **Ableton stock devices, the same way** (Jack, 13 Oct). The 2 Oct L1a audit found a dedicated corpus note for 77 of
+- [ ] **Ableton stock devices, the same way** (me, 13 Oct). The 2 Oct L1a audit found a dedicated corpus note for 77 of
   78 stock devices, so this is gaps and accuracy, not rewriting: from Ableton's Live 12 manual, every claim cited.
   - [ ] Drum Synth, the one device with no note.
   - [ ] Devices added in Live 12 updates that the 78-device list does not include (Granulator III is one), checked
@@ -1208,13 +1224,13 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     acceptances (33 vs 32 within 15 s). On 8 calculator questions the branch was accepted 6/7 against 3/7 and printed
     352 ms, 5.8 ms, 440 Hz and 500 ms correctly. Two gaps: "What is -3 dB as a gain factor?" is answered by the
     which-track clarification before the calculator is reached, and "MIDI note 60" gets no pitch fact.
-  - [ ] Confirm on the Mac with real Live that it labels middle C as C3 (Jack).
+  - [ ] Confirm on the Mac with real Live that it labels middle C as C3 (me).
   - [x] KENN's MIDI card names pitches in scientific pitch (middle C = C4) while Live shows C3; make the two agree.
     Done 14 Oct (`cf639a31`): the generated-clip card and the studio piano roll now use Live's numbering (MIDI 60 =
     C3); a regression test checks the card's range against the proposed notes. The calculators branch already names
     both conventions. Seeing Live's own C3 label on the Mac stays with the item above.
 
-- [ ] **C1 — Current-path baseline.** At least 30 knowledge questions on M3/16 GB,
+- [ ] **C1: Current-path baseline.** At least 30 knowledge questions on M3/16 GB,
   separate streaming, foreground and background runs, both caches declared, exact
   model/index/code versions. Capture each stage and rejection reason. Repeat comparable
   runs; keep TTFT separate from completion time. Compare Live-open/closed only under
@@ -1258,8 +1274,8 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     repeats in the [return packet](docs/evidence/KENN_C1_HTTP_ACCOUNTING_AND_LOCAL_PACKET_2026-10-13.md).
   - [x] Scripted the supervised C1 Mac session, 13 Oct: `tooling/scripts/c1_supervised_session.sh` (seven stages,
     about 1.5 to 2 hours). A stubbed dry run walked every stage here, so it is ready, not run.
-  - [ ] Run that session on the M3/16 GB (Jack): stream, foreground and background repeats, Live-open run, dropout count.
-- [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
+  - [ ] Run that session on the M3/16 GB (me): stream, foreground and background repeats, Live-open run, dropout count.
+- [ ] **C2: Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already
   exist; verify the selected model digest and actual response path before blaming
@@ -1364,13 +1380,13 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     assets; justify new dependencies/assets separately before adding them.
     - Phase and cap diagnostic, 3 Oct: five questions per surface on M3 / 16 GB with Fake Live. Baseline accepted
       within 15 s: stream 2/5, payload 2/5; a temporary 128-token cap: stream 4/5, payload 1/5. Decode slowed during
-      the cap run and accepted answers were truncated. Production cap and residency stay unchanged pending Jack's
+      the cap run and accepted answers were truncated. Production cap and residency stay unchanged pending my
       decision; no Live-open gate or held-out quality qualification. C2 stays open.
       [Receipt and keep_alive trade-off](docs/evidence/KENN_C2_MODEL_PHASES_AND_OUTPUT_CAP_2026-10-03.md).
     - Research follow-through, 3 Oct: isolated brief-style instruction with the 384-token ceiling unchanged.
       Fresh baseline timely acceptance was 2/5 on both surfaces; brief style was stream 3/5, payload 1/5.
       No brief answer hit the ceiling, but acceptance and workflow quality declined; production style stays
-      unchanged for Jack's decision. A fixed Qwen3 8B / approximately 1,100-token MLX comparison proposal is
+      unchanged for my decision. A fixed Qwen3 8B / approximately 1,100-token MLX comparison proposal is
       written, not executed; no dependencies/assets added or residency changed. C2 stays open.
       [Measurements, quality limits and runtime proposal](docs/evidence/KENN_C2_BRIEF_STYLE_AND_RUNTIME_PROPOSAL_2026-10-03.md).
     - Response cache identity, 3 Oct: task, answer mode, provider and endpoint now separate cached prose on both
@@ -1406,7 +1422,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       or Live-open qualification. C2 stays open. [Code commit, phases, Mac state and limits](docs/evidence/KENN_C2_AUDIO_FUNDAMENTAL_ROUTING_2026-10-03.md).
     - Research and quality checkpoint, 3 Oct: other-hardware speed figures remain hypotheses. At 13 tok/s,
       220–280 output tokens already take 17–21 s; prefill tuning cannot meet the 15 s gate alone. Cap/brief-style
-      trials remain disabled for Jack's decision, residency is unchanged, and the exact Qwen3 8B M3/16 GiB MLX
+      trials remain disabled for my decision, residency is unchanged, and the exact Qwen3 8B M3/16 GiB MLX
       comparison remains a proposal requiring approval. Thinking is already off.
     - Measurement and retrieval diagnosis, 3 Oct: the phase harness now separates explicit abstentions from
       raw accepted responses. Recount of the three-question run: stream 2/3 timely accepted but both abstained;
@@ -1419,7 +1435,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       before any import or rebuild. Older 4B planner receipts used multiple visible GPUs and do not qualify current
       8B Mac latency. Scoped checks: 65 passes. No runtime/corpus change; C1, C2 and C3 stay open.
       [Inventory, source-review tasks, commands and limits](docs/evidence/KENN_GPU1_QWEN_NOTES_INVENTORY_2026-10-03.md).
-    - GPU permission, 3 Oct: Jack authorized physical GPU 0 and GPU 1 for KENN work. GPUs 2–7 remain off limits;
+    - GPU permission, 3 Oct: I authorized physical GPU 0 and GPU 1 for KENN work. GPUs 2–7 remain off limits;
       server restarts, dependency installation, model downloads and an MLX switch still require approval.
     - Precedence/Haas retrieval, 3 Oct: the exact precedence-effect phrase now selects existing Haas evidence
       consistently in candidate and displayed-source ranking. Bare precedence keeps its original meaning.
@@ -1433,7 +1449,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       hum-prevention tip. Review provenance and concept coverage before promoting or importing these sources.
       Scoped checks: 45 passes. Existing index only; no model, grounding-policy change or latency qualification.
       C1, C2 and C3 stay open. [Audit, commands, sources and limits](docs/evidence/KENN_C2_FUNDAMENTAL_SOURCE_REVIEW_2026-10-03.md).
-- [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
+- [ ] **C3: Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
   actions; only explicit Apply produces an execution receipt. Include the UI delivery path.
@@ -1459,7 +1475,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     on both surfaces. Scoped checks: 45 passes; full backend: 3626 passes, 12 skips, the same pre-existing personal-path
     failure. Real-model replay: stream 20.755 s accepted wrong-device guidance; payload 15.306 s rejected and fell
     back to AutoMix. History is fixed, quality and timing remain failed. Research triage keeps style/residency and
-    new runtime/assets behind Jack's decision; no plan tick.
+    new runtime/assets behind my decision; no plan tick.
     [Regression, replay and research triage receipt](docs/evidence/KENN_C3_THRESHOLD_CONTEXT_AND_RESEARCH_TRIAGE_2026-10-03.md).
   - Limiter command routing, 3 Oct: Put/Add/Insert requests on both chat surfaces now reach the existing honest
     unsupported-device refusal without retrieval, answer generation, proposal or Fake Live writes. Advice questions
@@ -1481,7 +1497,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     12 skips and the same pre-existing personal-path failure. Presentation repair only; no acceptance,
     decode-speed or Live-open gate claim. C3 stays open.
     [Regression, commands, results and research limits](docs/evidence/KENN_C3_FALLBACK_HISTORY_LABEL_2026-10-03.md).
-- [ ] **C4 — Independent language and answer qualification.** Keep tuning, sealed and
+- [ ] **C4: Independent language and answer qualification.** Keep tuning, sealed and
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and
   all attempted/accepted/rejected/busy counts. No regenerated expectations that bless
   a new implementation's mistakes; no tuning on sealed cases.
@@ -1509,7 +1525,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     - [x] Prepared an 18-card pilot in
       `.runtime/seal-pilot-2026-10-13`: two training contexts, four ordinary
       targets, seven reward tasks, two retention checks and seven reserved final
-      tasks. Jack approved the exact displayed packet in chat; the ignored approval
+      tasks. I approved the exact displayed packet in chat; the ignored approval
       receipt binds all 38 source/target records and records the limits of owner
       acceptance. The approved copy validates; the untouched draft remains rejected.
       Primary references and arithmetic were checked separately. Password SSH now
@@ -1519,11 +1535,11 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       registry. These establish published lineage; BF16 GPU trials remain a distinct
       condition from Q4_K_M serving. The isolated remote source passed **79 offline
       tests + 28 existing grounding tests**. No server restart was needed.
-    - [x] Recorded real baseline answers: Jack accepted seven reward answers and
+    - [x] Recorded real baseline answers: I accepted seven reward answers and
       two retention answers shown in chat. Ordinary SFT completed four steps on
       the four approved targets: 176 training tokens, 96 target tokens, 18.06 s
       operation wall time and 8.55 GB peak reserved GPU memory. The adapter is an
-      isolated artifact. Jack accepted all seven ordinary-arm answers; reward gain
+      isolated artifact. I accepted all seven ordinary-arm answers; reward gain
       is zero on this packet. The lunch batch completed the adapter's retention
       checks and one/two-step ordinary trials in 409.94 s on GPU 1. Eight newly
       worded answers await owner grading; no model was selected. The first fixed-policy
@@ -1539,7 +1555,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       Live 11 manual. Preserve manual-version provenance and review new targets
       before a separate audio-engineering corpus run. The prior 505 gate-kept
       teacher answers are not owner-reviewed targets.
-      Jack's smaller-model question is recorded in the research note: consider
+      My smaller-model question is recorded in the research note: consider
       pretrained Qwen3 1.7B as a specialist challenger before a smaller trial,
       fine-tuned on reviewed audio-engineering examples with the same retrieval
       evidence and held-out questions. Measure accuracy, units, unsupported claims,
@@ -1571,11 +1587,11 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     | Device knowledge | Use actual device/control names, units and documented ranges; cover missing devices, third-party plug-ins and version conflicts without inventing controls. Coordinate scope with L1/L2. |
     | Producer dialogue and proposals | Handle short follow-ups, incomplete evidence and conflicting briefs; request the missing audio or meter evidence; prepare inspectable proposals through existing services and report confirmation/readback/Undo truthfully. |
 
-    - [ ] **S1 — Curate a first source batch and freeze the experiment.** Audit 20
+    - [ ] **S1: Curate a first source batch and freeze the experiment.** Audit 20
       candidate notes, predominantly checked against the Live 12 manual, starting
       from observed failure families rather than note count. Record source URL/author,
       content hash, license and shared-weight permission, review, Live version and
-      manual/observed/measured status. Jack delegates factual note corrections,
+      manual/observed/measured status. I delegate factual note corrections,
       derived-target review and knowledge decisions to the agent/Gemini workflow;
       do not wait for owner sign-off. Record evidence, uncertainty and hashes.
       This delegation does not grant rights to third-party source material: use
@@ -1592,12 +1608,12 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       17 primarily Live 12 manual-backed, with exact before/after hashes and five
       four-note review pages. The 807-note inventory has 118 flagged records and
       347 “ableton” filenames; no purge or index rebuild at that point. The
-      initial owner factual-review gate was pending; Jack's later delegation and
+      initial owner factual-review gate was pending; my later delegation and
       the remaining source-rights boundary are recorded below. Read-only assets
       were re-frozen after pulling cloud main `ab63cd33`; paired retrieval
       and full condition manifests remain pending. S1 stays open.
       **MiMo batch 1 correction pass, 13 Oct:** seven evidence-supported note
-      corrections were applied and Jack delegated factual and knowledge approval
+      corrections were applied and I delegated factual and knowledge approval
       to the agent/Gemini evidence-review process; no further owner sign-off is
       required. Ten other proposed findings were not adopted; MiMo's ten “no issue”
       classifications were not freshly claim-audited. Third-party training rights
@@ -1615,7 +1631,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       reverb and unsupported former settings. Two pending Batch 2 notes, mastering
       streaming loudness and phase/polarity, were also checked against primary
       sources and approved. The complete 20-note Batch 2 review remains open;
-      approval of these two is not a pass for the other 18. Jack delegated factual
+      approval of these two is not a pass for the other 18. I delegated factual
       note corrections and derived-target decisions to the agent/Gemini evidence
       review process; no per-item owner approval is required. Source rights remain
       a separate gate: unknown or unsupported rights keep material out of
@@ -1718,7 +1734,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       & LFO routing) and 8 unchanged.
       Batch 13: 5 corrected (instruments-pt1 sine+PW/LFO-Depth, instruments-pt10
       Spread/Glide, instruments-pt15 Sensitivity-64 + Morph question,
-      instruments-pt16/ms + pt17/s Decay units) and 15 unchanged — the sixth
+      instruments-pt16/ms + pt17/s Decay units) and 15 unchanged - the sixth
       ledger item (instruments-pt14 Simpler-modes question) was verified absent
       from the file, a ledger misreference, recorded as no-change in
       `batch13-addendum-2026-10-14.json`.
@@ -1746,7 +1762,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       Batch 19: 7 corrected (baphometrix pt1–pt7 source labels; pt3 LUFS-peak
       conflation, pt5 RMS-vs-peak, pt6 RMS-momentary-max, pt7 lossy-clipping
       guidance) and 13 unchanged.
-      Batch 20: 20 corrected, none unchanged — all baphometrix video-transcript
+      Batch 20: 20 corrected, none unchanged - all baphometrix video-transcript
       notes carried the false Official-docs source label (fixed everywhere);
       plus pt8 TP-trim fiction, 2ZU0-pt2 headroom contradiction, 5UT42 Valhalla
       product fiction + limiter ratios, 5UT42-pt2 LFE→LUFS + crest physics,
@@ -1754,13 +1770,13 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       ratio/knee + Gullfoss spelling, B1FD-pt3 SSL-G clipper fiction,
       BToeN-pt1 thermal + Auto-Gain fiction, BToeN-pt2 LPF/HPF swap, Cern-pt2
       listen-bus compensation fiction.
-      Batch 21: 20 corrected, none unchanged — all baphometrix video-transcript
+      Batch 21: 20 corrected, none unchanged - all baphometrix video-transcript
       notes carried the false Official-docs source label (fixed everywhere);
       plus CernKPIDEHY-pt4/pt5 unit fixes, JeurQAySdzA-pt1 Spectre vendor,
       LgNW9teSo38-pt1 dBTP→LUFS, pt2 Mix-Tool/ratio/K9, pt3 K-system peaks,
       PR1o5LQzEB0-pt1/pt3 oversampling-ceiling, pt4 32-bit switch, pt7 1:1
       limiter + 2%-OS, TdiCDayFMa8-pt2 smart:comp vendor.
-      Batch 22: 20 corrected, none unchanged — all baphometrix video-transcript
+      Batch 22: 20 corrected, none unchanged - all baphometrix video-transcript
       notes carried the false Official-docs source label (fixed everywhere);
       plus b2I8 momentary-dB→LUFS + Abbey-Road-1176 fiction + unitless levels,
       bF6iw LPF/HPF swaps, jR_AX clipper/limiter params + heat fiction,
@@ -1827,7 +1843,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       a caveat).
       Batch 30: 2 corrected (jack-mastering-clipper-use -0.5 dB ceiling
       misdirection→-1.0 dBTP with safety note, loudness-measurement
-      relative-gate misphrase fixed) and 18 unchanged (8 Jack studio
+      relative-gate misphrase fixed) and 18 unchanged (8 of my studio
       notes + 10 general mixing notes pass).
       Batch 31: 3 corrected (dramatic-intro Face-Plan fiction→Granulator II
       + 2-minute prescription hedged, midi-routing Live-12 source→Live 11
@@ -1835,7 +1851,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       Live-12 claim de-versioned) and 17 unchanged (all pass).
       Batch 32: 0 corrected and 20 unchanged (19 pass, incl. verified
       reference meters/plugins; 1 uncertain: modulating-delay-time,
-      self-declared Unreviewed, left untouched) — receipt-only batch.
+      self-declared Unreviewed, left untouched) - receipt-only batch.
       Batch 33: 10 corrected (3 mr-bill Cliff-X→ClyphX renames + installer/
       macro-syntax/menu/warp-mode fixes grounded via ClyphX manual +
       Isotonik lookup, 3 Noisia source-label fixes + value hedges +
@@ -1864,7 +1880,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       chaos-racks + formula-parser + vriot-pt1 retitles, cps→cents,
       OTT-overdrive label; 3 vriot source-label fixes) and 7 unchanged
       (all pass). Batch-37 addendum: the Jump-Mode removal in that batch
-      was wrong — the delay-test transcript note confirms Repitch/Fade/
+      was wrong - the delay-test transcript note confirms Repitch/Fade/
       Jump modes, so Jump wording was restored in the delay-plugin note
       (no edit needed in delay-for-pitch, verified absent).
       Batch 38: 12 corrected (all false Official-docs labels→Virtual Riot
@@ -1885,11 +1901,11 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       half stripped) and 17 unchanged (all pass, incl. 12 sourced Wwise
       notes).
       Batch 41: 0 corrected and 7 unchanged (all pass, well-sourced
-      Wwise notes) — receipt-only final batch.
-      Batch 1: 0 corrected and 20 unchanged (all pass — prior 2026-10-13
+      Wwise notes) - receipt-only final batch.
+      Batch 1: 0 corrected and 20 unchanged (all pass - prior 2026-10-13
       online-manual audit headers accepted after read-through, no new
       errors; online sources not re-fetched locally, recorded as caveat)
-      — receipt-only closing batch; schedule now complete 1–41.
+      - receipt-only closing batch; schedule now complete 1–41.
       Receipts: `.runtime/mimo-note-review-validation-2026-10-13/pro-d2-resolution-2026-10-13.json`
       and `batch1-corrections-2026-10-14.json` plus
       `batch2/batch3/batch4/batch5-corrections-2026-10-13.json` plus
@@ -1953,7 +1969,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       paired with the 1578-byte pre-edit hash); it also absorbed this lane's
       edits as its own outputs. Both files are preserved untouched; reconcile
       which manifest stands before any index rebuild. S1 stays open.
-    - [ ] **S2 — Build a harder, reviewed packet within today's limits.** Start with
+    - [ ] **S2: Build a harder, reviewed packet within today's limits.** Start with
       four training source families and two ordinary targets per context: eight
       reviewed examples, including concise explanations and follow-ups. Prepare
       24 reward questions, 12 retention checks and 24 separately reserved final
@@ -1972,7 +1988,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       24 reward, 12 retention and 24 reserved final questions, on 23 four-card
       pages. Split aliases, exact hashes and lexical guards passed; independent
       semantic review remains pending and source rights must be checked before any
-      shared-weight training. Jack has delegated factual/target decisions, so no
+      shared-weight training. I have delegated factual/target decisions, so no
       owner-approval field is required; training remains disabled until evidence
       gates pass.
       Final wording stays reserved. Preparation/SEAL checks pass 101 tests and
@@ -1993,14 +2009,14 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       This establishes robust headroom for specialist fine-tuning on both 4B control and 1.7B challenger.
       Full answers and summaries logged in `.runtime/seal-specialist-packet-v1/baseline-4b-summary.json`
       and `baseline-1.7b-summary.json`.
-      **14 October packet v1 review and v2:** Jack granted training rights on all packet sources and allowed an
-      agent to review cards on his behalf. The agent approved 75 of 92 v1 cards and rejected 17: 8 retention
+      **14 October packet v1 review and v2:** I granted training rights on all packet sources and allowed an
+      agent to review cards on my behalf. The agent approved 75 of 92 v1 cards and rejected 17: 8 retention
       questions whose answers depended on facts the model never sees, and 9 Live 12-only cards it could not check
       offline. The validator still rejected v1 because granting rights changes each source's record hash. Packet v2
       (`.runtime/seal-specialist-packet-v2/`, v1 untouched) rewrites the 8 retention questions to carry their own
       facts, drops the 9 Live 12 cards and their 3 siblings, and replaces them with Gate, Delay and Limiter cards
       from the local Live 12 snapshot; 72 of v1's 75 approved cards are byte-identical. 19 cards need fresh review,
-      sent to a light-model review agent; the reviewer is an agent on Jack's delegation, not an independent human.
+      sent to a light-model review agent; the reviewer is an agent on my delegation, not an independent human.
       Preparation tests pass (101). The v2 review approved 88 of 92 and rejected the Delay and Limiter groups
       (control names and Limiter values not in the local Live 12 snapshot), so v2 still failed the validator.
       **Packet v3** (`.runtime/seal-specialist-packet-v3/`) swaps those eight final cards for Filter Delay and Redux
@@ -2008,8 +2024,15 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       approved, validator passes, 101 preparation tests pass. The same agent wrote and approved the eight new
       cards, so they are the best candidates for a second reader. Next: unchanged-4B baseline on v3 (the reward
       and retention wording changed, so v1's baseline no longer applies), then S3.
+      **Unchanged-4B baseline on v3, 14 Oct** (384 tokens; the first run at 128 truncated 19 of 24 reward answers).
+      Strict exact-match reward is 0.0 everywhere, so it says nothing. The looser key-facts score is 0.542 on reward
+      (24 tasks) and 0.75 on retention (12), with 2 answers truncated. It is inflated: the model abstains on 18 of
+      24 reward tasks, and a generic abstention passes wherever abstaining is the right answer. Weakest category is
+      follow-ups (0.167 of 6). Tighten the scorer (right abstention and right facts together, or hand grading)
+      before S3, or a training gain won't be readable. The run was on battery power with the machine busy, which is
+      fine for quality scores but not for timings.
       S2 stays open pending adapter trial qualification.
-    - [ ] **S3 — Establish specialist learning against a pinned control.** Start
+    - [ ] **S3: Establish specialist learning against a pinned control.** Start
       with the current worker's verified 4B condition; another model requires the
       separate identity and compatibility checks in S4. Start ordinary SFT at
       eight steps so every ordinary example can be used. Compare development-only
@@ -2031,7 +2054,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       reviewed positive gains with retention intact; resample after policy updates.
       If C/D do not beat B enough to justify their extra cost, retain ordinary SFT
       as the specialist method. SEAL and LoRA do not establish faster decoding.
-    - [ ] **S4 — Compare alternative model sizes as separate experiments.** First
+    - [ ] **S4: Compare alternative model sizes as separate experiments.** First
       candidate: [Qwen3 1.7B](https://huggingface.co/Qwen/Qwen3-1.7B), using the
       publisher’s pretrained/post-trained checkpoint and explicitly pinned non-thinking mode.
       This is a candidate, not a claim that it is the best small model or already
@@ -2066,7 +2089,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       indexed gain-staging note's blanket -18 dB input-gain instruction: the
       grounding gate accepted it because it was in the evidence. No production
       model change or SEAL gain is established by this sample.
-      **13 October advanced probe, one run at Jack's request:** unchanged Ollama
+      **13 October advanced probe, one run at my request:** unchanged Ollama
       1.7B delivered 36/44 eligible answers within 15 s (81.8%); the full pass
       kept all 47 cases, including three abstention controls. Background browser
       upgrades on `71515b88`, the same `v-db8c6334cf63` hybrid index, FakeLive,
@@ -2080,7 +2103,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       This is one development diagnostic, not a controlled 4B comparison or a
       qualifying session; correctness, retention and Live coexistence remain
       unmeasured. S4/S6 stay open and the production control remains 4B.
-    - [ ] **S5 — Grow only after an independent signal.** If the bounded packet
+    - [ ] **S5: Grow only after an independent signal.** If the bounded packet
       shows a reviewed quality gain, prepare a first larger batch of 200–400 reviewed
       targets, balanced across the curriculum and actual failure families. Drafting,
       deduplication and formatting may use the GPU; factual and rights approval do
@@ -2091,7 +2114,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       existing training code and meaningful isolation tests before that larger run;
       do not evade pilot ceilings by launching an unbounded series of small jobs.
       Use the existing qualification harness for the broader independent evaluation.
-    - [ ] **S6 — Qualify useful answers per inference cost on the Mac.** Freeze
+    - [ ] **S6: Qualify useful answers per inference cost on the Mac.** Freeze
       candidate choice on development data before opening final answers once for
       blind owner review. Test BF16 adapters offline, then verify any merge and
       Q4_K_M conversion as separately identified candidate artifacts. Compare the
@@ -2119,7 +2142,7 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       gains over the unchanged production control. Require no material quality,
       retention, latency, memory or policy regression. Keep experimental serving
       disabled until the owner chooses.
-- [ ] **C5 — Reach the quality and timing targets below.** Improve evidence selection
+- [ ] **C5: Reach the quality and timing targets below.** Improve evidence selection
   and useful answers without lowering grounding thresholds. Pin the local model
   within each comparison; model choice stays open and a missed target stays failed.
   - [ ] Carried over from A3: six held-out wrapper rows still fail (`upgrade-kick-tail`, `upgrade-room-null`,
@@ -2132,13 +2155,13 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     them ([receipt](docs/evidence/KENN_C5_RANKING_PROBE_2026-10-02.md)). The experiment 2 reranker spike has run
     ([receipt](docs/evidence/KENN_C5_RERANK_SPIKE_2026-10-02.md), 2 Oct 2026): blend 0.6 fixes three of the six rows and
     +8 hit@3 on the tuning sets, with coverage and guards unchanged, but the six rows are no longer a clean holdout and
-    nothing is shipped. A repo implementation needs a new model file and ONNX Runtime, so it waits for Jack's OK.
+    nothing is shipped. A repo implementation needs a new model file and ONNX Runtime, so it waits for my OK.
 
 ### 3. Qualify Ableton knowledge and existing control breadth
 
 Needs C3's dialogue contract. Improve concrete failed journeys before adding families.
 
-- [ ] **L1 — Device capability coverage.** Inventory all 78 target devices against
+- [ ] **L1: Device capability coverage.** Inventory all 78 target devices against
   the installed Live version. Distinguish manual-described, observed, measured,
   fake-tested and real-Live-qualified parameters. First milestone: at least 25 devices
   and 60 parameters qualified end to end; then close remaining coverage explicitly.
@@ -2146,7 +2169,7 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   enabled/state/automation metadata, chooser labels and display-unit parity. Treat
   the 78 stock entries as a baseline; separately inventory Packs, presets, Max for
   Live and plug-ins, recording unsupported or manual-only controls explicitly.
-- [x] **L1a — Audit whole-software Live 12 coverage.** Completed 2 October 2026:
+- [x] **L1a: Audit whole-software Live 12 coverage.** Completed 2 October 2026:
   chat, planner, HTTP, MCP, frontend, native plug-in, desktop, backend and bundled
   Remote Script reviewed against installed Live 12.4.6 and official references.
   Three independent agent reviews confirmed the source/offline findings; the
@@ -2154,7 +2177,7 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   [JSON evidence](docs/evidence/KENN_LIVE12_IMPLEMENTATION_AUDIT_2026-10-02.json)
   record the 78-device matrix and verification limits. Full control is not proved;
   repairs remain in L1/L5 and real-Live qualification remains open.
-- [ ] **L2 — Retrieval and knowledge.** Authorized Live 11 manual material already
+- [ ] **L2: Retrieval and knowledge.** Authorized Live 11 manual material already
   exists in the local index; it does not prove Live 12 parameter accuracy. Add only
   reviewed, version-applicable missing facts and craft notes tied to failed questions.
   Audit fixture exclusions (including substring matching) and source tiers before
@@ -2174,7 +2197,7 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
     more than one source, `clipping` matches 27, and three default business cases expect a source the index does not
     contain. Nothing changed; source tiers not audited. L2 stays open.
     [Audit](docs/evidence/KENN_L2_FIXTURE_SOURCE_MATCHING_AUDIT_2026-10-03.md).
-- [ ] **L3 — Qualify existing recipes.** At least 15 recipes, fake first, then an
+- [ ] **L3: Qualify existing recipes.** At least 15 recipes, fake first, then an
   owner-scheduled disposable-set run: exact target/value, Apply/readback, partial
   failure, stop/cancel and verified Undo. The recipe card and its component test
   already exist; audit usability rather than schedule their creation again.
@@ -2188,11 +2211,11 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   - [x] Requal follow-ups, 9 Oct (merged at 757ae30f). A recipe undo refuses once a control it set was moved by hand.
     "Undo that" walks past a card refused before it wrote. Undo cards no longer offer Undo. Button and device-parameter
     undos are linked, so "Undo that" never redoes them. The mud card always reads the mixer first.
-- [ ] **L4 — Planner shadow qualification.** Keep deterministic authority. Promotion
+- [ ] **L4: Planner shadow qualification.** Keep deterministic authority. Promotion
   requires the existing comparison/time/schema/agreement gates and human review;
   include ambiguity, missing ranges, wrong units and stale identities. A large
   synthetic corpus or high schema validity alone does not qualify action accuracy.
-- [ ] **L5 — Confirm transport reliability across surfaces.** Fresh preconditions,
+- [ ] **L5: Confirm transport reliability across surfaces.** Fresh preconditions,
   ordered/duplicate/missing OSC replies, reconnect, idempotency, per-set serialization,
   ambiguous timeout outcomes, restart and identity-bound Undo. Use the A2 route map
   to demonstrate that no frontend or MCP entry point has independent write authority.
@@ -2214,7 +2237,7 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   - Verification on 13 Oct: the focused backend files (`test_live_session_questions.py`, `test_realtime_observer.py`, `test_realtime_session_review.py`, `test_track_diagnostic.py`, `test_ableton_project_detector.py`) pass **66 tests** on FakeLive. Frontend Vitest passes **86 tests**; `npm run build` passes, including `vue-tsc`.
   - The adjacent `test_mixing_doctor.py` run has two failures: the low-end name/fader overlap advisory and near-ceiling meter headroom advisory are no longer emitted. Reconcile those expectations with the new evidence path before claiming the mixing-doctor behavior is qualified. The combined six-file run was **78 passed, 2 failed**. No real-Live run or end-to-end producer qualification was performed.
   - `kenn-app/main` was synced to monorepo source `349189a9` earlier today. The later real-time commits listed above are on monorepo `main` and have not yet been mirrored.
-- [ ] **Stage 2/3 guarded parameter control: implementation reviewed, 12 Oct.** This is Jack's branch
+- [ ] **Stage 2/3 guarded parameter control: implementation reviewed, 12 Oct.** This is the branch
   `codex/kenn-stage2-stage3-integration`, reviewed through `945b4373`. It adds inspect → proposal → explicit
   Apply → readback → Undo for any device parameter, holds retained target references in the AbletonOSC handler, and
   adds two routes: `/api/ableton/parameter/inspect` and `/api/ableton/parameter/proposal`. It touches L1, L3, L4 and
@@ -2306,7 +2329,7 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
       after the fix, its recheck found no unresolved issue. All execution used fake Live; no model inference ran.
   - Fresh independent Standards and Spec reviews pass through `945b4373`. Rechecks cover exact card targets,
     chooser labels and refusal of unsupported templates-only HTTP measurements, including an empty-label
-    fallback. All six injected regression faults were detected. Jack removed the requirement to wait for the
+    fallback. All six injected regression faults were detected. I removed the requirement to wait for the
     original reviewer on 12 Oct; the recorded independent reviews satisfy the code merge check.
   - Final fake verification: **4884 backend tests passed, 16 skipped**; **86 frontend tests passed**;
     frontend type check and production build passed; **21 demo checks passed**. Fresh synthetic parameter
@@ -2319,7 +2342,7 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
 Listening and memory read-only work may proceed once scoped context is proved.
 Creation that writes to Live depends on L3/L5; it does not delay the core assistant.
 
-- [ ] **B1 — Listening usefulness.** Consented mix evaluation with two independent
+- [ ] **B1: Listening usefulness.** Consented mix evaluation with two independent
   human reviewers; keep clipping/headroom/L-R findings and broader unqualified
   interpretations distinct. A finding offers a change only with a separately bound
   Live target, and re-measurement reports what changed rather than promising quality.
@@ -2331,48 +2354,71 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     supplied 40-band comparisons retain their existing behavior. 73 scoped cases,
     12 consumer cases and five separate multipart cases pass; 17 mutations are
     caught. [Evidence and exact files](docs/evidence/KENN_REFERENCE_INPUTS_2026-10-02.md).
-- [ ] **B2 — Memory usability.** Testers can inspect, edit, delete and restore saved
+- [ ] **B2: Memory usability.** Testers can inspect, edit, delete and restore saved
   preferences; answers identify memory used; a different project/session cannot read
   it. Explicit saves only. Verify reset/export/retention behavior and UI/API parity.
-- [ ] **B3 — MIDI creation.** Validate bounded, hashed, labelled artifacts; preview
+- [ ] **B3: MIDI creation.** Validate bounded, hashed, labelled artifacts; preview
   musical metadata; select an exact target; propose insertion; verify Apply and Undo.
   Owner listening review is required for usefulness claims. Existing artifact/import
   code is a starting point, not a completed creation gate.
-- [ ] **B4 — Optional integrations.** Audio-to-MIDI, reference suggestions, AudioGen, SLO and offline AutoMix remain separate typed artifact providers with unavailable states. Audio generation needs explicit opt-in and license/provider review; no silent network provider, filesystem rename or automatic session modification. Reference A/B should use authorized files, corresponding sections and matched playback loudness; identify analysed regions and normalization separately. For later provider trials, investigate local whisper.cpp push-to-talk or Basic Pitch ONNX on bounded instrument clips, one at a time. Speech becomes inspectable text through the existing policy; MIDI keeps preview/target/Apply/Undo. Pin code and weight licences separately and qualify offline operation and resource use.
-- [ ] **E1 — Real-time analysis pipeline.** Build the analysis bridge that reads Live channel state (levels, dynamics, spectrum, stereo width, correlation, transit time, peak analysis) and serves it to chat and mix-review modules as grounded 100 ms windows with sample positions, capture age, source generation and drop counts. Constrain to the measured 100 ms windows from the existing insert-analysis work; overflow must drop measurements, never wait for playback.
-  - [ ] Existing insert-analysis queue and 100 ms window contract already exist; verify the analysis pipeline serves those windows to chat and mix-review without adding a second write authority.
-  - [ ] Test synthetic signal correctness, queue overflow/recovery, callback allocations, pass-through, instance isolation, and average/p99/max timings at multiple rates, buffer sizes and 1/8/32/64 instances. Connect two native inserts through independent insert IDs and owner-scoped explicit bindings; verify matching kick/bass spectra through FakeLive HTTP.
-  - [ ] Profile real native publishers against an isolated FakeLive HTTP companion. Replace per-insert HTTP threads with one shared feature-batch publisher; verify 64-insert freshness, payload caps, independent control limits, atomic validation, and the 15-second retained-memory regression plus per-tick macOS compliance.
-  - [ ] Qualify 64 native publishers for 65 seconds against isolated FakeLive HTTP, including peak accuracy under silence, DC, bin-edge impulses and noise.
-- [ ] **E2 — Grade out of 100.** Implement the mix grade: take the current-state analysis plus the producer's own reference (a song, a reference track, an explicit target), compare against those and against permitted conformance vectors, and return a single grounded score from 0 to 100 with the reasoning shown.
-  - [ ] Decide what the 100 points are made of (reference match, declared target, published conventions) and how each is weighted, with Jack; a second analyst given the same inputs and rules must reproduce the same grade.
-  - [ ] Benchmark offline: compare current mix-review code against cheaper existing variants, choose the reference, and document the decision with evidence (see docs/research and the reuse comparison receipts).
-  - [ ] Build the grading logic in the existing mix-review module; grade only against authorized references, declared conventions, and the producer's own comparison target; never invent numbers.
-  - [ ] Verify the grade is deterministic for the same inputs and that a change to the underlying analysis is reflected in the grade.
-- [ ] **E3 — Suggest specific, actionable help.** Implement the suggestion engine: given a grade below a helpful threshold, produce a short list of specific levers (what to adjust, why, what a known baseline would look like, and what to listen for), each individually bound to a Live target or explicitly marked as informational.
-  - [ ] Draft the suggestion templates against the 2026-10-14 audio-analysis reuse review, preserving the existing accuracy margins and refusal paths.
-  - [ ] Test: each suggestion must name a live target, offer an Apply/Undo path, or be explicitly outside Live; the grade must change if the suggestion is applied and re-measured.
-  - [ ] Require owner listening review before usefulness claims are made; existing artifact/import code is a starting point, not a completed creation gate.
-- [ ] **E4 — Explain and teach.** Implement the explanation layer: chat and mix-review responses explain the music and audio clearly (why the grade is what it is, what a number means, what to listen for), so the producer learns, not just executes.
-  - [ ] Use existing grounded conversation patterns; citation, evidence, and refusal paths must work from chat, the browser chat, and the first model call.
-  - [ ] Test that every number in an explanation comes from the grade's own measurements or a cited source, so the grounding gate has nothing to reject; the model must not guess figures from the prompt.
-  - [ ] Verify the result survives: the model can restate it, answers identify memory used, a different session cannot read it.
-- [ ] **E5 — Gate the end-to-end flow.** Qualify the complete education/mixing guidance path: real-time analysis → grounded grade → actionable suggestion → explanation, with exact Apply/Undo and human grading.
-  - [ ] Reference the 15 s gate path at docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md; the full sequence must be scripted and rehearsed before any release claim.
-  - [ ] Jack grades a held-out set of mix questions blind (grade, suggestion and explanation separately), beside the gate figures; land the synonym fix before the v5 bench.
-  - [ ] Confirm the audio calculators (note lengths at tempo, buffer latency, pitch, dB factors) stay grounded when the grade and explanations quote them; verify middle C labelling agreement with Live (Live labels middle C as C3).
+- [ ] **B4: Optional integrations.** Audio-to-MIDI, reference suggestions, AudioGen, SLO and offline AutoMix remain separate typed artifact providers with unavailable states. Audio generation needs explicit opt-in and license/provider review; no silent network provider, filesystem rename or automatic session modification. Reference A/B should use authorized files, corresponding sections and matched playback loudness; identify analysed regions and normalization separately. For later provider trials, investigate local whisper.cpp push-to-talk or Basic Pitch ONNX on bounded instrument clips, one at a time. Speech becomes inspectable text through the existing policy; MIDI keeps preview/target/Apply/Undo. Pin code and weight licences separately and qualify offline operation and resource use.
+- [ ] **E1: Real-time analysis.** Chat and mix review should read Live's channel state (levels, dynamics, spectrum, stereo width, correlation, transit time, peak) as 100 ms windows. Each window carries its sample positions, capture age, source generation and drop count. We only use the 100 ms windows the insert-analysis work already measures. If the queue overflows we drop measurements; we never make playback wait.
+  - [ ] The insert-analysis queue and the 100 ms window contract already exist. Check that chat and mix review actually get those windows, and that nothing on the path can write to Live.
+  - [ ] Tests: synthetic signals, queue overflow and recovery, allocations in the audio callback, pass-through, instance isolation, and average/p99/max timings across sample rates, buffer sizes and 1/8/32/64 instances. Connect two native inserts through separate insert IDs and owner-scoped bindings, and check the kick/bass spectra match through FakeLive HTTP.
+  - [ ] Profile the real native publishers against an isolated FakeLive HTTP companion. Swap the per-insert HTTP threads for one shared batch publisher, then check 64-insert freshness, payload caps, independent control limits, atomic validation, the 15 s retained-memory regression and per-tick macOS compliance.
+  - [ ] Run 64 native publishers for 65 s against isolated FakeLive HTTP, including peak accuracy under silence, DC, bin-edge impulses and noise.
+  - [ ] Audit 14 Oct (read-only, native C++ suites not re-run): the 100 ms windows reach chat only through the track-analysis and paired-analysis answers. The generic chat evidence packet and mix review get a reduced set (peak, RMS, crest, correlation, width, three band energies) with no sample positions, capture age, source generation or drop counts, and no test pins which fields they receive. Next step: pass those window fields into `from_plugin_context` and add that test, then tick the three bullets above that the existing C++ receipts already cover. Direct Live writes from the insert stay behind `KENN_ENABLE_DIRECT_LIVE_WRITES`, which is off in CMake; keep it off.
+- [ ] **E2: Grade out of 100.** One score from 0 to 100, with the reasoning shown. It compares the current analysis with the producer's own reference (a song, a reference track or a stated target), and with permitted conformance vectors.
+  - [ ] With me, decide what the 100 points are made of (reference match, declared target, published conventions) and how each is weighted. Someone else given the same inputs and rules should land on the same grade.
+  - [ ] Benchmark offline: compare the current mix-review code with cheaper variants, pick the reference, and write down why (see docs/research and the reuse comparison receipts).
+  - [ ] Build the grading in the existing mix-review module. Grade only against authorized references, declared conventions and the producer's own target, and never invent a number.
+  - [ ] Check the grade is deterministic for the same inputs, and that it moves when the underlying analysis changes.
+- [ ] **E3: Specific, actionable help.** When the grade is low enough to need help, give a short list of levers: what to change, why, what a known baseline looks like and what to listen for. Each lever is either bound to a Live target or marked as informational.
+  - [ ] Draft the suggestion templates from the 2026-10-14 audio-analysis reuse review, keeping the existing accuracy margins and refusal paths.
+  - [ ] Test that every suggestion names a Live target, offers Apply/Undo, or says it is outside Live, and that applying it and re-measuring changes the grade.
+  - [ ] I listen before we claim any of this is useful.
+- [ ] **E4: Explain and teach.** Chat and mix-review answers explain the music and the audio (why the grade is what it is, what a number means, what to listen for), so the producer learns rather than just clicks Apply.
+  - [ ] Reuse the existing grounded conversation patterns. Citations, evidence and refusals must work from chat, the browser chat and the first model call.
+  - [ ] Test that every number in an explanation comes from the grade's own measurements or a cited source, so the grounding gate has nothing to reject and the model never guesses a figure.
+- [ ] **E5: Gate the whole flow.** Qualify the full path: real-time analysis, grounded grade, actionable suggestion, explanation, with exact Apply/Undo and human grading.
+  - [ ] Follow the 15 s gate path in docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md. Script and rehearse the whole sequence before anyone makes a release claim.
+  - [ ] I grade a held-out set of mix questions blind (grade, suggestion and explanation scored separately) alongside the gate figures. Land the synonym fix before the v5 bench.
+  - [ ] Confirm the audio calculators (note lengths at tempo, buffer latency, pitch, dB factors) stay grounded when the grade and explanations quote them, and confirm with real Live that middle C is labelled C3.
+- [ ] **E6: Reference library and mix archive.** Producers save named mixes and grade them again after each change, across sessions.
+  - [ ] Design the archive schema: name, date, tempo, genre, target loudness, session notes, and a list of revisions (date, what changed, suggestion applied, re-measured grade).
+  - [ ] Store mixes as referenced audio files or links. Never silently change or delete a stored reference.
+  - [ ] Check on the Mac with Live open: list, add, view, edit notes, delete and export a named set.
+  - [ ] Grading against the producer's own stored reference must not expose other producers' or other sessions' mixes.
+- [ ] **E7: Remembering the session.** The system keeps context across turns and sessions.
+  - [ ] Keep corrections ("I told you to reduce the low-mids; what's the grade now?"), advice the producer followed ("I lowered the low-mids and the grade went from 42 to 61") and preferences.
+  - [ ] Check a correction is stored in the session, readable in a later turn and invisible to other sessions.
+  - [ ] Check export and reset: one session's data can be exported and deleted without touching another session or producer.
+- [ ] **E8: Learning path versus one-off help.** Keep a formal curriculum separate from ad-hoc questions.
+  - [ ] Define the curriculum: session objectives, before and after grades, lesson notes, and gaps found from suggestions that failed.
+  - [ ] Add a simple session: the producer picks a topic and gets an objective, a starting grade and a suggested path.
+  - [ ] Check that one-off questions don't corrupt curriculum state, and that curriculum state never blocks a one-off question.
+- [ ] **E9: Is the grade reliable?** Check the grade; don't assume it.
+  - [ ] Build a held-out set of mixes judged by independent human reviewers. The grade counts as correct when it agrees with them.
+  - [ ] Regression test: a test file with known level, dynamics, spectrum and correlation must always get the same grade.
+  - [ ] I listen before we claim the grade is right. It is a model output and we treat it as one.
+- [ ] **E10: Before/after comparison.** Show the producer the before and after of a change, keep the analysis, and let them re-grade against the original.
+  - [ ] Capture the analysis before an Apply, store it with the change, and serve the comparison on request.
+  - [ ] Check the re-grade after an applied suggestion reflects the change and agrees with the before/after comparison.
+- [ ] **E11: Expert network.** Working engineers contribute notes, lessons and benchmarks to the knowledge base.
+  - [ ] Review and version expert content like any other knowledge. Nothing unvetted gets surfaced.
+  - [ ] I listen before we claim usefulness. Expert content is a source, not a guarantee of correctness.
 
 ### 5. Qualify and release one exact build
 
-- [ ] **R1 — Reproducible source and package.** Clean checkout on the supported matrix,
+- [ ] **R1: Reproducible source and package.** Clean checkout on the supported matrix,
   backend/frontend/native/plugin checks, approved local assets declared separately,
   source/index/model/build digests and distribution rollback. Historical clean builds
   do not prove this commit. Do not change dependencies or CI without approval.
-- [ ] **R2 — Human and real-session evidence.** Two independent reviews/adjudication,
+- [ ] **R2: Human and real-session evidence.** Two independent reviews/adjudication,
   consented real mixes, at least 10 supervised sessions across three projects, and
   an eight-hour reconnect-aware soak for the candidate build. Record unauthorized
   writes and exact Undo outcomes. Owner scheduling is required for Live mutations.
-- [ ] **R3 — Distribution and support.** Signing/notarization/clean-host AU and VST3
+- [ ] **R3: Distribution and support.** Signing/notarization/clean-host AU and VST3
   validation, clean-account setup under 15 minutes, supported matrix, feedback channel,
   privacy-preserving diagnostics, tester sign-off and exercised rollback. Do not invite
   testers or publish from a historical “ready” assertion.
@@ -2380,20 +2426,19 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     4B Instruct 2507, Q4_K_M) isn't in the app, so first run fetches it with progress
     and a resume, checks its digest, and says plainly when the Mac can't run it.
     Until it's there, chat says no model is installed rather than silently
-    substituting an unqualified model. Blocked on
-    Jack: where it's hosted (Ollama registry or our own server), the Qwen3 weight
+    substituting an unqualified model. Blocked on me: where it's hosted (Ollama registry or our own server), the Qwen3 weight
     licence and the fine-tune's terms, and the minimum Mac (16 GB Apple Silicon is
     the working guess). Counts toward the 15-minute setup above.
     Since 5 Oct MLX is no longer the zero-config default: with no provider set, KENN uses
     Ollama and says when no model is configured, rather than answering with MLX's 1.5B.
-- [ ] **R4 — Run the existing release qualifier.** Evaluate all 15 named checks at the
+- [ ] **R4: Run the existing release qualifier.** Evaluate all 15 named checks at the
   exact release source and artifacts; preserve profile-specific requirements. Required
   failed, pending or unmeasured gates prevent a qualified release. Optional current-Live
   probing is not a substitute for captured qualification evidence.
 
 ### Investor walkthrough
 
-The owner's Mac drives KENN's web UI to control Ableton Live. Jack is preparing
+The owner's Mac drives KENN's web UI to control Ableton Live. I am preparing
 a demo video for 14 October 2026. A supervised qualification slot and video length
 have not been agreed. The
 [five-minute showcase](docs/runbooks/KENN_INVESTOR_DEMO.md#five-minute-ableton-showcase)
@@ -2407,7 +2452,7 @@ on the exact candidate. The final milestone is the full scripted presentation,
 recovery, display/audio checks and a verified backup recording. Items below stay
 open until their checks pass; the qualification window remains unscheduled.
 
-Initial demo-readiness audit on 13 October, for Jack's planned 14 October video
+Initial demo-readiness audit on 13 October, for my planned 14 October video
 (superseded for the insert bridge by the offline follow-up below):
 the existing web chat and action cards are connected, but the new continuous
 insert analysis is not yet connected to browser requests. `askKenn` in
@@ -2518,18 +2563,18 @@ functional CTests passed with the existing arm64 JUCE cache; these artifacts wer
 not installed. Live LUFS/dBTP, callback deadline tails, sustained host/model
 contention, SLO classification cache and recording-build model qualification remain
 open. D2–D5 still require the exact candidate and owner-supervised Ableton rehearsal;
-Jack's current instruction is to keep this work offline.
+My current instruction is to keep this work offline.
 
-- [x] **D1 — Review the fixes.** Fresh independent Standards and
+- [x] **D1: Review the fixes.** Fresh independent Standards and
   Spec reviews covered citation repair `67921916`, the Stage 2/3 integration and
   audit-fixes merge `2377eed1`. Card target positions, chooser transitions and the
   templates-only HTTP measurement contract were fixed in `53fffa4c`; the empty
   chooser-label fallback was fixed in `945b4373`. Rechecks found no remaining
   actionable implementation blocker, and all six injected regression faults
-  were detected. Jack removed the original-reviewer requirement on 12 Oct.
+  were detected. I removed the original-reviewer requirement on 12 Oct.
   Citation repair precedes Stage 2/3 in the candidate ancestry. These code reviews
   permit landing; owner grading and supervised Live qualification remain open.
-- [ ] **D2 — Assemble and check one candidate.** Codex uses a clean
+- [ ] **D2: Assemble and check one candidate.** Codex uses a clean
   checkout containing the approved changes, preserving unrelated working edits.
   Run the full backend suite with fake Live, frontend tests and frontend build;
   run the scoped `test_demo_preflight.py` and `test_demo_script_gate.py` checks.
@@ -2538,8 +2583,8 @@ Jack's current instruction is to keep this work offline.
   Use the full companion described in the runbook. Keep the existing models and
   dependencies; native plug-in packaging is outside this web-UI demo. Exit: green
   checks and one identified build to use for every subsequent receipt.
-- [ ] **D3 — Prove the current Live path.** Use a verified disposable copy of the
-  demo set. Jack supervises all Live mutations; no fixed time is committed here. Codex checks or deploys the candidate Remote Script in that window;
+- [ ] **D3: Prove the current Live path.** Use a verified disposable copy of the
+  demo set. I supervise all Live mutations; no fixed time is committed here. Codex checks or deploys the candidate Remote Script in that window;
   restart/reload and verify its digest before collecting results. Revalidate the
   rights-clear generated audio, track/device topology, saved reset point and
   actual listening output. Run read-only preflight, then the runbook's explicitly
@@ -2564,10 +2609,10 @@ Jack's current instruction is to keep this work offline.
   leave replacements untouched, no unauthorized writes and no uncertain readback.
   Stop on a failure, inspect the receipt and Live state, fix and recheck before
   presentation rehearsals.
-- [ ] **D4 — Check answers and the narrative.** Codex captures the
-  exact scripted questions with Live open on the candidate. Jack grades their
-  correctness, usefulness and displayed evidence, reviews the
-  [investor FAQ](docs/runbooks/KENN_INVESTOR_FAQ.md), and agrees the claims he will
+- [ ] **D4: Check answers and the narrative.** Codex captures the
+  exact scripted questions with Live open on the candidate. I grade their
+  correctness, usefulness and displayed evidence, review the
+  [investor FAQ](docs/runbooks/KENN_INVESTOR_FAQ.md), and agree the claims I will
   make. Show the audible control change, the inspected proposal and exact Undo.
   Label WAV analysis with its actual capture source and distinguish demonstrated
   behavior from roadmap items. Run the script gate through the same chat endpoint
@@ -2578,8 +2623,7 @@ Jack's current instruction is to keep this work offline.
   This bounded owner check does not close the wider held-out grading gate.
   Grade the short showcase's answers as well, and measure its actual end-to-end
   time, including Live navigation, listening and Undo; the hard limit is 300 s.
-- [ ] **D5 — Rehearse and freeze.** Reserve at least 2–3 hours with
-  Jack for ten consecutive complete runs: each 20/20 steps, 8–12 minutes, no raw
+- [ ] **D5: Rehearse and freeze.** Reserve at least 2–3 hours with me for ten consecutive complete runs: each 20/20 steps, 8–12 minutes, no raw
   errors, wrong targets or failed/stale readbacks. Include the planned recovery
   drill in at least one run and use the actual projector/large display and audio
   output in at least one. Reopen the verified reset set between runs. Start a new
@@ -2589,7 +2633,7 @@ Jack's current instruction is to keep this work offline.
   September passes. An unexpected failure resets the consecutive count. A code,
   model, index or script change requires qualification of the new candidate.
   After qualification, run the showcase as a supervised bug-finding dry run,
-  stopping when Jack is satisfied. Record failures in the
+  stopping when I am satisfied. Record failures in the
   rehearsal log with the prompt, target, expected/actual values and restoration;
   add actionable fixes to this plan. Fix and recheck any failure before a clean
   take, and requalify if code changes. Record one successful complete showcase
@@ -2598,19 +2642,19 @@ Jack's current instruction is to keep this work offline.
   Exit: ten qualification passes, a successful showcase with intelligible
   narration and audible before/after, a checked backup recording and a frozen
   candidate.
-- [ ] **D6 — Room preflight and showing.** Jack and Codex verify
+- [ ] **D6: Room preflight and showing.** Codex and I verify
   the frozen build, mains power, loaded local model/index, disposable reset set,
   selected starting device, connection, projector and audio. Run read-only
   preflight and check the backup recording plays before the audience arrives.
-  Jack presents a short walkthrough and handles questions using the reviewed
+  I present a short walkthrough and handles questions using the reviewed
   FAQ afterwards. If preflight fails, use a verified recording of the
   same demonstrated sequence and describe it as a recording; do not improvise
   mutations. Exit: live showing only with D1–D5 and room preflight passed.
 
 Owners: Codex handles build preparation, fixes, checks and evidence; independent
-reviewers provide code sign-off; Jack supervises all Live mutations,
+reviewers provide code sign-off; I supervise all Live mutations,
 grades the demo answers and rehearses/presents. No supervised Live slot is
-scheduled, and none is committed here. Jack clarified that video preparation and
+scheduled, and none is committed here. I clarified that video preparation and
 bug finding take priority over any further scheduling. Nothing here
 authorizes an unattended Live run. R1–R4, broader answer grading, device coverage
 and beta/release qualification remain separately open.
@@ -2727,7 +2771,7 @@ Earlier 12 Oct preparation receipt (fake Live only; D1–D6 were open at capture
   recheck nor a code merge on main was claimed.
   Citation commit `67921916` fixes that finding. Its independent standards and
   spec rechecks found no remaining material issue; the spec review exercised
-  the supplied cap cases and 84 additional actual ending variants. Jack's later
+  the supplied cap cases and 84 additional actual ending variants. My later
   12 Oct decision accepts the fresh independent reviews recorded under D1.
   Owner answer grading, current real-Live transactions, ten consecutive rehearsals
   and backup capture/playback remain outstanding. The current focus is the video
@@ -2861,11 +2905,11 @@ the symptom opener on advice questions are in, tested on fake Live only; see
 
 3 Oct 2026: generated answers that name a plugin brand neither the question nor the notes mention are now rejected by the grounding gate ([receipt](docs/evidence/KENN_UNASKED_PRODUCT_GUARD_2026-10-03.md)). Fake-backed only; the Mac probe still has to say whether the FabFilter answer was invention or leaked context.
 
-3 Oct 2026, Mac probe (fake Live, Live open, no code change): 21 of 47 advanced questions were answered by the model and 26 by the template (25 of those were rejected upgrades); final time p50 18.2 s, p95 26.2 s, 9 of 47 inside 15 s, so the gate stays failed and C1, C2 and C3 stay open. "fab filter" was read as a generic filter and described, and "i need help mixing vocals" still returns only a background-vocals note. A 128-token output cap raised 5-question accepted-within-15 s from 2/5 and 1/5 to 4/5 and 4/5 but is not enabled, pending Jack; see [the receipt](docs/evidence/KENN_MAC_BASELINE_PROBE_AND_OUTPUT_CAP_2026-10-03.md).
+3 Oct 2026, Mac probe (fake Live, Live open, no code change): 21 of 47 advanced questions were answered by the model and 26 by the template (25 of those were rejected upgrades); final time p50 18.2 s, p95 26.2 s, 9 of 47 inside 15 s, so the gate stays failed and C1, C2 and C3 stay open. "fab filter" was read as a generic filter and described, and "i need help mixing vocals" still returns only a background-vocals note. A 128-token output cap raised 5-question accepted-within-15 s from 2/5 and 1/5 to 4/5 and 4/5 but is not enabled, pending my decision; see [the receipt](docs/evidence/KENN_MAC_BASELINE_PROBE_AND_OUTPUT_CAP_2026-10-03.md).
 
 3 Oct 2026: the probe no longer scores questions that should abstain on concept recall, so the Mac `scope` 0.0 was partly a scoring artefact; the summary now reports `expected_abstain_handled`. Behaviour is unchanged and the model-abstention gap needs a rerun on the Mac; see [the receipt](docs/evidence/KENN_PROBE_ABSTAIN_SCORING_2026-10-03.md).
 
-4 Oct 2026: the 128-token output cap is on for all prose answer modes at Jack's request ([receipt](docs/evidence/KENN_OUTPUT_CAP_128_ENABLED_2026-10-04.md)). The 15 s gate has not been rerun with it and answers are often cut mid-sentence, so C1, C2 and C3 stay open until the Mac probe and a Live-open soak are rerun.
+4 Oct 2026: the 128-token output cap is on for all prose answer modes at my request ([receipt](docs/evidence/KENN_OUTPUT_CAP_128_ENABLED_2026-10-04.md)). The 15 s gate has not been rerun with it and answers are often cut mid-sentence, so C1, C2 and C3 stay open until the Mac probe and a Live-open soak are rerun.
 
 4 Oct 2026, four Mac probes with the 128-token cap on (fake Live; three with Live open throughout, one with Live quit a minute in): the first three had 18 to 22 of 47 answered by the model, final time p50 28.2 to 32.2 s and 0 to 4 model answers inside 15 s; the fourth, after the model calls sped up to about 10 s at roughly 10:50, had 23 of 47 answered by the model, p50 10.1 s, and all 23 inside 15 s. A caffeinate on/off test showed the speed-up was not caffeinate, and we do not know what it was, but only 23 of 46 attempts were accepted (50%) against the 70% acceptance the gate asks for, so the 15 s gate is still failed and C1, C2 and C3 stay open until acceptance and speed both hold on repeat runs and a Live-open soak has run. Nearly every model answer is cut mid-sentence (21 of 23 in the last run), and unsupported measurements is the largest gate rejection (11 to 13 of about 40 attempts per run); see [the receipt](docs/evidence/KENN_PROBE_CAP128_2026-10-04.md).
 
@@ -2874,7 +2918,7 @@ the symptom opener on advice questions are in, tested on fake Live only; see
 The order we're working the gate in. One change per branch, adversary review, one probe run, keep or revert. The gate
 only passes on three clean runs in a row at 31/44 or better; a single good run moves nothing.
 
-Decided by Jack, 5 Oct 2026, after the readiness review:
+Decided by me, 5 Oct 2026, after the readiness review:
 
 - The gate is three probe runs in a row at 31/44 or better, on mains power with Live open. That is stricter than a
   flat 70%: a build whose true rate is 70% passes it about one time in six, so aim for 78–80%. Every qualifying run
@@ -2942,7 +2986,7 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
   still leaked was advice put as a value ("what's a good attack for the drum bus compressor" read back "Attack is
   1.00 ms."); a good/right/ideal value or "should I set" next to a parameter now goes to the notes.
 - [ ] Lower prose temperature, measured on its own.
-- [ ] Reference-numbers note for the values the model keeps inventing (needs Jack and a box rebuild).
+- [ ] Reference-numbers note for the values the model keeps inventing (needs me and a box rebuild).
 - [x] Three clean runs in a row at 31/44 or better. 32 / 33 / 31 on 5 Oct, 4B with allowed figures (below).
 
 5 Oct 2026, 8B against 4B on a quiet Mac. Same code (`dffd1551`, steady-short), gate index `v-5f6964698b76`, fake
@@ -3077,11 +3121,19 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   - [x] Built 13 Oct on `draft/synonym-weight-stemming` (`9cd19dc`, not merged): typed words and their inflections at
     weight 1, untyped synonyms at 0.35, each word counted once. Unit and mutation checks only.
     [Draft receipt and commands](docs/evidence/KENN_SYNONYM_WEIGHT_AND_STEMMING_DRAFT_2026-10-13.md), on that branch.
-  - [ ] Measure it against main on the Mac (coverage, held-out, probe together) and merge only with no loss.
-- [ ] A precedence-effect note for the corpus (needs Jack and an index rebuild); no ranking change can supply it.
+  - [x] Measured 14 Oct on the Mac against main, same index (v-5f69, 3974 chunks) and cutoff: **don't merge as it stands**.
+    Coverage recall@3 0.9483 to 0.9310 (sidechain-bass-disappears and stereo-width-mono slip out of the top 3, one gained),
+    MRR 0.8502 to 0.8540. Sealed holdout (150) recall@3 0.373 to 0.380, MRR 0.302 to 0.325. Probe concepts 113 to 114
+    (dynamic-eq-vs-multiband and vague-vocals lost). The three abstain rows did not move (oversampling reaches rank 3
+    but still isn't in the excerpts shown). Net gain is small and there are real per-row losses, which fails the no-loss bar.
+    Side finding: the main checkout's current index has no embeddings, so retrieval there is BM25-only, and its "hybrid"
+    fallback scores far below plain BM25 (MRR 0.37 against 0.79); worth its own look. Outputs in
+    `.runtime/synonym-weight-2026-10-14/`.
+  - [ ] Rebase the draft, try a gentler weight or topic multiplier, and re-measure.
+- [ ] A precedence-effect note for the corpus (needs me and an index rebuild); no ranking change can supply it.
   - [x] Drafted 13 Oct from Wallach et al. 1949, Haas 1951/1972, Lochner & Burger 1958 and Litovsky et al. 1999, with
-    a per-figure check sheet. Delivered to Jack outside git (corpora stay out of this repo).
-  - [ ] Jack confirms the three secondary-cited figures and two Live control names, then it joins the corpus with the
+    a per-figure check sheet. Delivered to me outside git (corpora stay out of this repo).
+  - [ ] I confirm the three secondary-cited figures and two Live control names, then it joins the corpus with the
     reference-numbers note after the v7 grading, one GPU-box rebuild and a bench.
 - [ ] Revisit the fused-list cap of 40 once the synonym fix has landed.
 - [x] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
@@ -3096,14 +3148,14 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   - **Probe:** 36, 33, 35 of 44 within 15 s (mean 34.67 / 44, 78.8%). **Passed** probe bar (>= 31) across three consecutive runs.
   - **Held-out:** 49, 38, 46 of 72 within 15 s (mean 44.33; total model deliveries 52, 44, 49; median final seconds 7.15 s, 10.72 s, 9.18 s). Run 1 achieved 52 model deliveries (72.2%), but 3 delivered answers landed between 15.1–17.8 s due to host swap memory pressure.
   - **Rejections:** Unshown excerpt citations dropped from 4–5 to 0 in runs 1 and 3; weak match / intent guard misses dropped from 5 to 2.
-  - **Blind grading:** Generated `heldout-grading.html` (55 differing questions, 54 with model answers) for Jack's blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench/`).
+  - **Blind grading:** Generated `heldout-grading.html` (55 differing questions, 54 with model answers) for my blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench/`).
 - [x] Candidate qualification bench v2, 10 Oct 2026 (`draft/excerpt-id-format` `4e41a3b8`):
   Adds precision grounding normalization: decimal equivalence (`-14.0 LUFS` to `-14 LUFS`), range interval containment (`5 dB` in `3–6 dB`), and colloquial question audio shorthand (`5k` -> `5 kHz`, `+0.8 true peak` -> `0.8 dBTP`). 138 scoped regression tests passing.
   Local 4B model (`qwen3:4b-instruct-2507-q4_K_M`), fake Live, Live closed, mains power, pinned index `v-5f6964698b76`, `KENN_LLM_CACHE=0`.
   - **Probe:** 35/44 (79.5%), 36/44 (81.8%), 23/44 (52.3%, clock-limited; 33 delivered by model, 10 took 15.2–21.3 s under 8.3 GB host swap pressure). Unsupported measurement rejections dropped from 16 to 1 (run 1, 2) and 5 (run 3).
   - **Held-out:** 42, 46, 44 of 72 within 15 s (total model deliveries 44, 48, 49; median final seconds 6.63 s, 7.62 s, 8.61 s). Model acceptance rate when attempted rose to 68.7% (46 of 67).
   - **Rejections:** Unsupported measurement rejections dropped monotonically across held-out runs: 15 (run 1) -> 12 (run 2) -> 10 (run 3), down from 16 on main.
-  - **Blind grading:** Generated `heldout-grading.html` (55 differing questions, 93 answers to grade) for Jack's blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench-v2/`).
+  - **Blind grading:** Generated `heldout-grading.html` (55 differing questions, 93 answers to grade) for my blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench-v2/`).
 - [x] Candidate qualification bench v3, 10 Oct 2026 (`draft/excerpt-id-format` `f82d4bdd`):
   Adds symmetrical 12+ char hex prefix resolution (`q116`), true peak headroom dB/dBTP equivalence (`1.0 dB` headroom supported by `-1 dBTP` ceiling note, `q192`), and Ollama model buffer purge (`keep_alive: 0`) between runs to prevent swap clock degradation. 107 scoped regression tests passing.
   Local 4B model (`qwen3:4b-instruct-2507-q4_K_M`), fake Live, Live closed, mains power, pinned index `v-5f6964698b76`, `KENN_LLM_CACHE=0`.
@@ -3113,8 +3165,8 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   - **Held-out rows tuned on:** the v3 fixes name `q116` and `q192`, and both are held-out ids. Those two of the 72 are no
     longer clean. From here, diagnose on the probe and the 225 non-held-out rows only.
   - **Rejections:** Unshown excerpt citations dropped to 0 in run 2; unsupported measurements dropped to 11.
-  - **Blind grading:** Generated `heldout-grading.html` (56 differing questions, 98 answers to grade) for Jack's blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench-v3/`).
-    Published privately for Jack on 11 Oct (claude.ai artifact). `grade_page.py` was edited a minute after the page
+  - **Blind grading:** Generated `heldout-grading.html` (56 differing questions, 98 answers to grade) for my blind correctness evaluation (`kenn-evaluation-data/2026-10-10-gate-qualification-bench-v3/`).
+    Published privately for me on 11 Oct (claude.ai artifact). `grade_page.py` was edited a minute after the page
     was written; a fresh regeneration from cand-heldout2 is byte-identical to the page and key on disk.
 - [x] Grounding holes, 11 Oct 2026 (`draft/grounding-holes` `f1524def` to `376b4f00`, merged `5aeee7f1`). An ordinal citation
   resolves only on a full match (`source1`, `excerpt1`, `chunk1`, `ex1`, `1`), and one past the shown excerpts
@@ -3124,10 +3176,10 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   Full suite 4564 passed, 16 skipped at `7d5bdea8`.
   - Adversary review of `f1524def` found 10 things; dropping the equivalence closes 1, 2, 3, 6 and 8. Finding 9 (a
     unit split across two stream chunks gets past the prefix guard) is already on main. The re-review of `7d5bdea8`
-    ran once Jack gave the go-ahead. It found that a typed "-1 true peak" became a plain "1 dB", so "cut 1 dB on
+    ran once I gave the go-ahead. It found that a typed "-1 true peak" became a plain "1 dB", so "cut 1 dB on
     the vocal bus" passed; `fd87aaf7` keeps the sign and `376b4f00` keeps "1-2 true peak" a range. Merge-ready at
     `376b4f00`; replaying the v1–v3 benches with both commits changes no verdict.
-  - Decided 11 Oct, with Jack's go-ahead to make the open calls (he can reverse any of them):
+  - Decided 11 Oct, with my go-ahead to make the open calls (I can reverse any of them):
     - Ordinal ids keep resolving, on a full match and only inside the shown excerpts (finding 4). The figure still
       has to be in the excerpt the id lands on, so an ordinal cannot bring in a figure; refusing them would only
       cost answers that cite by position.
@@ -3198,21 +3250,21 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     Where held-out rows go, per run over the 76 that expect an answer: 12–13 rejected for unsupported figures,
     about 8 never sent to the model (weak results, guards, caveats), 4 abstains, 0–3 late, 0–3 other rejections.
     20 rows are lost in all three runs, 7 in two, 10 in one. (Over the 72 gate-eligible rows, without the four
-    setup turns, that is 19, 7 and 10; Jack's 11 Oct audit recounted it.)
+    setup turns, that is 19, 7 and 10; my 11 Oct audit recounted it.)
 - [ ] Next steps from the 2, 3 and 5 Oct research, read against the v3 misses on 11 Oct. Most of the research was
   written while answers were late; v3 had none, so its speed work waits on v4's Live-open timings. What it says
   about wrong and missing answers still holds. Since 8 Oct owner grades, not delivery, are the measure, so each
   item is judged on grades as well as the gate.
-  Jack, 11 Oct: make these once the v4 bench has finished, in this order. After v4 he asked for the fixes and a v5
-  bench. He chose to grade the note-first pack before it counts (it counts and is wired in only if notes grade at
-  least as well as the current answers), and approved drafting the reference-numbers note for his check and
+  Me, 11 Oct: make these once the v4 bench has finished, in this order. After v4 I asked for the fixes and a v5
+  bench. I chose to grade the note-first pack before it counts (it counts and is wired in only if notes grade at
+  least as well as the current answers), and approved drafting the reference-numbers note for my check and
   rebuilding the index, so v5 runs both sets on the new index and is not directly comparable with v1–v4.
   - [ ] Note-first comparison first ([5 Oct research §7.1](docs/research/KENN_GLM_COMPREHENSIVE_RESEARCH_2026-10-05.md),
     and "Review of 4 October" above). 6–10 held-out refusals a run are rows where the refused figure is the step
     itself, which no excision can save, and a served note's figures are right by construction. Build the
     ~40-question grading pack from the probe and the 225 non-held-out rows only: the note's own Short answer and
-    Try this beside the current model answer, graded 0/1/2 by Jack. Whether a note-served answer counts as a
-    "model answer" for the gate is Jack's call before anything is wired in.
+    Try this beside the current model answer, graded 0/1/2 by me. Whether a note-served answer counts as a
+    "model answer" for the gate is my call before anything is wired in.
   - [ ] Reference-numbers note (open above), written from published conventions (streaming loudness targets,
     -1 dBTP, the -18 dBFS gain-staging habit) and the probe's refused figures, never from held-out rows. The
     5 Oct "allowed values" idea (§7.2) is already on main; this supplies the values the notes never print.
@@ -3221,7 +3273,7 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     ONNX cross-encoder over the top 12
     ([Experiment 2](docs/research/KENN_PRODUCT_AND_OPEN_SOURCE_RESEARCH_2026-10-02.md#experiment-2-test-whether-passage-reranking-improves-the-existing-retrieval)).
     Its bar: 0.05 more recall@4 or 20% fewer retrieval-caused failures, inside 150 ms p95 and 250 MB. It adds
-    onnxruntime and a model file, so it needs Jack's OK.
+    onnxruntime and a model file, so it needs my OK.
   - [ ] Speed. v4 had 8 late answers with Live open, so this is on. In the 3 Oct order, MLX against Ollama on the same 4B
     checkpoint, then a matched draft model for speculative decoding. MoE (DeepSeek-V2-Lite is ~8–9 GB resident,
     per the 5 Oct corrections) and Kev-0.8B routing (torch, hundreds of ms on a Mac) stay parked.
@@ -3230,16 +3282,16 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     the system prompt and evidence order fixed so Ollama reuses the cached prefix; then count how often the HTTP
     background path reruns routing and retrieval in `answer_payload` after building the template.
     LoRA was asked about on 11 Oct: it does not speed up a merged model, and S-LoRA serves many adapters on one
-    server. Revisit an answer tune only on answers Jack has graded right (the note-first pack starts that set).
+    server. Revisit an answer tune only on answers I have graded right (the note-first pack starts that set).
   - Product rather than gate (5 Oct stage 2): the producer's measured LUFS, true peak and crest as evidence the
     model may cite, and the selected track's device chain in the prompt. That is what only KENN can do, but a
     fake-Live bench cannot see it, so it needs its own owner-graded set.
 - [ ] Work in flight toward the v5 bench, 11 Oct 2026. Pick up here: each line says where the work is and what is
-  left. Jack asked for every change to be written down here as it lands.
-  - [ ] Note-first grading pack, built and waiting on Jack's grades. 40 questions: 20 probe and 20 from the
+  left. I asked for every change to be written down here as it lands.
+  - [ ] Note-first grading pack, built and waiting on my grades. 40 questions: 20 probe and 20 from the
     non-held-out set, none from the 75 held-out. Each shows today's answer (fallbacks included) and the Short answer
     and Try this of the top retrieved note, served as written, in shuffled A/B order. Grades are Right 2, Partly 1
-    and Wrong 0. Page: https://claude.ai/artifact/G3A5dmySDgPnwLErYqLzrt (private to Jack). Grades are stored in its
+    and Wrong 0. Page: https://claude.ai/artifact/G3A5dmySDgPnwLErYqLzrt (private to me). Grades are stored in its
     `grades` collection as `<id>-<A|B>`. Which slot is the note is in
     `kenn-evaluation-data/2026-10-11-note-first-pack/note-first-key.json`. `build_pack.py` in that folder rebuilds
     the pack from the pinned index. To score it, join the grades with the key and add up each side. Note-first is
@@ -3286,7 +3338,7 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       from the genre or acoustic lines (A's included 3500 Hz, 40 Hz, -2.5 dB, -3.5 dB from acoustic guidance).
       Median final A 6.66 and 7.72 s, B 6.92 and 7.18 s. The fix holds: about +4 answers on 40 rows.
     - Found on the way: q265 (quick fix, drum balance) dropped "Short answer:" in B1 and B2 and opened at "Try
-      this". 0 of 255 v4 model answers did that, 2 of 90 here, both q265. Jack asked if it is a regression. The
+      this". 0 of 255 v4 model answers did that, 2 of 90 here, both q265. I asked if it is a regression. The
       likely cause is the quick_fix mode line asking for a "single-paragraph response", which now sits after the
       Rules where the model reads it last. Reworded to "a one-paragraph Short answer, then one or two Try this
       steps" (uncommitted in the stable-prefix and prompt-figures worktrees). `check.sh` there runs the 11
@@ -3314,24 +3366,24 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
   - [x] Count how often the HTTP background path reruns routing and retrieval in `answer_payload` after it
     builds the template, and drop the repeat if it costs time. Closed 11 Oct: v4 template_seconds median 0.07 s, max
     0.14 s, n=378. The repeat is not worth a change.
-  - [ ] Reference-numbers note: draft it from published conventions for Jack to check, then rebuild the index.
+  - [ ] Reference-numbers note: draft it from published conventions for me to check, then rebuild the index.
     - Checked first (11 Oct): the premise is mostly false. -18 dBFS (`jack-gain-staging-targets.md`), -14 LUFS
       and -1 dBTP are already in indexed notes. The misses are retrieval: dig-gain-staging pulls three general
       gain-staging notes instead. Across the 3 v4 probe runs 11 figures were refused, 6 of them on dig-gain-staging,
       and two of the others were wrong anyway (-16 LUFS, 300 ms momentary). The 8 Oct study puts figures in no note
       at all at 9 of 116.
-    - Upside is about 2 answers a run at most, and a rebuild makes v5 incomparable with v4. Recommended to Jack:
+    - Upside is about 2 answers a run at most, and a rebuild makes v5 incomparable with v4. Recommended to me:
       hold the note and the rebuild until after v5, and run v5 on the pinned index so the two fixes can be credited.
-      Waiting on his answer.
-  - [ ] Ask Jack about a declared cool-down between bench runs. The fanless Air's decode fell from about 29 to
+      Waiting on my answer.
+  - [ ] Ask me about a declared cool-down between bench runs. The fanless Air's decode fell from about 29 to
     about 20 tok/s mid-session in v4, and 255 of 339 calls hit the 128-token cap. Do not change the harness
-    without his OK.
+    without my OK.
   - [ ] v5 bench. Copy `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v4/bench.sh`, then change its OUT
     folder, worktree and index check to the new index. Keep the same run order (probe, held-out ×2, probe,
     held-out, probe), Live open, mains power. Record each run here as it finishes.
-    - Runs on the pinned index `v-5f6964698b76`, not a rebuilt one, while the reference note waits on Jack (above),
+    - Runs on the pinned index `v-5f6964698b76`, not a rebuilt one, while the reference note waits on me (above),
       so v5 compares directly with v4 and the two merged fixes can be credited. Harness unchanged from v4 (no
-      cool-down) until Jack answers the question above.
+      cool-down) until I answer the question above.
     - Script `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v5/bench.sh`, worktree
       `workspace/worktrees/kenn/bench-v5/` at the commit that records this entry (code as `def7a83c`), with the
       index and minilm links under `apps/backend/src/kenn/`, port 8095. Plan edits during the bench stay
@@ -3354,14 +3406,14 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     - Held-out run 2 (18:45–18:59): 42/72 within 15 s, median final 8.63 s, model accepted 42 of 67. Rejections:
       8 unsupported figures, 3 excerpt ids never shown, 3 quality, 2 overlap, 2 structure, 1 Live claim. 0 refused
       a figure the old prompt supplied; 5 model-written abstains.
-    - Stopped at 19:00 during probe run 2, at Jack's call: held-out 43 and 42 cannot average up to 51 in the
+    - Stopped at 19:00 during probe run 2, at my call: held-out 43 and 42 cannot average up to 51 in the
       remaining run, so the time goes to the audit fixes. The partial run 2 output is in `partial/`, not counted.
     - Verdict: not qualified. Probe 32 on one run; held-out 43 and 42 against v4's 48/44/43. The figures fix is a
       real gain (0 prompt-supplied figures refused, against 2–4 a run). The loss came with the stable-prefix
       reorder: v5 held-out had 7 to 10 rejections a run for structure, quality, overlap and unshown ids, where v4
       had 0 to 3. That is the reorder's measured cost, so it was reverted rather than split out on a further A/B
       (audit item 1 below).
-  - [ ] Jack's inference and answer audit, `docs/KENN_INFERENCE_AND_ANSWER_AUDIT_2026-10-11.md`, written with
+  - [ ] My inference and answer audit, `docs/KENN_INFERENCE_AND_ANSWER_AUDIT_2026-10-11.md`, written with
     ChatGPT during v5 (evidence to about 18:42). It starts no new programme; its five items are read into this list.
     Checked against the raw data the same evening:
     - Confirmed: accepted generation rows in `routes.jsonl` log milliseconds × 1000. `make_answer` passes
@@ -3380,9 +3432,9 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
          answers to garbled ids, and the resolver already maps an ordinal on a full match.
       4. An answer contract that fits 128 tokens: 255 of 339 v4 calls ended on the cap.
       5. The synonym fix, then the reranker only if a ranking gap remains (above).
-      Note-first stays waiting on Jack's grades.
+      Note-first stays waiting on my grades.
     - Done 11 Oct as branch `draft/audit-fixes` (worktree `workspace/worktrees/kenn/audit-fixes/`, on `20b3de3c`),
-      merged into main as `2377eed1` (`--no-ff`). Jack asked for these and then one probe and one held-out run, not
+      merged into main as `2377eed1` (`--no-ff`). I asked for these and then one probe and one held-out run, not
       three of each, to get a faster read. Items 1–3 only; 4 and 5 not started.
       - `5f6029df` reverts the stable-prefix merge `e3673444`: route and mode lines back above the Rules, the
         quick_fix line back to its old wording, `test_prompt_prefix_reuse.py` removed. The prompt-figures fix
@@ -3412,7 +3464,7 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
           [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
       - Watch in v6: misattributed figures. A model that tags every figure [#1] is now caught as misattribution
         rather than as an unshown id, so that count may rise as the unshown count falls.
-  - [ ] v6 development bench, 11 Oct: one probe run and one held-out run on main `2377eed1`, at Jack's call. A read
+  - [ ] v6 development bench, 11 Oct: one probe run and one held-out run on main `2377eed1`, at my call. A read
     on the audit fixes, not a qualification: a pass here earns the full three-run bench. Script
     `kenn-evaluation-data/2026-10-11-gate-dev-bench-v6/bench.sh` (v5's harness with only `cand-run1` and
     `cand-heldout1`), worktree `workspace/worktrees/kenn/bench-v5/` detached at `2377eed1`, port 8095, pinned
@@ -3433,11 +3485,11 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
       unchanged by that: every figure in an answer is still checked against the shown excerpts
       (`_unsupported_measurements` in chat_grounding.py, tag or no tag); a tag only adds the per-excerpt check.
     - Read: one run each, and v4's held-out spread was 5 rows run to run, so 50 is within noise of both 51 and 46.
-      It is the first time a run has come within one row of the bar. Next, Jack's call: the full qualifying bench
+      It is the first time a run has come within one row of the bar. Next, my call: the full qualifying bench
       (probe ×3, held-out ×3, v5's order) on `2377eed1` unchanged, or one more fix first. The cheapest candidate is
       the 2 misattributed figures; the 8 invented figures are the larger pool but have no quick fix.
       The gate also still owes owner-graded correctness (8 Oct decision above), whatever the counts.
-  - [x] Citation repair, 11 Oct, at Jack's call ("fix it first rather than gamble"). Branch `draft/citation-repair`
+  - [x] Citation repair, 11 Oct, at my call ("fix it first rather than gamble"). Branch `draft/citation-repair`
     (worktree `workspace/worktrees/kenn/citation-repair/`, from `1cbaa916`), merged into main as `f2c4d738`
     (`--no-ff`).
     - Diagnosis, on non-held-out rows only. Held-out was read in aggregate only, per the rule. We replayed every
@@ -3478,8 +3530,8 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     - Expected effect: v6's 2 held-out misattributed rejections are the class this fixes. Whether both now pass is
       for the bench to say.
     - Next: the full qualifying bench (probe ×3, held-out ×3, v5's order) on `f2c4d738`, on mains, Live open, Mac
-      quiet. Bench dir `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v7`. Waiting on Jack to say when.
-  - [ ] v7 qualification bench, 11 Oct, at Jack's call ("let's go then"): the full sequence in v5's order (probe 1,
+      quiet. Bench dir `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v7`. Waiting on me to say when.
+  - [ ] v7 qualification bench, 11 Oct, at my call ("let's go then"): the full sequence in v5's order (probe 1,
     held-out 1, held-out 2, probe 2, held-out 3, probe 3) on main `f2c4d738`. Script
     `kenn-evaluation-data/2026-10-11-gate-qualification-bench-v7/bench.sh` (v6's harness with v5's six runs).
     Worktree `workspace/worktrees/kenn/bench-v5/` moved to `f2c4d738` (detached), port 8095, pinned index
@@ -3519,7 +3571,7 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
     - What the citation-repair review found:
       - #1, medium: a tagged figure from the unshown rest of a whole note now ships, because the repair drops its
         tag. Untagged figures already pass the same way. The planned call is to keep it and correct the comment at
-        `chat_grounding.py:982-984`; Jack can reverse that.
+        `chat_grounding.py:982-984`; I can reverse that.
       - #2, medium: dropping a tag can bypass the quality check. "4:1 [#2]. Then" becomes "4:1. Then", which
         `_STEP_INLINE` counts as a numbered step.
       - #3: dropping "#2" can clear an overlap warning, because "#2" counts as a word.
@@ -3567,12 +3619,12 @@ prompts), and drops comma fragments like "000 Hz". Re-review verdict: merge. Sam
         Standards and spec rechecks of `67921916` found no remaining material issue. The spec review passed
         69 focused tests and checked the supplied cap cases, 56 punctuation/tail variants, 84 additional
         actual ending variants and three duplicate-credit cases. No inference or real-Live writes ran.
-      - The fresh independent code rechecks are recorded under D1; Jack removed the original-reviewer
+      - The fresh independent code rechecks are recorded under D1; I removed the original-reviewer
         requirement on 12 Oct. Owner grading remains open; these fixes do not close the answer gate.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
-Jack approved this on 5 Oct as the main route to the held-out half of the gate. The arithmetic: the 5 Oct 8B baseline
+I approved this on 5 Oct as the main route to the held-out half of the gate. The arithmetic: the 5 Oct 8B baseline
 had about 40 of 72 held-out answers accepted and 29 inside 15 s. If allowed figures removed every one of the 14
 unsupported-measurement rejections, that would still be about 39 of the 51 needed. So answers also have to be
 rejected less for other reasons, and come back faster. A LoRA on Qwen3-4B-Instruct-2507 goes after both. It teaches
@@ -3600,11 +3652,11 @@ phrasings, so this run stops early and is judged only on sets it never saw.
   - scratch
 
   Run 11's GGUF stays, because it's the only copy left. Older copies (`kenn-GPU`, `kenn-regression-20260910`,
-  `kenn_retrieval`) are still waiting for Jack.
+  `kenn_retrieval`) are still waiting for me.
 - [x] Questions from the approved notes. 977 were written, not a few thousand. No held-out question appears in any
   training prompt (substring check, 8 Oct).
 - [x] Teacher answers from `qwen3:32b`. 505 were kept: 448 train and 57 valid.
-- [ ] Jack grades about 40 of the kept answers before training. Not done: the grading page was built, but training
+- [ ] I grade about 40 of the kept answers before training. Not done: the grading page was built, but training
   went ahead with no grades in. A 40-answer sample Claude graded on 8 Oct was 37% right, 45% partly right and 17% wrong.
   That is no better than the plain 4B, so the teacher was not a stronger source of correct answers.
 - [x] LoRA on GPU 0 in the existing `c6/venv`: rank 16, best validation loss 0.693 at step 60, early stop at 68.
@@ -3614,7 +3666,7 @@ phrasings, so this run stops early and is judged only on sets it never saw.
   - held-out 58/72 vs 44/72;
   - held-out median 6.13 s vs 6.67 s.
 - [x] Keep it only if both sets rise, the median is no slower and the negative-advice guard holds. **Not kept.** It
-  meets the first two on paper, and the guard was not checked. Claude's partly blind grading (not Jack's; his
+  meets the first two on paper, and the guard was not checked. Claude's partly blind grading (not mine; my
   blind page is still the authority) of the 62 held-out rows where the two models differ found that the extra
   deliveries are mostly wrong advice. Of the 16 rows it newly got through, 1 is right, 7 are partly right and 8
   are wrong, e.g. de-ess at 500 Hz, a "Warp device" in Live, and high crest factor called
@@ -3623,7 +3675,7 @@ phrasings, so this run stops early and is judged only on sets it never saw.
   The gate counts delivery, so it could not see this. `kenn-answer1` stays in Ollama on the Mac but is not wired
   into KENN. Write-up and grades: `Nite-DSP/kenn-evaluation-data/2026-10-06-answer-tune/results.md`.
 
-8 Oct 2026, Jack: we move past the 15 s gate. It stays **open, not passed**. Probe runs pass on paper with the tune,
+8 Oct 2026, me: we move past the 15 s gate. It stays **open, not passed**. Probe runs pass on paper with the tune,
 but neither model is right often enough on the held-out set for the gate to mean the answers help. A held-out
 question set with owner-graded correctness, not delivery alone, is the measure to bring back before the gate is
 picked up again.

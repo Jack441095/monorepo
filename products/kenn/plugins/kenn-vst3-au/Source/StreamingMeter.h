@@ -15,6 +15,11 @@ struct KENNStreamingMeterSnapshot
     // remains separate so callers cannot confuse missing history with silence.
     std::optional<double> momentaryLUFS, shortTermLUFS, truePeakDBTP;
     static constexpr double interpolationDelaySamples = 5.875; // (48 FIR taps - 1) / (2 * 4x).
+    // The continuous loudness window covers [endSample - samplesPerBin, endSample].
+    // Causal polyphase FIR upsampling delays output by interpolationDelaySamples
+    // input frames, so the 100 ms peak scan corresponds to this exact input interval.
+    double peakIntervalStartSample = 0.0;
+    double peakIntervalEndSample = 0.0;
 };
 
 // Offline candidate, owned by one analysis consumer. Call reset after a gap,
@@ -124,11 +129,13 @@ public:
             latest.shortTermLUFS = loudness(latest.shortTermMeanSquare);
         }
         // This peak describes FIR output in the completed 100 ms interval,
-        // delayed 5.875 input frames. It has no added playback latency and is
-        // not an exactly aligned peak of the loudness input window.
+        // delayed 5.875 input frames. It has no added playback latency;
+        // record the exact input interval it represents.
         latest.truePeakReady = frames >= static_cast<int64_t>(peakTaps);
         latest.truePeakLinear = binPeak;
         if (binPeak > 0.0) latest.truePeakDBTP = 20.0 * std::log10(binPeak);
+        latest.peakIntervalEndSample = static_cast<double>(frames) - KENNStreamingMeterSnapshot::interpolationDelaySamples;
+        latest.peakIntervalStartSample = latest.peakIntervalEndSample - static_cast<double>(samplesPerBin);
         binFrames = 0; binEnergy = binPeak = 0.0;
         return true;
     }

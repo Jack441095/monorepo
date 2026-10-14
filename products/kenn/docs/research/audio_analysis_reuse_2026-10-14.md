@@ -107,6 +107,20 @@ screen. Shortlist both shorter FIR variants for further comparison; precision
 ordering varies by sample rate. Their maximum serial 100 ms batch at 96 kHz
 is 68.54 ms and 67.78 ms respectively, before capture/FFT, loudness, publication
 or model work. This remains a substantial cost, not a worker deadline result.
+
+On EBU Tech 3341 cases 15–19 (phased tones at fs/4, fs/6, fs/8 and 1.41 amplitude),
+the current 4x FIR exhibits frequency-dependent underreading (up to -0.313 dB on
+case 17 at all rates and -0.217 dB on case 15). Lower-quality 8x FIR in both double
+and float reduces error across all cases to between -0.016 dB and -0.024 dB:
+
+| Case | Target | Current 4x FIR (44.1 / 48 / 96 kHz) | Lower-quality 8x FIR (`juce8_low` / `juce8_low_float`) |
+|---|---|---|---|
+| Case 15 (fs/4, 0°, 0.5 pk) | -6.0 dBTP | -6.217 dBTP (-0.217 dB) | -6.021 dBTP (-0.021 dB) |
+| Case 16 (fs/4, 45°, 0.5 pk) | -6.0 dBTP | -5.975 dBTP (+0.025 dB) | -6.021 dBTP (-0.021 dB) |
+| Case 17 (fs/6, 60°, 0.5 pk) | -6.0 dBTP | -6.313 dBTP (-0.313 dB) | -6.021 dBTP (-0.021 dB) |
+| Case 18 (fs/8, 67.5°, 0.5 pk) | -6.0 dBTP | -6.028 dBTP (-0.028 dB) | -6.023 dBTP (-0.023 dB) |
+| Case 19 (fs/4, 45°, 1.41 pk) | +3.0 dBTP | +3.030 dBTP (+0.030 dB) | +2.984 dBTP (-0.016 dB) |
+
 Do not select a production implementation from these isolated timings. Broader
 frequency/transient checks, corrected input intervals, reset/gap retirement,
 prepared storage/RSS and combined-worker contention remain open. Keep the live

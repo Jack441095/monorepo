@@ -82,6 +82,10 @@ static void verifyMeter()
                 "Generated Tech 3341 case 1 momentary calibration is within 0.1 LU");
         require(steady.shortTermLUFS && std::abs(*steady.shortTermLUFS + 23.0) < 0.1,
                 "Generated Tech 3341 case 1 short-term calibration is within 0.1 LU");
+        require(steady.truePeakReady && std::abs(steady.peakIntervalEndSample - (static_cast<double>(3 * rate) - KENNStreamingMeterSnapshot::interpolationDelaySamples)) < 1e-9,
+                "Peak interval end sample accounts for causal interpolation delay exactly");
+        require(std::abs(steady.peakIntervalStartSample - (steady.peakIntervalEndSample - static_cast<double>(bin))) < 1e-9,
+                "Peak interval start sample is exactly 100 ms prior to peak interval end sample");
         meter.reset();
         feed(meter, static_cast<int>(3 * rate), rate, 1000.0, std::pow(10.0, -33.0 / 20.0), 0, true);
         require(meter.snapshot().shortTermLUFS && std::abs(*meter.snapshot().shortTermLUFS + 33.0) < 0.1,
