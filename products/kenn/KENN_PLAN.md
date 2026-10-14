@@ -1993,7 +1993,13 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       facts, drops the 9 Live 12 cards and their 3 siblings, and replaces them with Gate, Delay and Limiter cards
       from the local Live 12 snapshot; 72 of v1's 75 approved cards are byte-identical. 19 cards need fresh review,
       sent to a light-model review agent; the reviewer is an agent on Jack's delegation, not an independent human.
-      Preparation tests pass (101). Next: validator pass on v2, then the unchanged-4B baseline on v2, then S3.
+      Preparation tests pass (101). The v2 review approved 88 of 92 and rejected the Delay and Limiter groups
+      (control names and Limiter values not in the local Live 12 snapshot), so v2 still failed the validator.
+      **Packet v3** (`.runtime/seal-specialist-packet-v3/`) swaps those eight final cards for Filter Delay and Redux
+      cards taken verbatim from the Live 12 `audio-effects.html` snapshot (SHA-256 `83d8047a…`): all 92 cards
+      approved, validator passes, 101 preparation tests pass. The same agent wrote and approved the eight new
+      cards, so they are the best candidates for a second reader. Next: unchanged-4B baseline on v3 (the reward
+      and retention wording changed, so v1's baseline no longer applies), then S3.
       S2 stays open pending adapter trial qualification.
     - [ ] **S3 — Establish specialist learning against a pinned control.** Start
       with the current worker's verified 4B condition; another model requires the
