@@ -7,13 +7,15 @@ Groups session tracks into standard commercial delivery tiers:
 - 04_VOCALS (Lead Vocal, Backings, Ad-libs, Harmonies)
 - 05_FX (Sweeps, Risers, Impacts, Textures, Downlifters)
 
-Performs stem-level True Peak (<= -0.5 dBTP) and subsonic DC validation,
-and generates a cryptographically hashed Master Quality Delivery Certificate.
+The packager groups tracks and hashes the figures the caller states. It does not measure audio, so a stem's peak,
+loudness and compliance stay None (not measured) until something that does measure supplies them; the old version filled
+in -1.2 dBTP and called every stem compliant.
 """
 
 from __future__ import annotations
 
 import hashlib
+import math
 import time
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional
@@ -24,10 +26,10 @@ class StemTier:
     tier_id: str
     tier_name: str
     track_names: List[str]
-    peak_dbtp: float
-    integrated_lufs: float
-    dc_offset_clean: bool
-    compliant: bool
+    peak_dbtp: Optional[float]
+    integrated_lufs: Optional[float]
+    dc_offset_clean: Optional[bool]
+    compliant: Optional[bool]  # None until a measured peak exists to compare with MAX_STEM_TRUE_PEAK_DBTP
     description: str
 
     def to_dict(self) -> Dict[str, Any]:
@@ -37,28 +39,31 @@ class StemTier:
 @dataclass
 class MasterDeliveryCertificate:
     song_title: str
-    artist: str
-    bpm: float
-    musical_key: str
-    mqm_score: float
-    mqm_grade: str
-    integrated_lufs: float
-    true_peak_dbtp: float
+    # Each figure below is what the caller stated; absent means nobody gave it, and we do not guess.
+    artist: Optional[str]
+    bpm: Optional[float]
+    musical_key: Optional[str]
+    mqm_score: Optional[float]
+    integrated_lufs: Optional[float]
+    true_peak_dbtp: Optional[float]
     stems_exported: int
     sha256_provenance: str
     signature: str
     timestamp: float = field(default_factory=time.time)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
-            "song_title": self.song_title,
+        stated = {
             "artist": self.artist,
             "bpm": self.bpm,
             "musical_key": self.musical_key,
-            "mqm_score": round(self.mqm_score, 1),
-            "mqm_grade": self.mqm_grade,
-            "integrated_lufs": round(self.integrated_lufs, 1),
-            "true_peak_dbtp": round(self.true_peak_dbtp, 2),
+            "mqm_score": None if self.mqm_score is None else round(self.mqm_score, 1),
+            "integrated_lufs": None if self.integrated_lufs is None else round(self.integrated_lufs, 1),
+            "true_peak_dbtp": None if self.true_peak_dbtp is None else round(self.true_peak_dbtp, 2),
+        }
+        return {
+            "song_title": self.song_title,
+            # A figure nobody stated is left out, not sent as null, so a reader cannot mistake it for a zero.
+            **{name: value for name, value in stated.items() if value is not None},
             "stems_exported": self.stems_exported,
             "sha256_provenance": self.sha256_provenance,
             "signature": self.signature,
@@ -71,7 +76,7 @@ class StemPackagePlan:
     song_title: str
     audio_format: str
     tiers: List[StemTier]
-    all_compliant: bool
+    all_compliant: Optional[bool]  # None while any stem is unmeasured
     certificate: MasterDeliveryCertificate
     timestamp: float = field(default_factory=time.time)
 
@@ -91,9 +96,26 @@ class StemPackagePlan:
         }
 
 
+def _stated_number(value: Any) -> Optional[float]:
+    """The finite float the caller stated, or None for a missing, junk or non-finite value."""
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        # Absent, null or not a number: the caller gave us nothing to certify.
+        return None
+    return number if math.isfinite(number) else None
+
+
+def _stated_text(value: Any) -> Optional[str]:
+    """The caller's text trimmed, or None when it is missing or blank."""
+    text = str(value).strip() if value is not None else ""
+    return text or None
+
+
 class StemPackager:
     """Manages stem group categorization, quality gating, and cryptographic release certification."""
 
+    # House ceiling for a delivered stem (our choice, not a published figure). Unused until stems carry measured peaks.
     MAX_STEM_TRUE_PEAK_DBTP: float = -0.5
 
     def generate_stem_plan(
@@ -104,11 +126,12 @@ class StemPackager:
         """Categorize session tracks into 5 delivery stems and verify quality compliance."""
         meta = project_metadata or {}
         title = str(meta.get("title", meta.get("song_title", "Untitled Session")))
-        artist = str(meta.get("artist", "KENN Artist"))
-        bpm = float(meta.get("bpm", 128.0))
-        key = str(meta.get("key", "F Minor"))
-        mqm = float(meta.get("mqm_score", 88.5))
-        grade = str(meta.get("mqm_grade", "A"))
+        artist = _stated_text(meta.get("artist"))
+        bpm = _stated_number(meta.get("bpm"))
+        key = _stated_text(meta.get("key"))
+        mqm = _stated_number(meta.get("mqm_score"))
+        lufs = _stated_number(meta.get("integrated_lufs"))
+        true_peak = _stated_number(meta.get("true_peak_dbtp"))
 
         buckets: Dict[str, List[str]] = {
             "01_DRUMS": [],
@@ -141,29 +164,22 @@ class StemPackager:
         if not buckets["05_FX"]: buckets["05_FX"].append("FX Summed")
 
         tiers: List[StemTier] = []
-        all_compliant = True
 
         for tier_id, t_names in buckets.items():
-            # Approximate or ingest stem true peak
-            peak = -1.2 if tier_id != "01_DRUMS" else -0.8
-            lufs = -18.0 if tier_id != "01_DRUMS" else -15.5
-            is_compliant = peak <= self.MAX_STEM_TRUE_PEAK_DBTP
-            if not is_compliant:
-                all_compliant = False
-
+            # Nothing here renders or measures a stem, so there is no peak to check against the ceiling yet.
             tiers.append(StemTier(
                 tier_id=tier_id,
                 tier_name=tier_id.split("_")[1].capitalize(),
                 track_names=t_names,
-                peak_dbtp=peak,
-                integrated_lufs=lufs,
-                dc_offset_clean=True,
-                compliant=is_compliant,
+                peak_dbtp=None,
+                integrated_lufs=None,
+                dc_offset_clean=None,
+                compliant=None,
                 description=f"Lossless 24-bit 48kHz stem containing {len(t_names)} tracks.",
             ))
 
         # Cryptographic provenance hash
-        payload_string = f"{title}|{artist}|{bpm}|{key}|{mqm}|{len(tiers)}"
+        payload_string = f"{title}|{artist}|{bpm}|{key}|{mqm}|{lufs}|{true_peak}|{len(tiers)}"
         sha256 = hashlib.sha256(payload_string.encode("utf-8")).hexdigest()
 
         cert = MasterDeliveryCertificate(
@@ -172,9 +188,8 @@ class StemPackager:
             bpm=bpm,
             musical_key=key,
             mqm_score=mqm,
-            mqm_grade=grade,
-            integrated_lufs=-14.0,
-            true_peak_dbtp=-1.0,
+            integrated_lufs=lufs,
+            true_peak_dbtp=true_peak,
             stems_exported=len(tiers),
             sha256_provenance=sha256,
             signature=f"KENN-RELEASE-{sha256[:12].upper()}",
@@ -184,7 +199,7 @@ class StemPackager:
             song_title=title,
             audio_format="24-bit / 48 kHz Linear PCM Broadcast WAV (BWF)",
             tiers=tiers,
-            all_compliant=all_compliant,
+            all_compliant=None,  # becomes a real answer once stems carry measured peaks
             certificate=cert,
         )
 

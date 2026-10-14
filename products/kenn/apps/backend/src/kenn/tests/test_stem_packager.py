@@ -41,15 +41,23 @@ def test_standard_5_stem_grouping():
     assert "Main Lead Vocal" in vox_tier.track_names
 
 
-def test_stem_true_peak_validation():
-    """Asserts stems satisfy <= -0.5 dBTP compliance gate."""
-    packager = get_stem_packager()
-    plan = packager.generate_stem_plan(tracks=[])
+def test_stems_nobody_measured_are_not_called_compliant():
+    # 14 Oct 2026: every stem used to come back at -1.2 dBTP and compliant, from constants rather than audio.
+    plan = get_stem_packager().generate_stem_plan(tracks=[])
 
-    assert plan.all_compliant is True
+    assert plan.all_compliant is None
     for stem in plan.tiers:
-        assert stem.peak_dbtp <= -0.5
-        assert stem.dc_offset_clean is True
+        assert stem.peak_dbtp is None and stem.integrated_lufs is None
+        assert stem.compliant is None and stem.dc_offset_clean is None
+
+
+def test_a_certificate_carries_only_the_figures_the_caller_stated():
+    cert = get_stem_packager().generate_stem_plan(tracks=[]).certificate.to_dict()
+
+    # The old defaults were 128 BPM, F Minor, MQM 88.5 / "A", -14 LUFS and -1 dBTP, none of them measured.
+    for invented in ("bpm", "musical_key", "mqm_score", "mqm_grade", "integrated_lufs", "true_peak_dbtp", "artist"):
+        assert invented not in cert
+    assert cert["signature"].startswith("KENN-RELEASE-")
 
 
 def test_master_delivery_certificate_sha256():
@@ -60,8 +68,9 @@ def test_master_delivery_certificate_sha256():
         "artist": "Nite DSP",
         "bpm": 126.0,
         "key": "G Minor",
-        "mqm_score": 92.4,
-        "mqm_grade": "S",
+        "mqm_score": 27.4,
+        "integrated_lufs": -9.8,
+        "true_peak_dbtp": -1.1,
     }
     plan = packager.generate_stem_plan(tracks=[], project_metadata=meta)
     cert = plan.certificate
@@ -70,7 +79,7 @@ def test_master_delivery_certificate_sha256():
     assert cert.artist == "Nite DSP"
     assert cert.bpm == 126.0
     assert cert.musical_key == "G Minor"
-    assert cert.mqm_score == 92.4
-    assert cert.mqm_grade == "S"
+    assert cert.mqm_score == 27.4
+    assert cert.integrated_lufs == -9.8 and cert.true_peak_dbtp == -1.1
     assert len(cert.sha256_provenance) == 64  # Valid SHA-256 length
     assert cert.signature.startswith("KENN-RELEASE-")

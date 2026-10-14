@@ -354,7 +354,7 @@ def tool_cure_vocal_resonances(track_name: str = "Lead Vocal", spectral_peaks: O
 
 
 def tool_package_stems(tracks: Optional[List[Dict[str, Any]]] = None, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """Group session tracks into 5 delivery stems, verify peak compliance, and generate a signed release certificate."""
+    """Group session tracks into 5 delivery stems and hash the stated release figures; stem peaks are reported as unmeasured."""
     from kenn.core.stem_packager import get_stem_packager
     packager = get_stem_packager()
     trks = tracks
@@ -1444,9 +1444,9 @@ class KennAutonomousAgent:
                 "thought": f"Organized {len(tracks)} session tracks into {len(stem_plan.tiers)} standard delivery stems.",
                 "action": "package_commercial_stems",
                 "observation": stem_plan.to_dict(),
-                "reflection": f"Verified peak compliance. Generated SHA-256 release certificate {stem_plan.certificate.signature}.",
+                "reflection": f"Grouped the tracks and hashed the stated figures into release certificate {stem_plan.certificate.signature}. No stem was measured, so peak compliance is unchecked.",
             })
-            advice_lines.append(f"• **Stem Packager**: Prepared 5 delivery tiers with Master Certificate ({stem_plan.certificate.signature}).")
+            advice_lines.append(f"• **Stem Packager**: Grouped the tracks into 5 delivery tiers (certificate {stem_plan.certificate.signature}). Stem peaks were not measured, so none is marked compliant.")
 
         # -------------------------------------------------------------
         # Iteration 3: Subjective Metaphor Translation (if present)
