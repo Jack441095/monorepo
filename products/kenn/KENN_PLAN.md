@@ -915,13 +915,27 @@ mock, an agent reviewer or an unrelated receipt.
     Discarding delivery keeps
     the model slot occupied until inference finishes; actual inference cancellation
     remains unqualified.
-    Each was traced by reading source and ends in a fix or a recorded open finding: owners in
+    each was traced by reading source and ends in a fix or a recorded open finding: owners in
     [the A2 route map](docs/evidence/KENN_A2_ROUTE_MAP_2026-10-02.md), cache invalidation in
     [its receipt](docs/evidence/KENN_LIVE_CACHE_INVALIDATION_2026-10-02.md), and project switching,
     Apply/Undo during generation and trace storage in
     [the session-clear receipt](docs/evidence/KENN_SESSION_CLEAR_REVOKES_TOKENS_2026-10-02.md). Limits:
     no Live set identity scopes tokens or Undo receipts (open, needs a decision); inference is not
     cancelled and the cancel reply reports `inference_aborted: false`; nothing was run against real Live.
+  - [x] **Monolith Route Modularization (14 Oct):** refactored inline route clusters out of
+    the monolithic `server.py` into dedicated, typed modules in `products/kenn/apps/backend/src/kenn/routes/`:
+    - Ableton diagnostics and matrix (`/api/ableton/ping`, `/api/ableton/watchdog`, `/api/ableton/capabilities`,
+      `/api/ableton/device-matrix`) to `ableton_routes.py`.
+    - Project analysis routes (`/api/project-manager/report`, `/api/project-health/report`) to `doctor_handler.py`.
+    - DAW audio detection routes (`/api/ableton/session-tracks`, `/api/ableton/project-audio/poll`,
+      `/api/ableton/project-audio/file`) to `daw_routes.py`.
+    - OSC session, song time, locators, return tracks, clip states, and parameter inspection/value string
+      endpoints, plus arrangement analysis to `ableton_routes.py`.
+    - Live clip action proposals (`/api/ableton/midi-clip/proposal`, `/api/ableton/midi-clip/update-proposal`,
+      `/api/ableton/clip-duplication/proposal`, `/api/ableton/clip-rename/proposal`,
+      `/api/ableton/sample-import/proposal`, `/api/ableton/clip-audition/proposal`) to `daw_routes.py`.
+    - Aligned MIDI generation pitch labels and piano roll with Live octave convention ($60 = \text{C3}$).
+    All scoped tests (76 route, smoke, and command tests) pass; changes synced to `kenn-app/main`.
   - [x] Remove confirmed dead code and redundant ownership after checking callers,
     exports, dynamic registries, packaging and tests. Keep cleanup independent of
     the fixed benchmark revision; qualify each deletion with scoped checks.
