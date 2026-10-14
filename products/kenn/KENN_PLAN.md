@@ -111,11 +111,14 @@ Review of 4 October 2026, to test before deciding:
   is where KENN is different, so that work outranks winning the gate on general questions.
 - One scoreboard. Acceptance shows the checker is satisfied, not that the answer helped.
   Owner grades on a fixed, held-out question set sit beside the gate figures.
-- One experiment at a time, measured on mains power. On 4 October the Mac went to
-  battery at 21:04 and generation fell from about 18 to about 5 tokens a second, which
-  turned 10 s answers into 30 s ones and made that evening's timing figures meaningless.
-
-## Architecture
+- The owner's end goal is one assistant that is specialised in music production and Ableton Live, answers ordinary questions well, controls Live through the existing Apply and Undo path, and teaches Live to the producer. We confirmed this on 13 October: plan, evidence, and the user's request agree that the end goal includes a dedicated **mixing and music-production education system**.
+- **New end goal (14 October):** In addition to the assistant above, KENN must help a producer make good mixing and music-production decisions, like an education system. It does this by:
+  - Running real-time analysis of the Live session (channel levels, dynamics, spectrum, stereo width, correlation, transit time, peak analysis) to give grounded, current-state feedback.
+  - Grading the current mix or a specific change out of 100 against the producer's own reference, an explicit target, and published conventions, with the reasoning shown.
+  - Suggesting specific, actionable help: what to adjust, why, what a known baseline would look like, and what the producer should listen for.
+  - Explaining the music and audio clearly, so the producer learns, not just executes.
+  - Keeping every measurement grounded: unsupported measurements, sources and claims must be rejected, exactly as today.
+- The SaaS expansion plan (`Kenn的SaaS扩展方案&Kenn SaaS Expansion Plan.md`) is referenced for commercial positioning and architecture direction only: it informs interface choices and the "local-first hybrid" boundary (local Live bridging and low-latency DSP stay local; cloud hosts billing, multi-tenant data, and model inference). No new dependency, model asset, or service is approved by this edit.## Architecture
 
 This is the intended dependency direction. Existing code already implements much
 of it; the audit below identifies where consistency still needs proof. It is not
@@ -2330,18 +2333,29 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   musical metadata; select an exact target; propose insertion; verify Apply and Undo.
   Owner listening review is required for usefulness claims. Existing artifact/import
   code is a starting point, not a completed creation gate.
-- [ ] **B4 — Optional integrations.** Audio-to-MIDI, reference suggestions, AudioGen,
-  SLO and offline AutoMix remain separate typed artifact providers with unavailable
-  states. Audio generation needs explicit opt-in and license/provider review; no
-  silent network provider, filesystem rename or automatic session modification.
-  Reference A/B should use authorized files, corresponding sections and matched
-  playback loudness; identify analysed regions and normalization separately. For
-  later provider trials, investigate local whisper.cpp push-to-talk or Basic Pitch
-  ONNX on bounded instrument clips, one at a time. Speech becomes inspectable text
-  through the existing policy; MIDI keeps preview/target/Apply/Undo. Pin code and
-  weight licences separately and qualify offline operation and resource use.
-
-### 5. Qualify and release one exact build
+- [ ] **B4 — Optional integrations.** Audio-to-MIDI, reference suggestions, AudioGen, SLO and offline AutoMix remain separate typed artifact providers with unavailable states. Audio generation needs explicit opt-in and license/provider review; no silent network provider, filesystem rename or automatic session modification. Reference A/B should use authorized files, corresponding sections and matched playback loudness; identify analysed regions and normalization separately. For later provider trials, investigate local whisper.cpp push-to-talk or Basic Pitch ONNX on bounded instrument clips, one at a time. Speech becomes inspectable text through the existing policy; MIDI keeps preview/target/Apply/Undo. Pin code and weight licences separately and qualify offline operation and resource use.
+- [ ] **E1 — Real-time analysis pipeline.** Build the analysis bridge that reads Live channel state (levels, dynamics, spectrum, stereo width, correlation, transit time, peak analysis) and serves it to chat and mix-review modules as grounded 100 ms windows with sample positions, capture age, source generation and drop counts. Constrain to the measured 100 ms windows from the existing insert-analysis work; overflow must drop measurements, never wait for playback.
+  - [ ] Existing insert-analysis queue and 100 ms window contract already exist; verify the analysis pipeline serves those windows to chat and mix-review without adding a second write authority.
+  - [ ] Test synthetic signal correctness, queue overflow/recovery, callback allocations, pass-through, instance isolation, and average/p99/max timings at multiple rates, buffer sizes and 1/8/32/64 instances. Connect two native inserts through independent insert IDs and owner-scoped explicit bindings; verify matching kick/bass spectra through FakeLive HTTP.
+  - [ ] Profile real native publishers against an isolated FakeLive HTTP companion. Replace per-insert HTTP threads with one shared feature-batch publisher; verify 64-insert freshness, payload caps, independent control limits, atomic validation, and the 15-second retained-memory regression plus per-tick macOS compliance.
+  - [ ] Qualify 64 native publishers for 65 seconds against isolated FakeLive HTTP, including peak accuracy under silence, DC, bin-edge impulses and noise.
+- [ ] **E2 — Grade out of 100.** Implement the mix grade: take the current-state analysis plus the producer's own reference (a song, a reference track, an explicit target), compare against those and against permitted conformance vectors, and return a single grounded score from 0 to 100 with the reasoning shown.
+  - [ ] Measure the HTTP template/upgrade path's conditional repeated routing, and verify that the same result can be reproduced by a second analyst.
+  - [ ] Benchmark offline: compare current mix-review code against cheaper existing variants, choose the reference, and document the decision with evidence (see docs/research and the reuse comparison receipts).
+  - [ ] Build the grading logic in the existing mix-review module; grade only against authorized references, declared conventions, and the producer's own comparison target; never invent numbers.
+  - [ ] Verify the grade is deterministic for the same inputs and that a change to the underlying analysis is reflected in the grade.
+- [ ] **E3 — Suggest specific, actionable help.** Implement the suggestion engine: given a grade below a helpful threshold, produce a short list of specific levers (what to adjust, why, what a known baseline would look like, and what to listen for), each individually bound to a Live target or explicitly marked as informational.
+  - [ ] Draft the suggestion templates against the 2026-10-14 audio-analysis reuse review, preserving the existing accuracy margins and refusal paths.
+  - [ ] Test: each suggestion must name a live target, offer an Apply/Undo path, or be explicitly outside Live; the grade must change if the suggestion is applied and re-measured.
+  - [ ] Require owner listening review before usefulness claims are made; existing artifact/import code is a starting point, not a completed creation gate.
+- [ ] **E4 — Explain and teach.** Implement the explanation layer: chat and mix-review responses explain the music and audio clearly (why the grade is what it is, what a number means, what to listen for), so the producer learns, not just executes.
+  - [ ] Use existing grounded conversation patterns; citation, evidence, and refusal paths must work from chat, the browser chat, and the first model call.
+  - [ ] Test the explanation against the acceptance graph in the voice output stubs; the result must be interrogable by the model without guessing numbers from the prompt.
+  - [ ] Verify the result survives: the model can restate it, answers identify memory used, a different session cannot read it.
+- [ ] **E5 — Gate the end-to-end flow.** Qualify the complete education/mixing guidance path: real-time analysis → grounded grade → actionable suggestion → explanation, with exact Apply/Undo and human grading.
+  - [ ] Reference the 15 s gate path at docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md; the full sequence must be scripted and rehearsed before any release claim.
+  - [ ] Grade sealed answers blind against the existing held-out question set, compare B/C/D across development-only steps, and land the synonym fix before the v5 bench.
+  - [ ] Confirm the mixed-deck audio calculator remains grounded against published conventions (note lengths at tempo, chord degrees, time signatures) with real reference notes; verify middle C labelling agreement with Live (KENN uses scientific pitch, middle C = C4).### 5. Qualify and release one exact build
 
 - [ ] **R1 — Reproducible source and package.** Clean checkout on the supported matrix,
   backend/frontend/native/plugin checks, approved local assets declared separately,
@@ -2747,6 +2761,11 @@ different hardware, routes or fixtures into a single passing figure.
 | Recipes | At least 15 real-Live-qualified recipes; p95 per-step at most 3 s; exact Undo; at least three supervised testers and zero unauthorized writes. Fake receipts do not close this gate. |
 | Planner promotion | At least 500 comparisons over at least 14 days, at least 98% schema validity, at least 90% deterministic agreement, no increased wrong plans or safety failures, and human review under `live_llm_promotion.py`. |
 | Listening | At least 80% reviewer agreement on useful findings and at least 90% applied-fix remeasurement success on the consented qualified corpus; two reviewers. No unsupported musical-quality claims. |
+| Mix grade and education | Grade the current mix or a change out of 100 against the producer's own reference, an explicit target, and published conventions; reasoning shown. A grade below a helpful threshold triggers a short list of specific, actionable suggestions, each bound to a Live target or marked informational. Owner listening review required before usefulness claims. |
+| Real-time analysis | 100 ms analysis windows with sample positions, capture age, source generation and drop counts. Oversampling variants (4x and 8x) must preserve the same causal peak bins across silence, right-channel DC, bin-edge impulses and noise; reset/gap retirement and full transient/temporal conformance qualified. |
+| Suggestion validity | Each suggestion names a live target, offers an Apply/Undo path, or is explicitly marked informational; the grade changes if an applied suggestion is re-measured. |
+| Grade defensibility | Same inputs produce the same grade; the target set, conventions and reference files are declared and versioned; unsupported measurements, sources and claims are rejected, not graded around. |
+
 | Memory and creation | Human memory find/delete/isolation checks; explicit consent and provenance; owner listening review for generated ideas; every enabled insertion has verified Undo or is withheld. |
 
 Report monthly with [monthly measures](tooling/scripts/monthly_measures.py):
