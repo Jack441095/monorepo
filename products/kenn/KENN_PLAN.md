@@ -1601,10 +1601,24 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       compressor, Timeless 3 a delay, Pro-R 2 a reverb). The sound-stage note
       body already denied Pro-D2; its false-name Tags were removed (2660B
       `9bc90930` to 2765B `f0d6e27c`), denial body kept. Targeted BM25 rerun
-      against staged `v-d1788545da5c` (read-only) still surfaces the note rank 1
-      because staged chunks carry pre-correction text: a rebuild is required
-      before the product-name check can pass. Candidate stays inactive; active
-      index `v-db8c6334cf63` untouched. Schedule batches 2–5 (80 notes) were
+      against older staged `v-d1788545da5c` (read-only) surfaced pre-correction
+      text, confirming a clean rebuild was required before qualification.
+      **14 October clean candidate qualification (agent/Gemini evidence review):**
+      defined explicit `source-allowlist.json` with 763 vetted notes (743 Approved,
+      13 factual-owner-review-pending, 7 unmarked; 44 Draft/Unreviewed excluded) and
+      2 verified manuals (`live11-manual-en.pdf` SHA-256 `7afedc8d8fb1...`,
+      `audio-too-workflow-checklist.pdf` SHA-256 `cd8e0061...`). Rebuilt clean
+      staged candidate index `v-f303b83a1e01` into isolated `.runtime/mimo-note-review-validation-2026-10-13/candidate-index-clean`
+      (3903 chunks, 750 notes indexed, 57 skipped, 2 manuals indexed). Active index
+      `v-db8c6334cf63` remained untouched. Runbook shadow preflight verified
+      1435 official-manual chunks bound to Live 11 manual, passing 16/16 manual
+      grounding checks across 9 categories and 1/1 unsupported reference query
+      abstention check. Targeted product-name evaluation passed: "Does FabFilter Pro-D2 exist?"
+      surfaces corrected Short answer at rank 1 (score 47.61) and Common mistakes at
+      rank 2 (score 40.53) explicitly denying Pro-D2 per FabFilter catalog evidence.
+      Qualification receipt: `.runtime/mimo-note-review-validation-2026-10-13/candidate-index-clean-receipt-2026-10-14.json`.
+      Candidate stays staged; active index untouched pending full serving promotion protocol.
+      Schedule batches 2–5 (80 notes) were
       independently claim-reviewed: 31 corrected, 49 unchanged with input hashes
       recorded but no pass marks. Batch 2: 7 corrected (noisia units, arpeggiator
       shortcut, Auto Filter circuits, Auto Pan waveshapes, Auto Shift
@@ -1660,8 +1674,183 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       architecture, instrument-pt10 Operator voice/spread/glide cleanup,
       instrument-pt11 Operator LFO routing, instrument-pt14 Sampler envelope
       & LFO routing) and 8 unchanged.
+      Batch 13: 5 corrected (instruments-pt1 sine+PW/LFO-Depth, instruments-pt10
+      Spread/Glide, instruments-pt15 Sensitivity-64 + Morph question,
+      instruments-pt16/ms + pt17/s Decay units) and 15 unchanged — the sixth
+      ledger item (instruments-pt14 Simpler-modes question) was verified absent
+      from the file, a ledger misreference, recorded as no-change in
+      `batch13-addendum-2026-10-14.json`.
+      Batch 14: 11 corrected (instruments-pt19 25% figure, instruments-pt2
+      LFO/Width/Noise-Res, instruments-pt20 fabricated LFO/delay/zones,
+      instruments-pt3 Decay unit, instruments-pt8 modulation-bus fiction,
+      instruments-pt9 End-parameter question, shortcuts-pt2 Option-Shift-F,
+      midi-fx-pt1 Chance question, midi-fx-pt2 Decay-% + ±28, midi-fx-pt3
+      Add-Envelope fiction, midi-fx-pt4 mapping direction; incl. a residual
+      pt20 Why-it-matters + short-answer cleanup in a follow-up fix) and 9
+      unchanged. Batch 15: 8 corrected (m4l-pt1 LFO target, m4l-pt2 Sync-Rate
+      BPM, m4l-pt5 fabricated interconnect, fact-pt1 Play-Through switch,
+      fact-pt2/pt3 Draft rewrites incl. a residual Why + short-answer cleanup
+      in a follow-up fix, tools-pt4/pt5 invented params) and 12 unchanged.
+      Batch 16: 11 corrected (mixing-manual-pt3 invented level rules, recording
+      mono-input blanket + tempo-range misapplication, routing Mac modifiers,
+      routing-io-pt2/pt4 Draft rewrites, session-pt3 envelope-UI fiction,
+      stem-pt1 real-time claim, stem-pt2/pt3 Draft rewrites) and 9 unchanged.
+      Batch 17: 5 corrected (push-1-pt4 aftertouch notation, push-1-pt5
+      footswitch swap, push-2-pt6 scene block, tuning-pt3 MIDI-sync rewrite,
+      instruments-fx-pt3 Mute→listen) and 15 unchanged.
+      Batch 18: 2 corrected (browser-pt4 File-menu path, rack-basics Group/Map
+      UI paths) and 17 unchanged plus 1 uncertain (adding-random-noise,
+      self-declared pending owner review, never passed).
+      Batch 19: 7 corrected (baphometrix pt1–pt7 source labels; pt3 LUFS-peak
+      conflation, pt5 RMS-vs-peak, pt6 RMS-momentary-max, pt7 lossy-clipping
+      guidance) and 13 unchanged.
+      Batch 20: 20 corrected, none unchanged — all baphometrix video-transcript
+      notes carried the false Official-docs source label (fixed everywhere);
+      plus pt8 TP-trim fiction, 2ZU0-pt2 headroom contradiction, 5UT42 Valhalla
+      product fiction + limiter ratios, 5UT42-pt2 LFE→LUFS + crest physics,
+      ASdiHX-pt1 Pro-Q-as-saturator + limiter ratio, B1FD-pt2 limiter
+      ratio/knee + Gullfoss spelling, B1FD-pt3 SSL-G clipper fiction,
+      BToeN-pt1 thermal + Auto-Gain fiction, BToeN-pt2 LPF/HPF swap, Cern-pt2
+      listen-bus compensation fiction.
+      Batch 21: 20 corrected, none unchanged — all baphometrix video-transcript
+      notes carried the false Official-docs source label (fixed everywhere);
+      plus CernKPIDEHY-pt4/pt5 unit fixes, JeurQAySdzA-pt1 Spectre vendor,
+      LgNW9teSo38-pt1 dBTP→LUFS, pt2 Mix-Tool/ratio/K9, pt3 K-system peaks,
+      PR1o5LQzEB0-pt1/pt3 oversampling-ceiling, pt4 32-bit switch, pt7 1:1
+      limiter + 2%-OS, TdiCDayFMa8-pt2 smart:comp vendor.
+      Batch 22: 20 corrected, none unchanged — all baphometrix video-transcript
+      notes carried the false Official-docs source label (fixed everywhere);
+      plus b2I8 momentary-dB→LUFS + Abbey-Road-1176 fiction + unitless levels,
+      bF6iw LPF/HPF swaps, jR_AX clipper/limiter params + heat fiction,
+      tAlTYR-pt2 32-bit switch + pt6 Aux-Send/feedback + pt7 clipper params,
+      tnOVEXS 1:1 limiter, wcxvb LUFS units + RMS muddle + 1176 attack value.
+      Batch 23: 8 corrected (wcxvbJgKVUM-pt4 unitless/contradiction,
+      x1ZNWl-xuh8-pt1 master-LPF fiction, x1ZNWl-xuh8-pt6 shelf contradiction
+      + spectre-compressor fiction incl. a residual question cleared in a
+      follow-up fix) and 12 unchanged; the other 5 baphometrix notes needed
+      source-label fixes only.
+      Batch 24: 13 corrected (0AxzJ Preamp→+48V + Residual section +
+      What-to-cite fix, LtNa8-pt2 dither-power fiction, PlcwZ-pt2 null-test
+      procedure fiction, a3O3 1176-attack value, b8NV tags→reaper, 1xPO-pt3
+      dual-100Hz/self-noise fiction, 9InC9-pt7 Diva-patches fix + pt17/19
+      cuts, PWc1e-pt2 refusal fix, DRdADzxaRY-pt5 tools fix + 4ZgdnpIlBA-pt3
+      pills fix, PlcwZ-pt1 single-video label fix) and 7 unchanged (6 pass,
+      1 uncertain: creating-a-laser-sound re-adjudicated Unreviewed
+      pre-existing, left untouched).
+      Batch 25: 5 corrected (nP74656yTi8-pt1 transducer-physics rewrite +
+      incoherent Live-module steps replaced, s8JGUzZCynU-pt1 phantom-power
+      step removed + analogue-lookahead hedged, s8JGUzZCynU-pt2 FabFilter
+      spelling + LUFS unit + masking claim hedged, s8JGUzZCynU-pt3 L-limiter
+      wording generalized, vgtB1lYMbTU-pt1 iLok product fiction removed;
+      all 5 source labels fixed to video) and 15 unchanged (13 general
+      mixing notes pass; 2 linear-phase notes pass; dolby-atmos passes
+      with its cited PDF absent locally recorded as a caveat).
+      Batch 26: 7 corrected (eliminating-stream-loudness incoherent premise
+      retitled to Dramatic Intro Sound Design + equal-access fiction dropped,
+      basic-compressor-controls Lower→Raise threshold, bus-parallel aux-send
+      →group/bus + stereo-imaging phrase dropped, intro-to-compression knee
+      0%→0 dB, side-chain 20 Hz/80 Hz detector staging + fluff trimmed,
+      frequency-range 3-band-EQ wording fixed, intro-to-eq Q-1.5 narrow→
+      moderate + chain rule softened; all 6 Learn source labels fixed) and
+      13 unchanged (EBU LRA passes with its cited PDF absent locally
+      recorded as a caveat; FabFilter linear-phase EQ passes on its cited
+      primaries with explicit Pro-Q 3/4 scoping).
+      Batch 27: 13 corrected (automation Live-12→Live + envelope attack/
+      release fiction + aux-send muddle, 3 reverb notes Pro-R→Pro-R 2 +
+      45 s/FMP/reflection-mix/convolution fixes, localization stereo-imager
+      →Utility + 500 Hz recipe hedged, wave-theory dB-SPL→dBFS, oscillators
+      sync/sub numbers fixed, envelopes/LFOs wording fixed, timbre/filters/
+      subtractive source-label fixes, feed-me-pt1 transcript source + retag;
+      all 13 false Official-docs labels fixed) and 7 unchanged (audited
+      Pro-D2 sound-stage note byte-identical, perception/phase Learn notes,
+      Pro-Q/Pro-C basics, feed-forward lore note, both transcript-grounded
+      feed-me notes).
+      Batch 28: 6 corrected (follow-actions Live-12 source→Live 11,
+      freeze-flatten Bounce-in-Place de-versioned + return-freeze fiction
+      replaced, glitching-with-delay nonexistent glitch device→Beat Repeat,
+      gain-staging Live-12 refs stripped, grain-delay knob names fixed,
+      glitch-effects Ctrl+R→context-menu) and 14 unchanged (12 pass,
+      incl. Draft harsh-after-limiting as-is and verified headphone
+      product names; 2 uncertain: signature-sound + frequency-signature,
+      self-declared Unreviewed, left untouched).
+      Batch 29: 13 corrected (all false Official-docs labels→iZotope Learn;
+      ref-tracks retitle + TBC version + crest-factor wording, glossary-pt1
+      crest-factor definition + all-pass step, glossary-pt2 Time-align
+      fiction, sample-rate pre-ADC impossibility + Live-12 + dither fixes,
+      eq-vocals precision hedges + Q-0.5 contradiction, mix-music recipe
+      hedge, streaming -14 LUFS hedge + -0.3/-1 dBTP chain + -12/-14
+      contradiction, de-clip -10 dB hedge, RX-12→RX, Spectral-Repair
+      attack/release fiction) and 7 unchanged (4 house/vocal pass; 3 ITU
+      pass, BS.1116-3 with its cited PDF absent locally recorded as
+      a caveat).
+      Batch 30: 2 corrected (jack-mastering-clipper-use -0.5 dB ceiling
+      misdirection→-1.0 dBTP with safety note, loudness-measurement
+      relative-gate misphrase fixed) and 18 unchanged (8 Jack studio
+      notes + 10 general mixing notes pass).
+      Batch 31: 3 corrected (dramatic-intro Face-Plan fiction→Granulator II
+      + 2-minute prescription hedged, midi-routing Live-12 source→Live 11
+      + Hardware-Latency location fixed, ambient-music Spectrum-Effect
+      Live-12 claim de-versioned) and 17 unchanged (all pass).
+      Batch 32: 0 corrected and 20 unchanged (19 pass, incl. verified
+      reference meters/plugins; 1 uncertain: modulating-delay-time,
+      self-declared Unreviewed, left untouched) — receipt-only batch.
+      Batch 33: 10 corrected (3 mr-bill Cliff-X→ClyphX renames + installer/
+      macro-syntax/menu/warp-mode fixes grounded via ClyphX manual +
+      Isotonik lookup, 3 Noisia source-label fixes + value hedges +
+      stereo-imager/reverb fixes, Operator Live-12 source→Live 11,
+      neuro-bass Wavetable-feedback restriction, stem-mixing below-30 Hz
+      cut fix, OTT built-in-preset fiction fix) and 10 unchanged (all
+      pass, incl. both transcript-grounded Noisia notes).
+      Batch 34: 5 corrected (pitch-bend D#-sharp redundancy, pitch-
+      correction stock-plugin implication + at-4000-Hz incoherence,
+      PDC title de-versioned, random-grain Looping/Com-Filter/Phase-Plan/
+      Atilier fictions, random-flutter backwards cap claim) and 15
+      unchanged (all pass).
+      Batch 35: 5 corrected (recording-audio Spacebar-as-Record fiction,
+      recording-workflow title/content mismatch retitled to stream setup,
+      resampling baselines typo, sample-flipping Ctrl+R fiction,
+      sample-rate streaming-normalization overgeneralization) and 15
+      unchanged (all pass).
+      Batch 36: 5 corrected (session-recording + simpler/sampler Live-12
+      sources→Live 11, tape-stop in-place-export + Shifter-Live-12 claims,
+      midi-tips draft demoted to Draft + nav-chrome removed, time-signature
+      View-menu fiction→ruler right-click path) and 15 unchanged (all
+      pass).
+      Batch 37: 13 corrected (Transient-Master pointer, delay pitch
+      mechanism, macros de-garble, stems piracy hedges x2,
+      inverse-principle→M/S reframe, warp shortcut/slider fictions,
+      chaos-racks + formula-parser + vriot-pt1 retitles, cps→cents,
+      OTT-overdrive label; 3 vriot source-label fixes) and 7 unchanged
+      (all pass). Batch-37 addendum: the Jump-Mode removal in that batch
+      was wrong — the delay-test transcript note confirms Repitch/Fade/
+      Jump modes, so Jump wording was restored in the delay-plugin note
+      (no edit needed in delay-for-pitch, verified absent).
+      Batch 38: 12 corrected (all false Official-docs labels→Virtual Riot
+      video incl. delay-test + fine-dat-anthem transcripts; pt2 Live-12 +
+      value hedge, pt3 FacePlan fiction, pt4 D#-sharp + Edit-Window,
+      pt6 25 kHz crossover, pt7 Transients-device/scaleware/mud-rate/
+      ping-pong fixes, pt8 limiter knobs, pt9 a-cappella typo + hedges,
+      anthem-pt1 stacked cuts, anthem-pt2 20 Hz LP + stereo-imaging
+      clause) and 8 unchanged (all pass, incl. transcript-grounded
+      delay-fade note byte-identical).
+      Batch 39: 6 corrected (synth-layering Serum possessive + 20 Hz LP,
+      transformers-pt1 source-only, pt2 FabFilter spelling + Atelier,
+      pt3 chaos devices + Reaktor garble, pt4 sustain-% + dB-pan +
+      comb-filter, vocal-chain Live-12 refs stripped) and 14 unchanged
+      (all pass, incl. transcript-grounded transformers.md).
+      Batch 40: 3 corrected (vocal-tuning ARA/Edit-with-Melodyne fiction,
+      wavetable Live-12 source→Live 11, wwise-loop Ableton Live-12 source
+      half stripped) and 17 unchanged (all pass, incl. 12 sourced Wwise
+      notes).
+      Batch 41: 0 corrected and 7 unchanged (all pass, well-sourced
+      Wwise notes) — receipt-only final batch.
+      Batch 1: 0 corrected and 20 unchanged (all pass — prior 2026-10-13
+      online-manual audit headers accepted after read-through, no new
+      errors; online sources not re-fetched locally, recorded as caveat)
+      — receipt-only closing batch; schedule now complete 1–41.
       Receipts: `.runtime/mimo-note-review-validation-2026-10-13/pro-d2-resolution-2026-10-13.json`
-      and `batch2/batch3/batch4/batch5-corrections-2026-10-13.json` plus
+      and `batch1-corrections-2026-10-14.json` plus
+      `batch2/batch3/batch4/batch5-corrections-2026-10-13.json` plus
       `batch6-corrections-2026-10-14.json` and
       `batch7-corrections-2026-10-14.json` with
       `batch7-addendum-2026-10-14.json` plus
@@ -1673,11 +1862,55 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       `batch10-addendum-2026-10-14.json` plus
       `batch11-corrections-2026-10-14.json` with
       `batch11-addendum-2026-10-14.json` plus
-      `batch12-corrections-2026-10-14.json` (all
+      `batch12-corrections-2026-10-14.json` plus
+      `batch12-corrections-2026-10-14-agent.json` plus
+      `batch13-corrections-2026-10-14.json` with
+      `batch13-addendum-2026-10-14.json` plus
+      `batch14-corrections-2026-10-14.json` with
+      `batch14-addendum-2026-10-14.json` plus
+      `batch15-corrections-2026-10-14.json` with
+      `batch15-addendum-2026-10-14.json` plus
+      `batch16-corrections-2026-10-14.json` plus
+      `batch17-corrections-2026-10-14.json` plus
+      `batch18-corrections-2026-10-14.json` plus
+      `batch19-corrections-2026-10-14.json` plus
+      `batch20-corrections-2026-10-14.json` plus
+      `batch21-corrections-2026-10-14.json` plus
+      `batch22-corrections-2026-10-14.json` plus
+      `batch23-corrections-2026-10-14.json` with
+      `batch23-addendum-2026-10-14.json` plus
+      `batch24-corrections-2026-10-14.json` plus
+      `batch25-corrections-2026-10-14.json` plus
+      `batch26-corrections-2026-10-14.json` plus
+      `batch27-corrections-2026-10-14.json` plus
+      `batch28-corrections-2026-10-14.json` plus
+      `batch29-corrections-2026-10-14.json` plus
+      `batch30-corrections-2026-10-14.json` plus
+      `batch31-corrections-2026-10-14.json` plus
+      `batch32-corrections-2026-10-14.json` plus
+      `batch33-corrections-2026-10-14.json` plus
+      `batch34-corrections-2026-10-14.json` plus
+      `batch35-corrections-2026-10-14.json` plus
+      `batch36-corrections-2026-10-14.json` plus
+      `batch37-corrections-2026-10-14.json` with
+      `batch37-addendum-2026-10-14.json` plus
+      `batch38-corrections-2026-10-14.json` plus
+      `batch39-corrections-2026-10-14.json` plus
+      `batch40-corrections-2026-10-14.json` plus
+      `batch41-corrections-2026-10-14.json` (all
       json.load verified). No training, no rebuild/promotion, no Live contact;
       all sources rights-unknown with no shared-weight grant. Live 12 manual
       remains absent locally, so Live 11 grounding does not qualify Live 12
-      claims. S1 stays open.
+      claims. Batch 12 manifest note: two lanes wrote batch-12 receipts
+      concurrently. This lane corrected 7 notes, found 3 already rewritten by
+      the other lane (recorded as superseded, not re-edited), and left 10
+      unchanged (receipt `-agent.json`; 6/7 outputs plus all superseded and
+      no-change values verified byte-for-byte on disk). The same-named
+      manifest from the other lane claims 12 corrected with input records that
+      mismatch independently verified pre-edit values (e.g. pt20 input 1493B
+      paired with the 1578-byte pre-edit hash); it also absorbed this lane's
+      edits as its own outputs. Both files are preserved untouched; reconcile
+      which manifest stands before any index rebuild. S1 stays open.
     - [ ] **S2 — Build a harder, reviewed packet within today's limits.** Start with
       four training source families and two ordinary targets per context: eight
       reviewed examples, including concise explanations and follow-ups. Prepare
