@@ -1985,6 +1985,15 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       This establishes robust headroom for specialist fine-tuning on both 4B control and 1.7B challenger.
       Full answers and summaries logged in `.runtime/seal-specialist-packet-v1/baseline-4b-summary.json`
       and `baseline-1.7b-summary.json`.
+      **14 October packet v1 review and v2:** Jack granted training rights on all packet sources and allowed an
+      agent to review cards on his behalf. The agent approved 75 of 92 v1 cards and rejected 17: 8 retention
+      questions whose answers depended on facts the model never sees, and 9 Live 12-only cards it could not check
+      offline. The validator still rejected v1 because granting rights changes each source's record hash. Packet v2
+      (`.runtime/seal-specialist-packet-v2/`, v1 untouched) rewrites the 8 retention questions to carry their own
+      facts, drops the 9 Live 12 cards and their 3 siblings, and replaces them with Gate, Delay and Limiter cards
+      from the local Live 12 snapshot; 72 of v1's 75 approved cards are byte-identical. 19 cards need fresh review,
+      sent to a light-model review agent; the reviewer is an agent on Jack's delegation, not an independent human.
+      Preparation tests pass (101). Next: validator pass on v2, then the unchanged-4B baseline on v2, then S3.
       S2 stays open pending adapter trial qualification.
     - [ ] **S3 — Establish specialist learning against a pinned control.** Start
       with the current worker's verified 4B condition; another model requires the
