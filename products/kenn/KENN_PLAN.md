@@ -287,10 +287,9 @@ Execution plan for efficient continuous analysis (2026-10-13):
   the actual browser against FakeLive. Native Ask tests do not close this gate.
   Closed offline on 13 October by `plugin_audio.e2e.ts`; exact installed-build
   and supervised Ableton verification remain D2–D5 below.
-- [ ] Complete meter qualification before exposing live LUFS/dBTP: resolve 44.1 kHz
-  interpolation accuracy and delayed peak interval semantics, cover temporal and
-  transient conformance cases, and measure sustained shared-worker/publisher/model
-  contention. Investigate the intermittent callback/freshness tails recorded below.
+- [ ] Complete meter qualification before exposing live LUFS/dBTP:
+  - [x] Resolve 44.1 kHz interpolation accuracy (Tech 3341 cases 15–19 benchmarks shortlist JUCE lower-quality 8x FIR in float/double, reducing underreading from -0.313 dB to -0.021 dB) and delayed peak interval semantics (`StreamingMeterSnapshot` explicitly defines input-frame interval $[t_{\text{end}} - \text{samplesPerBin} - \text{delay},\ t_{\text{end}} - \text{delay}]$).
+  - [ ] Cover remaining temporal and transient conformance cases, and measure sustained shared-worker/publisher/model contention. Investigate the intermittent callback/freshness tails recorded below.
   First apply the standing reuse check: evaluate existing JUCE DSP and upstream
   loudness/resampling tools before extending KENN's interpolation kernel.
   The 14 October comparison makes JUCE double FIR 8x an accuracy reference,

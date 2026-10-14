@@ -70,7 +70,7 @@ def from_plugin_context(context: dict[str, Any] | None) -> EvidencePacket | None
         ("stereo_correlation", "correlation"), ("stereo_width", "ratio"),
         ("low_energy", "linear energy"), ("mid_energy", "linear energy"),
         ("high_energy", "linear energy"), ("sample_rate", "Hz"),
-        ("analysed_samples", "samples"),
+        ("analysed_samples", "samples"), ("audio_age_seconds", "seconds"),
     )
     facts: list[EvidenceFact] = []
     for name, unit in fields:
@@ -91,6 +91,19 @@ def from_plugin_context(context: dict[str, Any] | None) -> EvidencePacket | None
         curve = pink_noise.get("curve")
         if isinstance(curve, str) and curve.strip():
             facts.append(EvidenceFact("realtime_pink_noise_reference_curve", curve.strip(), "", "plugin_bus_snapshot"))
+    # The 100 ms window the plug-in measured: where it sits in the stream and whether any audio was dropped around it.
+    # Without these a reader cannot tell a fresh window from an old one, or a clean one from one with a gap.
+    measurement_window = context.get("measurement_window")
+    if isinstance(measurement_window, dict):
+        for name, unit in (
+            ("start_sample", "samples"), ("end_sample", "samples"), ("duration_seconds", "seconds"),
+            ("source_generation", "count"), ("dropped_samples", "samples"), ("invalid_samples", "samples"),
+        ):
+            value = measurement_window.get(name)
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                # A missing or malformed field is left out rather than guessed; the packet stays valid without it.
+                continue
+            facts.append(EvidenceFact(f"measurement_window_{name}", float(value), unit, "plugin_bus_snapshot"))
     live_window = context.get("live_window")
     if isinstance(live_window, dict):
         sample_count = live_window.get("sample_count")

@@ -275,3 +275,39 @@ def test_stale_realtime_evidence_remains_visible_but_is_not_current() -> None:
     freshness = packet.payload()["freshness"]
     assert freshness["status"] == "stale_or_unknown"
     assert freshness["current_for_diagnosis"] is False
+
+
+def test_plugin_evidence_carries_where_the_100_ms_window_sits_and_what_was_dropped() -> None:
+    # 14 Oct 2026: chat and mix review got levels from the windows but not the sample positions, capture age,
+    # source generation or drop counts, so a stale or gapped window looked the same as a clean one.
+    packet = from_plugin_context({
+        "schema": "kenn.live_mix_context.v1",
+        "age_seconds": 0.2,
+        "peak_dbfs": -5.0,
+        "rms_dbfs": -18.0,
+        "audio_age_seconds": 0.12,
+        "measurement_window": {
+            "valid": True, "sequence": 7, "source_generation": 3, "start_sample": 4_800, "end_sample": 9_600,
+            "duration_seconds": 0.1, "dropped_samples": 256, "invalid_samples": 0,
+        },
+    })
+
+    assert packet is not None
+    facts = {fact.name: (fact.value, fact.unit) for fact in packet.facts}
+    assert facts["measurement_window_end_sample"] == (9_600.0, "samples")
+    assert facts["measurement_window_source_generation"] == (3.0, "count")
+    assert facts["measurement_window_dropped_samples"] == (256.0, "samples")
+    assert facts["audio_age_seconds"] == (0.12, "seconds")
+
+
+def test_a_malformed_window_field_is_left_out_not_guessed() -> None:
+    packet = from_plugin_context({
+        "schema": "kenn.live_mix_context.v1",
+        "peak_dbfs": -5.0,
+        "measurement_window": {"end_sample": "9600", "dropped_samples": True, "source_generation": 1},
+    })
+
+    assert packet is not None
+    names = {fact.name for fact in packet.facts}
+    assert names >= {"measurement_window_source_generation"}
+    assert not names & {"measurement_window_end_sample", "measurement_window_dropped_samples"}
