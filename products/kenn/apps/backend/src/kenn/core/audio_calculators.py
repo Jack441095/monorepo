@@ -73,12 +73,15 @@ _DB_RE = re.compile(r"(?<![\w.])([+\-−]?\d+(?:\.\d+)?)\s*db\b(?!\s*(?:fs|tp|sp
 # for no conversion. "Ratio" only counts after "as"/"in", since "what ratio" is a compressor setting question.
 _FACTOR_WORDS_RE = re.compile(
     r"\b(?:as|in|to|into)\s+(?:an?\s+)?(?:linear\s+|amplitude\s+)?"
-    r"(?:ratio|multiplier|gain\s+factor|factor|percent(?:age)?|linear|amplitude)\b"
+    r"(?:ratio|multiplier|gain\s+factor|gain|factor|percent(?:age)?|linear|amplitude)\b"
     r"|\b(?:what|which)(?:'s|\s+is)?\s+(?:the\s+|that\s+)?(?:linear\s+)?(?:multiplier|gain\s+factor|factor|percent(?:age)?)\b"
+    # "What gain is -6 dB" only with "is": "what gain should I set" is a gain-staging question, not a conversion.
+    r"|\bwhat\s+gain\s+is\b|\bdb\s+(?:gain\s+factor|multiplier)\b"
     r"|\bhow\s+many\s+times\b|\b(?:gain\s+factor|multiplier|percentage)\s+(?:of|for)\b",
     re.IGNORECASE)
 # Direction words for a dB figure typed without a sign. "Reduce by 6 dB" is -6 dB, and reading it as +6 gave 199.5%.
-_CUT_WORDS_RE = re.compile(r"\b(cut\w*|reduc\w*|lower\w*|attenuat\w*|drop\w*|down|quieter)\b", re.IGNORECASE)
+# A pad is a fixed attenuator, so "a 3 dB pad" is a cut too.
+_CUT_WORDS_RE = re.compile(r"\b(cut\w*|reduc\w*|lower\w*|attenuat\w*|drop\w*|down|quieter|pads?)\b", re.IGNORECASE)
 _BOOST_WORDS_RE = re.compile(r"\b(boost\w*|rais\w*|increas\w*|up|louder)\b", re.IGNORECASE)
 _DOUBLE_RE = re.compile(r"\b(double|doubling|twice|half|halve|halving)\b", re.IGNORECASE)
 _LEVEL_WORDS_RE = re.compile(r"\b(level|volume|amplitude|voltage|signal|power|gain|loud\w*)\b", re.IGNORECASE)
@@ -223,15 +226,16 @@ def level_facts(question: str) -> list[str]:
             if abs(db) > 120:
                 continue
             signed = typed[0] in "+-"
-            if not signed and cut and boost:
-                # "Cut the lows and boost the highs by 3 dB": we cannot tell which way this figure goes, and a
-                # factor for the wrong direction is worse than none.
+            # 0 dB is unity either way, so it needs no direction.
+            if not signed and db != 0 and cut == boost:
+                # Neither direction named ("the 3 dB point of the filter", "what percent is 3 dB"), or both ("cut
+                # the lows and boost the highs by 3 dB"): which way the figure goes would be a guess, and a factor
+                # for the wrong direction (141.3% for a 3 dB pad) is worse than none.
                 continue
             if not signed and cut:
                 db = -db
-            # "+" only for a boost the producer typed or named, so "+3 dB" is not read back as a level of 3 dB and
-            # a bare "6 dB" does not pick up a sign nobody gave it.
-            plus = "+" if db > 0 and (typed.startswith("+") or (not signed and boost)) else ""
+            # "+" for a boost the producer typed or named, so "+3 dB" is not read back as a level of 3 dB.
+            plus = "+" if db > 0 else ""
             amplitude, power = 10.0 ** (db / 20.0), 10.0 ** (db / 10.0)
             facts.append(f"{plus}{_fmt(db)} dB is a gain factor of {_fmt(amplitude, 3)} on amplitude "
                          f"({_fmt(amplitude * 100.0)}%) and {_fmt(power, 3)} on power.")

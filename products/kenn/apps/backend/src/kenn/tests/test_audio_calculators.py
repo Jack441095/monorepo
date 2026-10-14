@@ -97,11 +97,30 @@ def test_a_cut_is_worked_out_as_a_reduction(question, expected, wrong):
     assert wrong not in facts
 
 
-def test_an_unsigned_db_with_no_direction_is_not_called_a_boost():
-    # 14 Oct 2026: "6 dB" with no boost word was printed as "+6 dB", a sign nobody typed.
-    facts = calc.calculated_facts("what is 6 dB as a ratio?")
-    assert "6 dB is a gain factor of 1.995 on amplitude" in facts
-    assert "+6 dB" not in facts
+def test_a_pad_is_a_cut():
+    # 14 Oct 2026: "a 3 dB pad" had no sign and no cut word, so it got the boost factor, 141.3%.
+    facts = calc.calculated_facts("what multiplier is a 3 dB pad?")
+    assert "-3 dB is a gain factor of 0.708 on amplitude (70.8%)" in facts
+    assert "141.3%" not in facts
+
+
+@pytest.mark.parametrize("question", [
+    "the 3 dB point of the filter, what percent is that?",
+    "what percent is 3 dB?",
+])
+def test_an_unsigned_db_with_no_direction_gets_no_factor(question):
+    # 14 Oct 2026: an unsigned dB with no direction word was worked out as a boost; which way it goes is a guess.
+    assert calc.calculated_facts(question) == ""
+
+
+@pytest.mark.parametrize("question, expected", [
+    ("convert -3 dB to gain", "-3 dB is a gain factor of 0.708"),
+    ("-6 dB as gain", "-6 dB is a gain factor of 0.501"),
+    ("what gain is -6 dB?", "-6 dB is a gain factor of 0.501"),
+    ("-6 dB gain factor", "-6 dB is a gain factor of 0.501"),
+])
+def test_gain_is_a_conversion_target(question, expected):
+    assert expected in calc.calculated_facts(question)
 
 
 @pytest.mark.parametrize("question", [

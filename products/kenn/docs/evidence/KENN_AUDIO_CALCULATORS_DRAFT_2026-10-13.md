@@ -42,10 +42,13 @@ A read-only review found ways the calculator printed a wrong or unrequested figu
 missing one: the gate accepts a calculated figure anywhere in the answer, so a spurious reading lets an invented
 sentence through. Each fix below has a regression test that was written first and seen failing.
 
-- A cut read as a boost: "reduce by 6 dB, what percent" gave +6 dB and 199.5%. Cut words (cut, reduce, lower,
-  attenuate, drop, down) now make an unsigned dB negative (-6 dB = 50.1%, -3 dB = 70.8%); with both cut and boost
-  words the direction is unclear and no factor is given; "+" is printed only for a typed or named boost.
-  (`test_a_cut_is_worked_out_as_a_reduction`, `test_an_unsigned_db_with_no_direction_is_not_called_a_boost`)
+- A cut read as a boost: "reduce by 6 dB, what percent" gave +6 dB and 199.5%, and "a 3 dB pad" gave 141.3%. Cut
+  words (cut, reduce, lower, attenuate, drop, down, pad) now make an unsigned dB negative (-6 dB = 50.1%, -3 dB =
+  70.8%). Only a typed "+" or a boost word gives a boost factor. An unsigned dB with no direction word ("the 3 dB
+  point of the filter", "what percent is 3 dB"), or with both, now gets no factor; 0 dB is unity either way.
+  (`test_a_cut_is_worked_out_as_a_reduction`, `test_a_pad_is_a_cut`, `test_an_unsigned_db_with_no_direction_gets_no_factor`)
+- "Gain" is accepted as a conversion target: "convert -3 dB to gain", "-6 dB as gain", "what gain is -6 dB",
+  "-6 dB gain factor". "What gain should I set" is still not a conversion. (`test_gain_is_a_conversion_target`)
 - A stated tuning ignored: "A4 at 432 tuning" was answered at 440. A stated reference other than 440 Hz ("A=442",
   "432 tuning", "tuned to 432 Hz") now gives no pitch figure at all, rather than computing at another reference.
   (`test_a_stated_tuning_other_than_440_gets_no_pitch_figure`)
@@ -62,13 +65,13 @@ sentence through. Each fix below has a regression test that was written first an
 
 ## Checks
 
-- `test_audio_calculators.py`: 38 cases (21 original, all still passing, plus 17 from the review fixes). Expected
+- `test_audio_calculators.py`: 44 cases (21 original, all still passing, plus 23 from the review fixes). Expected
   values were worked out by hand first; two of my own expectations were wrong (450 ms, not 225, for a dotted 1/8 at
   100 BPM; 1.413, not 1.995, for +3 dB on amplitude), and the code was right both times.
 - The answer-path contrast: the same model answer quoting "351.6 ms" keeps the figure with the calculator and loses
   it to the gate's figure cut without it. Dropping the calculation, or computing from the search query instead of
   the typed question, each fail a test.
-- Full backend suite (14 Oct): 5162 passed, 175 skipped, 3 failed, all pre-existing and also red on clean `main`:
+- Full backend suite (14 Oct): 5168 passed, 175 skipped, 3 failed, all pre-existing and also red on clean `main`:
   the two `test_mixing_doctor.py` advisory tests and the typo-routing test.
 
 ## To try it on the Mac
