@@ -81,8 +81,8 @@ def test_an_empty_frame_does_not_earn_the_mix_audit_any_points() -> None:
     meters = AudioTelemetryManager().ingest({}).to_dict()
     report = MixDoctor().audit_session({"tracks": []}, meters=meters)
 
-    assert report.grade == "UNRATED"
-    assert report.points_available == 20.0  # stem separation needs no meter, and an empty session costs it nothing
+    assert "only 1 of 5 checks had a meter reading" in report.meaning
+    assert report.points_available == 6.0  # stem separation needs no meter, and an empty session costs it nothing
 
 
 def test_mix_planner_dag_generation() -> None:

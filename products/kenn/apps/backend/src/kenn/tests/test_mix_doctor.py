@@ -1,4 +1,4 @@
-"""Unit and integration tests for KENN Full-Session Mix Doctor (0-100 MQM)."""
+"""Unit and integration tests for KENN Full-Session Mix Doctor, the 30-point technical-health part of the grade."""
 
 from __future__ import annotations
 
@@ -62,15 +62,15 @@ def test_mix_doctor_audit_synthetic_session():
 
     report = doctor.audit_session(session, meters=meters)
 
-    assert 70.0 <= report.mqm_score <= 100.0
-    assert report.grade in ("S", "A", "B")
+    assert 21.0 <= report.mqm_score <= 30.0
+    assert report.points_available == 30.0
     assert "dynamic_health" in report.dimension_scores
     assert "low_end_control" in report.dimension_scores
     assert "spectral_balance" in report.dimension_scores
     assert "stem_separation" in report.dimension_scores
     assert "stereo_imaging" in report.dimension_scores
-    assert report.dimension_scores["dynamic_health"] == 20.0
-    assert report.dimension_scores["stereo_imaging"] == 20.0
+    assert report.dimension_scores["dynamic_health"] == 6.0
+    assert report.dimension_scores["stereo_imaging"] == 6.0
 
 
 def test_mix_doctor_detects_clipping_and_boxiness():
@@ -95,9 +95,9 @@ def test_mix_doctor_detects_clipping_and_boxiness():
 
     report = doctor.audit_session(session, meters=meters)
 
-    assert report.mqm_score < 75.0
-    assert report.dimension_scores["dynamic_health"] <= 10.0
-    assert report.dimension_scores["spectral_balance"] <= 15.0
+    assert report.mqm_score < 22.5
+    assert report.dimension_scores["dynamic_health"] <= 3.0
+    assert report.dimension_scores["spectral_balance"] <= 4.5
 
     critical_dynamic = [i for i in report.critical_issues if i.category == "dynamic"]
     assert len(critical_dynamic) >= 1
@@ -128,7 +128,7 @@ def test_mix_doctor_mono_correlation_penalty():
 
     report = doctor.audit_session(session, meters=meters)
 
-    assert report.dimension_scores["stereo_imaging"] == 5.0  # -15 pt penalty
+    assert report.dimension_scores["stereo_imaging"] == 1.5  # 15 of the 20 working points lost, of 6 reported
     stereo_issues = [i for i in report.critical_issues if i.category == "stereo"]
     assert len(stereo_issues) >= 1
     assert "out-of-phase" in stereo_issues[0].message
@@ -141,12 +141,12 @@ def test_mix_doctor_mono_correlation_penalty():
 def test_a_session_with_no_meters_is_not_graded():
     report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters=None)
 
-    assert report.grade == "UNRATED"
+    assert "only 1 of 5 checks had a meter reading" in report.meaning
     assert report.dimension_scores["dynamic_health"] is None
     assert report.dimension_scores["spectral_balance"] is None
     assert report.dimension_scores["stereo_imaging"] is None
-    # Only the fader-based dimension could be judged, so only its 20 points are on offer.
-    assert report.points_available == 20.0
+    # Only the fader-based dimension could be judged, so only its 6 points are on offer.
+    assert report.points_available == 6.0
     assert report.mqm_score <= report.points_available
 
 
@@ -164,7 +164,7 @@ def test_peak_to_loudness_is_skipped_without_a_loudness_reading():
     # Only a peak reading: the peak check runs, the PLR check has nothing to compare against.
     report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters={"true_peak_dbtp": -1.5})
 
-    assert report.dimension_scores["dynamic_health"] == 20.0
+    assert report.dimension_scores["dynamic_health"] == 6.0
     assert not [i for i in report.all_issues if "PLR" in i.message]
 
 
@@ -177,21 +177,20 @@ def test_a_loudness_reading_alone_does_not_earn_the_dynamics_points():
 def test_a_bad_reading_still_costs_points_when_the_rest_are_missing():
     report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters={"phase_correlation": -0.4})
 
-    assert report.dimension_scores["stereo_imaging"] == 5.0
-    assert report.grade == "UNRATED"
-    assert report.points_available == 40.0  # stereo + stem separation
+    assert report.dimension_scores["stereo_imaging"] == 1.5
+    assert report.points_available == 12.0  # stereo + stem separation, 6 each
     assert any(i.severity == "CRITICAL" for i in report.critical_issues)
 
 
-def test_a_full_set_of_meters_is_still_graded_out_of_100():
+def test_a_full_set_of_meters_is_scored_out_of_30():
     meters = {
         "integrated_lufs": -13.8, "true_peak_dbtp": -1.2, "phase_correlation": 0.88,
         "spectral_energy": {"sub_20_60hz": 0.25, "low_mid_200_500hz": 0.26, "high_mid_2_6khz": 0.25, "air_10_20khz": 0.24},
     }
     report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters=meters)
 
-    assert report.points_available == 100.0
-    assert report.grade != "UNRATED"
+    assert report.points_available == 30.0
+    assert "checks had a meter reading" not in report.meaning
     assert report.unmeasured == ["crest_factor_db"]  # reported, but no check scores on it today
 
 
@@ -202,7 +201,7 @@ def test_tracks_without_fader_or_device_data_cost_nothing():
 
     report = MixDoctor().audit_session(session, meters=None)
 
-    assert report.dimension_scores["stem_separation"] == 20.0
+    assert report.dimension_scores["stem_separation"] == 6.0
     assert not [i for i in report.all_issues if i.category == "low_end"]
 
 
@@ -212,3 +211,53 @@ def test_a_non_numeric_meter_value_counts_as_missing():
 
     assert report.loudness_telemetry["true_peak_dbtp"] is None
     assert report.loudness_telemetry["phase_correlation"] is None
+
+
+# E2 step 4 (14 Oct 2026): technical health is 30 points, every deduction says where its threshold comes from,
+# and there is no letter grade.
+
+def _worst_case_session_and_meters():
+    session = _build_synthetic_16_track_session()
+    session["tracks"][0]["volume"] = 1.25
+    meters = {
+        "integrated_lufs": -10.0, "true_peak_dbtp": +0.6, "phase_correlation": -0.35,
+        "spectral_energy": {"sub_20_60hz": 0.5, "low_mid_200_500hz": 0.42, "high_mid_2_6khz": 0.45, "air_10_20khz": 0.05},
+    }
+    return session, meters
+
+
+def test_every_deduction_names_its_source():
+    report = MixDoctor().audit_session(*_worst_case_session_and_meters())
+
+    costly = [i for i in report.all_issues if i.points_lost > 0]
+    assert len(costly) >= 6
+    assert all(i.source for i in costly)
+    assert all(i.to_dict()["source"] for i in costly)
+
+
+def test_only_the_true_peak_ceiling_and_correlation_sign_rest_on_a_published_basis():
+    report = MixDoctor().audit_session(*_worst_case_session_and_meters())
+
+    peak = next(i for i in report.all_issues if i.category == "dynamic" and "True Peak" in i.message)
+    assert "Spotify" in peak.source and "-1 dBTP" in peak.source
+    fader = next(i for i in report.all_issues if "fader" in i.message)
+    assert fader.source.startswith("house rule")
+    # The meaning line owns up to how few deductions are backed by a published source.
+    assert "deductions, 2 resting on a published source" in report.meaning
+
+
+def test_points_lost_add_up_to_what_the_scored_dimensions_lost():
+    report = MixDoctor().audit_session(*_worst_case_session_and_meters())
+
+    kept = sum(v for v in report.dimension_scores.values() if v is not None)
+    lost = sum(i.points_lost for i in report.all_issues)
+    # A dimension cannot go below zero, so the issues may account for more than was on offer but never less.
+    assert lost >= report.points_available - kept - 0.05
+
+
+def test_the_report_has_no_letter_grade():
+    report = MixDoctor().audit_session(*_worst_case_session_and_meters())
+
+    assert not hasattr(report, "grade")
+    assert "grade" not in report.to_dict()
+    assert report.to_dict()["meaning"] == report.meaning

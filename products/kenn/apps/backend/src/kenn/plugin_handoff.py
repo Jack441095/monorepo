@@ -705,7 +705,7 @@ def _live_context_summary(session_id: str) -> dict[str, Any] | None:
             result["mqm"] = {
                 "score": report.mqm_score,
                 "points_available": report.points_available,
-                "grade": report.grade,
+                "meaning": report.meaning,
                 "critical_issues": len(report.critical_issues),
             }
     except Exception:

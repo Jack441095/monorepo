@@ -1,4 +1,4 @@
-"""Full-Session Mix Doctor and 0-100 Mix Quality Metric (MQM) Engine.
+"""Full-Session Mix Doctor: the technical-health part (30 points) of the E2 grade.
 
 Audits an entire multi-track Ableton Live session across 5 psychoacoustic dimensions:
 1. Dynamic Health & Crest Factor (Peak-to-Loudness Ratio, squashed vs open dynamics, clipping)
@@ -7,8 +7,9 @@ Audits an entire multi-track Ableton Live session across 5 psychoacoustic dimens
 4. Pairwise Stem Separation (Kick vs Bass, Vocal vs Instruments cross-spectral collisions)
 5. Stereo Imaging & Mono Compatibility (phase correlation, cancellation detection)
 
-Produces a typed MixAuditReport containing the 0-100 MQM score, letter grade,
-prioritized critical issues, and a non-destructive, bounded remediation DAG.
+Produces a typed MixAuditReport containing the technical-health score, a one-line meaning, prioritized
+critical issues (each with the points it cost and where its threshold comes from), and a non-destructive,
+bounded remediation DAG. There is no letter grade: a number and what it means is all we claim.
 """
 
 from __future__ import annotations
@@ -27,6 +28,10 @@ class MixIssue:
     track_index: Optional[int] = None
     track_name: Optional[str] = None
     remediation_proposal: Optional[Dict[str, Any]] = None
+    # What this finding cost, in points of the final technical-health score, and where its threshold comes from.
+    # An advisory that costs nothing leaves both at their defaults.
+    points_lost: float = 0.0
+    source: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -34,21 +39,21 @@ class MixIssue:
 
 @dataclass
 class MixAuditReport:
-    mqm_score: float  # points kept, out of points_available (0.0 - 100.0)
-    grade: str  # "S" | "A" | "B" | "C" | "D" | "CRITICAL", or "UNRATED" when a dimension had no reading
+    mqm_score: float  # points kept, out of points_available (at most 30)
+    meaning: str  # one line saying what the number covers and how many deductions rest on a published source
     dimension_scores: Dict[str, Optional[float]]  # None = the dimension had no reading to score from
     critical_issues: List[MixIssue]
     all_issues: List[MixIssue]
     remediation_dag: List[Dict[str, Any]]
     loudness_telemetry: Dict[str, Optional[float]]  # None = the meter did not report this reading
-    points_available: float = 100.0  # 20 per scored dimension; the score is never rescaled to 100
+    points_available: float = 30.0  # 6 per scored dimension; the score is never rescaled to 30
     unmeasured: List[str] = field(default_factory=list)  # telemetry readings that were missing
     timestamp: float = field(default_factory=time.time)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "mqm_score": round(self.mqm_score, 1),
-            "grade": self.grade,
+            "meaning": self.meaning,
             "dimension_scores": {k: None if v is None else round(v, 1) for k, v in self.dimension_scores.items()},
             "critical_issues": [i.to_dict() for i in self.critical_issues],
             "all_issues": [i.to_dict() for i in self.all_issues],
@@ -60,8 +65,23 @@ class MixAuditReport:
         }
 
 
-# Each of the five dimensions is worth 20 points, so a fully measured mix is out of 100.
-_POINTS_PER_DIMENSION = 20.0
+# Technical health is 30 of the grade's 100 points (decided 14 Oct 2026), so each of the five dimensions is worth 6.
+_POINTS_PER_DIMENSION = 6.0
+# The audits below were tuned on a 20-point scale and their deductions are still written that way; audit_session
+# converts them, so moving a threshold or a cost here does not mean redoing the arithmetic for the 30-point scale.
+_WORKING_POINTS = 20.0
+
+# Where a deduction's threshold comes from. Only the true-peak ceiling and the sign of the correlation meter rest on
+# anything published; every other threshold is our own rule of thumb and says so, so the grade never implies more.
+SPOTIFY_PEAK_RULE = (
+    "Spotify for Artists, Loudness normalization: keep true peak below -1 dBTP (support.spotify.com, read 14 Oct 2026); "
+    "the -0.2 and -0.8 dBTP steps are our own margin for meter error"
+)
+CORRELATION_SIGN_RULE = (
+    "Correlation meter convention: a reading below 0 means the channels cancel when summed to mono; "
+    "it is a convention, not a published standard, and the cost is our own"
+)
+HOUSE_RULE = "house rule: our own threshold with no published basis, to be checked against the owner's ears under E9"
 
 
 class MixDoctor:
@@ -113,17 +133,24 @@ class MixDoctor:
             "stem_separation": s_unmasking,
             "stereo_imaging": s_stereo,
         }
+        # Move everything from the audits' working scale to report points, so a dimension's score and the points its
+        # issues cost add up in the same units.
+        to_points = _POINTS_PER_DIMENSION / _WORKING_POINTS
+        dimension_scores = {k: None if v is None else v * to_points for k, v in dimension_scores.items()}
+        for issue in all_issues:
+            issue.points_lost = round(issue.points_lost * to_points, 2)
+
         scored = [v for v in dimension_scores.values() if v is not None]
         points_available = _POINTS_PER_DIMENSION * len(scored)
         total_mqm = max(0.0, min(points_available, sum(scored)))
-        # A letter only means something against all 100 points. With fewer, we report the points and
-        # say it is unrated rather than rescale (3 of 5 dimensions kept at 55/60 is not an A).
-        grade = self._score_to_grade(total_mqm) if len(scored) == len(dimension_scores) else "UNRATED"
+        # With fewer than five dimensions measured we report the points available and say so in `meaning`; the score
+        # is never rescaled up (3 of 5 dimensions kept at 16.5 of 18 is not 27.5 of 30).
+        meaning = self._meaning(total_mqm, points_available, len(scored), len(dimension_scores), all_issues)
         critical_issues = [i for i in all_issues if i.severity in ("CRITICAL", "WARNING")]
 
         report = MixAuditReport(
             mqm_score=total_mqm,
-            grade=grade,
+            meaning=meaning,
             dimension_scores=dimension_scores,
             critical_issues=critical_issues,
             all_issues=all_issues,
@@ -199,8 +226,11 @@ class MixDoctor:
         if tp is None:
             pass
         elif tp > -0.2:
-            score -= 10.0
+            cost = 10.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=SPOTIFY_PEAK_RULE,
                 severity="CRITICAL",
                 category="dynamic",
                 message=f"True Peak exceeds safety margin: {tp:+.2f} dBTP (target <= -1.0 dBTP). Inter-sample clipping detected.",
@@ -223,8 +253,11 @@ class MixDoctor:
                 "unit": "dBTP",
             })
         elif tp > -0.8:
-            score -= 3.0
+            cost = 3.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=SPOTIFY_PEAK_RULE,
                 severity="ADVISORY",
                 category="dynamic",
                 message=f"True Peak is near threshold ({tp:+.1f} dBTP). Recommended ceiling is -1.0 dBTP for streaming delivery.",
@@ -238,9 +271,12 @@ class MixDoctor:
             # No fader reading means no verdict on this track. The old 0.85 default also fed the kick/bass and
             # vocal/synth collision checks, so a snapshot without volumes could be docked for collisions.
             if vol is not None and vol > 1.0:
-                score -= 4.0
+                cost = 4.0
+                score -= cost
                 excess_db = 20.0 * math.log10(vol) if vol > 0 else 0.0
                 issues.append(MixIssue(
+                    points_lost=cost,
+                    source=HOUSE_RULE,
                     severity="WARNING",
                     category="dynamic",
                     track_index=idx,
@@ -258,15 +294,21 @@ class MixDoctor:
         if plr is None:
             pass
         elif plr < 6.0:
-            score -= 6.0
+            cost = 6.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=HOUSE_RULE,
                 severity="WARNING",
                 category="dynamic",
                 message=f"Mix is hyper-compressed (PLR {plr:.1f} dB). Transients are squashed; consider easing master bus threshold or ratio.",
             ))
         elif plr > 16.0 and tp < -6.0:
-            score -= 3.0
+            cost = 3.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=HOUSE_RULE,
                 severity="ADVISORY",
                 category="dynamic",
                 message=f"Mix has wide crest factor (PLR {plr:.1f} dB) with quiet master peak ({tp:+.1f} dBTP). Headroom is available for makeup gain.",
@@ -288,8 +330,11 @@ class MixDoctor:
         sub_energy = telemetry["sub_energy"]
         # Excessive sub energy
         if sub_energy is not None and sub_energy > 0.45:
-            score -= 5.0
+            cost = 5.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=HOUSE_RULE,
                 severity="WARNING",
                 category="low_end",
                 message=f"Sub energy is disproportionately high ({sub_energy:.0%} of spectrum). Low-end headroom may starve master limiter.",
@@ -308,8 +353,11 @@ class MixDoctor:
             has_eq = any("eq" in d or "filter" in d for d in devices)
 
             if is_non_bass and not has_eq:
-                score -= 1.5
+                cost = 1.5
+                score -= cost
                 issues.append(MixIssue(
+                    points_lost=cost,
+                    source=HOUSE_RULE,
                     severity="ADVISORY",
                     category="low_end",
                     track_index=idx,
@@ -341,8 +389,11 @@ class MixDoctor:
 
         # 200-500 Hz Boxiness / Mud accumulation
         if low_mid is not None and low_mid > 0.38:
-            score -= 6.0
+            cost = 6.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=HOUSE_RULE,
                 severity="WARNING",
                 category="spectral",
                 message=f"Low-mid energy accumulation detected ({low_mid:.0%} in 200-500 Hz band). Mix may sound boxy or congested.",
@@ -366,8 +417,11 @@ class MixDoctor:
 
         # 3-6 kHz Harshness accumulation
         if high_mid is not None and high_mid > 0.40:
-            score -= 5.0
+            cost = 5.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=HOUSE_RULE,
                 severity="WARNING",
                 category="spectral",
                 message=f"High-mid harshness detected ({high_mid:.0%} in 2-6 kHz band). May cause listener fatigue at higher volumes.",
@@ -382,8 +436,11 @@ class MixDoctor:
 
         # Air extension check
         if air is not None and air < 0.10:
-            score -= 3.0
+            cost = 3.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=HOUSE_RULE,
                 severity="ADVISORY",
                 category="spectral",
                 message=f"Air band (>10 kHz) is dark ({air:.0%}). Consider gentle high shelf boost (+1.5 dB at 12 kHz) on vocals or drum bus.",
@@ -410,8 +467,11 @@ class MixDoctor:
             kick_vol = _number(kick_track.get("volume"))
             bass_vol = _number(bass_track.get("volume"))
             if kick_vol is not None and bass_vol is not None and kick_vol > 0.80 and bass_vol > 0.80:
-                score -= 4.0
+                cost = 4.0
+                score -= cost
                 issues.append(MixIssue(
+                    points_lost=cost,
+                    source=HOUSE_RULE,
                     severity="WARNING",
                     category="unmasking",
                     track_name=f"{kick_track.get('name')} & {bass_track.get('name')}",
@@ -444,8 +504,11 @@ class MixDoctor:
             v_vol = _number(vocal_track.get("volume"))
             m_vol = _number(mid_track.get("volume"))
             if v_vol is not None and m_vol is not None and v_vol > 0.80 and m_vol > 0.80:
-                score -= 3.0
+                cost = 3.0
+                score -= cost
                 issues.append(MixIssue(
+                    points_lost=cost,
+                    source=HOUSE_RULE,
                     severity="ADVISORY",
                     category="unmasking",
                     track_name=f"{vocal_track.get('name')} & {mid_track.get('name')}",
@@ -469,8 +532,11 @@ class MixDoctor:
         if corr is None:
             pass
         elif corr < 0.0:
-            score -= 15.0
+            cost = 15.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=CORRELATION_SIGN_RULE,
                 severity="CRITICAL",
                 category="stereo",
                 message=f"Destructive out-of-phase audio detected on master bus (correlation {corr:+.2f} < 0.0). Mix will cancel out in mono.",
@@ -480,15 +546,21 @@ class MixDoctor:
                 }
             ))
         elif corr < 0.25:
-            score -= 8.0
+            cost = 8.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=HOUSE_RULE,
                 severity="WARNING",
                 category="stereo",
                 message=f"Weak phase correlation ({corr:+.2f}). Mix is at risk of comb-filtering when played on phones or club mono systems.",
             ))
         elif corr < 0.50:
-            score -= 3.0
+            cost = 3.0
+            score -= cost
             issues.append(MixIssue(
+                points_lost=cost,
+                source=HOUSE_RULE,
                 severity="ADVISORY",
                 category="stereo",
                 message=f"Phase correlation is moderate ({corr:+.2f}). Recommended target is >= +0.60 for commercial releases.",
@@ -501,8 +573,11 @@ class MixDoctor:
             pan = float(t.get("panning", t.get("pan", 0.0)))
             idx = int(t.get("index", 0))
             if any(em in name for em in essential_mono) and abs(pan) > 0.4:
-                score -= 3.0
+                cost = 3.0
+                score -= cost
                 issues.append(MixIssue(
+                    points_lost=cost,
+                    source=HOUSE_RULE,
                     severity="WARNING",
                     category="stereo",
                     track_index=idx,
@@ -518,19 +593,17 @@ class MixDoctor:
 
         return (max(0.0, score) if corr is not None else None), issues, recs
 
-    def _score_to_grade(self, score: float) -> str:
-        """Map 0-100 MQM score to letter grade."""
-        if score >= 90.0:
-            return "S"
-        if score >= 80.0:
-            return "A"
-        if score >= 70.0:
-            return "B"
-        if score >= 60.0:
-            return "C"
-        if score >= 50.0:
-            return "D"
-        return "CRITICAL"
+    @staticmethod
+    def _meaning(points: float, available: float, scored: int, total: int, issues: List[MixIssue]) -> str:
+        """One line on what the number covers, so a partial or house-rule-heavy score cannot read as a full one."""
+        text = f"{points:.1f} of {available:.0f} technical-health points kept"
+        if scored < total:
+            text += f"; only {scored} of {total} checks had a meter reading, the rest are not counted"
+        costly = [i for i in issues if i.points_lost > 0]
+        if costly:
+            published = sum(1 for i in costly if i.source != HOUSE_RULE)
+            text += f"; {len(costly)} deductions, {published} resting on a published source"
+        return text + "."
 
 
 def _number(value: Any) -> Optional[float]:

@@ -1066,6 +1066,9 @@ async function executeFullMixPlan(planId, btn) {
 let zeroBiasAuditionActive = false;
 let lastSessionSnapshot = null;
 
+// Each of the five technical-health dimensions is worth 6 points (30 in all), matching mix_doctor.py.
+const MQM_POINTS_PER_DIMENSION = 6;
+
 function renderMQMRadarPentagon(canvas, scores) {
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
@@ -1080,7 +1083,7 @@ function renderMQMRadarPentagon(canvas, scores) {
   const radius = Math.min(cx, cy) - 25;
   // Placeholder shape only when there is no report at all. A report whose dimension is null had no meter
   // reading for it, so it plots at the centre rather than at an invented 14-17.
-  const demo = { dynamic_health: 16, low_end_control: 15, spectral_balance: 17, stem_separation: 14, stereo_imaging: 16 };
+  const demo = { dynamic_health: 4.8, low_end_control: 4.5, spectral_balance: 5.1, stem_separation: 4.2, stereo_imaging: 4.8 };
   const pick = (key) => (scores ? (scores[key] ?? 0) : demo[key]);
   const axes = [
     { label: "Dynamic", key: "dynamic_health", val: pick("dynamic_health") },
@@ -1131,7 +1134,7 @@ function renderMQMRadarPentagon(canvas, scores) {
   // Data Polygon
   ctx.beginPath();
   for (let i = 0; i < numAxes; i++) {
-    const norm = Math.max(0, Math.min(20, axes[i].val)) / 20.0;
+    const norm = Math.max(0, Math.min(MQM_POINTS_PER_DIMENSION, axes[i].val)) / MQM_POINTS_PER_DIMENSION;
     const r = radius * norm;
     const angle = (Math.PI * 2 / numAxes) * i - Math.PI / 2;
     const x = cx + r * Math.cos(angle);
