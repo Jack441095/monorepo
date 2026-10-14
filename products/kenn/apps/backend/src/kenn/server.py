@@ -164,9 +164,16 @@ from kenn.core.live_turn import (
 )
 
 
+def _fetch_return_tracks():
+    from kenn.ableton_osc_bridge import live_client
+
+    return live_client.get_return_tracks()
+
+
 def _chat_wants_live(question: str) -> bool:
     """The rule parser, on the last cached look at the set, reads a Live change in a chat message."""
     from kenn.core.chat_live_router import wants_live_change
+    from kenn.core.return_tracks_cache import attach_return_tracks
     from kenn.mixing_doctor import get_latest_session_state
 
     from kenn.core.chat_live_router import needs_return_tracks
@@ -174,17 +181,13 @@ def _chat_wants_live(question: str) -> bool:
     snapshot = get_latest_session_state()
     if isinstance(snapshot, dict) and needs_return_tracks(question, snapshot):
         # The cached snapshot never lists returns, and a message about one (a send, or its level) needs them. Kept for
-        # a few seconds: this runs for every chat message.
+        # a few seconds: this runs for every chat message. The global stays
+        # here (not in the helper) so tests can still seed/clear it via
+        # monkeypatch on server._RETURNS_CACHE.
         global _RETURNS_CACHE
-        if _RETURNS_CACHE is None or time.monotonic() - _RETURNS_CACHE[0] > 20:
-            try:
-                from kenn.ableton_osc_bridge import live_client
-
-                _RETURNS_CACHE = (time.monotonic(), live_client.get_return_tracks())
-            except Exception:
-                _RETURNS_CACHE = None
-        if _RETURNS_CACHE is not None:
-            snapshot = {**snapshot, "return_tracks": _RETURNS_CACHE[1]}
+        snapshot, _RETURNS_CACHE = attach_return_tracks(
+            snapshot, _RETURNS_CACHE, now=time.monotonic(), fetch=_fetch_return_tracks
+        )
     return wants_live_change(question, snapshot)
 
 
