@@ -54,6 +54,7 @@ from kenn.core.chat_retrieval import (
     evidence_label,
     source_label,
 )
+from kenn.core.audio_calculators import calculated_facts
 from kenn.core.chat_grounding import (
     StreamedAnswerGuard,
     answer_quality_report,
@@ -178,6 +179,16 @@ def _specialist_evidence_context(query: str, history: list | None) -> str:
         if packet.source in {"audio_classification", "stem_masking_analysis"}
     ]
     return " ".join(relevant_observations(query, specialist_packets))
+
+
+def _tool_evidence(search_query: str, history: list | None, typed_question: str) -> str:
+    """Tool readings the prompt lists as allowed figures and the gate accepts: specialist observations and calculations.
+
+    Calculations read only `typed_question`, the producer's words this turn. The search query can be expanded with
+    an earlier turn, and a tempo taken from it would compute an answer to a question nobody asked.
+    """
+    return " ".join(part for part in (_specialist_evidence_context(search_query, history),
+                                      calculated_facts(typed_question)) if part)
 
 
 def asks_for_sources(query: str) -> bool:
@@ -1045,7 +1056,7 @@ def make_answer(
     _ma_t2 = _time.perf_counter()
     # Read once and handed to both the prompt's allowed-figures list and the gate below, so a stem-scan figure the
     # gate would pass is never left off the list the model is told to stay within.
-    specialist_evidence = _specialist_evidence_context(query, history)
+    specialist_evidence = _tool_evidence(query, history, question or query)
     enhanced = llm_enhance_answer(
         query,
         template,
@@ -2027,7 +2038,7 @@ def _answer_payload_stream_raw(
 
     if llm_active:
         # The same text the stream guard and the full gate below read, so the prompt's figure list and the gate agree.
-        specialist_evidence = _specialist_evidence_context(relevance_query, history)
+        specialist_evidence = _tool_evidence(relevance_query, history, query)
         generator = llm_enhance_answer_stream(
             query,
             template,
