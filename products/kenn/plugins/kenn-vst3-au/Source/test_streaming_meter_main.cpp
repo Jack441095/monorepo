@@ -262,7 +262,54 @@ static void verifyTech3341Loudness()
             worstMiss = std::max(worstMiss, std::abs(highest + 23.0));
         }
         requireNear(worstMiss, 0.46, 0.05, label + "Tech 3341 case 13 off-grid starts read about 0.46 LU low, the cost of the 100 ms hop");
+
+        // Integrated loudness, cases 1-5. Each reads the last snapshot, the whole programme's gated loudness.
+        const auto integrated = [&](const Signal& signal) {
+            const auto snapshots = run(signal, rate);
+            require(!snapshots.empty() && snapshots.back().integratedReady, (label + "integrated loudness is ready by the end of the programme").c_str());
+            return snapshots.back().integratedLUFS.value_or(-200.0);
+        };
+        Signal one, two, three, four, five;
+        appendTone(one, rate, -23.0, 20.0);
+        appendTone(two, rate, -33.0, 20.0);
+        appendTone(three, rate, -36.0, 10.0); appendTone(three, rate, -23.0, 60.0); appendTone(three, rate, -36.0, 10.0);
+        appendTone(four, rate, -72.0, 10.0); appendTone(four, rate, -36.0, 10.0); appendTone(four, rate, -23.0, 60.0);
+        appendTone(four, rate, -36.0, 10.0); appendTone(four, rate, -72.0, 10.0);
+        appendTone(five, rate, -26.0, 20.0); appendTone(five, rate, -20.0, 20.1); appendTone(five, rate, -26.0, 20.0);
+        requireNear(integrated(one), -23.0, tolerance, label + "Tech 3341 case 1 integrated is -23 LUFS");
+        requireNear(integrated(two), -33.0, tolerance, label + "Tech 3341 case 2 integrated is -33 LUFS");
+        requireNear(integrated(three), -23.0, tolerance, label + "Tech 3341 case 3 integrated ignores the -36 LUFS tails (relative gate)");
+        requireNear(integrated(four), -23.0, tolerance, label + "Tech 3341 case 4 integrated ignores the -72 LUFS tails (absolute gate) and the -36 LUFS tails");
+        requireNear(integrated(five), -23.0, tolerance, label + "Tech 3341 case 5 integrated sits between -26 and -20 LUFS segments at -23");
     }
+}
+
+static void verifyIntegratedGating()
+{
+    constexpr double rate = 48000.0;
+    // Integrated is not ready until a block has cleared both gates: silence never does.
+    Signal quiet;
+    appendSilence(quiet, rate, 2.0);
+    appendTone(quiet, rate, -80.0, 2.0); // about -80 LUFS, under the -70 LUFS absolute gate
+    for (const auto& s : run(quiet, rate))
+        require(!s.integratedReady && !s.integratedLUFS, "Silence and a passage under -70 LUFS never produce an integrated reading");
+
+    // Non-finite input retires the programme: integrated loudness starts again, rather than averaging across the gap.
+    KENNStreamingMeter meter;
+    meter.prepare(rate);
+    Signal loud;
+    appendTone(loud, rate, -14.0, 3.0);
+    for (const auto sample : loud) meter.push(sample, sample);
+    require(meter.snapshot().integratedReady, "A loud passage reads integrated loudness");
+    meter.push(std::numeric_limits<float>::quiet_NaN(), 0.0f);
+    require(!meter.snapshot().integratedReady, "NaN retires the integrated measurement along with the other history");
+
+    // A 3 h programme has to cost no more memory than 3 s: feed 10 minutes and check nothing allocated.
+    meter.reset();
+    watchAllocations = true;
+    for (int n = 0; n < static_cast<int>(600 * rate); ++n) { const auto v = static_cast<float>(0.1 * std::sin(0.13 * n)); meter.push(v, v); }
+    watchAllocations = false;
+    require(meter.snapshot().integratedReady && allocations == 0, "Ten minutes of programme allocate no heap storage for integrated loudness");
 }
 
 // Tech 3341 cases 15-19: one tone at fs/N, with a 10 ms fade at each end.
@@ -492,7 +539,7 @@ int main(int argc, char** argv)
             profile(repeats); return 0;
         }
         if (argc != 1) throw std::runtime_error("Use --trace RATE FLOAT32_STEREO or --profile REPEATS"); // Refuse ignored/mislabelled options.
-        verifyMeter(); verifyWorkerRetirement(); verifyTech3341Loudness(); verifyTech3341TruePeak();
+        verifyMeter(); verifyWorkerRetirement(); verifyTech3341Loudness(); verifyIntegratedGating(); verifyTech3341TruePeak();
         std::cout << checks << " streaming meter checks, " << failures << " failures\n";
         return failures == 0 ? 0 : 1;
     }

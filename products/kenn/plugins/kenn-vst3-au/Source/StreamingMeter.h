@@ -11,9 +11,13 @@ struct KENNStreamingMeterSnapshot
     int64_t endSample = 0; // Contiguous frames since prepare/reset, not a host position.
     double momentaryMeanSquare = 0.0, shortTermMeanSquare = 0.0, truePeakLinear = 0.0;
     bool momentaryReady = false, shortTermReady = false, truePeakReady = false;
+    // Gated programme loudness since prepare/reset (BS.1770-5 §5.1, two-stage gate). Ready once one 400 ms block has
+    // cleared both gates; a passage that never does (digital silence, or everything under -70 LUFS) stays not ready.
+    double integratedMeanSquare = 0.0;
+    bool integratedReady = false;
     // Ready silence has zero energy and no finite logarithmic reading. Warm-up
     // remains separate so callers cannot confuse missing history with silence.
-    std::optional<double> momentaryLUFS, shortTermLUFS, truePeakDBTP;
+    std::optional<double> momentaryLUFS, shortTermLUFS, integratedLUFS, truePeakDBTP;
     static constexpr double interpolationDelaySamples = 5.875; // (48 FIR taps - 1) / (2 * 4x).
     // The continuous loudness window covers [endSample - samplesPerBin, endSample].
     // Causal polyphase FIR upsampling delays output by interpolationDelaySamples
@@ -24,7 +28,8 @@ struct KENNStreamingMeterSnapshot
 
 // Offline candidate, owned by one analysis consumer. Call reset after a gap,
 // seek or source change. No storage grows with playback duration; no input is
-// modified. This module does not implement integrated loudness or LRA.
+// modified. Integrated loudness is kept as a fixed-size histogram of block energy, so a three-hour
+// programme costs the same memory as a three-second one. This module does not implement LRA.
 class KENNStreamingMeter
 {
     struct Biquad
@@ -71,6 +76,8 @@ public:
         for (auto& stage : highPass) stage.reset();
         for (auto& channel : peakHistory) channel.fill(0.0);
         bins.fill(0.0);
+        gatedCount.fill(0); gatedEnergy.fill(0.0);
+        absoluteGatedBlocks = 0; absoluteGatedEnergy = 0.0;
         binFrames = binCursor = completedBins = peakCursor = 0;
         frames = 0; binEnergy = binPeak = 0.0; latest = {};
     }
@@ -121,6 +128,10 @@ public:
                 latest.momentaryMeanSquare += bins[(binCursor + shortTermBins - 1 - age) % shortTermBins];
             latest.momentaryMeanSquare /= momentaryBins;
             latest.momentaryLUFS = loudness(latest.momentaryMeanSquare);
+            // BS.1770-5 gating blocks are 400 ms long and overlap by 75%, which is exactly one momentary window
+            // every 100 ms bin, so each completed window is one gating block.
+            addGatingBlock(latest.momentaryMeanSquare);
+            integrate();
         }
         if (latest.shortTermReady)
         {
@@ -160,12 +171,55 @@ private:
         for (auto& value : a) value /= scale;
         return { b, a };
     }
+    // Buckets a block by its loudness so the relative gate can be found without keeping every block. Each bucket
+    // holds the block count and the exact energy sum, so the mean is not rounded to the bucket width; only whether
+    // a block counts as above the relative gate is decided at bucket resolution.
+    void addGatingBlock(double energy) noexcept
+    {
+        if (energy <= 0.0) return; // Digital silence has no loudness and is below any gate.
+        const auto blockLUFS = -0.691 + 10.0 * std::log10(energy);
+        if (blockLUFS <= absoluteGateLUFS) return; // Absolute gate: BS.1770-5 drops blocks at or under -70 LUFS.
+        // A block louder than the top bucket (+10 LUFS, far above digital full scale) is counted in it; its energy
+        // is still summed exactly, so only the gate membership is approximate and nothing quiet depends on it.
+        const auto bucket = std::min(static_cast<size_t>((blockLUFS - absoluteGateLUFS) / bucketWidthLU), gateBuckets - 1);
+        ++gatedCount[bucket];
+        gatedEnergy[bucket] += energy;
+        ++absoluteGatedBlocks;
+        absoluteGatedEnergy += energy;
+    }
+
+    // Applies the relative gate (10 LU under the mean of everything past the absolute gate) and averages what is left.
+    void integrate() noexcept
+    {
+        if (absoluteGatedBlocks == 0) return;
+        const auto relativeGateLUFS = loudness(absoluteGatedEnergy / static_cast<double>(absoluteGatedBlocks)).value() - 10.0;
+        // First bucket whose lower edge is at or above the gate; the single bucket straddling the gate is left out.
+        // At 0.05 LU wide that bucket can only hold blocks within 0.05 LU of a threshold the spec already sets
+        // loosely, and the Tech 3341 cases below confirm it moves the result well inside the +/-0.1 LU tolerance.
+        const auto first = relativeGateLUFS <= absoluteGateLUFS
+            ? size_t { 0 }
+            : static_cast<size_t>(std::ceil((relativeGateLUFS - absoluteGateLUFS) / bucketWidthLU));
+        int64_t blocks = 0;
+        double energy = 0.0;
+        for (size_t bucket = first; bucket < gateBuckets; ++bucket)
+        {
+            blocks += gatedCount[bucket];
+            energy += gatedEnergy[bucket];
+        }
+        if (blocks == 0) return;
+        latest.integratedReady = true;
+        latest.integratedMeanSquare = energy / static_cast<double>(blocks);
+        latest.integratedLUFS = loudness(latest.integratedMeanSquare);
+    }
     static std::optional<double> loudness(double energy) noexcept
     {
         if (energy <= 0.0) return {}; // Exact silence has no finite LUFS; do not invent a meter floor.
         return -0.691 + 10.0 * std::log10(energy); // BS.1770 Annex 1 calibration offset, dB.
     }
     static constexpr size_t momentaryBins = 4, shortTermBins = 30; // 400 ms and 3 s, ungated (Tech 3341 §2.2).
+    // 0.05 LU buckets from the -70 LUFS absolute gate up to +10 LUFS: 1600 buckets, about 19 KB per meter.
+    static constexpr double absoluteGateLUFS = -70.0, bucketWidthLU = 0.05;
+    static constexpr size_t gateBuckets = 1600;
     static constexpr size_t peakTaps = 12; // 48 FIR coefficients, split into four interpolation phases.
     // BS.1770-5 Annex 2's published interpolator, dimensionless coefficients.
     // Floating point needs no initial 12.04 dB fixed-point headroom shift.
@@ -183,6 +237,10 @@ private:
     std::array<Biquad, 2> shelf, highPass;
     std::array<std::array<double, peakTaps * 2>, 2> peakHistory {};
     std::array<double, shortTermBins> bins {};
+    std::array<int64_t, gateBuckets> gatedCount {};
+    std::array<double, gateBuckets> gatedEnergy {};
+    int64_t absoluteGatedBlocks = 0;
+    double absoluteGatedEnergy = 0.0;
     int samplesPerBin = 0, binFrames = 0;
     size_t binCursor = 0, completedBins = 0, peakCursor = 0;
     int64_t frames = 0;
