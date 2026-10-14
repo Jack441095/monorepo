@@ -32,6 +32,8 @@ class MixIssue:
     # An advisory that costs nothing leaves both at their defaults.
     points_lost: float = 0.0
     source: str = ""
+    # How much weight the source can bear, set from `source` in audit_session; see TIER_LEGEND.
+    tier: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -48,6 +50,7 @@ class MixAuditReport:
     loudness_telemetry: Dict[str, Optional[float]]  # None = the meter did not report this reading
     points_available: float = 30.0  # 6 per scored dimension; the score is never rescaled to 30
     unmeasured: List[str] = field(default_factory=list)  # telemetry readings that were missing
+    legend: Dict[str, str] = field(default_factory=lambda: dict(TIER_LEGEND))
     timestamp: float = field(default_factory=time.time)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -61,6 +64,7 @@ class MixAuditReport:
             "loudness_telemetry": self.loudness_telemetry,
             "points_available": self.points_available,
             "unmeasured": self.unmeasured,
+            "legend": self.legend,
             "timestamp": self.timestamp,
         }
 
@@ -82,6 +86,15 @@ CORRELATION_SIGN_RULE = (
     "it is a convention, not a published standard, and the cost is our own"
 )
 HOUSE_RULE = "house rule: our own threshold with no published basis, to be checked against the owner's ears under E9"
+
+# Three tiers so a reader can weigh a deduction at a glance. There is no corpus tier yet: nothing here was measured
+# against reference tracks. When one is, it gets its own line, not a place among these.
+TIER_LEGEND = {
+    "published": "the threshold's main figure comes from a publisher's own guidance; our margins around it are named in the source",
+    "convention": "a widely used meter convention with no published standard behind it",
+    "judgement": "our own rule of thumb, not yet checked against the owner's ears or any reference",
+}
+_TIER_BY_SOURCE = {SPOTIFY_PEAK_RULE: "published", CORRELATION_SIGN_RULE: "convention"}
 
 
 class MixDoctor:
@@ -139,6 +152,8 @@ class MixDoctor:
         dimension_scores = {k: None if v is None else v * to_points for k, v in dimension_scores.items()}
         for issue in all_issues:
             issue.points_lost = round(issue.points_lost * to_points, 2)
+            # Anything without a recognised source is judgement; an unexplained threshold never reads as better.
+            issue.tier = _TIER_BY_SOURCE.get(issue.source, "judgement")
 
         scored = [v for v in dimension_scores.values() if v is not None]
         points_available = _POINTS_PER_DIMENSION * len(scored)
@@ -601,7 +616,7 @@ class MixDoctor:
             text += f"; only {scored} of {total} checks had a meter reading, the rest are not counted"
         costly = [i for i in issues if i.points_lost > 0]
         if costly:
-            published = sum(1 for i in costly if i.source != HOUSE_RULE)
+            published = sum(1 for i in costly if i.tier == "published")
             text += f"; {len(costly)} deductions, {published} resting on a published source"
         return text + "."
 

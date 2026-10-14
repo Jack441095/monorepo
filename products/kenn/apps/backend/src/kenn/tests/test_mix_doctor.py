@@ -235,7 +235,7 @@ def test_every_deduction_names_its_source():
     assert all(i.to_dict()["source"] for i in costly)
 
 
-def test_only_the_true_peak_ceiling_and_correlation_sign_rest_on_a_published_basis():
+def test_only_the_true_peak_ceiling_rests_on_a_published_basis():
     report = MixDoctor().audit_session(*_worst_case_session_and_meters())
 
     peak = next(i for i in report.all_issues if i.category == "dynamic" and "True Peak" in i.message)
@@ -243,7 +243,19 @@ def test_only_the_true_peak_ceiling_and_correlation_sign_rest_on_a_published_bas
     fader = next(i for i in report.all_issues if "fader" in i.message)
     assert fader.source.startswith("house rule")
     # The meaning line owns up to how few deductions are backed by a published source.
-    assert "deductions, 2 resting on a published source" in report.meaning
+    assert "deductions, 1 resting on a published source" in report.meaning
+
+
+def test_each_deduction_carries_a_tier_and_the_report_explains_the_tiers():
+    report = MixDoctor().audit_session(*_worst_case_session_and_meters())
+
+    tiers = {i.tier for i in report.all_issues if i.points_lost > 0}
+    assert tiers == {"published", "convention", "judgement"}
+    correlation = next(i for i in report.all_issues if "phase" in i.message.lower() and i.points_lost > 0)
+    assert correlation.tier in {"convention", "judgement"}  # never "published": no standard sets a correlation cost
+    payload = report.to_dict()
+    assert set(payload["legend"]) == {"published", "convention", "judgement"}
+    assert all(issue["tier"] for issue in payload["all_issues"] if issue["points_lost"] > 0)
 
 
 def test_points_lost_add_up_to_what_the_scored_dimensions_lost():
