@@ -113,6 +113,29 @@ def test_an_unsigned_db_with_no_direction_gets_no_factor(question):
     assert calc.calculated_facts(question) == ""
 
 
+@pytest.mark.parametrize("question", [
+    "Convert 3 dB to a gain factor, I'm using a pad plugin",
+    "What is 6 dB as a gain factor in the lower band?",
+    "What is 6 dB as a gain factor, with the track volume up",
+])
+def test_a_direction_word_elsewhere_in_the_question_does_not_sign_the_figure(question):
+    # 14 Oct 2026: direction was read from the whole question, so "a pad plugin" made an unsigned 3 dB a 70.8% cut.
+    assert calc.calculated_facts(question) == ""
+
+
+def test_only_the_figure_asked_about_is_converted():
+    # 14 Oct 2026: every dB in the question got a factor, including a compressor threshold nobody asked about.
+    facts = calc.calculated_facts("What is -6 dB as a gain factor? My threshold is at -18 dB")
+    assert "-6 dB is a gain factor of 0.501" in facts
+    assert "-18 dB" not in facts
+
+
+def test_a_repeated_figure_prints_once():
+    # 14 Oct 2026: "drops off at 6 dB per octave ... what is -6 dB" printed the factor twice.
+    facts = calc.calculated_facts("It drops off at 6 dB per octave; what is -6 dB as a factor?")
+    assert facts.count("gain factor of") == 1
+
+
 @pytest.mark.parametrize("question, expected", [
     ("convert -3 dB to gain", "-3 dB is a gain factor of 0.708"),
     ("-6 dB as gain", "-6 dB is a gain factor of 0.501"),

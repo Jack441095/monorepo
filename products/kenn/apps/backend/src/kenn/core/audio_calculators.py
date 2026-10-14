@@ -216,22 +216,34 @@ def pitch_facts(question: str) -> list[str]:
     return facts
 
 
+def _direction_window(question: str, found: re.Match) -> str:
+    """The words that can say which way an unsigned dB figure goes: its own clause up to 30 characters before it, and
+    the word right after "dB" ("6 dB down", "a 3 dB pad")."""
+    before = re.split(r"[,.;?!]", question[max(0, found.start() - 30):found.start()])[-1]
+    after = re.match(r"\s*\w*", question[found.end():]).group(0)
+    return before + after
+
+
 def level_facts(question: str) -> list[str]:
     facts = []
-    if _FACTOR_WORDS_RE.search(question):
-        cut, boost = bool(_CUT_WORDS_RE.search(question)), bool(_BOOST_WORDS_RE.search(question))
-        for found in _DB_RE.finditer(question):
-            typed = found.group(1).replace("−", "-")
-            db = float(typed)
-            if abs(db) > 120:
-                continue
-            signed = typed[0] in "+-"
-            # 0 dB is unity either way, so it needs no direction.
-            if not signed and db != 0 and cut == boost:
-                # Neither direction named ("the 3 dB point of the filter", "what percent is 3 dB"), or both ("cut
-                # the lows and boost the highs by 3 dB"): which way the figure goes would be a guess, and a factor
-                # for the wrong direction (141.3% for a 3 dB pad) is worse than none.
-                continue
+    conversion = _FACTOR_WORDS_RE.search(question)
+    figures = [found for found in _DB_RE.finditer(question) if abs(float(found.group(1).replace("−", "-"))) <= 120]
+    if conversion and figures:
+        # Only the figure closest to the conversion phrase. Converting every dB in the question gave an unasked
+        # factor for "my threshold is at -18 dB", and printed "6 dB per octave ... what is 6 dB" twice (14 Oct 2026).
+        found = min(figures, key=lambda f: min(abs(f.start() - conversion.end()), abs(conversion.start() - f.end())))
+        typed = found.group(1).replace("−", "-")
+        db = float(typed)
+        signed = typed[0] in "+-"
+        # Direction words count only next to the figure. Scanning the whole question read "a pad plugin", "the
+        # lower band" and "the track volume up" as the figure's direction and printed a confident wrong factor.
+        window = _direction_window(question, found)
+        cut, boost = bool(_CUT_WORDS_RE.search(window)), bool(_BOOST_WORDS_RE.search(window))
+        # Neither direction named ("the 3 dB point of the filter", "what percent is 3 dB"), or both ("cut the lows
+        # and boost the highs by 3 dB"): which way the figure goes would be a guess, and a factor for the wrong
+        # direction (141.3% for a 3 dB pad) is worse than none, so we print nothing. 0 dB is unity either way.
+        guessing = not signed and db != 0 and cut == boost
+        if not guessing:
             if not signed and cut:
                 db = -db
             # "+" for a boost the producer typed or named, so "+3 dB" is not read back as a level of 3 dB.
