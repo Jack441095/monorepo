@@ -169,6 +169,201 @@ static void verifyWorkerRetirement()
     require(allocations == 0, "Enabling the candidate adds no C++ heap allocation to callback or worker processing");
 }
 
+// EBU Tech 3341 (Nov 2023) Table 1, read from the EBU PDF on 14 Oct 2026. The signals are generated from the table's
+// wording, not taken from the EBU's own test files (which we have not fetched), so where the wording is loose we say
+// how we read it. Every case here is a stereo signal with the same samples in both channels.
+using Signal = std::vector<float>;
+
+static void appendTone(Signal& out, double rate, double dbfs, double seconds, double hz = 1000.0)
+{
+    const auto frames = static_cast<size_t>(std::llround(seconds * rate));
+    const auto gain = std::pow(10.0, dbfs / 20.0);
+    const auto first = out.size(); // Phase follows the file position, so adjoining tones join without a click.
+    for (size_t n = 0; n < frames; ++n)
+        out.push_back(static_cast<float>(gain * std::sin(2.0 * juce::MathConstants<double>::pi * hz * static_cast<double>(first + n) / rate)));
+}
+
+static void appendSilence(Signal& out, double rate, double seconds)
+{
+    out.insert(out.end(), static_cast<size_t>(std::llround(seconds * rate)), 0.0f);
+}
+
+// Every snapshot the meter produced for this signal, in order.
+static std::vector<KENNStreamingMeterSnapshot> run(const Signal& signal, double rate)
+{
+    KENNStreamingMeter meter;
+    meter.prepare(rate);
+    std::vector<KENNStreamingMeterSnapshot> snapshots;
+    for (const auto sample : signal)
+        if (meter.push(sample, sample)) snapshots.push_back(meter.snapshot());
+    return snapshots;
+}
+
+static void requireNear(double actual, double expected, double tolerance, const std::string& behavior)
+{
+    require(std::abs(actual - expected) <= tolerance, behavior.c_str());
+    if (std::abs(actual - expected) > tolerance)
+        std::cerr << "  got " << actual << ", wanted " << expected << " +/- " << tolerance << '\n';
+}
+
+static void verifyTech3341Loudness()
+{
+    constexpr double tolerance = 0.1; // LU, the tolerance every loudness row in Table 1 uses.
+    for (const double rate : { 44100.0, 48000.0, 96000.0 })
+    {
+        const auto label = std::to_string(static_cast<int>(rate)) + " Hz: ";
+
+        // Case 9: 1.34 s at -20 and 1.66 s at -30, five times. Its period is 3 s, the length of the short-term
+        // window, so S must read -23 from 3 s onward.
+        Signal nine;
+        for (int repeat = 0; repeat < 5; ++repeat) { appendTone(nine, rate, -20.0, 1.34); appendTone(nine, rate, -30.0, 1.66); }
+        for (const auto& s : run(nine, rate))
+            if (s.shortTermLUFS) requireNear(*s.shortTermLUFS, -23.0, tolerance, label + "Tech 3341 case 9 short-term is constant at -23 LUFS");
+
+        // Case 12: 0.18 s at -20 and 0.22 s at -30, 25 times. The 0.4 s period is the momentary window, so M must
+        // read -23 once the signal has run for the table's 1 s.
+        Signal twelve;
+        for (int repeat = 0; repeat < 25; ++repeat) { appendTone(twelve, rate, -20.0, 0.18); appendTone(twelve, rate, -30.0, 0.22); }
+        for (const auto& s : run(twelve, rate))
+            if (s.momentaryLUFS && s.endSample >= static_cast<int64_t>(rate))
+                requireNear(*s.momentaryLUFS, -23.0, tolerance, label + "Tech 3341 case 12 momentary is constant at -23 LUFS");
+
+        // Case 10: a 3 s tone at -23 starting i * 0.15 s into the file; the highest S must be -23. The meter's windows
+        // sit on a 100 ms grid, so the odd offsets land 50 ms off it and lose 50 ms of 3000 (0.07 LU): inside the tolerance.
+        for (int i = 0; i < 20; ++i)
+        {
+            Signal ten;
+            appendSilence(ten, rate, i * 0.15);
+            appendTone(ten, rate, -23.0, 3.0);
+            appendSilence(ten, rate, 1.0);
+            double highest = -200.0;
+            for (const auto& s : run(ten, rate))
+                if (s.shortTermLUFS) highest = std::max(highest, *s.shortTermLUFS);
+            requireNear(highest, -23.0, tolerance, label + "Tech 3341 case 10 maximum short-term is -23 LUFS at every start offset");
+        }
+
+        // Case 13: a 400 ms tone at -23 starting i * 20 ms into the file; the highest M must be -23. This one we do
+        // not meet. The meter reports every 100 ms, so a tone that starts off that grid never fills a whole window:
+        // at 40 ms or 60 ms off it covers 360 of 400 ms, which reads 0.46 LU low. Only the offsets on the grid pass.
+        // We pin the size of the miss so nobody claims EBU-mode momentary from this meter; closing it needs a
+        // shorter hop than 100 ms.
+        double worstMiss = 0.0;
+        for (int i = 0; i < 20; ++i)
+        {
+            Signal thirteen;
+            appendSilence(thirteen, rate, i * 0.020);
+            appendTone(thirteen, rate, -23.0, 0.4);
+            appendSilence(thirteen, rate, 1.0);
+            double highest = -200.0;
+            for (const auto& s : run(thirteen, rate))
+                if (s.momentaryLUFS) highest = std::max(highest, *s.momentaryLUFS);
+            if (i % 5 == 0)
+                requireNear(highest, -23.0, tolerance, label + "Tech 3341 case 13 maximum momentary is -23 LUFS when the tone starts on the 100 ms grid");
+            worstMiss = std::max(worstMiss, std::abs(highest + 23.0));
+        }
+        requireNear(worstMiss, 0.46, 0.05, label + "Tech 3341 case 13 off-grid starts read about 0.46 LU low, the cost of the 100 ms hop");
+    }
+}
+
+// Tech 3341 cases 15-19: one tone at fs/N, with a 10 ms fade at each end.
+static Signal peakTone(double rate, double divisor, double amplitude, double phaseDegrees)
+{
+    const auto frames = static_cast<size_t>(rate / 2.0); // 0.5 s; the table says the length does not matter.
+    const auto fade = static_cast<size_t>(rate * 0.010);
+    Signal out(frames);
+    for (size_t n = 0; n < frames; ++n)
+    {
+        const auto phase = 2.0 * juce::MathConstants<double>::pi * (static_cast<double>(n) / divisor + phaseDegrees / 360.0);
+        const auto edge = std::min(n, frames - 1 - n);
+        const auto taper = edge >= fade ? 1.0 : 0.5 * (1.0 - std::cos(juce::MathConstants<double>::pi * static_cast<double>(edge) / static_cast<double>(fade)));
+        out[n] = static_cast<float>(amplitude * taper * std::sin(phase));
+    }
+    appendSilence(out, rate, 0.3); // Lets the last 100 ms bin complete and the interpolation filter run out.
+    return out;
+}
+
+// Tech 3341 cases 20-23: an fs/6 tone at 0.5 holding one full-scale fs/4 period, built at 4 x fs, low-passed and
+// decimated by four starting `offset` samples in. We read "continuous in phase" as: the fs/6 tone keeps the phase it
+// would have had with no interruption, and the fs/4 period starts where the fs/6 tone crosses zero. The low-pass is
+// a 1601-tap Blackman-Harris windowed sinc with its cutoff at 0.45 x fs, wide enough to pass fs/4 untouched.
+static Signal singlePeriodCase(double rate, int offset)
+{
+    constexpr int taps = 1601;
+    const auto length = 4 * static_cast<int>(rate / 20.0); // 50 ms at 4 x fs.
+    std::vector<double> wide(static_cast<size_t>(length));
+    for (int n = 0; n < length; ++n) wide[static_cast<size_t>(n)] = 0.5 * std::sin(2.0 * juce::MathConstants<double>::pi * n / 24.0); // fs/6 is 24 samples a cycle at 4 x fs.
+    const auto start = (length / 2 / 24) * 24; // A zero crossing of the fs/6 tone.
+    for (int n = 0; n < 16; ++n) // One fs/4 period is 16 samples at 4 x fs.
+        wide[static_cast<size_t>(start + n)] = std::sin(2.0 * juce::MathConstants<double>::pi * n / 16.0);
+
+    const auto pi = juce::MathConstants<double>::pi;
+    std::vector<double> lowpass(taps);
+    const auto cutoff = 0.45 / 4.0; // Cycles per sample at 4 x fs.
+    for (int n = 0; n < taps; ++n)
+    {
+        const auto m = n - taps / 2;
+        const auto sinc = m == 0 ? 2.0 * cutoff : std::sin(2.0 * pi * cutoff * m) / (pi * m);
+        const auto x = 2.0 * pi * n / (taps - 1);
+        const auto window = 0.35875 - 0.48829 * std::cos(x) + 0.14128 * std::cos(2.0 * x) - 0.01168 * std::cos(3.0 * x);
+        lowpass[static_cast<size_t>(n)] = sinc * window;
+    }
+
+    Signal out;
+    const auto fade = static_cast<size_t>(rate * 0.005);
+    for (int n = offset; n < length; n += 4)
+    {
+        double sum = 0.0;
+        for (int tap = 0; tap < taps; ++tap)
+        {
+            const auto source = n - (tap - taps / 2);
+            if (source >= 0 && source < length) sum += lowpass[static_cast<size_t>(tap)] * wide[static_cast<size_t>(source)];
+        }
+        out.push_back(static_cast<float>(sum));
+    }
+    for (size_t n = 0; n < fade && n < out.size(); ++n) // The table asks for a short fade at each end.
+    {
+        const auto taper = 0.5 * (1.0 - std::cos(pi * static_cast<double>(n) / static_cast<double>(fade)));
+        out[n] = static_cast<float>(out[n] * taper);
+        out[out.size() - 1 - n] = static_cast<float>(out[out.size() - 1 - n] * taper);
+    }
+    appendSilence(out, rate, 0.3);
+    return out;
+}
+
+static double highestTruePeakDBTP(const Signal& signal, double rate)
+{
+    double highest = -200.0;
+    for (const auto& s : run(signal, rate))
+        if (s.truePeakDBTP) highest = std::max(highest, *s.truePeakDBTP);
+    return highest;
+}
+
+static void verifyTech3341TruePeak()
+{
+    // Table 1 gives +0.2/-0.4 dBTP for cases 15-23, so a reading may sit 0.2 above or 0.4 below the expected peak.
+    constexpr double over = 0.2, under = 0.4;
+    struct Case { const char* name; double divisor, amplitude, phase, expected; };
+    const Case cases[] = {
+        { "15 (fs/4, 0 deg, 0.5)", 4.0, 0.50, 0.0, -6.0 },
+        { "16 (fs/4, 45 deg, 0.5)", 4.0, 0.50, 45.0, -6.0 },
+        { "17 (fs/6, 60 deg, 0.5)", 6.0, 0.50, 60.0, -6.0 },
+        { "18 (fs/8, 67.5 deg, 0.5)", 8.0, 0.50, 67.5, -6.0 },
+        { "19 (fs/4, 45 deg, 1.41)", 4.0, 1.41, 45.0, 3.0 },
+    };
+    for (const double rate : { 44100.0, 48000.0, 96000.0 })
+    {
+        const auto label = std::to_string(static_cast<int>(rate)) + " Hz: Tech 3341 true-peak case ";
+        for (const auto& c : cases)
+        {
+            const auto reading = highestTruePeakDBTP(peakTone(rate, c.divisor, c.amplitude, c.phase), rate);
+            requireNear(reading, c.expected + 0.5 * (over - under), 0.5 * (over + under), label + c.name);
+        }
+        for (int offset = 0; offset < 4; ++offset)
+            requireNear(highestTruePeakDBTP(singlePeriodCase(rate, offset), rate), 0.5 * (over - under), 0.5 * (over + under),
+                        label + std::to_string(20 + offset) + " (single fs/4 period, decimation offset " + std::to_string(offset) + ")");
+    }
+}
+
 static int trace(int rate, const char* path)
 {
     KENNStreamingMeter meter;
@@ -297,7 +492,7 @@ int main(int argc, char** argv)
             profile(repeats); return 0;
         }
         if (argc != 1) throw std::runtime_error("Use --trace RATE FLOAT32_STEREO or --profile REPEATS"); // Refuse ignored/mislabelled options.
-        verifyMeter(); verifyWorkerRetirement();
+        verifyMeter(); verifyWorkerRetirement(); verifyTech3341Loudness(); verifyTech3341TruePeak();
         std::cout << checks << " streaming meter checks, " << failures << " failures\n";
         return failures == 0 ? 0 : 1;
     }
