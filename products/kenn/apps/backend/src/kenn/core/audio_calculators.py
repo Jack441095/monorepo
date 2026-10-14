@@ -9,6 +9,11 @@ handed to the model as tool readings, which the gate already accepts figures fro
 Only the question typed this turn is read, never the history-expanded search query: a follow-up's search string can
 carry an earlier question's tempo, and a calculation from it would answer a question nobody asked.
 
+Every calculation needs the question to ask for that conversion in so many words ("what note is 220 Hz", "-6 dB as a
+ratio"), not just to mention a figure near a trigger word: the gate accepts a calculated figure anywhere in the answer,
+so an unrequested one ("200 Hz is G3" for a question about cutting 200 Hz) is a licence for an invented sentence. When
+the wording is unclear we compute nothing.
+
 Deliberately not here: anything perceptual. "Twice as loud" has no exact dB answer (it depends on level, frequency
 and listener), so a question about loudness gets the level and power arithmetic and nothing pretending to be more.
 """
@@ -17,6 +22,7 @@ from __future__ import annotations
 
 import math
 import re
+from decimal import ROUND_HALF_UP, Decimal
 
 # A whole note is four beats, so its length in ms is 4 x 60 000 / BPM.
 _MS_PER_WHOLE_NOTE_AT_1_BPM = 240_000.0
@@ -25,26 +31,55 @@ _NOTE_WORDS = {
     "whole": 1, "half": 2, "quarter": 4, "crotchet": 4, "eighth": 8, "quaver": 8,
     "sixteenth": 16, "semiquaver": 16, "thirty-second": 32, "32nd": 32, "16th": 16, "8th": 8, "4th": 4,
 }
+# "half", "whole", "quarter" and "4th" only count with "note" after them: on their own they are "half time", "the whole
+# mix", "a quarter of the level", "the 4th bar", and a 1/2-note delay figure for "half time feel" answers nothing asked.
 _NOTE_RE = re.compile(
     r"\b(?P<dotted>dotted\s+)?(?P<triplet>triplet\s+)?"
-    r"(?:1/(?P<frac>1|2|4|8|16|32)(?P<t>t)?\b|(?P<word>whole|half|quarter|crotchet|eighth|quaver|sixteenth|"
-    r"semiquaver|thirty-second|32nd|16th|8th|4th)(?:[\s-]+notes?)?)"
+    r"(?:1/(?P<frac>1|2|4|8|16|32)(?P<t>t)?\b|(?P<word>crotchet|eighth|quaver|sixteenth|"
+    r"semiquaver|thirty-second|32nd|16th|8th)(?:[\s-]+notes?)?|(?P<noted_word>whole|half|quarter|4th)[\s-]+notes?\b)"
     r"(?P<dotted_after>\s+dotted)?(?P<triplet_after>\s+triplets?)?",
     re.IGNORECASE,
 )
 _BPM_RE = re.compile(r"\b(\d{2,3}(?:\.\d+)?)\s*bpm\b", re.IGNORECASE)
-_TEMPO_WORDS_RE = re.compile(r"\b(delay|pre-?delay|echo|lfo|time|sync|ms|milliseconds?|release)\b", re.IGNORECASE)
+# No bare "time": "time signature 7/8 at 140 BPM" is about metre, and it drew the full set of delay figures.
+_TEMPO_WORDS_RE = re.compile(r"\b(delay|pre-?delay|echo|lfo|sync|ms|milliseconds?|release)\b", re.IGNORECASE)
 
 _SAMPLES_RE = re.compile(r"\b(\d{2,7})\s*samples?\b", re.IGNORECASE)
 _RATE_RE = re.compile(r"\b(\d{2,3}(?:\.\d+)?)\s*k\s*hz\b|\b(\d{5,6})\s*hz\b", re.IGNORECASE)
 
 _HZ_RE = re.compile(r"\b(\d{1,5}(?:\.\d+)?)\s*hz\b", re.IGNORECASE)
 _NOTE_NAME_RE = re.compile(r"\b([A-G])([#b♯♭]?)(-?\d)\b")
-_NOTE_QUESTION_RE = re.compile(r"\b(which|what)\s+(musical\s+)?note\b|\bnote\s+(is|at)\b|\bpitch\b", re.IGNORECASE)
-_FREQ_QUESTION_RE = re.compile(r"\bfrequency\b|\bhz\b|\bhertz\b", re.IGNORECASE)
+# The conversion has to be asked of the figure itself, so each pattern is anchored to the text right before or right
+# after it. "what pitch is the vocal" next to "cut 200 Hz", or "what frequency should I cut" next to a sampler called
+# E4, names no conversion and gets none.
+_HZ_TO_NOTE_BEFORE_RE = re.compile(
+    r"\b(?:which|what)\s+(?:musical\s+)?(?:note|pitch)\s+(?:is|does|would)\s+(?:an?\s+)?\Z", re.IGNORECASE)
+_HZ_TO_NOTE_AFTER_RE = re.compile(
+    r"\s*(?:is\s+)?(?:which|what)\s+(?:musical\s+)?note\b|\s+(?:as|in|to)\s+(?:an?\s+)?(?:note|pitch|midi)\b",
+    re.IGNORECASE)
+_NOTE_TO_HZ_BEFORE_RE = re.compile(
+    r"(?:\b(?:what|which)\s+(?:frequency|freq|hz|hertz)\s+(?:is|does|would)|\bhow\s+many\s+(?:hz|hertz)\s+is"
+    r"|\bfrequency\s+of)\s+(?:an?\s+|the\s+|note\s+)?\Z", re.IGNORECASE)
+_NOTE_TO_HZ_AFTER_RE = re.compile(r"\s+(?:in|as|to)\s+(?:hz|hertz|frequency)\b", re.IGNORECASE)
+# A reference pitch the producer states: "A=442", "432 tuning", "tuned to 432 Hz". Three digits, because every
+# concert pitch in use sits between 415 Hz (baroque) and 466 Hz.
+_TUNING_RE = re.compile(
+    r"\bA4?\s*=\s*(\d{3}(?:\.\d+)?)|\b(\d{3}(?:\.\d+)?)\s*(?:hz\s*)?tuning\b"
+    r"|\btuned\s+(?:to\s+)?(?:A4?\s*=?\s*)?(\d{3}(?:\.\d+)?)|\btuning\s+(?:of\s+|at\s+)?(?:A4?\s*=?\s*)?(\d{3}(?:\.\d+)?)",
+    re.IGNORECASE)
 
 _DB_RE = re.compile(r"(?<![\w.])([+\-−]?\d+(?:\.\d+)?)\s*db\b(?!\s*(?:fs|tp|spl|u|v|a)\b)", re.IGNORECASE)
-_FACTOR_WORDS_RE = re.compile(r"\b(ratio|multiplier|factor|times|percent|percentage|linear|amplitude|%)", re.IGNORECASE)
+# A conversion phrase, not a bare word: "set ratio 4:1 and threshold -18 dB" mentions a ratio and a dB figure and asks
+# for no conversion. "Ratio" only counts after "as"/"in", since "what ratio" is a compressor setting question.
+_FACTOR_WORDS_RE = re.compile(
+    r"\b(?:as|in|to|into)\s+(?:an?\s+)?(?:linear\s+|amplitude\s+)?"
+    r"(?:ratio|multiplier|gain\s+factor|factor|percent(?:age)?|linear|amplitude)\b"
+    r"|\b(?:what|which)(?:'s|\s+is)?\s+(?:the\s+|that\s+)?(?:linear\s+)?(?:multiplier|gain\s+factor|factor|percent(?:age)?)\b"
+    r"|\bhow\s+many\s+times\b|\b(?:gain\s+factor|multiplier|percentage)\s+(?:of|for)\b",
+    re.IGNORECASE)
+# Direction words for a dB figure typed without a sign. "Reduce by 6 dB" is -6 dB, and reading it as +6 gave 199.5%.
+_CUT_WORDS_RE = re.compile(r"\b(cut\w*|reduc\w*|lower\w*|attenuat\w*|drop\w*|down|quieter)\b", re.IGNORECASE)
+_BOOST_WORDS_RE = re.compile(r"\b(boost\w*|rais\w*|increas\w*|up|louder)\b", re.IGNORECASE)
 _DOUBLE_RE = re.compile(r"\b(double|doubling|twice|half|halve|halving)\b", re.IGNORECASE)
 _LEVEL_WORDS_RE = re.compile(r"\b(level|volume|amplitude|voltage|signal|power|gain|loud\w*)\b", re.IGNORECASE)
 
@@ -54,7 +89,10 @@ _FLATS = {"Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#"}
 
 def _fmt(value: float, places: int = 1) -> str:
     """One decimal, with a trailing .0 dropped, so 500.0 ms reads 500 ms and the gate sees the figure as written."""
-    text = f"{value:.{places}f}"
+    # Half-up, as a producer works it on paper: Python's round() and f-strings round a tie to even, which printed
+    # 312.5 ms as "about 312" and 156.25 ms as 156.2. repr() first, so 2.675 rounds as typed, not as its binary
+    # neighbour 2.67499...
+    text = str(Decimal(repr(value)).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP))
     return text.rstrip("0").rstrip(".") if "." in text else text
 
 
@@ -82,7 +120,8 @@ def tempo_facts(question: str) -> list[str]:
         return []
     notes = []
     for found in _NOTE_RE.finditer(question):
-        division = int(found.group("frac")) if found.group("frac") else _NOTE_WORDS[found.group("word").lower()]
+        word = found.group("word") or found.group("noted_word")
+        division = int(found.group("frac")) if found.group("frac") else _NOTE_WORDS[word.lower()]
         dotted = bool(found.group("dotted") or found.group("dotted_after"))
         triplet = bool(found.group("triplet") or found.group("triplet_after") or found.group("t"))
         notes.append((division, dotted, triplet))
@@ -97,7 +136,7 @@ def tempo_facts(question: str) -> list[str]:
         ms = note_length_ms(bpm, division, dotted=dotted, triplet=triplet)
         facts.append(
             f"At {_fmt(bpm, 2)} BPM a {_note_label(division, dotted, triplet)} lasts {_fmt(ms)} ms "
-            f"(about {round(ms)} ms), which is {_fmt(1000.0 / ms, 2)} Hz as an LFO rate."
+            f"(about {_fmt(ms, 0)} ms), which is {_fmt(1000.0 / ms, 2)} Hz as an LFO rate."
         )
     return facts
 
@@ -133,42 +172,68 @@ def _names(note: int) -> str:
 
 
 def pitch_facts(question: str) -> list[str]:
+    for tuning in _TUNING_RE.finditer(question):
+        stated = next(group for group in tuning.groups() if group)
+        if float(stated) != 440.0:
+            # Every figure below assumes A4 = 440 Hz, so under a stated 432 or 442 each one would be a wrong pitch
+            # the gate then accepts. Saying nothing is safe: the model answers in words, as it did before this file.
+            return []
     facts = []
-    if _NOTE_QUESTION_RE.search(question):
-        for found in _HZ_RE.finditer(question):
-            hz = float(found.group(1))
-            if not 8.0 <= hz <= 20_000.0:
-                continue
-            exact = _midi_from_hz(hz)
-            nearest = round(exact)
-            cents = (exact - nearest) * 100.0
-            offset = "exactly" if abs(cents) < 0.5 else f"{_fmt(abs(cents), 0)} cents {'sharp' if cents > 0 else 'flat'} of"
-            facts.append(f"{_fmt(hz, 2)} Hz is {offset} {_names(nearest)}, at A4 = 440 Hz.")
-    if _FREQ_QUESTION_RE.search(question):
-        for found in _NOTE_NAME_RE.finditer(question):
-            letter, accidental, octave = found.group(1), found.group(2), int(found.group(3))
-            name = letter + {"♯": "#", "♭": "b"}.get(accidental, accidental)
-            name = _FLATS.get(name, name)
-            if name not in NOTE_NAMES:
-                continue
-            # The octave as typed is read as scientific pitch, the common convention; the answer names Live's label
-            # too, so a producer reading Live's piano roll can tell which one they meant.
-            note = (octave + 1) * 12 + NOTE_NAMES.index(name)
-            if 0 <= note <= 127:
-                facts.append(f"{name}{octave} is {_fmt(_hz_from_midi(note), 2)} Hz: {_names(note)}, at A4 = 440 Hz.")
+    for found in _HZ_RE.finditer(question):
+        if not (_HZ_TO_NOTE_BEFORE_RE.search(question[:found.start()])
+                or _HZ_TO_NOTE_AFTER_RE.match(question, found.end())):
+            continue
+        hz = float(found.group(1))
+        if not 8.0 <= hz <= 20_000.0:
+            continue
+        exact = _midi_from_hz(hz)
+        # Half-up for the same reason as _fmt; a tie here is a frequency exactly 50 cents between two notes.
+        nearest = math.floor(exact + 0.5)
+        if not 0 <= nearest <= 127:
+            # Above 12.54 kHz (MIDI 127) or below 8.18 Hz (MIDI 0) there is no MIDI note to name, and "MIDI note 135"
+            # would be a number no clip in Live can hold.
+            continue
+        cents = (exact - nearest) * 100.0
+        offset = "exactly" if abs(cents) < 0.5 else f"{_fmt(abs(cents), 0)} cents {'sharp' if cents > 0 else 'flat'} of"
+        facts.append(f"{_fmt(hz, 2)} Hz is {offset} {_names(nearest)}, at A4 = 440 Hz.")
+    for found in _NOTE_NAME_RE.finditer(question):
+        if not (_NOTE_TO_HZ_BEFORE_RE.search(question[:found.start()])
+                or _NOTE_TO_HZ_AFTER_RE.match(question, found.end())):
+            continue
+        letter, accidental, octave = found.group(1), found.group(2), int(found.group(3))
+        name = letter + {"♯": "#", "♭": "b"}.get(accidental, accidental)
+        name = _FLATS.get(name, name)
+        if name not in NOTE_NAMES:
+            continue
+        # The octave as typed is read as scientific pitch, the common convention; the answer names Live's label
+        # too, so a producer reading Live's piano roll can tell which one they meant.
+        note = (octave + 1) * 12 + NOTE_NAMES.index(name)
+        if 0 <= note <= 127:
+            facts.append(f"{name}{octave} is {_fmt(_hz_from_midi(note), 2)} Hz: {_names(note)}, at A4 = 440 Hz.")
     return facts
 
 
 def level_facts(question: str) -> list[str]:
     facts = []
     if _FACTOR_WORDS_RE.search(question):
+        cut, boost = bool(_CUT_WORDS_RE.search(question)), bool(_BOOST_WORDS_RE.search(question))
         for found in _DB_RE.finditer(question):
-            db = float(found.group(1).replace("−", "-"))
+            typed = found.group(1).replace("−", "-")
+            db = float(typed)
             if abs(db) > 120:
                 continue
+            signed = typed[0] in "+-"
+            if not signed and cut and boost:
+                # "Cut the lows and boost the highs by 3 dB": we cannot tell which way this figure goes, and a
+                # factor for the wrong direction is worse than none.
+                continue
+            if not signed and cut:
+                db = -db
+            # "+" only for a boost the producer typed or named, so "+3 dB" is not read back as a level of 3 dB and
+            # a bare "6 dB" does not pick up a sign nobody gave it.
+            plus = "+" if db > 0 and (typed.startswith("+") or (not signed and boost)) else ""
             amplitude, power = 10.0 ** (db / 20.0), 10.0 ** (db / 10.0)
-            # A boost keeps its sign, so "+3 dB" is not read back as a level of 3 dB.
-            facts.append(f"{'+' if db > 0 else ''}{_fmt(db)} dB is a gain factor of {_fmt(amplitude, 3)} on amplitude "
+            facts.append(f"{plus}{_fmt(db)} dB is a gain factor of {_fmt(amplitude, 3)} on amplitude "
                          f"({_fmt(amplitude * 100.0)}%) and {_fmt(power, 3)} on power.")
     if _DOUBLE_RE.search(question) and _LEVEL_WORDS_RE.search(question):
         facts.append("Doubling amplitude (voltage, sample values) is +6.02 dB and halving it is -6.02 dB; doubling power "

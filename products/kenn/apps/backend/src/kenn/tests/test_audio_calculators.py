@@ -82,6 +82,78 @@ def test_an_ordinary_question_gets_no_calculation():
     assert calc.calculated_facts("") == ""
 
 
+
+# Regressions found in review on 14 Oct 2026. A calculation is injected as a tool reading and the gate then accepts
+# its figures anywhere in the answer, so a wrong or unrequested fact lets an invented figure through.
+
+@pytest.mark.parametrize("question, expected, wrong", [
+    ("reduce by 6 dB, what percent is that?", "-6 dB is a gain factor of 0.501 on amplitude (50.1%)", "+6 dB"),
+    ("cut 3 dB, what's the multiplier?", "-3 dB is a gain factor of 0.708 on amplitude (70.8%)", "+3 dB"),
+])
+def test_a_cut_is_worked_out_as_a_reduction(question, expected, wrong):
+    # 14 Oct 2026: an unsigned dB after "reduce" or "cut" was read as a boost, giving 199.5% for a 6 dB cut.
+    facts = calc.calculated_facts(question)
+    assert expected in facts
+    assert wrong not in facts
+
+
+def test_an_unsigned_db_with_no_direction_is_not_called_a_boost():
+    # 14 Oct 2026: "6 dB" with no boost word was printed as "+6 dB", a sign nobody typed.
+    facts = calc.calculated_facts("what is 6 dB as a ratio?")
+    assert "6 dB is a gain factor of 1.995 on amplitude" in facts
+    assert "+6 dB" not in facts
+
+
+@pytest.mark.parametrize("question", [
+    "what hz is A4 at 432 tuning",
+    "A=442, what frequency is C4?",
+    "I'm tuned to 432 Hz, what note is 220 Hz?",
+])
+def test_a_stated_tuning_other_than_440_gets_no_pitch_figure(question):
+    # 14 Oct 2026: "A4 at 432 tuning" was answered with 440 Hz, the default the producer had just ruled out.
+    assert calc.calculated_facts(question) == ""
+
+
+def test_a_stated_440_tuning_still_gets_its_pitch_figure():
+    assert "C4 is 261.63 Hz" in calc.calculated_facts("At A=440, what frequency is C4?")
+
+
+def test_how_many_hz_is_a_note_is_a_conversion_question():
+    assert "A4 is 440 Hz" in calc.calculated_facts("How many Hz is A4?")
+
+
+@pytest.mark.parametrize("question", [
+    "Should I cut 200 Hz on the vocal? what pitch is the vocal",
+    "what frequency should I cut, my sampler is an E-mu E4",
+    "what frequency should I cut on the C4 model",
+    "set ratio 4:1 and threshold -18 dB",
+    "time signature 7/8 at 140 bpm",
+])
+def test_a_figure_mentioned_beside_an_unrelated_question_gets_no_calculation(question):
+    # 14 Oct 2026: a trigger word anywhere in the question (pitch, frequency, ratio, time) converted any number
+    # nearby, so a cut frequency became a note name and a compressor threshold became a gain factor.
+    assert calc.calculated_facts(question) == ""
+
+
+def test_half_time_is_not_a_half_note():
+    # 14 Oct 2026: "half time feel" was read as a 1/2 note and given a delay figure nobody asked for.
+    assert "1/2 note" not in calc.calculated_facts("128bpm half time feel, what release time")
+
+
+@pytest.mark.parametrize("question, expected", [
+    ("dotted 1/8 delay at 144 BPM", "At 144 BPM a dotted 1/8 note lasts 312.5 ms (about 313 ms)"),
+    ("1/8T delay at 128 bpm", "At 128 BPM a 1/8 triplet note lasts 156.3 ms"),
+])
+def test_an_exact_half_rounds_up(question, expected):
+    # 14 Oct 2026: Python's round-half-to-even printed 312.5 ms as "about 312" and 156.25 ms as 156.2 ms.
+    assert expected in calc.calculated_facts(question)
+
+
+def test_a_frequency_above_the_midi_range_gets_no_note():
+    # 14 Oct 2026: 20 000 Hz was named as MIDI note 135, which no MIDI note or Live clip can hold (0-127).
+    assert calc.calculated_facts("what note is 20000 Hz") == ""
+
+
 # The answer path: calculations reach the model and the gate as tool readings, from the typed question only.
 from kenn.core import chat_answer  # noqa: E402
 from kenn.tests.test_payload_transient_cache import _model, cache_writes  # noqa: E402,F401 (pytest fixture)
