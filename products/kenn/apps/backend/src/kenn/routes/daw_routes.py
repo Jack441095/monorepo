@@ -213,3 +213,136 @@ def handle_project_audio_file(file_path: str) -> tuple[int, bytes | dict[str, An
     except Exception as exc:
         return 500, {"ok": False, "error": f"Failed to read audio file: {exc}"}, "application/json"
 
+
+def handle_midi_clip_proposal(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Return status code and payload for /api/ableton/midi-clip/proposal."""
+    from kenn.core.midi_clip_action_service import MidiClipActionService
+
+    session_id = str(payload.get("session_id", "")).strip()
+    if not session_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+    try:
+        result = MidiClipActionService().propose_create(
+            track_index=payload.get("track_index"),
+            track_name=str(payload.get("track_name", "")),
+            clip_slot_index=payload.get("clip_slot_index"),
+            length=payload.get("length"),
+            notes=payload.get("notes"),
+            session_id=session_id,
+            source_artifact_sha256=str(payload.get("source_artifact_sha256", "")),
+            source_artifact_id=str(payload.get("source_artifact_id", "")),
+        )
+    except (TypeError, ValueError) as exc:
+        return 400, {"ok": False, "error": str(exc)}
+    return (200 if result.get("ok") else 409), result
+
+
+def handle_midi_clip_update_proposal(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Return status code and payload for /api/ableton/midi-clip/update-proposal."""
+    from kenn.core.midi_clip_action_service import MidiClipActionService
+
+    session_id = str(payload.get("session_id", "")).strip()
+    if not session_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+    try:
+        result = MidiClipActionService().propose_update(
+            track_index=payload.get("track_index"),
+            track_name=str(payload.get("track_name", "")),
+            clip_slot_index=payload.get("clip_slot_index"),
+            notes=payload.get("notes"),
+            session_id=session_id,
+            source_receipt_id=str(payload.get("source_receipt_id", "")),
+        )
+    except (TypeError, ValueError) as exc:
+        return 400, {"ok": False, "error": str(exc)}
+    if result.get("receipt") or result.get("changed") is True:
+        return 500, {"ok": False, "error": "MIDI clip update proposal endpoint returned a mutation."}
+    return (200 if result.get("ok") else 409), result
+
+
+def handle_clip_duplication_proposal(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Return status code and payload for /api/ableton/clip-duplication/proposal."""
+    from kenn.core.clip_duplication_action_service import ClipDuplicationActionService
+
+    session_id = str(payload.get("session_id", "")).strip()
+    if not session_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+    try:
+        result = ClipDuplicationActionService().propose(
+            source_track_index=payload.get("source_track_index"),
+            source_track_name=str(payload.get("source_track_name", "")),
+            source_clip_slot_index=payload.get("source_clip_slot_index"),
+            target_track_index=payload.get("target_track_index"),
+            target_track_name=str(payload.get("target_track_name", "")),
+            target_clip_slot_index=payload.get("target_clip_slot_index"),
+            session_id=session_id,
+        )
+    except (TypeError, ValueError) as exc:
+        return 400, {"ok": False, "error": str(exc)}
+    if result.get("receipt") or result.get("changed") is True:
+        return 500, {"ok": False, "error": "Clip duplication proposal endpoint returned a mutation."}
+    return (200 if result.get("ok") else 409), result
+
+
+def handle_clip_rename_proposal(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Return status code and payload for /api/ableton/clip-rename/proposal."""
+    from kenn.core.clip_rename_action_service import ClipRenameActionService
+
+    session_id = str(payload.get("session_id", "")).strip()
+    if not session_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+    try:
+        result = ClipRenameActionService().propose(
+            track_index=payload.get("track_index"),
+            track_name=str(payload.get("track_name", "")),
+            clip_slot_index=payload.get("clip_slot_index"),
+            new_name=str(payload.get("new_name", "")),
+            session_id=session_id,
+        )
+    except (TypeError, ValueError) as exc:
+        return 400, {"ok": False, "error": str(exc)}
+    if result.get("receipt") or result.get("changed") is True:
+        return 500, {"ok": False, "error": "Clip rename proposal endpoint returned a mutation."}
+    return (200 if result.get("ok") else 409), result
+
+
+def handle_sample_import_proposal(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Return status code and payload for /api/ableton/sample-import/proposal."""
+    from kenn.core.sample_import_service import SampleImportService
+
+    session_id = str(payload.get("session_id", "")).strip()
+    if not session_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+    try:
+        result = SampleImportService().propose_import(
+            track_index=payload.get("track_index"),
+            track_name=str(payload.get("track_name", "")),
+            clip_slot_index=payload.get("clip_slot_index"),
+            sample_id=str(payload.get("sample_id", "")),
+            session_id=session_id,
+        )
+    except (TypeError, ValueError) as exc:
+        return 400, {"ok": False, "error": str(exc)}
+    return (200 if result.get("ok") else 409), result
+
+
+def handle_clip_audition_proposal(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Return status code and payload for /api/ableton/clip-audition/proposal."""
+    from kenn.core.clip_audition_action_service import ClipAuditionActionService
+
+    session_id = str(payload.get("session_id", "")).strip()
+    if not session_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+    try:
+        result = ClipAuditionActionService().propose(
+            track_index=payload.get("track_index"),
+            track_name=str(payload.get("track_name", "")),
+            clip_slot_index=payload.get("clip_slot_index"),
+            session_id=session_id,
+            source_receipt_id=str(payload.get("source_receipt_id", "")),
+        )
+    except (TypeError, ValueError) as exc:
+        return 400, {"ok": False, "error": str(exc)}
+    return (200 if result.get("ok") else 409), result
+
+

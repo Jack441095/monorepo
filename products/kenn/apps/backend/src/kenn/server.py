@@ -2343,127 +2343,34 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(status, result)
             return
         if parsed.path == "/api/ableton/midi-clip/proposal":
-            session_id = str(payload.get("session_id", "")).strip()
-            if not session_id:
-                self.send_json(400, {"ok": False, "error": "session_id is required."})
-                return
-            try:
-                result = MidiClipActionService().propose_create(
-                    track_index=payload.get("track_index"),
-                    track_name=str(payload.get("track_name", "")),
-                    clip_slot_index=payload.get("clip_slot_index"),
-                    length=payload.get("length"),
-                    notes=payload.get("notes"),
-                    session_id=session_id,
-                    source_artifact_sha256=str(payload.get("source_artifact_sha256", "")),
-                    source_artifact_id=str(payload.get("source_artifact_id", "")),
-                )
-            except (TypeError, ValueError) as exc:
-                self.send_json(400, {"ok": False, "error": str(exc)})
-                return
-            self.send_json(200 if result.get("ok") else 409, result)
+            from kenn.routes.daw_routes import handle_midi_clip_proposal
+            code, payload = handle_midi_clip_proposal(payload)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/midi-clip/update-proposal":
-            session_id = str(payload.get("session_id", "")).strip()
-            if not session_id:
-                self.send_json(400, {"ok": False, "error": "session_id is required."})
-                return
-            try:
-                result = MidiClipActionService().propose_update(
-                    track_index=payload.get("track_index"),
-                    track_name=str(payload.get("track_name", "")),
-                    clip_slot_index=payload.get("clip_slot_index"),
-                    notes=payload.get("notes"),
-                    session_id=session_id,
-                    source_receipt_id=str(payload.get("source_receipt_id", "")),
-                )
-            except (TypeError, ValueError) as exc:
-                self.send_json(400, {"ok": False, "error": str(exc)})
-                return
-            if result.get("receipt") or result.get("changed") is True:
-                self.send_json(500, {"ok": False, "error": "MIDI clip update proposal endpoint returned a mutation."})
-                return
-            self.send_json(200 if result.get("ok") else 409, result)
+            from kenn.routes.daw_routes import handle_midi_clip_update_proposal
+            code, payload = handle_midi_clip_update_proposal(payload)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/clip-duplication/proposal":
-            session_id = str(payload.get("session_id", "")).strip()
-            if not session_id:
-                self.send_json(400, {"ok": False, "error": "session_id is required."})
-                return
-            try:
-                result = ClipDuplicationActionService().propose(
-                    source_track_index=payload.get("source_track_index"),
-                    source_track_name=str(payload.get("source_track_name", "")),
-                    source_clip_slot_index=payload.get("source_clip_slot_index"),
-                    target_track_index=payload.get("target_track_index"),
-                    target_track_name=str(payload.get("target_track_name", "")),
-                    target_clip_slot_index=payload.get("target_clip_slot_index"),
-                    session_id=session_id,
-                )
-            except (TypeError, ValueError) as exc:
-                self.send_json(400, {"ok": False, "error": str(exc)})
-                return
-            if result.get("receipt") or result.get("changed") is True:
-                self.send_json(500, {"ok": False, "error": "Clip duplication proposal endpoint returned a mutation."})
-                return
-            self.send_json(200 if result.get("ok") else 409, result)
+            from kenn.routes.daw_routes import handle_clip_duplication_proposal
+            code, payload = handle_clip_duplication_proposal(payload)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/clip-rename/proposal":
-            session_id = str(payload.get("session_id", "")).strip()
-            if not session_id:
-                self.send_json(400, {"ok": False, "error": "session_id is required."})
-                return
-            try:
-                result = ClipRenameActionService().propose(
-                    track_index=payload.get("track_index"),
-                    track_name=str(payload.get("track_name", "")),
-                    clip_slot_index=payload.get("clip_slot_index"),
-                    new_name=str(payload.get("new_name", "")),
-                    session_id=session_id,
-                )
-            except (TypeError, ValueError) as exc:
-                self.send_json(400, {"ok": False, "error": str(exc)})
-                return
-            if result.get("receipt") or result.get("changed") is True:
-                self.send_json(500, {"ok": False, "error": "Clip rename proposal endpoint returned a mutation."})
-                return
-            self.send_json(200 if result.get("ok") else 409, result)
+            from kenn.routes.daw_routes import handle_clip_rename_proposal
+            code, payload = handle_clip_rename_proposal(payload)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/sample-import/proposal":
-            session_id = str(payload.get("session_id", "")).strip()
-            if not session_id:
-                self.send_json(400, {"ok": False, "error": "session_id is required."})
-                return
-            try:
-                result = SampleImportService().propose_import(
-                    track_index=payload.get("track_index"),
-                    track_name=str(payload.get("track_name", "")),
-                    clip_slot_index=payload.get("clip_slot_index"),
-                    sample_id=str(payload.get("sample_id", "")),
-                    session_id=session_id,
-                )
-            except (TypeError, ValueError) as exc:
-                self.send_json(400, {"ok": False, "error": str(exc)})
-                return
-            self.send_json(200 if result.get("ok") else 409, result)
+            from kenn.routes.daw_routes import handle_sample_import_proposal
+            code, payload = handle_sample_import_proposal(payload)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/clip-audition/proposal":
-            session_id = str(payload.get("session_id", "")).strip()
-            if not session_id:
-                self.send_json(400, {"ok": False, "error": "session_id is required."})
-                return
-            try:
-                result = ClipAuditionActionService().propose(
-                    track_index=payload.get("track_index"),
-                    track_name=str(payload.get("track_name", "")),
-                    clip_slot_index=payload.get("clip_slot_index"),
-                    session_id=session_id,
-                    source_receipt_id=str(payload.get("source_receipt_id", "")),
-                )
-            except (TypeError, ValueError) as exc:
-                self.send_json(400, {"ok": False, "error": str(exc)})
-                return
-            self.send_json(200 if result.get("ok") else 409, result)
+            from kenn.routes.daw_routes import handle_clip_audition_proposal
+            code, payload = handle_clip_audition_proposal(payload)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/audition-feedback":
             self.handle_audition_feedback(payload)
