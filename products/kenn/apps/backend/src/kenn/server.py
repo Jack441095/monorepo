@@ -1371,156 +1371,127 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(503, {"success": False, "error": str(exc)})
             return
         if parsed.path == "/api/ableton/osc/session":
-            try:
-                from kenn.ableton_osc_bridge import live_client
-                query = parse_qs(parsed.query)
-                detail = str(query.get("detail", [""])[0]).strip().lower()
-                topology_only = detail in {"topology", "structure"}
-                state = (
-                    live_client.query_session_topology() if topology_only else
-                    live_client.query_session_understanding() if detail in {"understanding", "context"} else
-                    live_client.query_session_state()
-                )
-                self.send_json(200, state)
-            except Exception as exc:
-                self.send_json(500, {"ok": False, "error": str(exc)})
+            from kenn.routes.ableton_routes import handle_osc_session
+            client = None
+            if AbletonOSCClient is not None:
+                try:
+                    from kenn.ableton_osc_bridge import live_client
+                    client = live_client
+                except Exception:
+                    client = None
+            detail = str(parse_qs(parsed.query).get("detail", [""])[0])
+            code, payload = handle_osc_session(client, detail=detail)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/osc/song-time":
-            try:
-                from kenn.ableton_osc_bridge import live_client
-                value = live_client.get_current_song_time()
-                self.send_json(200 if value is not None else 503, {
-                    "success": value is not None,
-                    "current_song_time": value,
-                    **({"error": "Ableton did not return a readable current song position."} if value is None else {}),
-                })
-            except Exception as exc:
-                self.send_json(503, {"success": False, "current_song_time": None, "error": str(exc)})
+            from kenn.routes.ableton_routes import handle_osc_song_time
+            client = None
+            if AbletonOSCClient is not None:
+                try:
+                    from kenn.ableton_osc_bridge import live_client
+                    client = live_client
+                except Exception:
+                    client = None
+            code, payload = handle_osc_song_time(client)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/osc/locators":
-            try:
-                from kenn.ableton_osc_bridge import live_client
-                locators, available = live_client.get_locators_with_status()
-                self.send_json(200 if available else 503, {
-                    "success": available,
-                    "locators": locators if available else [],
-                    **({"error": "Ableton did not return the current locator list."} if not available else {}),
-                })
-            except Exception as exc:
-                self.send_json(503, {"success": False, "locators": [], "error": str(exc)})
+            from kenn.routes.ableton_routes import handle_osc_locators
+            client = None
+            if AbletonOSCClient is not None:
+                try:
+                    from kenn.ableton_osc_bridge import live_client
+                    client = live_client
+                except Exception:
+                    client = None
+            code, payload = handle_osc_locators(client)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/arrangement-analysis":
-            query = parse_qs(parsed.query)
-            session_id = str(query.get("session_id", [""])[0]).strip()[:128]
-            if not session_id:
-                self.send_json(400, {"ok": False, "error": "Missing session_id query param."})
-                return
-            try:
-                from kenn.ableton_osc_bridge import live_client
-                from kenn.core.arrangement_analysis import analyze_arrangement_context
-                from kenn.core.session_context import build_session_context
-
-                snapshot = live_client.query_session_understanding()
-                context = build_session_context(snapshot=snapshot, session_id=session_id)
-                result = analyze_arrangement_context(context)
-                self.send_json(200 if result.get("status") == "current" else 503, result)
-            except Exception as exc:
-                self.send_json(503, {"ok": False, "error": str(exc), "advisory_only": True, "mutation_authorized": False})
+            from kenn.routes.ableton_routes import handle_arrangement_analysis
+            client = None
+            if AbletonOSCClient is not None:
+                try:
+                    from kenn.ableton_osc_bridge import live_client
+                    client = live_client
+                except Exception:
+                    client = None
+            session_id = str(parse_qs(parsed.query).get("session_id", [""])[0])
+            code, payload = handle_arrangement_analysis(client, session_id=session_id)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/osc/return-tracks":
-            # Return-track identity was previously unreadable at all (the
-            # vendored AbletonOSC fork had no enumeration endpoint for it,
-            # only the pre-existing create/delete methods). Read-only,
-            # separate from the fast topology path since most requests
-            # don't need it -- see docs/ABLETON_ASSISTANT_CURRENT_STATE.md.
-            try:
-                from kenn.ableton_osc_bridge import live_client
-                self.send_json(200, {"ok": True, "return_tracks": live_client.get_return_tracks()})
-            except Exception as exc:
-                self.send_json(500, {"ok": False, "error": str(exc)})
+            from kenn.routes.ableton_routes import handle_osc_return_tracks
+            client = None
+            if AbletonOSCClient is not None:
+                try:
+                    from kenn.ableton_osc_bridge import live_client
+                    client = live_client
+                except Exception:
+                    client = None
+            code, payload = handle_osc_return_tracks(client)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/osc/midi-clip":
+            from kenn.routes.ableton_routes import handle_osc_midi_clip
+            client = None
+            if AbletonOSCClient is not None:
+                try:
+                    from kenn.ableton_osc_bridge import live_client
+                    client = live_client
+                except Exception:
+                    client = None
             query = parse_qs(parsed.query)
-            try:
-                track_index = int(query.get("track_index", [""])[0])
-                clip_slot_index = int(query.get("clip_slot_index", [""])[0])
-            except (TypeError, ValueError):
-                self.send_json(400, {"ok": False, "error": "track_index and clip_slot_index query parameters are required."})
-                return
-            if min(track_index, clip_slot_index) < 0:
-                self.send_json(400, {"ok": False, "error": "track_index and clip_slot_index must be non-negative."})
-                return
-            try:
-                from kenn.ableton_osc_bridge import live_client
-                result = live_client.get_midi_clip_state(track_index, clip_slot_index)
-                topology = live_client.query_session_topology()
-                tracks = [item for item in topology.get("tracks", []) if isinstance(item, dict)]
-                track = next((item for item in tracks if int(item.get("index", -1)) == track_index), None)
-                if track is not None:
-                    result["track_name"] = str(track.get("name", ""))
-                self.send_json(200 if result.get("success") else 503, result)
-            except Exception as exc:
-                self.send_json(503, {"ok": False, "error": str(exc)})
+            t_idx = str(query.get("track_index", [""])[0])
+            c_idx = str(query.get("clip_slot_index", [""])[0])
+            code, payload = handle_osc_midi_clip(client, t_idx, c_idx)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/osc/clip-slot":
+            from kenn.routes.ableton_routes import handle_osc_clip_slot
+            client = None
+            if AbletonOSCClient is not None:
+                try:
+                    from kenn.ableton_osc_bridge import live_client
+                    client = live_client
+                except Exception:
+                    client = None
             query = parse_qs(parsed.query)
-            try:
-                track_index = int(query.get("track_index", [""])[0])
-                clip_slot_index = int(query.get("clip_slot_index", [""])[0])
-            except (TypeError, ValueError):
-                self.send_json(400, {"ok": False, "error": "track_index and clip_slot_index query parameters are required."})
-                return
-            if min(track_index, clip_slot_index) < 0:
-                self.send_json(400, {"ok": False, "error": "track_index and clip_slot_index must be non-negative."})
-                return
-            try:
-                from kenn.ableton_osc_bridge import live_client
-                result = live_client.get_clip_slot_state(track_index, clip_slot_index)
-                topology = live_client.query_session_topology()
-                tracks = [item for item in topology.get("tracks", []) if isinstance(item, dict)]
-                track = next((item for item in tracks if int(item.get("index", -1)) == track_index), None)
-                if track is not None:
-                    result["track_name"] = str(track.get("name", ""))
-                self.send_json(200 if result.get("success") else 503, result)
-            except Exception as exc:
-                self.send_json(503, {"ok": False, "error": str(exc)})
+            t_idx = str(query.get("track_index", [""])[0])
+            c_idx = str(query.get("clip_slot_index", [""])[0])
+            code, payload = handle_osc_clip_slot(client, t_idx, c_idx)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/osc/device-parameters":
+            from kenn.routes.ableton_routes import handle_osc_device_parameters
+            client = None
+            if AbletonOSCClient is not None:
+                try:
+                    from kenn.ableton_osc_bridge import live_client
+                    client = live_client
+                except Exception:
+                    client = None
             query = parse_qs(parsed.query)
-            try:
-                track_index = int(query.get("track_index", [""])[0])
-                device_index = int(query.get("device_index", [""])[0])
-            except (TypeError, ValueError):
-                self.send_json(400, {"ok": False, "error": "track_index and device_index query parameters are required."})
-                return
-            if min(track_index, device_index) < 0:
-                self.send_json(400, {"ok": False, "error": "track_index and device_index must be non-negative."})
-                return
-            try:
-                from kenn.ableton_osc_bridge import live_client
-                result = live_client.get_device_parameters(track_index, device_index)
-                self.send_json(200 if result.get("success") else 503, result)
-            except Exception as exc:
-                self.send_json(503, {"ok": False, "error": str(exc)})
+            t_idx = str(query.get("track_index", [""])[0])
+            d_idx = str(query.get("device_index", [""])[0])
+            code, payload = handle_osc_device_parameters(client, t_idx, d_idx)
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/osc/device-parameter-value-string":
+            from kenn.routes.ableton_routes import handle_osc_device_parameter_value_string
+            client = None
+            if AbletonOSCClient is not None:
+                try:
+                    from kenn.ableton_osc_bridge import live_client
+                    client = live_client
+                except Exception:
+                    client = None
             query = parse_qs(parsed.query)
-            try:
-                track_index = int(query.get("track_index", [""])[0])
-                device_index = int(query.get("device_index", [""])[0])
-                parameter_index = int(query.get("parameter_index", [""])[0])
-            except (TypeError, ValueError):
-                self.send_json(400, {"ok": False, "error": "track_index, device_index, and parameter_index query parameters are required."})
-                return
-            if min(track_index, device_index, parameter_index) < 0:
-                self.send_json(400, {"ok": False, "error": "indices must be non-negative."})
-                return
-            try:
-                from kenn.ableton_osc_bridge import live_client
-                result = live_client.get_device_parameter_value_string(track_index, device_index, parameter_index)
-                self.send_json(200 if result.get("success") else 503, result)
-            except Exception as exc:
-                self.send_json(503, {"ok": False, "error": str(exc)})
+            t_idx = str(query.get("track_index", [""])[0])
+            d_idx = str(query.get("device_index", [""])[0])
+            p_idx = str(query.get("parameter_index", [""])[0])
+            code, payload = handle_osc_device_parameter_value_string(client, t_idx, d_idx, p_idx)
+            self.send_json(code, payload)
             return
         if parsed.path in {"/kenn/api/ask/upgrade", "/api/ask/upgrade"}:
             from kenn.core import answer_upgrades
