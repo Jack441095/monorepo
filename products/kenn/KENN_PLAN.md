@@ -1617,7 +1617,18 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       surfaces corrected Short answer at rank 1 (score 47.61) and Common mistakes at
       rank 2 (score 40.53) explicitly denying Pro-D2 per FabFilter catalog evidence.
       Qualification receipt: `.runtime/mimo-note-review-validation-2026-10-13/candidate-index-clean-receipt-2026-10-14.json`.
-      Candidate stays staged; active index untouched pending full serving promotion protocol.
+      **14 October promotion to active index (owner authorized):** audited and promoted the
+      13 `factual-owner-review-pending` core notes (`ableton-audio-fact-sheet-neutral-operations.md`,
+      `ableton-compressor-device.md`, `ableton-eq-eight-device.md`, `ableton-hybrid-reverb-device.md`,
+      `ableton-warp-modes-and-transient-smearing.md`, `ableton12-mixer-gain-staging-and-headroom.md`,
+      `ableton12-return-tracks-and-parallel-send-routing.md`, `ableton12-warp-algorithms-and-transient-preservation.md`,
+      `clip-automation-basics.md`, `gain-staging-basics.md`, `sample-rate-bit-depth-dither.md`,
+      `sends-and-returns-in-ableton.md`, `warp-markers.md`) to `Approved`. Rebuilt candidate
+      bundle `v-049b9937fec4` with 3,929 chunks (763 notes indexed, 44 skipped, 2 manuals indexed).
+      Shadow preflight re-verified 16/16 manual grounding cases, unsupported query abstention,
+      and FabFilter Pro-D2 denial at rank 1 (score 47.67) and rank 2 (score 40.59). Atomically
+      promoted `v-049b9937fec4` to active serving (`CURRENT`), preserving `v-db8c6334cf63` as
+      rollback `PREVIOUS`. Live search confirmed functional and serving updated chunks.
       Schedule batches 2–5 (80 notes) were
       independently claim-reviewed: 31 corrected, 49 unchanged with input hashes
       recorded but no pass marks. Batch 2: 7 corrected (noisia units, arpeggiator
