@@ -61,3 +61,21 @@ def handle_ableton_capabilities(live_client: Any | None) -> tuple[int, dict[str,
             "verified_features": {},
             "supported_parameters": {},
         }
+
+
+def handle_ableton_device_matrix(
+    live_client: Any | None, without_parameters: bool = False,
+) -> tuple[int, dict[str, Any]]:
+    """Return status code and response payload for /api/ableton/device-matrix."""
+    if live_client is None:
+        return 500, {"ok": False, "status": "error", "error": "Ableton client not available"}
+    try:
+        report = live_client.device_matrix_report(include_parameters=not without_parameters)
+        return 200, report
+    except Exception as exc:
+        return 200, {
+            "schema": "kenn.ableton_device_matrix.v1",
+            "available": False,
+            "error": str(exc),
+        }
+

@@ -1365,81 +1365,36 @@ class Handler(BaseHTTPRequestHandler):
                 "user": "Jack",
             })
             return
-        if parsed.path == "/api/ableton/ping":
+        if parsed.path in {
+            "/api/ableton/ping",
+            "/api/ableton/watchdog",
+            "/api/ableton/capabilities",
+            "/api/ableton/device-matrix",
+        }:
+            from kenn.routes.ableton_routes import (
+                handle_ableton_ping,
+                handle_ableton_watchdog,
+                handle_ableton_capabilities,
+                handle_ableton_device_matrix,
+            )
+            client = None
             if AbletonOSCClient is not None:
                 try:
                     from kenn.ableton_osc_bridge import live_client
-
-                    success = live_client.ping(timeout=0.5)
-                    self.send_json(200, {
-                        "ok": True,
-                        "connected": success,
-                        "state": live_client.connection_state,
-                    })
-                except Exception as exc:
-                    self.send_json(200, {
-                        "ok": False,
-                        "connected": False,
-                        "state": "disconnected",
-                        "error": str(exc),
-                    })
+                    client = live_client
+                except Exception:
+                    client = None
+            if parsed.path == "/api/ableton/ping":
+                code, payload = handle_ableton_ping(client)
+            elif parsed.path == "/api/ableton/watchdog":
+                code, payload = handle_ableton_watchdog(client)
+            elif parsed.path == "/api/ableton/capabilities":
+                code, payload = handle_ableton_capabilities(client)
             else:
-                self.send_json(500, {"ok": False, "error": "Ableton client not available"})
-            return
-        if parsed.path == "/api/ableton/watchdog":
-            if AbletonOSCClient is not None:
-                try:
-                    from kenn.ableton_osc_bridge import live_client
-
-                    status = live_client.get_connection_status()
-                    self.send_json(200, {
-                        "ok": True,
-                        "watchdog": status,
-                    })
-                except Exception as exc:
-                    self.send_json(200, {
-                        "ok": False,
-                        "error": str(exc),
-                    })
-            else:
-                self.send_json(500, {"ok": False, "error": "Ableton client not available"})
-            return
-        if parsed.path == "/api/ableton/capabilities":
-            if AbletonOSCClient is not None:
-                try:
-                    from kenn.ableton_osc_bridge import live_client
-
-                    self.send_json(200, live_client.capability_report())
-                except Exception as exc:
-                    self.send_json(200, {
-                        "schema": "kenn.abletonosc_capabilities.v1",
-                        "transport": "AbletonOSC",
-                        "status": "offline",
-                        "connected": False,
-                        "error": str(exc),
-                    })
-            else:
-                self.send_json(500, {"ok": False, "status": "error", "error": "Ableton client not available"})
-            return
-        if parsed.path == "/api/ableton/device-matrix":
-            if AbletonOSCClient is not None:
-                try:
-                    from kenn.ableton_osc_bridge import live_client
-
-                    query = parse_qs(parsed.query)
-                    without_parameters = str(query.get("parameters", ["1"])[0]).strip().lower() in {"0", "false", "no"}
-                    report = live_client.device_matrix_report(include_parameters=not without_parameters)
-                    self.send_json(200, report)
-                except Exception as exc:
-                    self.send_json(200, {
-                        "schema": "kenn.ableton_device_matrix.v1",
-                        "status": "offline",
-                        "connected": False,
-                        "entries": [],
-                        "error": str(exc),
-                    })
-            else:
-                self.send_json(500, {"ok": False, "status": "error", "error": "Ableton client not available"})
+                query = parse_qs(parsed.query)
+                without_params = str(query.get("parameters", ["1"])[0]).strip().lower() in {"0", "false", "no"}
+                code, payload = handle_ableton_device_matrix(client, without_parameters=without_params)
+            self.send_json(code, payload)
             return
         if parsed.path in {"/api/ableton/world-model", "/kenn/api/ableton/world-model"}:
             try:

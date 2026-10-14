@@ -59,3 +59,34 @@ def test_handle_ableton_capabilities_success():
     code, data = handle_ableton_capabilities(client)
     assert code == 200
     assert data["available"] is True
+
+
+def test_handle_ableton_device_matrix_when_client_none():
+    from kenn.routes.ableton_routes import handle_ableton_device_matrix
+    code, data = handle_ableton_device_matrix(None)
+    assert code == 500
+    assert data["ok"] is False
+
+
+def test_handle_ableton_device_matrix_success():
+    from kenn.routes.ableton_routes import handle_ableton_device_matrix
+    client = MagicMock()
+    client.device_matrix_report.return_value = {
+        "schema": "kenn.ableton_device_matrix.v1",
+        "devices": [{"name": "Compressor", "type": "audio_effect"}],
+    }
+    code, data = handle_ableton_device_matrix(client, without_parameters=True)
+    assert code == 200
+    assert data["schema"] == "kenn.ableton_device_matrix.v1"
+    client.device_matrix_report.assert_called_once_with(include_parameters=False)
+
+
+def test_handle_ableton_device_matrix_exception():
+    from kenn.routes.ableton_routes import handle_ableton_device_matrix
+    client = MagicMock()
+    client.device_matrix_report.side_effect = RuntimeError("OSC timeout")
+    code, data = handle_ableton_device_matrix(client)
+    assert code == 200
+    assert data["available"] is False
+    assert "OSC timeout" in data["error"]
+
