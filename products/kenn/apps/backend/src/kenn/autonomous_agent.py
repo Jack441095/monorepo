@@ -1217,10 +1217,13 @@ class KennAutonomousAgent:
             trajectory.append({
                 "iteration": 1.5,
                 "phase": "telemetry_sensing",
-                "thought": (
-                    f"Measured live master telemetry: {telemetry.integrated_lufs:.1f} LUFS, "
-                    f"True Peak {telemetry.true_peak_dbtp:+.1f} dBTP, Phase Correlation {telemetry.phase_correlation:+.2f}."
-                ),
+                "thought": "Measured live master telemetry: " + (", ".join(
+                    f"{label} {template.format(value)}" for label, value, template in (
+                        ("Integrated", telemetry.integrated_lufs, "{:.1f} LUFS"),
+                        ("True Peak", telemetry.true_peak_dbtp, "{:+.1f} dBTP"),
+                        ("Phase Correlation", telemetry.phase_correlation, "{:+.2f}"),
+                    ) if value is not None
+                ) or "no readings yet") + ".",
                 "action": "ingest_live_telemetry",
                 "observation": {
                     "integrated_lufs": telemetry.integrated_lufs,
@@ -1234,7 +1237,7 @@ class KennAutonomousAgent:
                 advice_lines.append(f"• **Live Meter Telemetry**: {'; '.join(telemetry_anomalies)}")
 
             # Autonomous true peak ceiling lock if clipping detected
-            if telemetry.true_peak_dbtp > -0.2:
+            if telemetry.true_peak_dbtp is not None and telemetry.true_peak_dbtp > -0.2:
                 steps.append({
                     "action": "set_device_parameter",
                     "track_name": "Master",

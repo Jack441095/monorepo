@@ -46,6 +46,46 @@ def test_audio_telemetry_ingest_and_diagnose() -> None:
     assert len(packet.facts) >= 5
 
 
+def test_a_meter_that_sends_nothing_leaves_every_reading_absent() -> None:
+    # 14 Oct 2026: an empty frame read as -14 LUFS, -1 dBTP and 0.90 correlation, so the mix audit graded it healthy.
+    frame = AudioTelemetryManager().ingest({})
+
+    assert frame.true_peak_dbtp is None and frame.integrated_lufs is None
+    assert frame.phase_correlation is None and frame.spectral_energy == {}
+    assert set(frame.to_dict()) == {"timestamp"}
+
+
+def test_a_reading_the_meter_did_not_send_is_not_diagnosed_or_quoted() -> None:
+    manager = AudioTelemetryManager()
+    frame = manager.ingest({"true_peak_dbtp": -3.0})
+
+    assert manager.diagnose_anomalies(frame) == []
+    context = manager.format_prompt_context(frame)
+    assert "-3.0 dBTP" in context
+    assert "LUFS" not in context and "Phase Correlation" not in context
+    assert [fact.name for fact in manager.to_evidence_packet(frame).facts] == ["true_peak_dbtp"]
+
+
+def test_junk_meter_values_count_as_not_sent() -> None:
+    frame = AudioTelemetryManager().ingest({
+        "integrated_lufs": "loud", "true_peak_dbtp": float("nan"), "phase_correlation": None,
+        "spectral_energy": {"low_mid_200_500hz": "n/a", "sub_20_60hz": 0.2},
+    })
+
+    assert frame.integrated_lufs is None and frame.true_peak_dbtp is None and frame.phase_correlation is None
+    assert frame.spectral_energy == {"sub_20_60hz": 0.2}
+
+
+def test_an_empty_frame_does_not_earn_the_mix_audit_any_points() -> None:
+    from kenn.core.mix_doctor import MixDoctor
+
+    meters = AudioTelemetryManager().ingest({}).to_dict()
+    report = MixDoctor().audit_session({"tracks": []}, meters=meters)
+
+    assert report.grade == "UNRATED"
+    assert report.points_available == 20.0  # stem separation needs no meter, and an empty session costs it nothing
+
+
 def test_mix_planner_dag_generation() -> None:
     planner = MixPlanner()
 

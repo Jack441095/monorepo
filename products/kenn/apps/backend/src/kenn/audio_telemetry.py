@@ -13,6 +13,7 @@ and converts telemetry frames into typed EvidencePackets for KENN grounding.
 
 from __future__ import annotations
 
+import math
 import threading
 import time
 from dataclasses import dataclass, field
@@ -21,31 +22,46 @@ from typing import Any, Dict, List, Optional
 from kenn.core.evidence import EvidenceFact, EvidencePacket
 
 
+def _reading(value: Any) -> Optional[float]:
+    """A finite float, or None when the meter did not send the reading or sent junk."""
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        # Absent or non-numeric: the reading stays absent so nothing downstream scores a level nobody measured.
+        return None
+    return number if math.isfinite(number) else None
+
+
 @dataclass
 class AudioTelemetryFrame:
-    integrated_lufs: float = -14.0
-    short_term_lufs: float = -14.0
-    true_peak_dbtp: float = -1.0
-    spectral_energy: Dict[str, float] = field(default_factory=lambda: {
-        "sub_20_60hz": 0.25,
-        "low_mid_200_500hz": 0.25,
-        "high_mid_2_6khz": 0.25,
-        "air_10_20khz": 0.25,
-    })
-    phase_correlation: float = 0.90
-    crest_factor_db: float = 10.0
+    """One meter reading. A field is None when the meter did not report it; we never fill in a typical value.
+
+    These frames feed the mix audit, so an invented -1.0 dBTP or 0.90 correlation would be graded as if it were
+    measured (14 Oct 2026: that is how an unmetered session came out looking healthy).
+    """
+
+    integrated_lufs: Optional[float] = None
+    short_term_lufs: Optional[float] = None
+    true_peak_dbtp: Optional[float] = None
+    spectral_energy: Dict[str, float] = field(default_factory=dict)  # only the bands the meter sent
+    phase_correlation: Optional[float] = None
+    crest_factor_db: Optional[float] = None
     timestamp: float = field(default_factory=time.time)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        """The readings the meter sent. Missing ones are left out so the mix audit sees them as unmeasured."""
+        readings = {
             "integrated_lufs": self.integrated_lufs,
             "short_term_lufs": self.short_term_lufs,
             "true_peak_dbtp": self.true_peak_dbtp,
-            "spectral_energy": dict(self.spectral_energy),
             "phase_correlation": self.phase_correlation,
             "crest_factor_db": self.crest_factor_db,
-            "timestamp": self.timestamp,
         }
+        result: Dict[str, Any] = {name: value for name, value in readings.items() if value is not None}
+        if self.spectral_energy:
+            result["spectral_energy"] = dict(self.spectral_energy)
+        result["timestamp"] = self.timestamp
+        return result
 
 
 class AudioTelemetryManager:
@@ -58,19 +74,19 @@ class AudioTelemetryManager:
 
     def ingest(self, data: Dict[str, Any]) -> AudioTelemetryFrame:
         """Ingest a live telemetry frame."""
+        bands = data.get("spectral_energy")
         frame = AudioTelemetryFrame(
-            integrated_lufs=float(data.get("integrated_lufs", -14.0)),
-            short_term_lufs=float(data.get("short_term_lufs", -14.0)),
-            true_peak_dbtp=float(data.get("true_peak_dbtp", -1.0)),
-            spectral_energy=dict(data.get("spectral_energy", {
-                "sub_20_60hz": 0.25,
-                "low_mid_200_500hz": 0.25,
-                "high_mid_2_6khz": 0.25,
-                "air_10_20khz": 0.25,
-            })),
-            phase_correlation=float(data.get("phase_correlation", 0.90)),
-            crest_factor_db=float(data.get("crest_factor_db", 10.0)),
-            timestamp=float(data.get("timestamp", time.time())),
+            integrated_lufs=_reading(data.get("integrated_lufs")),
+            short_term_lufs=_reading(data.get("short_term_lufs")),
+            true_peak_dbtp=_reading(data.get("true_peak_dbtp")),
+            spectral_energy={
+                name: level for name, value in (bands.items() if isinstance(bands, dict) else ())
+                if (level := _reading(value)) is not None
+            },
+            phase_correlation=_reading(data.get("phase_correlation")),
+            crest_factor_db=_reading(data.get("crest_factor_db")),
+            # A frame with no clock reading is stamped on arrival, which is when we actually heard it.
+            timestamp=_reading(data.get("timestamp")) or time.time(),
         )
         with self._lock:
             self._history.append(frame)
@@ -98,29 +114,29 @@ class AudioTelemetryManager:
         anomalies: List[str] = []
 
         # 1. True Peak Overload
-        if frame.true_peak_dbtp > -0.2:
+        if frame.true_peak_dbtp is not None and frame.true_peak_dbtp > -0.2:
             anomalies.append(
                 f"True Peak Overload: {frame.true_peak_dbtp:+.1f} dBTP exceeds streaming ceiling (-1.0 dBTP). "
                 "Risk of inter-sample distortion on lossy encoding (AAC/MP3)."
             )
 
         # 2. Phase Correlation Warning
-        if frame.phase_correlation < 0.25:
+        if frame.phase_correlation is not None and frame.phase_correlation < 0.25:
             anomalies.append(
                 f"Mono Cancellation Risk: Phase correlation is {frame.phase_correlation:.2f} (under +0.25). "
                 "Stereo widening elements may phase cancel or disappear in mono."
             )
 
         # 3. Spectral Low-Mid Mud
-        low_mid = frame.spectral_energy.get("low_mid_200_500hz", 0.25)
-        if low_mid > 0.33:
+        low_mid = frame.spectral_energy.get("low_mid_200_500hz")
+        if low_mid is not None and low_mid > 0.33:
             anomalies.append(
                 f"Low-Mid Mud Accumulation: {low_mid * 100:.0f}% energy in 200-500 Hz region. "
                 "Consider a narrow 2-3 dB dynamic cut around 300 Hz on bass or vocal bus."
             )
 
         # 4. Squashed Crest Factor
-        if frame.crest_factor_db < 6.0:
+        if frame.crest_factor_db is not None and frame.crest_factor_db < 6.0:
             anomalies.append(
                 f"Squashed Dynamics: Crest factor is only {frame.crest_factor_db:.1f} dB. "
                 "Mix is heavily over-compressed or over-limited; transients are flattened."
@@ -138,13 +154,18 @@ class AudioTelemetryManager:
         anomalies = self.diagnose_anomalies(frame)
         anomaly_str = (" | " + "; ".join(anomalies)) if anomalies else ""
 
-        return (
-            f"Live Audio Telemetry (DAW Master):\n"
-            f"- Integrated Loudness: {frame.integrated_lufs:.1f} LUFS | Short-Term: {frame.short_term_lufs:.1f} LUFS\n"
-            f"- True Peak: {frame.true_peak_dbtp:+.1f} dBTP | Crest Factor: {frame.crest_factor_db:.1f} dB\n"
-            f"- Phase Correlation: {frame.phase_correlation:+.2f} | Low-Mid Energy: {frame.spectral_energy.get('low_mid_200_500hz', 0.25)*100:.0f}%\n"
-            f"{anomaly_str}\n"
-        )
+        low_mid = frame.spectral_energy.get("low_mid_200_500hz")
+        shown = [
+            ("Integrated Loudness", frame.integrated_lufs, "{:.1f} LUFS"),
+            ("Short-Term", frame.short_term_lufs, "{:.1f} LUFS"),
+            ("True Peak", frame.true_peak_dbtp, "{:+.1f} dBTP"),
+            ("Crest Factor", frame.crest_factor_db, "{:.1f} dB"),
+            ("Phase Correlation", frame.phase_correlation, "{:+.2f}"),
+            ("Low-Mid Energy", None if low_mid is None else low_mid * 100, "{:.0f}%"),
+        ]
+        # A reading the meter did not send is left off the line rather than printed as a number.
+        lines = [f"- {label}: {template.format(value)}" for label, value, template in shown if value is not None]
+        return "Live Audio Telemetry (DAW Master):\n" + "\n".join(lines) + f"\n{anomaly_str}\n"
 
     def to_evidence_packet(self, frame: Optional[AudioTelemetryFrame] = None) -> Optional[EvidencePacket]:
         """Convert telemetry to a typed EvidencePacket."""
@@ -154,12 +175,17 @@ class AudioTelemetryManager:
             return None
 
         age = max(0.0, time.time() - frame.timestamp)
-        facts = (
-            EvidenceFact(name="integrated_lufs", value=frame.integrated_lufs, unit="LUFS", source="telemetry"),
-            EvidenceFact(name="short_term_lufs", value=frame.short_term_lufs, unit="LUFS", source="telemetry"),
-            EvidenceFact(name="true_peak_dbtp", value=frame.true_peak_dbtp, unit="dBTP", source="telemetry"),
-            EvidenceFact(name="phase_correlation", value=frame.phase_correlation, unit="", source="telemetry"),
-            EvidenceFact(name="crest_factor_db", value=frame.crest_factor_db, unit="dB", source="telemetry"),
+        measured = (
+            ("integrated_lufs", frame.integrated_lufs, "LUFS"),
+            ("short_term_lufs", frame.short_term_lufs, "LUFS"),
+            ("true_peak_dbtp", frame.true_peak_dbtp, "dBTP"),
+            ("phase_correlation", frame.phase_correlation, ""),
+            ("crest_factor_db", frame.crest_factor_db, "dB"),
+        )
+        # Only readings the meter sent become facts; the grounding gate must not see a figure we made up.
+        facts = tuple(
+            EvidenceFact(name=name, value=value, unit=unit, source="telemetry")
+            for name, value, unit in measured if value is not None
         )
         limitations = tuple(self.diagnose_anomalies(frame))
         return EvidencePacket(

@@ -144,7 +144,7 @@ class MixPlanner:
             step_idx += 1
 
         # 5. Master True Peak & Limiter Ceiling Clamp
-        if any(w in q_lower for w in ("master", "limit", "ceiling", "loudness", "lufs", "clip")) or (telemetry and telemetry.true_peak_dbtp > -0.2):
+        if any(w in q_lower for w in ("master", "limit", "ceiling", "loudness", "lufs", "clip")) or (telemetry and telemetry.true_peak_dbtp is not None and telemetry.true_peak_dbtp > -0.2):
             prev_id = steps[-1].id if steps else ""
             steps.append(
                 MixStep(
