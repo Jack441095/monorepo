@@ -225,7 +225,6 @@ function renderRecipeProposal(proposal, confirmationToken) {
   }).join("");
 
   const token = escapeHtml(confirmationToken || "");
-  return `<div class="recipe-proposal-card">
   return `<div class="recipe-proposal-card" id="recipe-card-${token}">
     <div class="recipe-title">🎚️ Proposed Mix Recipe (${steps.length} moves)</div>
     ${stepsHtml}
@@ -248,7 +247,6 @@ async function applyRecipe(token, btn) {
       body: JSON.stringify({ confirmation_token: token, action: "apply" }),
     });
     const data = await resp.json();
-    if (resp.ok && data.ok) {
     if (resp.ok && (data.ok || data.changed || data.status === "applied")) {
       btn.textContent = "✅ Applied";
       btn.style.opacity = "0.6";
@@ -261,7 +259,6 @@ async function applyRecipe(token, btn) {
         container.innerHTML = renderAuditionCard(token);
       }
     } else {
-      btn.textContent = "❌ Failed";
       btn.textContent = `❌ ${data.error || "Failed"}`;
       btn.disabled = false;
     }
@@ -282,7 +279,6 @@ async function undoRecipe(token, btn) {
       body: JSON.stringify({ confirmation_token: token, action: "undo" }),
     });
     const data = await resp.json();
-    if (resp.ok && data.ok) {
     if (resp.ok && (data.ok || data.changed || data.status === "applied")) {
       btn.textContent = "↩️ Reverted";
       btn.style.opacity = "0.6";
