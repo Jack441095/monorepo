@@ -72,6 +72,17 @@ def test_same_request_previews_exactly_the_same_notes() -> None:
     assert a["proposal"]["notes"] == b["proposal"]["notes"]
 
 
+def test_the_card_names_pitches_the_way_lives_piano_roll_does() -> None:
+    # Until 14 Oct the card used scientific pitch, so MIDI note 60 read "C4" here and "C3" in Live.
+    _live, service = _with_midi_track()
+    result = propose_generated_clip("Write a 4-bar chord progression in D minor", session_id="g", service=service)
+    pitches = [n["pitch"] for n in result["proposal"]["notes"]]
+    low, high = min(pitches), max(pitches)
+    names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    live_range = f"{names[low % 12]}{low // 12 - 2}–{names[high % 12]}{high // 12 - 2}"
+    assert f"pitches {live_range}." in result["answer"]
+
+
 @pytest.fixture
 def ask_clip(monkeypatch):
     import kenn.server as server

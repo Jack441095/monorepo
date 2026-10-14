@@ -320,7 +320,8 @@ function drawPianoRoll() {
     ctx.fillStyle = '#ffffff'
     ctx.font = '9px monospace'
     if (p % 12 === 0) {
-      ctx.fillText(`C${Math.floor(p / 12) - 1}`, 6, y + laneHeight - 2)
+      // Live's octave numbering (MIDI 60 = C3), so this roll matches the clip the producer opens in Live
+      ctx.fillText(`C${Math.floor(p / 12) - 2}`, 6, y + laneHeight - 2)
     }
   }
 

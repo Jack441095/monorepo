@@ -30,6 +30,14 @@ _BARS = re.compile(r"\b(\d{1,2})[\s-]*bars?\b", re.I)
 MAX_BARS = 16
 
 
+def _live_pitch_label(pitch: int) -> str:
+    """MIDI note number as Live's piano roll labels it: note 60 (middle C) is C3, not scientific pitch's C4.
+
+    The producer checks this card against the clip Live shows, so an octave mismatch reads as a wrong preview.
+    """
+    return f"{NOTE_NAMES[pitch % 12]}{pitch // 12 - 2}"
+
+
 # "a tremolo that pulses to the beat", "a fill from a slice of the drums": the beat and the drums are what the effect
 # works on, not the thing to write.
 _NOT_THE_OBJECT = re.compile(r"\b(?:to|of|on|with|from|in|over|behind|under)\s+(?:the|my|a|your)\s+\w+", re.I)
@@ -132,8 +140,8 @@ def propose_generated_clip(question: str, *, session_id: str, service: Any) -> d
     label = {"drums": "drum pattern", "bassline": "bassline", "chords": "chord progression"}[kind]
     key_text = "" if kind == "drums" else f" in {key[0]} {key[1]}"
     answer = (f"I can add a {bars}-bar {label}{key_text} to '{track['name']}', slot {slot + 1}: "
-              f"{len(notes)} notes, pitches {NOTE_NAMES[min(pitches) % 12]}{min(pitches) // 12 - 1}–"
-              f"{NOTE_NAMES[max(pitches) % 12]}{max(pitches) // 12 - 1}. Nothing has changed. Apply to insert it; Undo removes it.")
+              f"{len(notes)} notes, pitches {_live_pitch_label(min(pitches))}–{_live_pitch_label(max(pitches))}. "
+              "Nothing has changed. Apply to insert it; Undo removes it.")
     return {**base, "status": "confirmation_required", "answer": answer,
             "proposal": proposal_result["proposal"], "generation": {"kind": kind, "bars": bars, "seed": seed,
                                                                     "key": None if kind == "drums" else " ".join(key)}}
