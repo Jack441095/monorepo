@@ -1946,7 +1946,23 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
       gates pass.
       Final wording stays reserved. Preparation/SEAL checks pass 101 tests and
       ten isolated guard mutations were caught. Paired KENN retrieval and the
-      harder unchanged-4B baseline await exact-content review. S2 stays open.
+      harder unchanged-4B baseline await exact-content review.
+      **14 October S2 progress (cross-partition audit & 4B control baseline):**
+      prepared specialist packet v1 via `prepare_seal_specialist.py` under `.runtime/seal-specialist-packet-v1/`
+      (spec SHA-256 `89664355...`, dataset SHA-256 `5ba9f012...`, sealed SHA-256 `4b13ca87...`).
+      Audited cross-partition semantic overlap: lexical overlap flags 0; maximum question
+      Jaccard between Reward and Train is 0.2000 (`retention-calculation-1` vs `train-ex-3`),
+      and between Sealed and Train is 0.1739 (`final-capture-3` vs `train-ex-3`), well below the 0.35 threshold.
+      Ran full 36-task evaluation (24 reward, 12 retention across all 7 coverage categories)
+      on the unchanged serving control `qwen3:4b-instruct-2507-q4_K_M` (digest `0edcdef34593...`)
+      and challenger model `qwen3:1.7b-q4_K_M` (with thinking explicitly disabled).
+      Neither model saturated at 1.0 reward: on specific technical tasks (e.g. `reward-racks-1`,
+      `reward-grooves-1`), both models abstained or lacked specific Ableton parameter knowledge,
+      while correctly passing language/general arithmetic cases (`retention-language-2`, `reward-tuning-2`).
+      This establishes robust headroom for specialist fine-tuning on both 4B control and 1.7B challenger.
+      Full answers and summaries logged in `.runtime/seal-specialist-packet-v1/baseline-4b-summary.json`
+      and `baseline-1.7b-summary.json`.
+      S2 stays open pending adapter trial qualification.
     - [ ] **S3 — Establish specialist learning against a pinned control.** Start
       with the current worker's verified 4B condition; another model requires the
       separate identity and compatibility checks in S4. Start ordinary SFT at
