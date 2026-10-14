@@ -118,7 +118,12 @@ Review of 4 October 2026, to test before deciding:
   - Suggesting specific, actionable help: what to adjust, why, what a known baseline would look like, and what the producer should listen for.
   - Explaining the music and audio clearly, so the producer learns, not just executes.
   - Keeping every measurement grounded: unsupported measurements, sources and claims must be rejected, exactly as today.
-- The SaaS expansion plan (`Kenn的SaaS扩展方案&Kenn SaaS Expansion Plan.md`) is referenced for commercial positioning and architecture direction only: it informs interface choices and the "local-first hybrid" boundary (local Live bridging and low-latency DSP stay local; cloud hosts billing, multi-tenant data, and model inference). No new dependency, model asset, or service is approved by this edit.## Architecture
+- The SaaS expansion plan (`Kenn的SaaS扩展方案&Kenn SaaS Expansion Plan.md`) is referenced for commercial positioning and architecture direction only: it informs interface choices and the "local-first hybrid" boundary (local Live bridging and low-latency DSP stay local; cloud hosts billing, multi-tenant data, and model inference). No new dependency, model asset, or service is approved by this edit.
+- One experiment at a time, measured on mains power. On 4 October the Mac went to
+  battery at 21:04 and generation fell from about 18 to about 5 tokens a second, which
+  turned 10 s answers into 30 s ones and made that evening's timing figures meaningless.
+
+## Architecture
 
 This is the intended dependency direction. Existing code already implements much
 of it; the audit below identifies where consistency still needs proof. It is not
@@ -2340,7 +2345,7 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   - [ ] Profile real native publishers against an isolated FakeLive HTTP companion. Replace per-insert HTTP threads with one shared feature-batch publisher; verify 64-insert freshness, payload caps, independent control limits, atomic validation, and the 15-second retained-memory regression plus per-tick macOS compliance.
   - [ ] Qualify 64 native publishers for 65 seconds against isolated FakeLive HTTP, including peak accuracy under silence, DC, bin-edge impulses and noise.
 - [ ] **E2 — Grade out of 100.** Implement the mix grade: take the current-state analysis plus the producer's own reference (a song, a reference track, an explicit target), compare against those and against permitted conformance vectors, and return a single grounded score from 0 to 100 with the reasoning shown.
-  - [ ] Measure the HTTP template/upgrade path's conditional repeated routing, and verify that the same result can be reproduced by a second analyst.
+  - [ ] Decide what the 100 points are made of (reference match, declared target, published conventions) and how each is weighted, with Jack; a second analyst given the same inputs and rules must reproduce the same grade.
   - [ ] Benchmark offline: compare current mix-review code against cheaper existing variants, choose the reference, and document the decision with evidence (see docs/research and the reuse comparison receipts).
   - [ ] Build the grading logic in the existing mix-review module; grade only against authorized references, declared conventions, and the producer's own comparison target; never invent numbers.
   - [ ] Verify the grade is deterministic for the same inputs and that a change to the underlying analysis is reflected in the grade.
@@ -2350,12 +2355,14 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   - [ ] Require owner listening review before usefulness claims are made; existing artifact/import code is a starting point, not a completed creation gate.
 - [ ] **E4 — Explain and teach.** Implement the explanation layer: chat and mix-review responses explain the music and audio clearly (why the grade is what it is, what a number means, what to listen for), so the producer learns, not just executes.
   - [ ] Use existing grounded conversation patterns; citation, evidence, and refusal paths must work from chat, the browser chat, and the first model call.
-  - [ ] Test the explanation against the acceptance graph in the voice output stubs; the result must be interrogable by the model without guessing numbers from the prompt.
+  - [ ] Test that every number in an explanation comes from the grade's own measurements or a cited source, so the grounding gate has nothing to reject; the model must not guess figures from the prompt.
   - [ ] Verify the result survives: the model can restate it, answers identify memory used, a different session cannot read it.
 - [ ] **E5 — Gate the end-to-end flow.** Qualify the complete education/mixing guidance path: real-time analysis → grounded grade → actionable suggestion → explanation, with exact Apply/Undo and human grading.
   - [ ] Reference the 15 s gate path at docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md; the full sequence must be scripted and rehearsed before any release claim.
-  - [ ] Grade sealed answers blind against the existing held-out question set, compare B/C/D across development-only steps, and land the synonym fix before the v5 bench.
-  - [ ] Confirm the mixed-deck audio calculator remains grounded against published conventions (note lengths at tempo, chord degrees, time signatures) with real reference notes; verify middle C labelling agreement with Live (KENN uses scientific pitch, middle C = C4).### 5. Qualify and release one exact build
+  - [ ] Jack grades a held-out set of mix questions blind (grade, suggestion and explanation separately), beside the gate figures; land the synonym fix before the v5 bench.
+  - [ ] Confirm the audio calculators (note lengths at tempo, buffer latency, pitch, dB factors) stay grounded when the grade and explanations quote them; verify middle C labelling agreement with Live (Live labels middle C as C3).
+
+### 5. Qualify and release one exact build
 
 - [ ] **R1 — Reproducible source and package.** Clean checkout on the supported matrix,
   backend/frontend/native/plugin checks, approved local assets declared separately,
