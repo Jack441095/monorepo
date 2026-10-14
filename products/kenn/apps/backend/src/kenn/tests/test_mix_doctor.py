@@ -133,3 +133,82 @@ def test_mix_doctor_mono_correlation_penalty():
     assert len(stereo_issues) >= 1
     assert "out-of-phase" in stereo_issues[0].message
     assert stereo_issues[0].severity == "CRITICAL"
+
+
+# E2 step 1 (14 Oct 2026): a missing meter used to be filled with a healthy-looking default (-14 LUFS, -1 dBTP,
+# correlation 0.88, 25% in every band), so a session with no meters at all scored a full 100 and an "S".
+
+def test_a_session_with_no_meters_is_not_graded():
+    report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters=None)
+
+    assert report.grade == "UNRATED"
+    assert report.dimension_scores["dynamic_health"] is None
+    assert report.dimension_scores["spectral_balance"] is None
+    assert report.dimension_scores["stereo_imaging"] is None
+    # Only the fader-based dimension could be judged, so only its 20 points are on offer.
+    assert report.points_available == 20.0
+    assert report.mqm_score <= report.points_available
+
+
+def test_a_missing_reading_stays_missing_in_the_telemetry():
+    report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters={"true_peak_dbtp": -1.5})
+
+    assert report.loudness_telemetry["true_peak_dbtp"] == -1.5
+    assert report.loudness_telemetry["integrated_lufs"] is None
+    assert "integrated_lufs" in report.unmeasured
+    assert "phase_correlation" in report.unmeasured
+    assert report.to_dict()["loudness_telemetry"]["phase_correlation"] is None
+
+
+def test_peak_to_loudness_is_skipped_without_a_loudness_reading():
+    # Only a peak reading: the peak check runs, the PLR check has nothing to compare against.
+    report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters={"true_peak_dbtp": -1.5})
+
+    assert report.dimension_scores["dynamic_health"] == 20.0
+    assert not [i for i in report.all_issues if "PLR" in i.message]
+
+
+def test_a_loudness_reading_alone_does_not_earn_the_dynamics_points():
+    report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters={"integrated_lufs": -14.0})
+
+    assert report.dimension_scores["dynamic_health"] is None
+
+
+def test_a_bad_reading_still_costs_points_when_the_rest_are_missing():
+    report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters={"phase_correlation": -0.4})
+
+    assert report.dimension_scores["stereo_imaging"] == 5.0
+    assert report.grade == "UNRATED"
+    assert report.points_available == 40.0  # stereo + stem separation
+    assert any(i.severity == "CRITICAL" for i in report.critical_issues)
+
+
+def test_a_full_set_of_meters_is_still_graded_out_of_100():
+    meters = {
+        "integrated_lufs": -13.8, "true_peak_dbtp": -1.2, "phase_correlation": 0.88,
+        "spectral_energy": {"sub_20_60hz": 0.25, "low_mid_200_500hz": 0.26, "high_mid_2_6khz": 0.25, "air_10_20khz": 0.24},
+    }
+    report = MixDoctor().audit_session(_build_synthetic_16_track_session(), meters=meters)
+
+    assert report.points_available == 100.0
+    assert report.grade != "UNRATED"
+    assert report.unmeasured == ["crest_factor_db"]  # reported, but no check scores on it today
+
+
+def test_tracks_without_fader_or_device_data_cost_nothing():
+    # Before: no volume read as 0.85 (feeding the collision checks) and no device list read as "no EQ".
+    session = {"tracks": [{"index": 0, "name": "Kick"}, {"index": 1, "name": "Sub Bass"}, {"index": 2, "name": "Lead Vocal"},
+                          {"index": 3, "name": "Synth Pad"}], "master": {}}
+
+    report = MixDoctor().audit_session(session, meters=None)
+
+    assert report.dimension_scores["stem_separation"] == 20.0
+    assert not [i for i in report.all_issues if i.category == "low_end"]
+
+
+def test_a_non_numeric_meter_value_counts_as_missing():
+    report = MixDoctor().audit_session(_build_synthetic_16_track_session(),
+                                       meters={"true_peak_dbtp": "n/a", "phase_correlation": float("nan")})
+
+    assert report.loudness_telemetry["true_peak_dbtp"] is None
+    assert report.loudness_telemetry["phase_correlation"] is None

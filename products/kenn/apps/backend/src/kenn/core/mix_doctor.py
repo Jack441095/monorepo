@@ -34,26 +34,34 @@ class MixIssue:
 
 @dataclass
 class MixAuditReport:
-    mqm_score: float  # 0.0 - 100.0
-    grade: str  # "S" | "A" | "B" | "C" | "D" | "CRITICAL"
-    dimension_scores: Dict[str, float]
+    mqm_score: float  # points kept, out of points_available (0.0 - 100.0)
+    grade: str  # "S" | "A" | "B" | "C" | "D" | "CRITICAL", or "UNRATED" when a dimension had no reading
+    dimension_scores: Dict[str, Optional[float]]  # None = the dimension had no reading to score from
     critical_issues: List[MixIssue]
     all_issues: List[MixIssue]
     remediation_dag: List[Dict[str, Any]]
-    loudness_telemetry: Dict[str, float]
+    loudness_telemetry: Dict[str, Optional[float]]  # None = the meter did not report this reading
+    points_available: float = 100.0  # 20 per scored dimension; the score is never rescaled to 100
+    unmeasured: List[str] = field(default_factory=list)  # telemetry readings that were missing
     timestamp: float = field(default_factory=time.time)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "mqm_score": round(self.mqm_score, 1),
             "grade": self.grade,
-            "dimension_scores": {k: round(v, 1) for k, v in self.dimension_scores.items()},
+            "dimension_scores": {k: None if v is None else round(v, 1) for k, v in self.dimension_scores.items()},
             "critical_issues": [i.to_dict() for i in self.critical_issues],
             "all_issues": [i.to_dict() for i in self.all_issues],
             "remediation_dag": self.remediation_dag,
             "loudness_telemetry": self.loudness_telemetry,
+            "points_available": self.points_available,
+            "unmeasured": self.unmeasured,
             "timestamp": self.timestamp,
         }
+
+
+# Each of the five dimensions is worth 20 points, so a fully measured mix is out of 100.
+_POINTS_PER_DIMENSION = 20.0
 
 
 class MixDoctor:
@@ -76,67 +84,53 @@ class MixDoctor:
         all_issues: List[MixIssue] = []
         remediation_dag: List[Dict[str, Any]] = []
 
-        # -------------------------------------------------------------
-        # Extract telemetry & baseline metrics
-        # -------------------------------------------------------------
         telemetry = self._extract_telemetry(meters, tracks, master)
 
-        # -------------------------------------------------------------
-        # 1. Dynamic Health & Crest Factor (20 pts)
-        # -------------------------------------------------------------
+        # Each dimension reports a score, or None when none of the readings it judges came from a meter.
+        # A missing meter must not look like a healthy mix (it used to: the old defaults scored 20/20),
+        # so an unscored dimension is left out of the total instead of being filled in.
         s_dynamic, dynamic_issues, dynamic_recs = self._audit_dynamic_health(tracks, master, telemetry)
-        all_issues.extend(dynamic_issues)
-        remediation_dag.extend(dynamic_recs)
-
-        # -------------------------------------------------------------
-        # 2. Low-End Control & Sub Phase (20 pts)
-        # -------------------------------------------------------------
         s_low_end, low_end_issues, low_end_recs = self._audit_low_end_control(tracks, telemetry)
-        all_issues.extend(low_end_issues)
-        remediation_dag.extend(low_end_recs)
-
-        # -------------------------------------------------------------
-        # 3. Spectral Balance & Resonance (20 pts)
-        # -------------------------------------------------------------
         s_spectral, spectral_issues, spectral_recs = self._audit_spectral_balance(tracks, telemetry)
-        all_issues.extend(spectral_issues)
-        remediation_dag.extend(spectral_recs)
-
-        # -------------------------------------------------------------
-        # 4. Pairwise Stem Separation (20 pts)
-        # -------------------------------------------------------------
+        # Stem separation reads fader levels from the session snapshot, not a meter, so it always scores.
         s_unmasking, unmasking_issues, unmasking_recs = self._audit_stem_separation(tracks, telemetry)
-        all_issues.extend(unmasking_issues)
-        remediation_dag.extend(unmasking_recs)
-
-        # -------------------------------------------------------------
-        # 5. Stereo Imaging & Mono Compatibility (20 pts)
-        # -------------------------------------------------------------
         s_stereo, stereo_issues, stereo_recs = self._audit_stereo_imaging(tracks, telemetry)
-        all_issues.extend(stereo_issues)
-        remediation_dag.extend(stereo_recs)
 
-        # -------------------------------------------------------------
-        # Calculate Total MQM & Grade
-        # -------------------------------------------------------------
-        total_mqm = max(0.0, min(100.0, s_dynamic + s_low_end + s_spectral + s_unmasking + s_stereo))
-        grade = self._score_to_grade(total_mqm)
+        for issues, recs in (
+            (dynamic_issues, dynamic_recs),
+            (low_end_issues, low_end_recs),
+            (spectral_issues, spectral_recs),
+            (unmasking_issues, unmasking_recs),
+            (stereo_issues, stereo_recs),
+        ):
+            all_issues.extend(issues)
+            remediation_dag.extend(recs)
+
+        dimension_scores = {
+            "dynamic_health": s_dynamic,
+            "low_end_control": s_low_end,
+            "spectral_balance": s_spectral,
+            "stem_separation": s_unmasking,
+            "stereo_imaging": s_stereo,
+        }
+        scored = [v for v in dimension_scores.values() if v is not None]
+        points_available = _POINTS_PER_DIMENSION * len(scored)
+        total_mqm = max(0.0, min(points_available, sum(scored)))
+        # A letter only means something against all 100 points. With fewer, we report the points and
+        # say it is unrated rather than rescale (3 of 5 dimensions kept at 55/60 is not an A).
+        grade = self._score_to_grade(total_mqm) if len(scored) == len(dimension_scores) else "UNRATED"
         critical_issues = [i for i in all_issues if i.severity in ("CRITICAL", "WARNING")]
 
         report = MixAuditReport(
             mqm_score=total_mqm,
             grade=grade,
-            dimension_scores={
-                "dynamic_health": s_dynamic,
-                "low_end_control": s_low_end,
-                "spectral_balance": s_spectral,
-                "stem_separation": s_unmasking,
-                "stereo_imaging": s_stereo,
-            },
+            dimension_scores=dimension_scores,
             critical_issues=critical_issues,
             all_issues=all_issues,
             remediation_dag=remediation_dag,
             loudness_telemetry=telemetry,
+            points_available=points_available,
+            unmeasured=sorted(k for k, v in telemetry.items() if v is None),
         )
         self._last_report = report
         return report
@@ -154,48 +148,57 @@ class MixDoctor:
         meters: Optional[Dict[str, Any]],
         tracks: List[Dict[str, Any]],
         master: Dict[str, Any],
-    ) -> Dict[str, float]:
-        """Normalize live meter values or infer intelligent acoustic estimates."""
+    ) -> Dict[str, Optional[float]]:
+        """Normalise the meter readings; a reading the meter did not give stays None, never a stand-in value."""
         m = meters or {}
-        integrated_lufs = float(m.get("integrated_lufs", m.get("lufs", -14.0)))
-        true_peak_dbtp = float(m.get("true_peak_dbtp", m.get("peak_dbfs", -1.0)))
-        phase_correlation = float(m.get("phase_correlation", m.get("correlation", 0.88)))
-        crest_factor_db = float(m.get("crest_factor_db", m.get("crest_db", 10.0)))
 
-        spectral = m.get("spectral_energy", {})
-        sub = float(spectral.get("sub_20_60hz", 0.25))
-        low_mid = float(spectral.get("low_mid_200_500hz", 0.25))
-        high_mid = float(spectral.get("high_mid_2_6khz", 0.25))
-        air = float(spectral.get("air_10_20khz", 0.25))
+        def reading(source: Dict[str, Any], *keys: str) -> Optional[float]:
+            for key in keys:
+                value = source.get(key)
+                try:
+                    number = float(value)
+                except (TypeError, ValueError):
+                    # Absent, null or not a number: treat it as not measured and try the next alias.
+                    continue
+                if math.isfinite(number):
+                    return number
+            return None
+
+        spectral = m.get("spectral_energy")
+        spectral = spectral if isinstance(spectral, dict) else {}
 
         return {
-            "integrated_lufs": integrated_lufs,
-            "true_peak_dbtp": true_peak_dbtp,
-            "phase_correlation": phase_correlation,
-            "crest_factor_db": crest_factor_db,
-            "sub_energy": sub,
-            "low_mid_energy": low_mid,
-            "high_mid_energy": high_mid,
-            "air_energy": air,
+            "integrated_lufs": reading(m, "integrated_lufs", "lufs"),
+            "true_peak_dbtp": reading(m, "true_peak_dbtp", "peak_dbfs"),
+            "phase_correlation": reading(m, "phase_correlation", "correlation"),
+            "crest_factor_db": reading(m, "crest_factor_db", "crest_db"),
+            "sub_energy": reading(spectral, "sub_20_60hz"),
+            "low_mid_energy": reading(spectral, "low_mid_200_500hz"),
+            "high_mid_energy": reading(spectral, "high_mid_2_6khz"),
+            "air_energy": reading(spectral, "air_10_20khz"),
         }
 
     def _audit_dynamic_health(
         self,
         tracks: List[Dict[str, Any]],
         master: Dict[str, Any],
-        telemetry: Dict[str, float],
-    ) -> Tuple[float, List[MixIssue], List[Dict[str, Any]]]:
-        """Audit Dynamic Health & Crest Factor (Max 20 pts)."""
+        telemetry: Dict[str, Optional[float]],
+    ) -> Tuple[Optional[float], List[MixIssue], List[Dict[str, Any]]]:
+        """Audit Dynamic Health & Crest Factor (Max 20 pts). Scores None when there is no true-peak reading."""
         score = 20.0
         issues: List[MixIssue] = []
         recs: List[Dict[str, Any]] = []
 
         tp = telemetry["true_peak_dbtp"]
         lufs = telemetry["integrated_lufs"]
-        plr = abs(tp - lufs) if lufs < 0 else 10.0
+        # Peak-to-loudness needs both readings. It used to fall back to 10 dB when LUFS was missing or
+        # positive, which read as a healthy ratio; now we skip the check instead.
+        plr = abs(tp - lufs) if tp is not None and lufs is not None and lufs < 0 else None
 
         # Check Intersample Peak (ISP) / True Peak clipping
-        if tp > -0.2:
+        if tp is None:
+            pass
+        elif tp > -0.2:
             score -= 10.0
             issues.append(MixIssue(
                 severity="CRITICAL",
@@ -229,10 +232,12 @@ class MixDoctor:
 
         # Check Track Volume fader clipping
         for t in tracks:
-            vol = float(t.get("volume", 0.85))
+            vol = _number(t.get("volume"))
             idx = int(t.get("index", 0))
             name = str(t.get("name", f"Track {idx}"))
-            if vol > 1.0:
+            # No fader reading means no verdict on this track. The old 0.85 default also fed the kick/bass and
+            # vocal/synth collision checks, so a snapshot without volumes could be docked for collisions.
+            if vol is not None and vol > 1.0:
                 score -= 4.0
                 excess_db = 20.0 * math.log10(vol) if vol > 0 else 0.0
                 issues.append(MixIssue(
@@ -250,7 +255,9 @@ class MixDoctor:
                 ))
 
         # Check Peak-to-Loudness Ratio (PLR) / Crest Factor
-        if plr < 6.0:
+        if plr is None:
+            pass
+        elif plr < 6.0:
             score -= 6.0
             issues.append(MixIssue(
                 severity="WARNING",
@@ -265,21 +272,22 @@ class MixDoctor:
                 message=f"Mix has wide crest factor (PLR {plr:.1f} dB) with quiet master peak ({tp:+.1f} dBTP). Headroom is available for makeup gain.",
             ))
 
-        return max(0.0, score), issues, recs
+        # Only the true-peak check judges anything a meter measured; without it the faders alone are not a grade.
+        return (max(0.0, score) if tp is not None else None), issues, recs
 
     def _audit_low_end_control(
         self,
         tracks: List[Dict[str, Any]],
-        telemetry: Dict[str, float],
-    ) -> Tuple[float, List[MixIssue], List[Dict[str, Any]]]:
-        """Audit Low-End Control & Sub Phase (Max 20 pts)."""
+        telemetry: Dict[str, Optional[float]],
+    ) -> Tuple[Optional[float], List[MixIssue], List[Dict[str, Any]]]:
+        """Audit Low-End Control & Sub Phase (Max 20 pts). Scores None when there is no sub-band reading."""
         score = 20.0
         issues: List[MixIssue] = []
         recs: List[Dict[str, Any]] = []
 
         sub_energy = telemetry["sub_energy"]
         # Excessive sub energy
-        if sub_energy > 0.45:
+        if sub_energy is not None and sub_energy > 0.45:
             score -= 5.0
             issues.append(MixIssue(
                 severity="WARNING",
@@ -293,7 +301,10 @@ class MixDoctor:
             name = str(t.get("name", "")).lower()
             idx = int(t.get("index", 0))
             is_non_bass = any(r in name for r in non_bass_roles) and "bass" not in name and "sub" not in name
-            devices = [d.get("name", "").lower() for d in t.get("devices", [])] if isinstance(t.get("devices"), list) else []
+            # Snapshots that omit the device list tell us nothing; the old code read that as "no EQ" and docked 1.5 pts.
+            if not isinstance(t.get("devices"), list):
+                continue
+            devices = [str(d.get("name", "")).lower() for d in t["devices"] if isinstance(d, dict)]
             has_eq = any("eq" in d or "filter" in d for d in devices)
 
             if is_non_bass and not has_eq:
@@ -312,14 +323,14 @@ class MixDoctor:
                     }
                 ))
 
-        return max(0.0, score), issues, recs
+        return (max(0.0, score) if sub_energy is not None else None), issues, recs
 
     def _audit_spectral_balance(
         self,
         tracks: List[Dict[str, Any]],
-        telemetry: Dict[str, float],
-    ) -> Tuple[float, List[MixIssue], List[Dict[str, Any]]]:
-        """Audit Spectral Balance & Mud Accumulation (Max 20 pts)."""
+        telemetry: Dict[str, Optional[float]],
+    ) -> Tuple[Optional[float], List[MixIssue], List[Dict[str, Any]]]:
+        """Audit Spectral Balance & Mud Accumulation (Max 20 pts). Scores None when no band was measured."""
         score = 20.0
         issues: List[MixIssue] = []
         recs: List[Dict[str, Any]] = []
@@ -329,7 +340,7 @@ class MixDoctor:
         air = telemetry["air_energy"]
 
         # 200-500 Hz Boxiness / Mud accumulation
-        if low_mid > 0.38:
+        if low_mid is not None and low_mid > 0.38:
             score -= 6.0
             issues.append(MixIssue(
                 severity="WARNING",
@@ -354,7 +365,7 @@ class MixDoctor:
             })
 
         # 3-6 kHz Harshness accumulation
-        if high_mid > 0.40:
+        if high_mid is not None and high_mid > 0.40:
             score -= 5.0
             issues.append(MixIssue(
                 severity="WARNING",
@@ -370,7 +381,7 @@ class MixDoctor:
             ))
 
         # Air extension check
-        if air < 0.10:
+        if air is not None and air < 0.10:
             score -= 3.0
             issues.append(MixIssue(
                 severity="ADVISORY",
@@ -378,13 +389,14 @@ class MixDoctor:
                 message=f"Air band (>10 kHz) is dark ({air:.0%}). Consider gentle high shelf boost (+1.5 dB at 12 kHz) on vocals or drum bus.",
             ))
 
-        return max(0.0, score), issues, recs
+        measured = any(band is not None for band in (low_mid, high_mid, air))
+        return (max(0.0, score) if measured else None), issues, recs
 
     def _audit_stem_separation(
         self,
         tracks: List[Dict[str, Any]],
-        telemetry: Dict[str, float],
-    ) -> Tuple[float, List[MixIssue], List[Dict[str, Any]]]:
+        telemetry: Dict[str, Optional[float]],
+    ) -> Tuple[Optional[float], List[MixIssue], List[Dict[str, Any]]]:
         """Audit Pairwise Stem Separation & Collisions (Max 20 pts)."""
         score = 20.0
         issues: List[MixIssue] = []
@@ -395,9 +407,9 @@ class MixDoctor:
         bass_track = next((t for t in tracks if any(b in str(t.get("name", "")).lower() for b in ["bass", "sub", "808"])), None)
 
         if kick_track and bass_track:
-            kick_vol = float(kick_track.get("volume", 0.85))
-            bass_vol = float(bass_track.get("volume", 0.85))
-            if kick_vol > 0.80 and bass_vol > 0.80:
+            kick_vol = _number(kick_track.get("volume"))
+            bass_vol = _number(bass_track.get("volume"))
+            if kick_vol is not None and bass_vol is not None and kick_vol > 0.80 and bass_vol > 0.80:
                 score -= 4.0
                 issues.append(MixIssue(
                     severity="WARNING",
@@ -429,9 +441,9 @@ class MixDoctor:
         mid_track = next((t for t in tracks if any(m in str(t.get("name", "")).lower() for m in ["guitar", "keys", "synth", "piano"])), None)
 
         if vocal_track and mid_track:
-            v_vol = float(vocal_track.get("volume", 0.85))
-            m_vol = float(mid_track.get("volume", 0.85))
-            if v_vol > 0.80 and m_vol > 0.80:
+            v_vol = _number(vocal_track.get("volume"))
+            m_vol = _number(mid_track.get("volume"))
+            if v_vol is not None and m_vol is not None and v_vol > 0.80 and m_vol > 0.80:
                 score -= 3.0
                 issues.append(MixIssue(
                     severity="ADVISORY",
@@ -445,16 +457,18 @@ class MixDoctor:
     def _audit_stereo_imaging(
         self,
         tracks: List[Dict[str, Any]],
-        telemetry: Dict[str, float],
-    ) -> Tuple[float, List[MixIssue], List[Dict[str, Any]]]:
-        """Audit Stereo Imaging & Mono Compatibility (Max 20 pts)."""
+        telemetry: Dict[str, Optional[float]],
+    ) -> Tuple[Optional[float], List[MixIssue], List[Dict[str, Any]]]:
+        """Audit Stereo Imaging & Mono Compatibility (Max 20 pts). Scores None when there is no correlation reading."""
         score = 20.0
         issues: List[MixIssue] = []
         recs: List[Dict[str, Any]] = []
 
         corr = telemetry["phase_correlation"]
 
-        if corr < 0.0:
+        if corr is None:
+            pass
+        elif corr < 0.0:
             score -= 15.0
             issues.append(MixIssue(
                 severity="CRITICAL",
@@ -502,7 +516,7 @@ class MixDoctor:
                     }
                 ))
 
-        return max(0.0, score), issues, recs
+        return (max(0.0, score) if corr is not None else None), issues, recs
 
     def _score_to_grade(self, score: float) -> str:
         """Map 0-100 MQM score to letter grade."""
@@ -517,6 +531,16 @@ class MixDoctor:
         if score >= 50.0:
             return "D"
         return "CRITICAL"
+
+
+def _number(value: Any) -> Optional[float]:
+    """A finite float, or None for anything a snapshot left out or filled with junk."""
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        # Missing or non-numeric fader value: the caller skips the check instead of assuming a level.
+        return None
+    return number if math.isfinite(number) else None
 
 
 # Singleton instance

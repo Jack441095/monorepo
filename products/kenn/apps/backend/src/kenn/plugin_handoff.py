@@ -704,6 +704,7 @@ def _live_context_summary(session_id: str) -> dict[str, Any] | None:
         if report:
             result["mqm"] = {
                 "score": report.mqm_score,
+                "points_available": report.points_available,
                 "grade": report.grade,
                 "critical_issues": len(report.critical_issues),
             }

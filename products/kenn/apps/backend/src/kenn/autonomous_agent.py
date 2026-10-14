@@ -1255,12 +1255,12 @@ class KennAutonomousAgent:
             trajectory.append({
                 "iteration": 1.8,
                 "phase": "mix_doctor_audit",
-                "thought": f"Ran Full-Session Mix Doctor. Computed MQM score: {mix_report.mqm_score:.1f}/100 (Grade: {mix_report.grade}). Found {len(mix_report.critical_issues)} critical issues.",
+                "thought": f"Ran Full-Session Mix Doctor. Computed MQM score: {mix_report.mqm_score:.1f}/{mix_report.points_available:.0f} (Grade: {mix_report.grade}). Found {len(mix_report.critical_issues)} critical issues.",
                 "action": "audit_full_session",
                 "observation": mix_report.to_dict(),
                 "reflection": "Incorporating Mix Doctor remediation DAG into surgical recipe.",
             })
-            advice_lines.append(f"• **Mix Doctor (MQM {mix_report.mqm_score:.1f}/100 - Grade {mix_report.grade})**: {len(mix_report.critical_issues)} critical issues detected.")
+            advice_lines.append(f"• **Mix Doctor (MQM {mix_report.mqm_score:.1f}/{mix_report.points_available:.0f} - Grade {mix_report.grade})**: {len(mix_report.critical_issues)} critical issues detected.")
             if mix_report.remediation_dag:
                 for r in mix_report.remediation_dag:
                     if not any(existing.get("action") == r.get("action") and existing.get("track") == r.get("track") for existing in steps):

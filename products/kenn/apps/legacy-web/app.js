@@ -1078,12 +1078,16 @@ function renderMQMRadarPentagon(canvas, scores) {
   const cx = w / 2;
   const cy = h / 2 + 10;
   const radius = Math.min(cx, cy) - 25;
+  // Placeholder shape only when there is no report at all. A report whose dimension is null had no meter
+  // reading for it, so it plots at the centre rather than at an invented 14-17.
+  const demo = { dynamic_health: 16, low_end_control: 15, spectral_balance: 17, stem_separation: 14, stereo_imaging: 16 };
+  const pick = (key) => (scores ? (scores[key] ?? 0) : demo[key]);
   const axes = [
-    { label: "Dynamic", key: "dynamic_health", val: scores?.dynamic_health ?? 16 },
-    { label: "Low-End", key: "low_end_control", val: scores?.low_end_control ?? 15 },
-    { label: "Spectral", key: "spectral_balance", val: scores?.spectral_balance ?? 17 },
-    { label: "Separation", key: "stem_separation", val: scores?.stem_separation ?? 14 },
-    { label: "Stereo", key: "stereo_imaging", val: scores?.stereo_imaging ?? 16 },
+    { label: "Dynamic", key: "dynamic_health", val: pick("dynamic_health") },
+    { label: "Low-End", key: "low_end_control", val: pick("low_end_control") },
+    { label: "Spectral", key: "spectral_balance", val: pick("spectral_balance") },
+    { label: "Separation", key: "stem_separation", val: pick("stem_separation") },
+    { label: "Stereo", key: "stereo_imaging", val: pick("stereo_imaging") },
   ];
   const numAxes = axes.length;
 

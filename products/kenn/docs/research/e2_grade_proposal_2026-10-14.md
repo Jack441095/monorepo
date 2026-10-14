@@ -36,3 +36,17 @@ Rules that make it reproducible and honest:
 3. **Which conventions count** for the declared-target part: a fixed list of streaming targets, or only what the producer states?
 4. **What happens to the current five-dimension score.** Keep it as the technical-health part, rework it, or retire it?
 5. **Letter grades.** Keep S/A/B/C/D, or show only the number?
+
+## Decisions (14 Oct 2026, approved)
+
+1. **Weights:** 30 technical health, 30 declared target, 40 reference match.
+2. **No reference:** show a partial grade out of 60, labelled, never rescaled to 100.
+3. **Conventions:** a short fixed list of cited streaming loudness targets plus the -1 dBTP ceiling, overridden by what the producer states. No genre targets yet.
+4. **Current five-dimension score:** kept, reworked as the technical-health part.
+5. **Letters:** a number with a one-line meaning; the S letter goes.
+
+Order of work: stop inventing values for missing meters (done, see below), then the reference-match part, then the declared-target part, then check the grade against my ears under E9.
+
+## Step 1 done: missing meters stay missing
+
+`mix_doctor` now keeps a missing reading as None and skips the checks that need it. A dimension with no meter-based check run is not scored; the total is points kept out of `points_available` (20 per scored dimension) and the grade reads UNRATED unless all five were scored. Tracks without a fader value or device list are skipped instead of defaulting to 0.85 or "no EQ". The old behaviour scored a session with no meters at all as 100.
