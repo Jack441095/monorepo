@@ -288,6 +288,16 @@ def from_realtime_mix_comparison(comparison: dict[str, Any] | None) -> EvidenceP
         delta = pink.get("deviation_delta_db")
         if isinstance(delta, (int, float)) and not isinstance(delta, bool):
             facts.append(EvidenceFact("live_minus_uploaded_pink_noise_deviation_db", float(delta), "dB", "realtime_mix_comparison", "derived"))
+    live_window = comparison.get("live_window")
+    if isinstance(live_window, dict):
+        # Same window fields chat gets from the plug-in snapshot, so both answer paths can say how fresh and how clean the live side was.
+        for key, unit in (
+            ("end_sample", "samples"), ("source_generation", "count"), ("dropped_samples", "samples"),
+            ("invalid_samples", "samples"), ("audio_age_seconds", "seconds"),
+        ):
+            value = live_window.get(key)
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                facts.append(EvidenceFact(f"realtime_live_window_{key}", float(value), unit, "realtime_mix_comparison", "derived"))
     if not facts:
         return None
     return EvidencePacket(

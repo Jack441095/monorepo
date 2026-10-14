@@ -48,3 +48,44 @@ def test_comparison_withholds_stale_live_context() -> None:
     assert result["pink_noise_shape"] is None
     assert result["comparison_available"] is False
     assert any("stale_or_unknown" in item for item in result["limitations"])
+
+
+def _review_and_live(window: dict) -> dict:
+    return build_realtime_mix_comparison(
+        {"status": "completed", "metrics": {"peak_dbfs": -1.0, "rms_dbfs": -18.0}},
+        {
+            "peak_dbfs": -0.1, "rms_dbfs": -16.0, "audio_age_seconds": 0.12,
+            "measurement_window": window,
+            "freshness": {"current_for_diagnosis": True, "age_seconds": 0.2},
+        },
+        review_id="r", plugin_session_id="s",
+    )
+
+
+def test_comparison_says_which_live_window_it_used() -> None:
+    # 14 Oct 2026: mix review compared peak, RMS and crest without saying where in the stream the live side came from.
+    result = _review_and_live({"end_sample": 9_600, "source_generation": 3, "dropped_samples": 0, "invalid_samples": 0})
+
+    assert result["live_window"] == {
+        "end_sample": 9_600.0, "source_generation": 3.0, "dropped_samples": 0.0,
+        "invalid_samples": 0.0, "audio_age_seconds": 0.12,
+    }
+    assert not any("dropped or invalid" in item for item in result["limitations"])
+
+
+def test_comparison_warns_when_the_live_window_dropped_audio() -> None:
+    result = _review_and_live({"end_sample": 9_600, "source_generation": 3, "dropped_samples": 256, "invalid_samples": 0})
+
+    assert any("dropped or invalid" in item for item in result["limitations"])
+
+
+def test_comparison_without_a_window_still_compares() -> None:
+    # Older plug-in builds publish no measurement window; the levels are still comparable.
+    result = build_realtime_mix_comparison(
+        {"status": "completed", "metrics": {"peak_dbfs": -1.0}},
+        {"peak_dbfs": -0.1, "freshness": {"current_for_diagnosis": True, "age_seconds": 0.2}},
+        review_id="r", plugin_session_id="s",
+    )
+
+    assert result["live_window"] is None
+    assert result["comparison_available"] is True

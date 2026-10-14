@@ -311,3 +311,19 @@ def test_a_malformed_window_field_is_left_out_not_guessed() -> None:
     names = {fact.name for fact in packet.facts}
     assert names >= {"measurement_window_source_generation"}
     assert not names & {"measurement_window_end_sample", "measurement_window_dropped_samples"}
+
+
+def test_mix_review_evidence_carries_the_live_window_it_compared() -> None:
+    packet = from_realtime_mix_comparison({
+        "schema": "kenn.realtime_mix_comparison.v1",
+        "comparison_available": True,
+        "comparisons": [{"metric": "peak_dbfs", "unit": "dBFS", "live_value": -0.1, "uploaded_value": -1.0,
+                         "delta_live_minus_uploaded": 0.9}],
+        "live_window": {"end_sample": 9_600.0, "source_generation": 3.0, "dropped_samples": 256.0,
+                        "invalid_samples": 0.0, "audio_age_seconds": 0.12},
+    })
+
+    assert packet is not None
+    facts = {fact.name: fact.value for fact in packet.facts}
+    assert facts["realtime_live_window_dropped_samples"] == 256.0
+    assert facts["realtime_live_window_end_sample"] == 9_600.0

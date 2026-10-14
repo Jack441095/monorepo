@@ -15,6 +15,24 @@ def _number(value: Any) -> float | None:
     return number if math.isfinite(number) else None
 
 
+def _live_window_summary(live_context: dict[str, Any]) -> dict[str, float] | None:
+    """Pick out which 100 ms window the live values came from, so a delta can be traced to a place in the stream."""
+    window = live_context.get("measurement_window")
+    if not isinstance(window, dict):
+        # Older plug-in builds publish snapshots with no window; the comparison still works, it just can't say where.
+        return None
+    summary: dict[str, float] = {}
+    for key in ("end_sample", "source_generation", "dropped_samples", "invalid_samples"):
+        value = _number(window.get(key))
+        if value is not None:
+            summary[key] = value
+    audio_age = _number(live_context.get("audio_age_seconds"))
+    if audio_age is not None:
+        # Three decimals is millisecond resolution, finer than the plug-in's 100 ms window can justify.
+        summary["audio_age_seconds"] = round(audio_age, 3)
+    return summary or None
+
+
 def _metric_row(
     *,
     key: str,
@@ -125,6 +143,10 @@ def build_realtime_mix_comparison(
         missing.append("Uploaded true peak has no like-for-like realtime counterpart.")
     if missing:
         limitations.extend(missing)
+    live_window = _live_window_summary(live_context) if live_current else None
+    if live_window and (live_window.get("dropped_samples") or live_window.get("invalid_samples")):
+        # The plug-in dropped or discarded audio around this window, so its levels may miss part of the signal.
+        limitations.append("The live window had dropped or invalid samples; treat its levels as approximate.")
     pink_shape = _pink_shape_summary(live_context, review) if live_current else None
     if pink_shape is None:
         limitations.append("No paired pink-noise-style shape observation was available from both sources.")
@@ -137,6 +159,7 @@ def build_realtime_mix_comparison(
         "plugin_session_id": str(plugin_session_id)[:128],
         "comparisons": comparisons,
         "pink_noise_shape": pink_shape,
+        "live_window": live_window,
         "comparison_available": bool(comparisons or pink_shape),
         "scope": {"live": "plugin_bus", "uploaded": "whole_file_mix_review"},
         "advisory_only": True,
