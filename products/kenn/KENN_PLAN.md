@@ -1181,7 +1181,10 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
   - [x] Built and tested 13 Oct: 21 cases with hand-checked values, a contrast test showing the same "351.6 ms" kept
     with the calculator and cut without it, mutations caught; full backend 4849 passes.
   - [ ] Try it on the Mac, confirm Live labels middle C as C3, run a probe, merge if no new rejections.
-  - [ ] KENN's MIDI card names pitches in scientific pitch (middle C = C4) while Live shows C3; make the two agree.
+  - [x] KENN's MIDI card names pitches in scientific pitch (middle C = C4) while Live shows C3; make the two agree.
+    Done 14 Oct (`cf639a31`): the generated-clip card and the studio piano roll now use Live's numbering (MIDI 60 =
+    C3); a regression test checks the card's range against the proposed notes. The calculators branch already names
+    both conventions. Seeing Live's own C3 label on the Mac stays with the item above.
 
 - [ ] **C1 — Current-path baseline.** At least 30 knowledge questions on M3/16 GB,
   separate streaming, foreground and background runs, both caches declared, exact
