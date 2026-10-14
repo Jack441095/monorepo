@@ -1188,13 +1188,19 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     against Ableton's release notes.
   - [ ] Check the existing 77 device notes against the Live 12 manual (ranges, control names, version). The notes live
     only on the Mac, so this waits for it or for the files to be shared.
-- [ ] **Audio calculators** on `draft/audio-calculators` (`dc97516`, not merged): note lengths at a tempo (straight,
+- [ ] **Audio calculators**, merged to main 14 Oct (branch `draft/audio-calculators-rebased`): note lengths at a tempo (straight,
   dotted, triplet, as ms and LFO Hz), buffer latency, frequency to note and back, dB to gain factor. The figures go in
   as tool readings, so the gate accepts them. [Draft receipt](docs/evidence/KENN_AUDIO_CALCULATORS_DRAFT_2026-10-13.md),
   on that branch.
   - [x] Built and tested 13 Oct: 21 cases with hand-checked values, a contrast test showing the same "351.6 ms" kept
     with the calculator and cut without it, mutations caught; full backend 4849 passes.
-  - [ ] Try it on the Mac, confirm Live labels middle C as C3, run a probe, merge if no new rejections.
+  - [x] Probe and merge, 14 Oct: paired 47-case probe on main vs the branch (1.7B, FakeLive, AC power, one run each;
+    receipt `.runtime/probe-calc-2026-10-14/`). The calculators fire on none of the 47 cases, so the four flipped
+    rejections (`psy-itd-ild`, `dyn-attack-release`, `dyn-limiter-truepeak`, `loud-plr`) are single-run model noise, offset by three new
+    acceptances (33 vs 32 within 15 s). On 8 calculator questions the branch was accepted 6/7 against 3/7 and printed
+    352 ms, 5.8 ms, 440 Hz and 500 ms correctly. Two gaps: "What is -3 dB as a gain factor?" is answered by the
+    which-track clarification before the calculator is reached, and "MIDI note 60" gets no pitch fact.
+  - [ ] Confirm on the Mac with real Live that it labels middle C as C3 (Jack).
   - [x] KENN's MIDI card names pitches in scientific pitch (middle C = C4) while Live shows C3; make the two agree.
     Done 14 Oct (`cf639a31`): the generated-clip card and the studio piano roll now use Live's numbering (MIDI 60 =
     C3); a regression test checks the card's range against the proposed notes. The calculators branch already names
