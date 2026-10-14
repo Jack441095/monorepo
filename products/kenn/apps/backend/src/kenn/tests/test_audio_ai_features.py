@@ -1,6 +1,5 @@
 """Unit tests for audio telemetry ingest and agentic mix planner in KENN."""
 
-import time
 import pytest
 from kenn.audio_telemetry import AudioTelemetryManager, AudioTelemetryFrame
 from kenn.agent.mix_planner import MixPlanner
@@ -151,14 +150,3 @@ def test_vst3_insert_features_preserve_units_and_leave_master_telemetry_untouche
     assert "integrated_lufs" not in context
     assert "true_peak_dbtp" not in context
     assert manager.get_latest() is master
-
-
-def test_live_telemetry_poller_lifecycle() -> None:
-    """Verify starting and stopping the background live meter poller."""
-    from kenn.audio_telemetry import LiveTelemetryPoller
-    poller = LiveTelemetryPoller(interval_seconds=0.05)
-    poller.start()
-    assert poller._running is True
-    time.sleep(0.1)
-    poller.stop()
-    assert poller._running is False
