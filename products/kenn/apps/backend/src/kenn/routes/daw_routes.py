@@ -125,3 +125,91 @@ def handle_osc_undo(
     reply = _Reply()
     stdlib_handle_osc_undo(reply, payload)
     return reply.status, reply.body
+
+
+def handle_session_tracks() -> tuple[int, dict[str, Any]]:
+    """Return status code and payload for /api/ableton/session-tracks."""
+    import os
+    from kenn.core.ableton_project_detector import detect_active_ableton_project, find_project_bounces
+    from kenn.core.track_diagnostic import extract_session_tracks, build_tracks_from_live_session
+    from kenn.mixing_doctor import get_latest_session_state
+
+    proj = detect_active_ableton_project() or {"project_name": "Untitled", "project_dir": "", "als_path": ""}
+    session = get_latest_session_state()
+    bounces = find_project_bounces(proj["project_dir"]) if proj.get("project_dir") else []
+
+    if session.get("status") == "connected" and session.get("tracks"):
+        tracks = build_tracks_from_live_session(session["tracks"], bounces)
+    elif proj.get("als_path") and os.path.isfile(proj["als_path"]):
+        tracks = extract_session_tracks(proj["als_path"], proj["project_dir"])
+    else:
+        tracks = []
+
+    return 200, {
+        "ok": True,
+        "project_name": proj["project_name"],
+        "project_dir": proj["project_dir"],
+        "tracks": tracks,
+    }
+
+
+def handle_project_audio_poll(since_raw: str = "0") -> tuple[int, dict[str, Any]]:
+    """Return status code and payload for /api/ableton/project-audio/poll.
+
+    Ableton Live writes rendered WAVs directly to disk on export (Cmd+Shift+R)
+    without firing an OSC notification. We poll filesystem modified timestamps
+    so the frontend can offer one-click hydration the moment an export lands.
+    """
+    from kenn.core.ableton_project_detector import detect_active_ableton_project, find_project_bounces
+
+    try:
+        since = float(since_raw.strip())
+    except (TypeError, ValueError):
+        since = 0.0
+
+    proj = detect_active_ableton_project()
+    if not proj:
+        return 200, {
+            "ok": False,
+            "has_new": False,
+            "error": "No active Ableton Live project detected.",
+            "latest_mtime": since,
+        }
+
+    bounces = find_project_bounces(proj["project_dir"])
+    if not bounces:
+        return 200, {"ok": True, "has_new": False, "latest_mtime": since, "new_bounce": None}
+
+    newest = max(bounces, key=lambda b: b.get("modified_time", 0.0))
+    newest_mtime = float(newest.get("modified_time", 0.0))
+
+    # When since == 0.0 (initial client mount), we establish baseline latest_mtime
+    # without triggering an alert for historical bounces. A 1 ms threshold prevents
+    # floating-point jitter from falsely re-triggering the same file.
+    has_new = bool(since > 0.0 and newest_mtime > (since + 0.001))
+
+    return 200, {
+        "ok": True,
+        "has_new": has_new,
+        "latest_mtime": newest_mtime,
+        "new_bounce": newest if has_new else None,
+    }
+
+
+def handle_project_audio_file(file_path: str) -> tuple[int, bytes | dict[str, Any], str]:
+    """Return (status_code, content_or_error_dict, content_type) for /api/ableton/project-audio/file."""
+    import os
+
+    path_clean = file_path.strip()
+    if not path_clean or not os.path.isfile(path_clean):
+        return 404, {"ok": False, "error": "Audio file not found."}, "application/json"
+    if not path_clean.lower().endswith((".wav", ".aif", ".aiff")):
+        return 400, {"ok": False, "error": "Requested file is not an audio file."}, "application/json"
+    try:
+        with open(path_clean, "rb") as f:
+            content = f.read()
+        mime = "audio/aiff" if path_clean.lower().endswith((".aif", ".aiff")) else "audio/wav"
+        return 200, content, mime
+    except Exception as exc:
+        return 500, {"ok": False, "error": f"Failed to read audio file: {exc}"}, "application/json"
+

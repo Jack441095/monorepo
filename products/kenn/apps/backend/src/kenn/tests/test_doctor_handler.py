@@ -26,3 +26,39 @@ def test_an_audit_that_finds_issues_is_not_a_server_error(monkeypatch) -> None:
     doctor_handler.handle_post_doctor_audit(handler, {"session_state": hot})
     assert handler.status == 200 and handler.body["issues_found"] >= 1
 
+
+def test_handle_project_manager_report_success(monkeypatch) -> None:
+    from kenn import mixing_doctor
+    from kenn import project_analysis
+
+    fake_session = {"status": "connected", "tracks": [{"name": "Lead Vocal"}]}
+    monkeypatch.setattr(mixing_doctor, "get_latest_session_state", lambda: fake_session)
+    monkeypatch.setattr(
+        project_analysis,
+        "project_manager_report",
+        lambda state: {"schema": "kenn.project_manager_report.v1", "state": state},
+    )
+
+    code, body = doctor_handler.handle_project_manager_report()
+    assert code == 200
+    assert body["schema"] == "kenn.project_manager_report.v1"
+    assert body["state"] == fake_session
+
+
+def test_handle_project_health_report_success(monkeypatch) -> None:
+    from kenn import mixing_doctor
+    from kenn import project_analysis
+
+    fake_session = {"status": "connected", "tracks": []}
+    monkeypatch.setattr(mixing_doctor, "get_latest_session_state", lambda: fake_session)
+    monkeypatch.setattr(
+        project_analysis,
+        "project_health_report",
+        lambda state: {"schema": "kenn.project_health_report.v1", "health": "good"},
+    )
+
+    code, body = doctor_handler.handle_project_health_report()
+    assert code == 200
+    assert body["health"] == "good"
+
+

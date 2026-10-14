@@ -76,3 +76,30 @@ def handle_post_doctor_remediate(handler: Any, payload: dict[str, Any]) -> None:
         "ok": False,
         "error": "Session Doctor remediation is disabled until it has a typed, reversible proposal and verified readback.",
     })
+
+
+def handle_project_manager_report() -> tuple[int, dict[str, Any]]:
+    """Return status code and payload for /api/project-manager/report.
+
+    Analysis deliberately consumes Mixing Doctor's cached snapshot so the UI
+    can refresh safely without adding a second OSC poll.
+    """
+    try:
+        from kenn.mixing_doctor import get_latest_session_state
+        from kenn.project_analysis import project_manager_report
+
+        return 200, project_manager_report(get_latest_session_state())
+    except Exception as exc:
+        return 500, {"ok": False, "error": str(exc)}
+
+
+def handle_project_health_report() -> tuple[int, dict[str, Any]]:
+    """Return status code and payload for /api/project-health/report."""
+    try:
+        from kenn.mixing_doctor import get_latest_session_state
+        from kenn.project_analysis import project_health_report
+
+        return 200, project_health_report(get_latest_session_state())
+    except Exception as exc:
+        return 500, {"ok": False, "error": str(exc)}
+

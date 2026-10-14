@@ -1194,100 +1194,34 @@ class Handler(BaseHTTPRequestHandler):
             })
             return
         if parsed.path in {"/api/ableton/session-tracks", "/kenn/api/ableton/session-tracks"}:
-            from kenn.core.ableton_project_detector import detect_active_ableton_project, find_project_bounces
-            from kenn.core.track_diagnostic import extract_session_tracks, build_tracks_from_live_session
-            from kenn.mixing_doctor import get_latest_session_state
-
-            proj = detect_active_ableton_project() or {"project_name": "Untitled", "project_dir": "", "als_path": ""}
-            session = get_latest_session_state()
-            bounces = find_project_bounces(proj["project_dir"]) if proj.get("project_dir") else []
-
-            if session.get("status") == "connected" and session.get("tracks"):
-                tracks = build_tracks_from_live_session(session["tracks"], bounces)
-            elif proj.get("als_path") and os.path.isfile(proj["als_path"]):
-                tracks = extract_session_tracks(proj["als_path"], proj["project_dir"])
-            else:
-                tracks = []
-
-            self.send_json(200, {
-                "ok": True,
-                "project_name": proj["project_name"],
-                "project_dir": proj["project_dir"],
-                "tracks": tracks,
-            })
+            from kenn.routes.daw_routes import handle_session_tracks
+            code, payload = handle_session_tracks()
+            self.send_json(code, payload)
             return
         if parsed.path in {"/api/ableton/project-audio/poll", "/kenn/api/ableton/project-audio/poll"}:
-            # Ableton Live writes rendered WAVs directly to disk on export (Cmd+Shift+R)
-            # without firing an OSC notification. We poll filesystem modified timestamps
-            # so the frontend can offer one-click hydration the moment an export lands.
-            from kenn.core.ableton_project_detector import detect_active_ableton_project, find_project_bounces
+            from kenn.routes.daw_routes import handle_project_audio_poll
             since_raw = parse_qs(parsed.query).get("since", ["0"])[0].strip()
-            try:
-                since = float(since_raw)
-            except ValueError:
-                since = 0.0
-
-            proj = detect_active_ableton_project()
-            if not proj:
-                self.send_json(200, {"ok": False, "has_new": False, "error": "No active Ableton Live project detected.", "latest_mtime": since})
-                return
-
-            bounces = find_project_bounces(proj["project_dir"])
-            if not bounces:
-                self.send_json(200, {"ok": True, "has_new": False, "latest_mtime": since, "new_bounce": None})
-                return
-
-            # Determine the newest rendered audio file
-            newest = max(bounces, key=lambda b: b.get("modified_time", 0.0))
-            newest_mtime = float(newest.get("modified_time", 0.0))
-
-            # When since == 0.0 (initial client mount), we establish baseline latest_mtime
-            # without triggering an alert for historical bounces. A 1 ms threshold prevents
-            # floating-point jitter from falsely re-triggering the same file.
-            has_new = bool(since > 0.0 and newest_mtime > (since + 0.001))
-
-            self.send_json(200, {
-                "ok": True,
-                "has_new": has_new,
-                "latest_mtime": newest_mtime,
-                "new_bounce": newest if has_new else None,
-            })
+            code, payload = handle_project_audio_poll(since_raw)
+            self.send_json(code, payload)
             return
         if parsed.path in {"/api/ableton/project-audio/file", "/kenn/api/ableton/project-audio/file"}:
+            from kenn.routes.daw_routes import handle_project_audio_file
             file_path = parse_qs(parsed.query).get("path", [""])[0].strip()
-            if not file_path or not os.path.isfile(file_path):
-                self.send_json(404, {"ok": False, "error": "Audio file not found."})
-                return
-            if not file_path.lower().endswith((".wav", ".aif", ".aiff")):
-                self.send_json(400, {"ok": False, "error": "Requested file is not an audio file."})
-                return
-            try:
-                with open(file_path, "rb") as f:
-                    content = f.read()
-                mime = "audio/aiff" if file_path.lower().endswith((".aif", ".aiff")) else "audio/wav"
-                self.send_bytes(200, content, mime)
-            except Exception as exc:
-                self.send_json(500, {"ok": False, "error": f"Failed to read audio file: {exc}"})
+            code, data, mime = handle_project_audio_file(file_path)
+            if code == 200:
+                self.send_bytes(code, data, mime)
+            else:
+                self.send_json(code, data)
             return
         if parsed.path == "/api/project-manager/report":
-            # Analysis deliberately consumes Mixing Doctor's cached snapshot:
-            # the UI can refresh safely without adding a second OSC poll.
-            try:
-                from kenn.mixing_doctor import get_latest_session_state
-                from kenn.project_analysis import project_manager_report
-
-                self.send_json(200, project_manager_report(get_latest_session_state()))
-            except Exception as e:
-                self.send_json(500, {"ok": False, "error": str(e)})
+            from kenn.routes.doctor_handler import handle_project_manager_report
+            code, payload = handle_project_manager_report()
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/project-health/report":
-            try:
-                from kenn.mixing_doctor import get_latest_session_state
-                from kenn.project_analysis import project_health_report
-
-                self.send_json(200, project_health_report(get_latest_session_state()))
-            except Exception as e:
-                self.send_json(500, {"ok": False, "error": str(e)})
+            from kenn.routes.doctor_handler import handle_project_health_report
+            code, payload = handle_project_health_report()
+            self.send_json(code, payload)
             return
         if parsed.path == "/api/kenn/automix/pending-completions":
             # D2.3 (docs/KENN_FUTURE_PLAN.md Phase 2), "still open" half:
