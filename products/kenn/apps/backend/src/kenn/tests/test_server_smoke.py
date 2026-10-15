@@ -1080,6 +1080,48 @@ def test_realtime_comparison_endpoint_withholds_either_quiet_source(running_serv
     assert any(item.startswith("Live RMS" if quiet_source == "live" else "Uploaded RMS") for item in result["limitations"])
 
 
+@pytest.mark.parametrize("rms,active", [(-100.0, False), (-80.0, False), (-79.9, True)])
+def test_realtime_recommendation_endpoint_requires_active_audio_before_publishing_signal_context(
+    running_server: str, monkeypatch: pytest.MonkeyPatch, rms: float, active: bool,
+) -> None:
+    # Fresh hot peaks and stereo warnings used to bypass quiet RMS in both advice and its attached context.
+    from kenn import plugin_handoff
+
+    monkeypatch.setattr(plugin_handoff, "_live_contexts", {})
+    session_id = f"recommendation-activity-{uuid.uuid4().hex}"
+    assert plugin_handoff.ingest_live_context({
+        "schema": "kenn.plugin_handoff.v1", "audio_feature_schema": "audio_feature_frame.v1",
+        "kind": "mix_review_snapshot", "assistant_mode": "ask",
+        "peak_dbfs": -0.1, "rms_dbfs": rms, "stereo_correlation": -0.8, "stereo_width": 0.9,
+        "sample_rate": 48000, "analysed_samples": 4800,
+        "plugin_state": {"assistant_mode": "ask", "analysis_enabled": True},
+    }, session_id=session_id)["ok"]
+
+    with urllib.request.urlopen(
+        f"{running_server}/api/realtime-mix-recommendations?session_id={session_id}", timeout=10,
+    ) as response:
+        result = json.loads(response.read())
+
+    assert result["ok"] and result["schema"] == "kenn.realtime_mix_recommendations.v1"
+    assert result["session_id"] == session_id and result["scope"] == "plugin_bus"
+    assert result["advisory_only"] and not result["capture_requested"]
+    assert result["recommendations_available"] is active
+    context = result["live_context"]
+    assert context["freshness"]["current_for_diagnosis"] is True
+    assert context["live_window"]["sample_count"] == 1
+    if active:
+        assert context["rms_dbfs"] == rms and context["peak_dbfs"] == -0.1
+        assert result["recommendations"]
+    else:
+        assert result["recommendations"] == []
+        assert not set(context) & {"rms_dbfs", "peak_dbfs", "stereo_correlation", "stereo_width", "pink_noise_reference", "paired_windows", "fft_spectra"}
+        assert "pink_noise_shape" not in context["live_window"]
+        assert any("at/below -80 dBFS" in item for item in result["limitations"])
+        assert "peak_dbfs" not in {fact["name"] for fact in context["evidence"]["facts"]}
+    # The private handoff still retains measurements for bound analysis consumers.
+    assert plugin_handoff.live_context_summary(session_id)["rms_dbfs"] == rms
+
+
 def test_sample_import_proposal_endpoint_requires_session_id(running_server: str) -> None:
     request = urllib.request.Request(
         f"{running_server}/api/ableton/sample-import/proposal",

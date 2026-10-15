@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from kenn.core.arrangement_analysis import analyze_arrangement_context
+from kenn.core.evidence import plugin_context_for_advice
 from kenn.core.mcp.errors import KennTransportError
 from kenn.core.mcp.realtime import _realtime_context_is_current, _realtime_mix_recommendations
 from kenn.core.realtime_mix_comparison import build_realtime_mix_comparison
@@ -94,6 +95,9 @@ def realtime_mix_recommendations(facade: KennMCPFacade, args: dict[str, Any]) ->
             "error": result.get("error") or "No validated realtime plug-in review was available.",
             "limitations": limitations,
         }
+    published_context = plugin_context_for_advice(context)
+    if published_context and published_context.get("signal_limitation"):
+        limitations.append(published_context["signal_limitation"])
     return {
         "ok": True,
         "schema": "kenn.realtime_mix_recommendations.v1",
@@ -104,7 +108,7 @@ def realtime_mix_recommendations(facade: KennMCPFacade, args: dict[str, Any]) ->
         "advisory_only": True,
         "capture_requested": False,
         "freshness": context.get("freshness") if isinstance(context, dict) else None,
-        "live_context": context,
+        "live_context": published_context,
         "limitations": limitations,
     }
 

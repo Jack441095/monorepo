@@ -6,6 +6,7 @@ import math
 import re
 from typing import Any, Iterable
 
+from kenn.core.evidence import LIVE_ACTIVITY_FLOOR_DBFS, live_context_has_activity
 from kenn.project_analysis import analyze_project_doctor, normalize_session
 
 
@@ -163,6 +164,35 @@ def _safe_plugin_bus(
             "advisory_only": True,
             "capture_requested": False,
         }
+    freshness = context.get("freshness") if isinstance(context.get("freshness"), dict) else {}
+    safe_freshness = {
+        key: freshness[key]
+        for key in ("frame_count", "age_seconds", "ttl_seconds", "current_for_diagnosis", "status")
+        if key in freshness and isinstance(freshness[key], (str, int, float, bool))
+    }
+    live_window = context.get("live_window") if isinstance(context.get("live_window"), dict) else {}
+    safe_live_window = {
+        key: live_window[key]
+        for key in ("status", "sample_count", "window_seconds")
+        if key in live_window and isinstance(live_window[key], (str, int, float, bool))
+    }
+    if not live_context_has_activity(context):
+        # A large peak or unusual stereo statistic can survive near-silence, so keep only provenance and window health here.
+        return {
+            "status": "current",
+            "scope": "plugin_bus",
+            "metrics": {},
+            "freshness": safe_freshness or None,
+            "live_window": safe_live_window or None,
+            "pink_noise_reference": None,
+            "recommendations": [],
+            "advisory_only": True,
+            "capture_requested": False,
+            "live_target_inference_allowed": False,
+            "limitations": [
+                f"RMS is missing, invalid, or at/below {LIVE_ACTIVITY_FLOOR_DBFS:g} dBFS; signal-derived metrics, shape evidence, and recommendations are withheld until RMS rises above the activity floor."
+            ],
+        }
     metrics = {
         key: context[key]
         for key in (
@@ -187,18 +217,6 @@ def _safe_plugin_bus(
             ]
         if item:
             recommendations.append(item)
-    freshness = context.get("freshness") if isinstance(context.get("freshness"), dict) else {}
-    safe_freshness = {
-        key: freshness[key]
-        for key in ("frame_count", "age_seconds", "ttl_seconds", "current_for_diagnosis", "status")
-        if key in freshness and isinstance(freshness[key], (str, int, float, bool))
-    }
-    live_window = context.get("live_window") if isinstance(context.get("live_window"), dict) else {}
-    safe_live_window = {
-        key: live_window[key]
-        for key in ("status", "sample_count", "window_seconds")
-        if key in live_window and isinstance(live_window[key], (str, int, float, bool))
-    }
     pink_shape = _safe_pink_noise_shape(live_window.get("pink_noise_shape"))
     if pink_shape is not None:
         safe_live_window["pink_noise_shape"] = pink_shape

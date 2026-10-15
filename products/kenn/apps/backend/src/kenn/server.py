@@ -1015,6 +1015,7 @@ class Handler(BaseHTTPRequestHandler):
             result = live_review_summary(session_id)
             context = result.get("live_context") if isinstance(result, dict) else None
             from kenn.core.mcp_facade import _realtime_context_is_current, _realtime_mix_recommendations
+            from kenn.core.evidence import plugin_context_for_advice
 
             recommendations = (
                 _realtime_mix_recommendations(context)
@@ -1040,6 +1041,9 @@ class Handler(BaseHTTPRequestHandler):
                     "limitations": limitations,
                 })
                 return
+            published_context = plugin_context_for_advice(context)
+            if published_context and published_context.get("signal_limitation"):
+                limitations.append(published_context["signal_limitation"])
             self.send_json(200, {
                 "ok": True,
                 "schema": "kenn.realtime_mix_recommendations.v1",
@@ -1050,7 +1054,7 @@ class Handler(BaseHTTPRequestHandler):
                 "advisory_only": True,
                 "capture_requested": False,
                 "freshness": context.get("freshness") if isinstance(context, dict) else None,
-                "live_context": context,
+                "live_context": published_context,
                 "limitations": limitations,
             })
             return

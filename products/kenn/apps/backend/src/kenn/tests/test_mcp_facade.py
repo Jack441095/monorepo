@@ -1633,10 +1633,38 @@ def test_realtime_recommendation_abstains_on_retained_stale_context() -> None:
     assert _realtime_mix_recommendation(context) is None
 
 
+@pytest.mark.parametrize(
+    "rms",
+    ["missing", None, True, False, float("nan"), float("inf"), -float("inf"), 10 ** 1000, -100.0, -80.0],
+)
+def test_quiet_or_unqualified_context_cannot_promote_hot_bus_findings(rms) -> None:
+    # Peak, stereo, clipping and pink-shape facts must not escape when RMS cannot establish activity.
+    context = {
+        "peak_dbfs": -0.1,
+        "rms_dbfs": -18.0,
+        "clipped_samples": 3,
+        "stereo_correlation": -0.2,
+        "stereo_width": 0.9,
+        "freshness": {"current_for_diagnosis": True},
+        "pink_noise_reference": {
+            "largest_deviation": {"center_hz": 315.0, "deviation_db": 5.0},
+        },
+        "live_window": {"status": "stable", "sample_count": 4},
+    }
+    if rms == "missing":
+        context.pop("rms_dbfs")
+    else:
+        context["rms_dbfs"] = rms
+
+    assert _realtime_mix_recommendations(context) == []
+    assert _realtime_mix_recommendation(context) is None
+
+
 def test_realtime_recommendations_promote_all_current_bus_warnings() -> None:
     context = {
         "schema": "kenn.live_mix_context.v1",
         "peak_dbfs": -0.1,
+        "rms_dbfs": -18.0,
         "clipped_samples": 3,
         "stereo_correlation": -0.2,
         "stereo_width": 0.9,
@@ -2149,6 +2177,45 @@ def test_mcp_realtime_mix_recommendations_are_standalone_and_read_only() -> None
     assert all(item["category"] == "realtime_mix" for item in payload["recommendations"])
     assert client.calls[-1] == ("GET", "/api/plugin-live-review", {"session_id": "mix-session"})
     assert all(method == "GET" for method, _path, _query in client.calls)
+
+
+def test_mcp_realtime_mix_recommendations_withhold_quiet_signal_but_keep_capture_provenance() -> None:
+    client = FakeKennHTTP()
+    context = {
+        "schema": "kenn.live_mix_context.v1",
+        "scope": "plugin_bus",
+        "conversation_id": "conversation-1",
+        "host_track_name": "Bus",
+        "peak_dbfs": -0.1,
+        "rms_dbfs": -80.0,
+        "clipped_samples": 3,
+        "stereo_correlation": -0.2,
+        "stereo_width": 0.9,
+        "sample_rate": 48000.0,
+        "analysed_samples": 48000,
+        "freshness": {"status": "current", "current_for_diagnosis": True, "age_seconds": 0.2},
+        "live_window": {"status": "stable", "sample_count": 4, "window_seconds": 0.4,
+                        "pink_noise_shape": {"largest_median_deviation": {"center_hz": 315.0, "median_deviation_db": 5.0}}},
+        "pink_noise_reference": {"largest_deviation": {"center_hz": 315.0, "deviation_db": 5.0}},
+    }
+    client.get = lambda path, query=None: {
+        "ok": True, "session_id": (query or {}).get("session_id", ""), "live_context": context,
+    }
+    response = _call(KennMCPFacade(client), 122, "realtime_mix_recommendations", {"session_id": "mix-session"})
+    payload = json.loads(response["result"]["content"][0]["text"])
+
+    published = payload["live_context"]
+    assert payload["ok"] is True and payload["recommendations"] == []
+    assert payload["recommendations_available"] is False
+    assert payload["session_id"] == "mix-session" and payload["scope"] == "plugin_bus"
+    assert payload["advisory_only"] is True and payload["capture_requested"] is False
+    assert published["scope"] == "plugin_bus" and published["conversation_id"] == "conversation-1"
+    assert published["freshness"]["current_for_diagnosis"] is True
+    assert published["live_window"] == {"status": "stable", "sample_count": 4, "window_seconds": 0.4}
+    assert "signal_limitation" in published
+    assert not {"peak_dbfs", "rms_dbfs", "clipped_samples", "stereo_correlation", "stereo_width", "pink_noise_reference"} & published.keys()
+    assert all(fact["name"] not in {"peak_dbfs", "rms_dbfs", "stereo_correlation", "stereo_width"}
+               for fact in published["evidence"]["facts"])
 
 
 def test_mcp_realtime_mix_comparison_is_scope_labelled_and_read_only() -> None:

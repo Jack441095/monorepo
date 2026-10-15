@@ -63,16 +63,55 @@ class EvidencePacket:
         return payload
 
 
-def from_plugin_context(context: dict[str, Any] | None) -> EvidencePacket | None:
-    """Convert the validated plug-in snapshot into explicit bus evidence."""
-    if not isinstance(context, dict) or context.get("schema") != "kenn.live_mix_context.v1":
-        return None
+def live_context_has_activity(context: dict[str, Any] | None) -> bool:
+    """Return whether finite numeric bus RMS exceeds the existing -80 dBFS activity floor."""
+    if not isinstance(context, dict):
+        # Missing telemetry cannot establish measured activity.
+        return False
     rms = context.get("rms_dbfs")
     try:
         rms_value = float(rms) if not isinstance(rms, bool) and isinstance(rms, (int, float)) else None
     except OverflowError:
         rms_value = None  # An unrepresentable integer cannot establish the activity floor.
-    has_activity = rms_value is not None and math.isfinite(rms_value) and rms_value > LIVE_ACTIVITY_FLOOR_DBFS
+    return rms_value is not None and math.isfinite(rms_value) and rms_value > LIVE_ACTIVITY_FLOOR_DBFS
+
+
+def plugin_context_for_advice(context: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Copy a published bus context, retaining only capture provenance when activity is unqualified.
+
+    Raw handoff history remains available to measurement consumers. Advice responses
+    use this boundary so nested FFTs, paired windows or cached evidence cannot expose
+    signal facts after the top-level meters have been withheld.
+    """
+    if not isinstance(context, dict):
+        # Preserve absence instead of manufacturing a valid-looking empty capture.
+        return None
+    if live_context_has_activity(context):
+        return dict(context)
+    safe = {
+        key: context[key]
+        for key in (
+            "schema", "scope", "assistant_mode", "plugin_state", "conversation_id", "host_track_name",
+            "sample_rate", "analysed_samples", "age_seconds", "audio_age_seconds", "freshness", "measurement_window",
+        )
+        if key in context
+    }
+    window = context.get("live_window")
+    if isinstance(window, dict):
+        safe["live_window"] = {key: window[key] for key in ("status", "sample_count", "window_seconds") if key in window}
+    safe["signal_limitation"] = "RMS is missing, invalid or at/below -80 dBFS; signal-derived measurements and recommendations are withheld."
+    # Rebuild rather than trust a cached packet that could predate the activity gate.
+    packet = from_plugin_context(safe)
+    if packet is not None:
+        safe["evidence"] = packet.payload()
+    return safe
+
+
+def from_plugin_context(context: dict[str, Any] | None) -> EvidencePacket | None:
+    """Convert the validated plug-in snapshot into explicit bus evidence."""
+    if not isinstance(context, dict) or context.get("schema") != "kenn.live_mix_context.v1":
+        return None
+    has_activity = live_context_has_activity(context)
     fields = (
         ("peak_dbfs", "dBFS"), ("rms_dbfs", "dBFS"), ("crest_db", "dB"),
         ("transient_ratio", "ratio"), ("clipped_samples", "samples"),

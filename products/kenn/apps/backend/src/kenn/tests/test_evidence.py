@@ -7,6 +7,8 @@ from kenn.core.evidence import (
     from_audio_classification_context,
     from_mix_review_context,
     from_plugin_context,
+    live_context_has_activity,
+    plugin_context_for_advice,
     from_realtime_mix_comparison,
     from_stem_masking_context,
     relevant_observations,
@@ -407,3 +409,45 @@ def test_mix_review_evidence_carries_the_live_window_it_compared() -> None:
     facts = {fact.name: fact.value for fact in packet.facts}
     assert facts["realtime_live_window_dropped_samples"] == 256.0
     assert facts["realtime_live_window_end_sample"] == 9_600.0
+
+
+@pytest.mark.parametrize("rms", [None, True, float("nan"), float("inf"), -float("inf"), 10 ** 1000, -100.0, -80.0])
+def test_advice_context_withholds_nested_signal_data_and_rebuilds_cached_evidence(rms) -> None:
+    # Removing only top-level meters left FFTs, paired windows and old packets available to advice clients.
+    context = {
+        "schema": "kenn.live_mix_context.v1", "scope": "plugin_bus", "conversation_id": "owned-session",
+        "host_track_name": "Bass", "rms_dbfs": rms, "peak_dbfs": -0.1,
+        "sample_rate": 48000, "analysed_samples": 4800, "age_seconds": 0.1,
+        "freshness": {"current_for_diagnosis": True},
+        "measurement_window": {"start_sample": 0, "end_sample": 4800, "source_generation": 3},
+        "live_window": {"status": "stable", "sample_count": 4, "window_seconds": 24.0,
+                        "pink_noise_shape": {"largest_median_deviation": {"center_hz": 315, "median_deviation_db": 6}}},
+        "fft_spectra": {"bins": [1.0]}, "paired_windows": [{"peak_dbfs": -0.1}],
+        "pink_noise_reference": {"largest_deviation": {"center_hz": 315, "deviation_db": 6}},
+        "evidence": {"facts": [{"name": "peak_dbfs", "value": -0.1}]},
+        "future_signal_metric": 42,
+    }
+    published = plugin_context_for_advice(context)
+
+    assert not live_context_has_activity(context)
+    assert published["conversation_id"] == "owned-session" and published["host_track_name"] == "Bass"
+    assert published["freshness"] == context["freshness"]
+    assert published["measurement_window"] == context["measurement_window"]
+    assert published["live_window"] == {"status": "stable", "sample_count": 4, "window_seconds": 24.0}
+    assert not set(published) & {"rms_dbfs", "peak_dbfs", "fft_spectra", "paired_windows", "pink_noise_reference", "future_signal_metric"}
+    assert {fact["name"] for fact in published["evidence"]["facts"]} >= {"sample_rate", "measurement_window_source_generation"}
+    assert "peak_dbfs" not in {fact["name"] for fact in published["evidence"]["facts"]}
+    assert "at/below -80 dBFS" in published["signal_limitation"]
+    assert context["evidence"]["facts"][0]["name"] == "peak_dbfs"
+    assert "pink_noise_shape" in context["live_window"]
+
+
+def test_advice_context_keeps_active_signal_data_and_preserves_missing_context() -> None:
+    context = {"rms_dbfs": -79.9, "peak_dbfs": -0.1, "pink_noise_reference": {"status": "measured"}}
+    published = plugin_context_for_advice(context)
+
+    assert live_context_has_activity(context)
+    assert published == context and published is not context
+    assert plugin_context_for_advice(None) is None
+    assert not live_context_has_activity(None)
+    assert not live_context_has_activity({})

@@ -9,7 +9,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from kenn.core.evidence import MAX_PLUGIN_CONTEXT_AGE_SECONDS
+from kenn.core.evidence import MAX_PLUGIN_CONTEXT_AGE_SECONDS, live_context_has_activity
 
 
 def _realtime_context_is_current(live_context: dict[str, Any]) -> bool:
@@ -45,8 +45,8 @@ def _realtime_mix_recommendation(live_context: dict[str, Any]) -> Any | None:
 
     # The handoff is retained longer than it is diagnostically current so a
     # client can inspect bounded history/recovery state.  Never phrase an old
-    # bus snapshot as a current mix recommendation.
-    if not _realtime_context_is_current(live_context):
+    # or quiet bus snapshot as a current mix recommendation.
+    if not _realtime_context_is_current(live_context) or not live_context_has_activity(live_context):
         return None
 
     reference = live_context.get("pink_noise_reference")
@@ -102,7 +102,8 @@ def _realtime_mix_recommendations(live_context: dict[str, Any]) -> list[Any]:
     """
     from kenn.project_analysis import Recommendation
 
-    if not _realtime_context_is_current(live_context):
+    if not _realtime_context_is_current(live_context) or not live_context_has_activity(live_context):
+        # Hot peaks and stereo statistics alone do not establish enough signal to support advice.
         return []
 
     metrics = live_context
