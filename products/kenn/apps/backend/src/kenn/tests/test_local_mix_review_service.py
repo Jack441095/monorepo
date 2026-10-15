@@ -31,6 +31,20 @@ def _wav_bytes(*, amplitude: float = 0.99, sample_rate: int = 8000, seconds: int
     return output.getvalue()
 
 
+def _antiphase_wav_bytes(*, amplitude: float = 0.2, sample_rate: int = 8000, seconds: int = 1, frequency_hz: float = 100) -> bytes:
+    left = [int(amplitude * math.sin(2 * math.pi * frequency_hz * index / sample_rate) * 32767) for index in range(sample_rate * seconds)]
+    payload = struct.pack("<" + "h" * (2 * len(left)), *(sample for value in left for sample in (value, -value)))
+    from io import BytesIO
+
+    output = BytesIO()
+    with wave.open(output, "wb") as handle:
+        handle.setnchannels(2)
+        handle.setsampwidth(2)
+        handle.setframerate(sample_rate)
+        handle.writeframes(payload)
+    return output.getvalue()
+
+
 def _multipart_upload(parts: list[tuple[str, str, bytes]]) -> tuple[str, bytes]:
     """Encode browser field names while letting regressions vary attachment order and validity."""
     boundary = "kenn-browser-upload"
@@ -350,6 +364,49 @@ def test_silent_reference_is_ungraded_instead_of_a_perfect_match():
     assert result["reference_comparison"]["reference_match_score"]["points_available"] == 0.0
     reference = next(u for u in result["grade"]["ungraded"] if u["part"] == "reference_match")
     assert "reference RMS" in reference["reason"]
+
+
+@pytest.mark.parametrize("quiet_source", ["mix", "reference"])
+def test_near_silent_source_withholds_comparison_metrics_below_the_existing_significance_floor(quiet_source):
+    audible = _wav_bytes(amplitude=0.2, frequency_hz=100)
+    near_silent = _wav_bytes(amplitude=0.0005, frequency_hz=3000)
+    mix = near_silent if quiet_source == "mix" else audible
+    reference_audio = near_silent if quiet_source == "reference" else audible
+
+    result = compare_reference_audio(mix, "mix.wav", reference_audio, "quiet-reference.wav")
+    comparison = result["reference_comparison"]
+    score = comparison["reference_match_score"]
+
+    assert score["points_available"] == 0.0
+    assert comparison["largest_spectral_difference"] is None
+    assert comparison["ltas_40_band_deltas"] == []
+    assert comparison["lufs_delta_db"] is None
+    assert comparison["pink_noise_reference"] is None
+    assert "matching_gains_db" not in comparison
+    reference = next(u for u in result["grade"]["ungraded"] if u["part"] == "reference_match")
+    assert f"{quiet_source} RMS" in reference["reason"]
+    assert comparison["largest_ltas_difference"] is None
+    assert comparison["eq_bands"] == []
+    assert not {"tonal_balance_7band", "dynamics", "stereo", "coaching", "recommendations", "eq8_preset_adv_base64"} & comparison.keys()
+
+
+def test_antiphase_stereo_below_the_scorer_floor_withholds_comparison_details():
+    antiphase = _antiphase_wav_bytes()
+    audible = _wav_bytes(amplitude=0.2, frequency_hz=100)
+
+    result = compare_reference_audio(antiphase, "mix.wav", audible, "reference.wav")
+    comparison = result["reference_comparison"]
+    reference = next(u for u in result["grade"]["ungraded"] if u["part"] == "reference_match")
+
+    assert comparison["reference_match_score"]["points_available"] == 0.0
+    assert "mix RMS" in reference["reason"]
+    assert comparison["largest_spectral_difference"] is None
+    assert comparison["largest_ltas_difference"] is None
+    assert comparison["ltas_40_band_deltas"] == []
+    assert comparison["eq_bands"] == []
+    assert comparison["lufs_delta_db"] is None
+    assert comparison["pink_noise_reference"] is None
+    assert not {"tonal_balance_7band", "matching_gains_db", "dynamics", "stereo", "coaching", "recommendations", "eq8_preset_adv_base64"} & comparison.keys()
 
 
 def test_reference_points_follow_this_upload_and_do_not_leak_into_another_review(tmp_path):

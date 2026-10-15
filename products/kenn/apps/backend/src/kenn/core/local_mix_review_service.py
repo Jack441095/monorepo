@@ -30,6 +30,7 @@ from kenn.paths import PACKAGES_ROOT
 
 
 _SERVICE_ROOT = PACKAGES_ROOT / "mix-review"
+_REFERENCE_MIN_RMS_DBFS = -60.0  # Match the existing reference scorer's significance boundary.
 _ENGINE_PATH = _SERVICE_ROOT / "core" / "local_engine.py"
 _MASKING_PATH = _SERVICE_ROOT / "core" / "masking_analysis.py"
 _MATCHING_PATH = _SERVICE_ROOT / "core" / "reference_matching.py"
@@ -268,6 +269,30 @@ def compare_reference_audio(
 
     mix_report, reference_report = reports
     mix_spectral, reference_spectral = spectral_reports
+
+    matching_result = None
+    try:
+        # A bare `from reference_matching import` only worked when some other import had put
+        # mix-review/core on sys.path; the companion never does, so Reference Match quietly lost
+        # its tonal balance, matching gains and EQ Eight preset (found Sept 2026).
+        compare_mix_to_reference = _matching_engine().compare_mix_to_reference
+        matching_result = compare_mix_to_reference(
+            mix_bytes,
+            reference_bytes,
+            mix_name=Path(mix_filename).name[:256],
+            ref_name=Path(reference_filename).name[:256],
+        )
+    except Exception:
+        # A failed optional matcher leaves comparison details unavailable rather than guessed.
+        matching_result = None
+
+    dynamics = (matching_result or {}).get("dynamics") or {}
+    comparison_is_significant = all(
+        (rms := _finite((dynamics.get(source) or {}).get("rms_dbfs"))) is not None
+        and rms > _REFERENCE_MIN_RMS_DBFS
+        for source in ("mix", "reference")
+    )
+
     mix_spectral_data = mix_spectral.get("spectral") or {}
     reference_spectral_data = reference_spectral.get("spectral") or {}
     mix_bands = mix_spectral_data.get("band_energy_dbfs") or {}
@@ -284,12 +309,14 @@ def compare_reference_audio(
             "delta_db": round(mix_level - reference_level, 2),
         })
     band_deltas.sort(key=lambda item: abs(float(item["delta_db"])), reverse=True)
+    if not comparison_is_significant:
+        band_deltas = []
     largest = band_deltas[0] if band_deltas else None
-    ltas_deltas = _ltas_comparison(mix_spectral_data, reference_spectral_data)
+    ltas_deltas = _ltas_comparison(mix_spectral_data, reference_spectral_data) if comparison_is_significant else []
     largest_ltas = ltas_deltas[0] if ltas_deltas else None
     pink_noise = mix_spectral_data.get("pink_noise_reference")
     pink_noise_summary = None
-    if isinstance(pink_noise, dict):
+    if comparison_is_significant and isinstance(pink_noise, dict):
         largest_pink = pink_noise.get("largest_deviation")
         if isinstance(largest_pink, dict):
             pink_noise_summary = {
@@ -309,23 +336,11 @@ def compare_reference_audio(
             }
     mix_lufs = _number((mix_report.get("metrics") or {}).get("integrated_lufs"))
     reference_lufs = _number((reference_report.get("metrics") or {}).get("integrated_lufs"))
-    lufs_delta = round(mix_lufs - reference_lufs, 2) if mix_lufs is not None and reference_lufs is not None else None
-
-    matching_result = None
-    try:
-        # A bare `from reference_matching import` only worked when some other import had put
-        # mix-review/core on sys.path; the companion never does, so Reference Match quietly lost
-        # its tonal balance, matching gains and EQ Eight preset (found Sept 2026).
-        compare_mix_to_reference = _matching_engine().compare_mix_to_reference
-        matching_result = compare_mix_to_reference(
-            mix_bytes,
-            reference_bytes,
-            mix_name=Path(mix_filename).name[:256],
-            ref_name=Path(reference_filename).name[:256],
-        )
-    except Exception:
-        # Spectral/loudness comparisons remain useful if the optional matching engine fails; its grade stays absent.
-        matching_result = None
+    lufs_delta = (
+        round(mix_lufs - reference_lufs, 2)
+        if comparison_is_significant and mix_lufs is not None and reference_lufs is not None
+        else None
+    )
 
     reference_score = {
         "points": 0.0,
@@ -345,17 +360,18 @@ def compare_reference_audio(
     }
     if matching_result and matching_result.get("ok"):
         reference_score = matching_result.get("reference_match_score") or reference_score
-        ref_comp.update({
-            # Keep the measured gaps and sources alongside the combined grade's summary of this part.
-            "reference_match_score": reference_score,
-            "tonal_balance_7band": matching_result.get("tonal_balance"),
-            "matching_gains_db": matching_result.get("matching_gains_db"),
-            "dynamics": matching_result.get("dynamics"),
-            "stereo": matching_result.get("stereo"),
-            "coaching": matching_result.get("coaching_summary"),
-            "recommendations": matching_result.get("recommendations"),
-            "eq8_preset_adv_base64": matching_result.get("eq8_preset_adv_base64"),
-        })
+        ref_comp["reference_match_score"] = reference_score
+        if comparison_is_significant:
+            # Keep actionable gaps beside the grade only when both renders clear the significance floor.
+            ref_comp.update({
+                "tonal_balance_7band": matching_result.get("tonal_balance"),
+                "matching_gains_db": matching_result.get("matching_gains_db"),
+                "dynamics": matching_result.get("dynamics"),
+                "stereo": matching_result.get("stereo"),
+                "coaching": matching_result.get("coaching_summary"),
+                "recommendations": matching_result.get("recommendations"),
+                "eq8_preset_adv_base64": matching_result.get("eq8_preset_adv_base64"),
+            })
 
     return {
         "schema": "kenn.mix_review.reference_comparison.v1",
