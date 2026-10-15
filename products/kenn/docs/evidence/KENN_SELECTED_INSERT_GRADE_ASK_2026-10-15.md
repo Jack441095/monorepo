@@ -122,3 +122,59 @@ Owned paths: backend `core/live_track_analysis.py`, `core/plugin_grade.py`,
 `tests/test_live_track_analysis.py`; frontend `e2e/plugin_audio.e2e.ts`; native
 `Source/PluginProcessor.cpp`, `Source/test_command_integration_main.cpp`; this
 receipt and `KENN_PLAN.md`. Unrelated untracked research is excluded.
+
+## Installed-host rehearsal and control visibility
+
+The 15 Oct follow-up built and installed arm64 Release VST3 and AU wrappers from
+`7aed7de1`, with direct Live writes compiled off. Existing installed bundles were
+backed up; both replacements passed ad-hoc signature verification. Read-only
+process inspection confirmed that the restarted Live host loaded the installed
+VST3. The VST3 executable SHA-256 was
+`eee27089f52272472d5d3143f45cf644bc38d9648652105891e1753eeaa53b48`;
+the AU executable was
+`7fa5ea8bca6e50d9ba7aba2849f0cb6ad176ca770349935b2a19ab169cb6d179`.
+
+The owner scheduled this rehearsal on a disposable copy of their demo set.
+The isolated companion used real OSC readback with DAW control disabled, the
+answer model disabled and no fixture audio capture paths. Live was connected at
+44.1 kHz. The embedded frontend rendered and exposed the selected launch insert,
+but the owner could not identify Start: it reused Refresh's small muted text with
+no border, background or vertical padding. The initial blank editor resolved
+without a code change; its cause has not been established.
+
+`KennLiveStatus.vue` now gives the existing Start/Pause button a green border,
+background, padding, minimum height, keyboard focus outline and disabled style.
+The button label, native control requests, analysis and publication behavior are
+unchanged. The production build and **42 scoped frontend unit tests passed**.
+The existing Chrome FakeLive test passed again (**1 test**, 45.0 seconds / 52.1
+seconds total), including Start/Pause, explicit source changes, grade answers,
+mono/stale/foreign abstention and FakeLive Apply/readback/Undo. Its generated
+screenshot was inspected for the visible button; it is not committed.
+
+The first browser invocation could not start its fixture server: the subprocess
+selected x86_64 Python against the arm64 NumPy installation. Starting the owned
+fixture companion with `arch -arm64` resolved that harness failure without
+dependency changes. The scoped unit command remains the one listed above;
+the E2E command used the owned isolated FakeLive companion on port 18938, which
+was stopped after the passing run.
+
+The real host check is still incomplete: the last owner-scoped source response
+had no published features and reported `waiting_for_publication`. The owner
+still could not see the green button after closing and reopening only the editor;
+a full Live restart is the next check. Retention of the old embedded page is a
+hypothesis, not a demonstrated cache diagnosis. The companion's served index was
+checked byte-for-byte against the new build (SHA-256
+`7f930ce65f04c4d0e841e8418a1ad32e06318a5ddfcfc4bbfcd218d1455ad987`).
+An existing file-analysis result is not evidence of a current insert grade.
+
+Conditions remained battery power, 31% and discharging. No callback or sustained
+publisher timing gate was run or closed. The loudness candidate stays disabled;
+actual host Start, current measured evidence, grounded Ask and Pause still need
+verification. GitHub core run `38747276651` was rechecked and still reports that
+jobs could not start because of failed account payments or spending limits.
+No CI settings changed. Private audio, set names, local session paths and runtime
+insert/conversation identifiers are excluded from this receipt.
+
+This follow-up changes only `KennLiveStatus.vue`, `KENN_PLAN.md` and this receipt.
+It changes CSS presentation, with no DSP, callback, memory, HTTP cadence,
+dependency or permission change.

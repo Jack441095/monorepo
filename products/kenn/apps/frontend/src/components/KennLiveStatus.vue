@@ -33,7 +33,7 @@
         </select>
       </label>
       <span role="status">{{ pluginAudioStatus }}<template v-if="selectedPluginSource"> · {{ selectedPluginSource.audio_age_seconds.toFixed(1) }} s old</template></span>
-      <button type="button" class="live-status__refresh-btn" :disabled="pluginAudioBusy || !!pluginSourceError"
+      <button type="button" class="live-status__audio-btn" :disabled="pluginAudioBusy || !!pluginSourceError"
         @click="setPluginAudioEnabled(!pluginAudioRequestedEnabled)">
         {{ pluginAudioBusy ? 'Requesting…' : pluginAudioRequestedEnabled ? 'Pause audio analysis' : 'Start audio analysis' }}
       </button>
@@ -157,6 +157,23 @@ onBeforeUnmount(() => {
   }
 
   &__audio-hint { display: block; margin-top: 0.08rem; font-size: 0.1rem; color: var(--muted-text); }
+
+  &__audio-btn {
+    min-height: 0.36rem;
+    padding: 0.06rem 0.12rem;
+    border: 1px solid rgba(55, 214, 122, 0.6);
+    border-radius: 0.06rem;
+    background: color-mix(in srgb, #37d67a 15%, var(--floating-bg));
+    color: #37d67a;
+    font: inherit;
+    font-size: 0.12rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: color-mix(in srgb, #37d67a 25%, var(--floating-bg)); }
+    &:focus-visible { outline: 2px solid #37d67a; outline-offset: 2px; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
 
   &__grade {
     flex-basis: 100%;
