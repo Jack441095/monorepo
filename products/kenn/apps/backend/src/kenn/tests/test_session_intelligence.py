@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
+import pytest
+
 from kenn.core.session_context import build_session_context
 from kenn.core.session_intelligence import SCHEMA, build_session_intelligence, explanation_sections, retrieval_sources_from_cache
 
@@ -18,7 +22,7 @@ def _context() -> dict:
             "locators": [{"index": 0, "name": "Drop", "time_beats": 33.0}],
             "return_tracks": [],
         },
-        plugin_frames=[{"schema": "kenn.live_mix_context.v1", "peak_dbfs": -1.2, "stereo_width": 0.7}],
+        plugin_frames=[{"schema": "kenn.live_mix_context.v1", "peak_dbfs": -1.2, "rms_dbfs": -18.0, "stereo_width": 0.7}],
     )
 
 
@@ -255,3 +259,42 @@ def test_retrieval_provenance_cache_keeps_only_source_labels_and_classes() -> No
         {"source_id": "Live 12 Manual.pdf", "evidence_class": "official_ableton_manual", "title": "Routing"},
         {"source_id": "mixing.md", "evidence_class": "curated_kenn_note"},
     ]
+
+
+@pytest.mark.parametrize("rms", ["missing", None, True, float("nan"), float("inf"), -float("inf"), 10 ** 1000, -100.0, -80.0])
+def test_intelligence_withholds_quiet_signal_evidence_from_older_canonical_context(rms) -> None:
+    # Persisted contexts built before the ingress gate still contain both quiet meters and apparently valid pink observations.
+    context = _context()
+    measurement = {
+        "kind": "plugin_feature_frame", "schema": "kenn.live_mix_context.v1",
+        "metrics": {"peak_dbfs": -0.1, "rms_dbfs": rms, "stereo_correlation": -0.9},
+        "pink_noise_reference": {"largest_deviation": {"center_hz": 315.0, "deviation_db": 5.0}},
+    }
+    if rms == "missing":
+        measurement["metrics"].pop("rms_dbfs")
+    context["measurements"] = [measurement]
+    saved = deepcopy(context)
+
+    brief = build_session_intelligence(context)
+
+    assert brief["status"] == "current"
+    assert brief["audio_evidence"] == []
+    assert brief["mixdown_coach"] is None
+    assert brief["snapshot"]["track_count"] == 2
+    assert brief["track_roles"][0]["role"] == "kick"
+    assert brief["mutation_authorized"] is False
+    assert context == saved
+
+
+def test_intelligence_keeps_signal_evidence_just_above_live_activity_floor() -> None:
+    context = _context()
+    context["measurements"] = [{
+        "kind": "plugin_feature_frame", "schema": "kenn.live_mix_context.v1",
+        "metrics": {"peak_dbfs": -0.1, "rms_dbfs": -79.9},
+        "pink_noise_reference": {"largest_deviation": {"center_hz": 315.0, "deviation_db": 5.0}},
+    }]
+
+    brief = build_session_intelligence(context)
+
+    assert brief["audio_evidence"][0]["metrics"] == {"peak_dbfs": -0.1, "rms_dbfs": -79.9}
+    assert brief["audio_evidence"][1]["kind"] == "pink_noise_shape"

@@ -59,7 +59,7 @@ def test_formulate_surgical_remediation_phase_and_fader_overload():
             {"index": 1, "name": "Sub Bass", "volume": 0.80, "panning": 0.30, "devices": []},
         ]
     }
-    meters = {"peak_dbfs": -0.2, "stereo_correlation": -0.35}
+    meters = {"peak_dbfs": -0.2, "rms_dbfs": -18.0, "stereo_correlation": -0.35}
     res = SessionDoctor.formulate_surgical_remediation_proposal(session_state, meters=meters, session_id="test_remedy_phase")
     assert res["ok"] is True
     prop = res["proposal"]

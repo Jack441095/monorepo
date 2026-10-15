@@ -400,6 +400,46 @@ def test_mcp_context_can_include_explicit_realtime_plugin_evidence() -> None:
     assert ("GET", "/api/plugin-live-review", {"session_id": "mix-session"}) in client.calls
 
 
+@pytest.mark.parametrize("rms,active", [(-100.0, False), (-80.0, False), (-79.9, True)])
+@pytest.mark.parametrize("tool", ["kenn_context", "kenn_session_intelligence"])
+def test_mcp_context_and_intelligence_withhold_quiet_plugin_signal(rms, active, tool) -> None:
+    # Both context reads and derived briefs previously carried quiet metrics and pink shape to reasoning clients.
+    class ActivityHTTP(FakeKennHTTP):
+        def get(self, path: str, query: dict | None = None) -> dict:
+            result = super().get(path, query)
+            if path == "/api/plugin-live-review":
+                result["live_context"].update({
+                    "rms_dbfs": rms, "peak_dbfs": -0.1, "stereo_correlation": -0.9,
+                    "measurement_window": {"end_sample": 4800, "source_generation": 3},
+                })
+            return result
+
+    client = ActivityHTTP()
+    response = _call(KennMCPFacade(client), 10, tool, {"session_id": "context-test", "plugin_session_id": "mix-session"})
+    result = json.loads(response["result"]["content"][0]["text"])
+
+    if tool == "kenn_context":
+        measurement = next(item for item in result["measurements"] if item["kind"] == "plugin_feature_frame")
+        assert measurement["freshness"]["frame_count"] == 4
+        assert measurement["measurement_window"]["source_generation"] == 3
+        assert result["tracks"][0]["name"] == "4-Audio"
+        if active:
+            assert measurement["metrics"]["rms_dbfs"] == rms
+            assert "pink_noise_reference" in measurement
+        else:
+            assert measurement["metrics"] == {}
+            assert "pink_noise_reference" not in measurement and "spectrum_bands" not in measurement
+            assert "pink_noise_shape" not in measurement["live_window"]
+            assert "signal_limitation" in measurement
+    else:
+        assert result["status"] == "current" and not result["mutation_authorized"]
+        assert result["snapshot"]["track_count"] == 1
+        assert bool(result["audio_evidence"]) is active
+    if not active:
+        assert any("at/below -80 dBFS" in item for item in result["limitations"])
+    assert all(method == "GET" for method, _path, _query in client.calls)
+
+
 def test_mcp_context_carries_scope_labelled_realtime_mix_comparison() -> None:
     client = FakeKennHTTP()
     facade = KennMCPFacade(client)

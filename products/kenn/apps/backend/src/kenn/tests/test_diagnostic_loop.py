@@ -37,7 +37,7 @@ def _result(loop: dict, verdict: str = "contradicts") -> dict:
 
 def test_current_measurement_ranks_a_test_but_never_claims_a_cause() -> None:
     context = _context(plugin_frame={
-        "schema": "audio_feature_frame.v1", "peak_dbfs": -0.1,
+        "schema": "audio_feature_frame.v1", "peak_dbfs": -0.1, "rms_dbfs": -18.0,
         "clipped_samples": 8, "stereo_correlation": 0.8,
     })
 

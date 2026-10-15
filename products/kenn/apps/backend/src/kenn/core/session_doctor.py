@@ -11,11 +11,28 @@ Audits live session topology and real-time metering telemetry:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import math
 from typing import Any, Dict, List, Optional
+
+from kenn.core.evidence import live_context_has_activity
 
 
 BASS_KEYWORDS = frozenset({"bass", "sub", "808", "kick", "low"})
 HIGH_PASS_DEVICES = frozenset({"eq eight", "channel eq", "auto filter", "eq three", "filter delay"})
+
+
+def _finite_meter(value: Any) -> float | None:
+    """Return a finite numeric meter value, leaving invalid observations unavailable."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        # Missing or malformed meters are not zero-valued observations.
+        return None
+    try:
+        number = float(value)
+    except OverflowError:
+        # An unrepresentable integer cannot ground a meter finding.
+        return None
+    # NaN and infinity do not describe an observed signal level.
+    return number if math.isfinite(number) else None
 
 
 @dataclass
@@ -57,11 +74,11 @@ class SessionDoctor:
         tracks = session_state.get("tracks", [])
         issues: List[Issue] = []
 
-        # 1. Master bus & meter checks if available
-        if meters:
-            peak = meters.get("peak_dbfs", -60.0)
-            corr = meters.get("stereo_correlation", 1.0)
-            if peak > -0.5:
+        # 1. Master bus findings need an active source before peak or phase can support advice.
+        if isinstance(meters, dict) and live_context_has_activity(meters):
+            peak = _finite_meter(meters.get("peak_dbfs"))
+            corr = _finite_meter(meters.get("stereo_correlation"))
+            if peak is not None and peak > -0.5:
                 issues.append(Issue(
                     code="MASTER_OVERLOAD_RISK",
                     severity="critical",
@@ -72,7 +89,7 @@ class SessionDoctor:
                     target_param="volume",
                     proposed_value=None,
                 ))
-            if corr < 0.0:
+            if corr is not None and corr < 0.0:
                 issues.append(Issue(
                     code="STEREO_PHASE_CANCELLATION",
                     severity="critical",

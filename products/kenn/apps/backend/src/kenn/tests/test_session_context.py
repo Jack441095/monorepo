@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import math
+from copy import deepcopy
+
+import pytest
 
 from kenn.core.session_context import build_session_context, validate_session_context
 
@@ -143,6 +146,63 @@ def test_session_context_keeps_audio_sources_separate_and_bounded() -> None:
     assert "review_generated_asset" in context["available_actions"]
     assert "compare_offline_candidate" in context["available_actions"]
     assert validate_session_context(context)["ok"] is True
+
+
+@pytest.mark.parametrize("rms", [-80.0, -81.0, None, "invalid", True, float("nan"), float("inf"), float("-inf")])
+def test_quiet_or_unqualified_plugin_frame_withholds_signal_measurements(rms: object) -> None:
+    frame = {
+        "schema": "kenn.live_mix_context.v1",
+        "scope": "plugin_bus",
+        "conversation_id": "capture-7",
+        "host_track_name": "Bus A",
+        "rms_dbfs": rms,
+        "peak_dbfs": -1.0,
+        "stereo_correlation": -0.5,
+        "spectrum_schema": "spectrum.v1",
+        "spectrum_bands": [{"center_hz": 100.0, "level_db": -20.0}],
+        "pink_noise_reference": {"largest_deviation": {"center_hz": 100.0, "deviation_db": 8.0}},
+        "measurement_window": {"sample_count": 2048, "source_generation": 3},
+        "live_window": {"status": "ready", "sample_count": 2048, "window_seconds": 0.05, "pink_noise_shape": {"deviation_delta_db": 4.0}},
+        "freshness": {"status": "fresh", "age_seconds": 0.1},
+    }
+    if rms is None:
+        frame.pop("rms_dbfs")
+    original = deepcopy(frame)
+
+    context = build_session_context(snapshot=None, plugin_frames=[frame])
+
+    measurement = context["measurements"][0]
+    assert measurement["metrics"] == {}
+    assert "signal_limitation" in measurement
+    assert measurement["conversation_id"] == "capture-7"
+    assert measurement["host_track_name"] == "Bus A"
+    assert measurement["measurement_window"] == {"sample_count": 2048, "source_generation": 3}
+    assert measurement["live_window"] == {"status": "ready", "sample_count": 2048, "window_seconds": 0.05}
+    assert measurement["freshness"] == original["freshness"]
+    assert not {"spectrum_schema", "spectrum_bands", "pink_noise_reference"} & measurement.keys()
+    assert context["limitations"][-1] == measurement["signal_limitation"]
+    assert frame == original
+    assert validate_session_context(context)["ok"] is True
+
+
+@pytest.mark.parametrize("rms", [-79.9, -20.0])
+def test_active_plugin_frame_retains_signal_measurements(rms: float) -> None:
+    context = build_session_context(
+        snapshot=None,
+        plugin_frames=[{
+            "schema": "kenn.live_mix_context.v1",
+            "rms_dbfs": rms,
+            "peak_dbfs": -1.0,
+            "stereo_correlation": 0.9,
+            "spectrum_bands": [{"center_hz": 100.0, "level_db": -20.0}],
+            "pink_noise_reference": {"largest_deviation": {"center_hz": 100.0, "deviation_db": 2.0}},
+        }],
+    )
+    measurement = context["measurements"][0]
+    assert measurement["metrics"]["rms_dbfs"] == rms
+    assert measurement["metrics"]["peak_dbfs"] == -1.0
+    assert measurement["spectrum_bands"]
+    assert measurement["pink_noise_reference"]
 
 
 def test_session_context_exposes_only_completed_advisory_audio_classification() -> None:

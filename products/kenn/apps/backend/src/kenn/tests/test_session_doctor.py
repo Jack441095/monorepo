@@ -1,6 +1,13 @@
 """Tests for SessionDoctor audit and autonomous remediation batch generation."""
 
+import math
+
+import pytest
+
 from kenn.core.session_doctor import SessionDoctor
+
+
+_MISSING_RMS = object()
 
 
 def test_session_doctor_identifies_headroom_clipping_risk():
@@ -32,11 +39,56 @@ def test_session_doctor_flags_negative_stereo_correlation():
             {"index": 0, "name": "Bass", "volume": 0.80, "panning": 0.0, "devices": []},
         ]
     }
-    meters = {"peak_dbfs": -2.0, "stereo_correlation": -0.45}
+    meters = {"peak_dbfs": -2.0, "rms_dbfs": -18.0, "stereo_correlation": -0.45}
     report = SessionDoctor.audit(session_state, meters=meters)
     phase_issues = [i for i in report.issues if i.code == "STEREO_PHASE_CANCELLATION"]
     assert len(phase_issues) == 1
     assert phase_issues[0].severity == "critical"
+
+
+# Hot peak and phase readings can persist when RMS is near silence, but structural fader checks still apply.
+@pytest.mark.parametrize("rms,active", [
+    pytest.param(_MISSING_RMS, False, id="missing"),
+    pytest.param(None, False, id="null"),
+    pytest.param(True, False, id="boolean"),
+    pytest.param(float("nan"), False, id="nan"),
+    pytest.param(float("inf"), False, id="positive-infinity"),
+    pytest.param(-float("inf"), False, id="negative-infinity"),
+    pytest.param(10**1000, False, id="overflowing-integer"),
+    pytest.param(-100.0, False, id="quiet"),
+    pytest.param(-80.0, False, id="at-activity-floor"),
+    pytest.param(-79.9, True, id="above-activity-floor"),
+])
+def test_session_doctor_gates_only_meter_findings_on_live_activity(rms, active) -> None:
+    meters = {"peak_dbfs": 0.0, "stereo_correlation": -1.0}
+    if rms is not _MISSING_RMS:
+        meters["rms_dbfs"] = rms
+    report = SessionDoctor.audit({"tracks": [
+        {"index": 0, "name": "Hot Lead", "volume": 0.95, "devices": [{"name": "Compressor"}]},
+    ]}, meters=meters)
+
+    codes = {issue.code for issue in report.issues}
+    assert "HEADROOM_CLIPPING_RISK" in codes
+    assert "LOW_END_MUD_RISK" in codes
+    assert ("MASTER_OVERLOAD_RISK" in codes) is active
+    assert ("STEREO_PHASE_CANCELLATION" in codes) is active
+    assert any(action["action"] == "set_volume" for action in report.remediation_batch)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("peak_dbfs", None), ("peak_dbfs", True), ("peak_dbfs", math.nan), ("peak_dbfs", math.inf),
+    ("peak_dbfs", 10**1000), ("stereo_correlation", None), ("stereo_correlation", False),
+    ("stereo_correlation", math.nan), ("stereo_correlation", -math.inf), ("stereo_correlation", 10**1000),
+])
+def test_session_doctor_does_not_invent_missing_or_invalid_active_meter_values(field, value) -> None:
+    meters = {"rms_dbfs": -18.0, "peak_dbfs": 0.0, "stereo_correlation": -1.0}
+    meters[field] = value
+
+    report = SessionDoctor.audit({"tracks": []}, meters=meters)
+    codes = {issue.code for issue in report.issues}
+
+    assert ("MASTER_OVERLOAD_RISK" in codes) is (field != "peak_dbfs")
+    assert ("STEREO_PHASE_CANCELLATION" in codes) is (field != "stereo_correlation")
 
 
 def test_session_doctor_flags_sub_bass_off_center():

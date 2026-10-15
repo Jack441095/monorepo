@@ -18,6 +18,7 @@ from typing import Any, Iterable
 
 from kenn.core.audiogen_artifacts import safe_artifact_metadata
 from kenn.core.audio_classification import AudioClassificationError, normalize as normalize_audio_classification
+from kenn.core.evidence import plugin_context_for_advice
 from kenn.core.track_classifier import classify_track_context
 
 
@@ -539,21 +540,28 @@ def build_session_context(
     for frame in list(plugin_frames)[:MAX_JOBS]:
         if not isinstance(frame, dict):
             continue
+        advice_frame = plugin_context_for_advice(frame)
         measurement = {
             "kind": "plugin_feature_frame",
-            "schema": _text(frame.get("schema"), 128),
-            "metrics": {key: frame[key] for key in ("peak_dbfs", "rms_dbfs", "stereo_correlation", "stereo_width", "crest_db", "transient_ratio", "clipped_samples", "low_energy", "mid_energy", "high_energy") if key in frame},
-            "scope": _text(frame.get("scope"), 64) or "plugin_bus",
-            "plugin_state": frame.get("plugin_state", {}),
+            "schema": _text(advice_frame.get("schema"), 128),
+            "metrics": {key: advice_frame[key] for key in ("peak_dbfs", "rms_dbfs", "stereo_correlation", "stereo_width", "crest_db", "transient_ratio", "clipped_samples", "low_energy", "mid_energy", "high_energy") if key in advice_frame},
+            "scope": _text(advice_frame.get("scope"), 64) or "plugin_bus",
+            "plugin_state": advice_frame.get("plugin_state", {}),
         }
-        # These fields are already bounded by the validated plug-in handoff.
-        # Carry them into the explicit context so reasoning clients can see
-        # trend/freshness evidence rather than only the latest scalar meters.
-        for key in ("spectrum_schema", "spectrum_bands", "pink_noise_reference", "live_window", "freshness"):
-            if key in frame and isinstance(frame[key], (dict, list, str, int, float, bool)):
-                measurement[key] = frame[key]
+        # The sanitizer retains only capture metadata for quiet frames, so this
+        # list can carry live signal detail only after RMS qualified the frame.
+        for key in ("measurement_window", "spectrum_schema", "spectrum_bands", "pink_noise_reference", "live_window", "freshness"):
+            if key in advice_frame and isinstance(advice_frame[key], (dict, list, str, int, float, bool)):
+                measurement[key] = advice_frame[key]
+        for key in ("conversation_id", "host_track_name"):
+            if key in advice_frame:
+                measurement[key] = advice_frame[key]
+        limitation = advice_frame.get("signal_limitation")
+        if isinstance(limitation, str):
+            measurement["signal_limitation"] = limitation
+            context["limitations"].append(limitation)
         context["measurements"].append(measurement)
-        context["sources"].append(_source_envelope("plugin_feature_frame", frame))
+        context["sources"].append(_source_envelope("plugin_feature_frame", advice_frame))
 
     for receipt in list(mix_review_receipts)[:MAX_JOBS]:
         if not isinstance(receipt, dict):

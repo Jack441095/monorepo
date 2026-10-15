@@ -15,6 +15,7 @@ from typing import Any, Iterable
 
 from kenn.core.arrangement_analysis import analyze_arrangement_context
 from kenn.core.audio_classification import AudioClassificationError, normalize as normalize_audio_classification
+from kenn.core.evidence import live_context_has_activity
 from kenn.core.session_context import MAX_CONTEXT_AGE_SECONDS, validate_session_context
 
 
@@ -199,6 +200,9 @@ def _audio_evidence(context: dict[str, Any], reference_comparison: Any) -> list[
             continue
         kind = _text(measurement.get("kind"), 64)
         metrics = measurement.get("metrics") if isinstance(measurement.get("metrics"), dict) else {}
+        if kind == "plugin_feature_frame" and not live_context_has_activity(metrics):
+            # Older stored contexts can predate the ingress gate; neither their levels nor pink shape may ground advice.
+            continue
         numeric_metrics = {
             _text(key, 96): number
             for key, value in list(metrics.items())[:32]
