@@ -18,6 +18,7 @@ SCHEMA = "kenn.plugin_handoff.v1"
 FEATURE_SCHEMA = "audio_feature_frame.v1"
 SPECTRUM_SCHEMA = "realtime_spectrum.v1"
 _REQUIRED_NUMBERS = ("peak_dbfs", "rms_dbfs", "stereo_correlation", "stereo_width", "sample_rate", "analysed_samples")
+_CORRELATION_METADATA = ("input_channels", "correlation_valid")
 _OPTIONAL_NUMBERS = (
     "crest_db", "transient_ratio", "clipped_samples",
     # These are bounded linear band-energy estimates from the plug-in's
@@ -213,6 +214,18 @@ def _valid_export_clock(value: Any, received_at: float) -> bool:
             and 0 <= value <= received_at + 0.05 and math.isfinite(value))
 
 
+def _correlation_metadata(payload: dict[str, Any]) -> dict[str, Any]:
+    """Validate optional layout/validity as a pair; legacy absence earns no points."""
+    if not any(key in payload for key in _CORRELATION_METADATA):
+        return {}  # Existing publishers keep observations, without stereo-grade eligibility.
+    channels, valid = payload.get("input_channels"), payload.get("correlation_valid")
+    if isinstance(channels, bool) or not isinstance(channels, int) or channels not in (1, 2) or not isinstance(valid, bool):
+        raise ValueError("input_channels must be 1 or 2 and correlation_valid must be boolean, supplied together.")
+    if valid and channels != 2:
+        raise ValueError("Mono input cannot supply valid stereo correlation.")
+    return {"input_channels": channels, "correlation_valid": valid}
+
+
 def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(payload, dict) or payload.get("schema") != SCHEMA:
         return {"ok": False, "error": f"Expected {SCHEMA}."}
@@ -238,7 +251,7 @@ def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(host_track_name, str) or len(host_track_name) > 128:
         # Bound host text to 128 characters, as for the existing owner key, before matching it.
         return {"ok": False, "error": "host_track_name must be a string of at most 128 characters."}
-    values: dict[str, float] = {}
+    values: dict[str, Any] = {}
     for key in _REQUIRED_NUMBERS:
         value = payload.get(key)
         if isinstance(value, bool) or not isinstance(value, (int, float)):
@@ -268,6 +281,10 @@ def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
         return {"ok": False, "error": "Dynamics metrics are outside their valid range."}
     if any(not 0.0 <= values.get(key, 0.0) <= 16.0 for key in ("low_energy", "mid_energy", "high_energy")):
         return {"ok": False, "error": "Realtime band-energy metrics are outside their valid range."}
+    try:
+        values.update(_correlation_metadata(payload))
+    except ValueError as error:
+        return {"ok": False, "error": str(error)}  # Malformed eligibility cannot turn a placeholder into points.
     spectrum_bands: list[dict[str, float]] = []
     if "spectrum_bands" in payload:
         raw_spectrum = payload.get("spectrum_bands")
@@ -310,9 +327,13 @@ def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
             return {"ok": False, "error": "Continuous window duration/sample bounds disagree."}
         try:
             timeline = validate_host_timeline(window.get("host_timeline"), window)
+            correlation_metadata = _correlation_metadata(window)
         except ValueError as error:
             return {"ok": False, "error": str(error)}  # Contradictory clocks cannot ground cross-insert evidence.
+        if correlation_metadata != {key: values[key] for key in _CORRELATION_METADATA if key in values}:
+            return {"ok": False, "error": "Correlation eligibility must agree with its measurement window."}
         window = {key: window[key] for key in ("schema", "valid", "sequence", "source_generation", "start_sample", "end_sample", "duration_seconds", "dropped_samples", "invalid_samples")}
+        window.update(correlation_metadata)
         if timeline:
             window["host_timeline"] = timeline
     try:
@@ -353,7 +374,7 @@ def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
         # Only these fields may override the parent. In particular a child
         # cannot recurse, change track/source identity, or smuggle raw audio.
         fields = ("measurement_window", "fft_spectra", "peak_dbfs", "rms_dbfs", "stereo_correlation", "stereo_width", "analysed_samples", "audio_age_seconds")
-        if any(key not in fields for key in raw) or any(key not in raw for key in fields):
+        if any(key not in (*fields, *_CORRELATION_METADATA) for key in raw) or any(key not in raw for key in fields):
             return {"ok": False, "error": "Invalid paired feature window fields."}
         child = validate_handoff({**payload, **raw, "paired_windows": []})
         if not child["ok"]:
@@ -372,7 +393,7 @@ def validate_handoff(payload: dict[str, Any]) -> dict[str, Any]:
             return {"ok": False, "error": "Paired history straddles a clock/source change or lies outside its publication."}
         previous_end = child_window["end_sample"]
         paired_windows.append({"measurement_window": child_window, "fft_spectra": child["fft_spectra"],
-                               **{key: child["metrics"][key] for key in (*_REQUIRED_NUMBERS, "audio_age_seconds")}})
+                               **{key: child["metrics"][key] for key in (*_REQUIRED_NUMBERS, "audio_age_seconds", *_CORRELATION_METADATA) if key in child["metrics"]}})
     conversation = payload.get("conversation_id", "")
     if not isinstance(conversation, str) or len(conversation) > 128:
         return {"ok": False, "error": "conversation_id must be a string of at most 128 characters."}
@@ -523,6 +544,11 @@ def _ingest_live_context(payload: dict[str, Any], *, session_id: str = "", recei
             # Concurrent Ask/publisher requests may arrive out of order; never
             # roll back to earlier audio or resurrect a frame retired by a gap.
             return {"ok": False, "error": "Stale continuous publication; wait for a new complete audio window."}
+        if (window["sequence"] == old_window["sequence"] and window["valid"]
+                and any(metrics.get(key) != previous.get("metrics", {}).get(key) for key in _CORRELATION_METADATA)):
+            # An HTTP retry cannot upgrade the stereo eligibility of already
+            # captured audio. Native layout changes start a new generation.
+            return {"ok": False, "error": "Correlation eligibility changed without a new audio window."}
     gap = bool(window and (not window["valid"] or window["dropped_samples"] != old_window.get("dropped_samples", 0)
                           or window["invalid_samples"] != old_window.get("invalid_samples", 0)
                           or (window.get("host_timeline") or {}).get("transport_epoch") != (old_window.get("host_timeline") or {}).get("transport_epoch")))
@@ -626,10 +652,20 @@ def plugin_insert_sources(conversation_id: str, selected_insert: str = "") -> di
         sources = []
         for key, item in owned[:64]:  # Match the native publisher's 64-insert batch limit.
             age, current = _audio_currentness(item, now)
-            sources.append({"insert_id": key, "host_track_name": item.get("host_track_name", ""),
-                            "audio_age_seconds": round(age, 2), "current_for_diagnosis": current,
-                            "requested_parameters": dict(item["plugin_state"]),
-                            "reported_parameters": dict(item.get("reported_plugin_state", item["plugin_state"]))})
+            source = {"insert_id": key, "host_track_name": item.get("host_track_name", ""),
+                      "audio_age_seconds": round(age, 2), "current_for_diagnosis": current,
+                      "requested_parameters": dict(item["plugin_state"]),
+                      "reported_parameters": dict(item.get("reported_plugin_state", item["plugin_state"]))}
+            if key == selected:
+                from kenn.core.plugin_grade import selected_insert_grade
+
+                # Grade only the explicit selected source, under this same
+                # owner/capture lock. Siblings never contribute global points.
+                source["grading"] = selected_insert_grade(
+                    conversation_id=owner, insert_id=key, item=item, age_seconds=age, current=current,
+                    max_age_seconds=_MAX_CONTINUOUS_AGE_SECONDS if item.get("measurement_window") else _MAX_CURRENT_DIAGNOSIS_AGE_SECONDS,
+                )
+            sources.append(source)
         return {"ok": True, "conversation_id": owner, "sources": sources,
                 "selected_status": "known" if selected_item else "waiting_for_publication"}
 
@@ -674,6 +710,9 @@ def _live_context_summary(session_id: str) -> dict[str, Any] | None:
         "analysed_samples": metrics["analysed_samples"],
     }
     for key in _OPTIONAL_NUMBERS:
+        if key in metrics:
+            result[key] = metrics[key]
+    for key in _CORRELATION_METADATA:
         if key in metrics:
             result[key] = metrics[key]
     if window:

@@ -9,6 +9,7 @@ vi.mock('../api/kenn', () => ({
 }))
 
 import { askKenn, fetchPluginSources, requestPluginAudio } from '../api/kenn'
+import { insertGrade } from '../api/__fixtures__/pluginInsertGrade'
 
 const sources = [
   { insert_id: 'kick-insert', host_track_name: 'Kick', audio_age_seconds: 0.1, current_for_diagnosis: true,
@@ -25,7 +26,11 @@ describe('web chat attached to a native insert', () => {
     vi.mocked(requestPluginAudio).mockClear()
     window.history.replaceState({}, '', '/?session_id=native-owner&plugin_session_id=kick-insert')
   })
-  afterEach(() => window.history.replaceState({}, '', '/'))
+  afterEach(() => {
+    vi.clearAllTimers()
+    vi.useRealTimers()
+    window.history.replaceState({}, '', '/')
+  })
 
   it('asks with its launch owner and changes source only after an explicit selection', async () => {
     const kenn = (await import('./useKenn')).useKenn()
@@ -70,6 +75,80 @@ describe('web chat attached to a native insert', () => {
     expect(kenn.selectedPluginSource.value).toBeUndefined()
     await kenn.setPluginAudioEnabled(true)
     expect(requestPluginAudio).not.toHaveBeenCalled()
+  })
+
+  it('expires the score locally while hidden, without another source poll', async () => {
+    vi.useFakeTimers()
+    vi.mocked(fetchPluginSources).mockResolvedValue([{ ...sources[0]!, grading: insertGrade() }, sources[1]!])
+    const kenn = (await import('./useKenn')).useKenn()
+    await kenn.refreshPluginSources()
+    expect(kenn.selectedPluginGrade.value?.grade.points_available).toBe(6)
+    Object.defineProperty(document, 'hidden', { configurable: true, value: true })
+    await vi.advanceTimersByTimeAsync(901) // Milliseconds: 0.1 s old evidence has 0.9 s left in its one-second lifetime.
+    expect(kenn.selectedPluginGrade.value).toBeUndefined()
+    expect(fetchPluginSources).toHaveBeenCalledTimes(1)
+    Object.defineProperty(document, 'hidden', { configurable: true, value: false })
+  })
+
+  it('includes the response delay in the one-second evidence lifetime', async () => {
+    vi.useFakeTimers()
+    vi.mocked(fetchPluginSources).mockImplementation(async () => {
+      await new Promise(resolve => setTimeout(resolve, 950))
+      return [{ ...sources[0]!, grading: insertGrade() }]
+    })
+    const kenn = (await import('./useKenn')).useKenn()
+    const refresh = kenn.refreshPluginSources()
+    await vi.advanceTimersByTimeAsync(950)
+    await refresh
+    expect(kenn.selectedPluginGrade.value).toBeUndefined()
+  })
+
+  it('retires the score immediately when Pause is pending before HTTP acknowledgement', async () => {
+    vi.mocked(fetchPluginSources).mockResolvedValue([{ ...sources[0]!, grading: insertGrade() }])
+    let acknowledge!: () => void
+    vi.mocked(requestPluginAudio).mockImplementationOnce(() => new Promise(resolve => { acknowledge = resolve }))
+    const kenn = (await import('./useKenn')).useKenn()
+    await kenn.refreshPluginSources()
+    expect(kenn.selectedPluginGrade.value).toBeDefined()
+    const pause = kenn.setPluginAudioEnabled(false)
+    expect(kenn.selectedPluginGrade.value).toBeUndefined()
+    acknowledge()
+    await pause
+    expect(kenn.selectedPluginGrade.value).toBeUndefined()
+  })
+
+  it('rejects the first A response after selecting A to B to A', async () => {
+    vi.mocked(fetchPluginSources).mockResolvedValue([{ ...sources[0]!, grading: insertGrade() }, sources[1]!])
+    const kenn = (await import('./useKenn')).useKenn()
+    await kenn.refreshPluginSources()
+    let resolveOld!: (value: typeof sources) => void
+    vi.mocked(fetchPluginSources).mockImplementationOnce(() => new Promise(resolve => { resolveOld = resolve }))
+    const oldRefresh = kenn.refreshPluginSources()
+    kenn.selectPluginInsert('bass-insert')
+    expect(kenn.selectedPluginGrade.value).toBeUndefined()
+    kenn.selectPluginInsert('kick-insert')
+    expect(kenn.selectedPluginGrade.value).toBeUndefined()
+    resolveOld([{ ...sources[0]!, grading: insertGrade() } as typeof sources[number]])
+    await oldRefresh
+    expect(kenn.selectedPluginGrade.value).toBeUndefined()
+    await kenn.refreshPluginSources()
+    expect(kenn.selectedPluginGrade.value?.insert_id).toBe('kick-insert')
+  })
+
+  it('retires a score on polling failure and ignores a late older poll', async () => {
+    vi.mocked(fetchPluginSources).mockResolvedValue([{ ...sources[0]!, grading: insertGrade() }])
+    const kenn = (await import('./useKenn')).useKenn()
+    await kenn.refreshPluginSources()
+    let resolveOld!: (value: typeof sources) => void
+    vi.mocked(fetchPluginSources).mockImplementationOnce(() => new Promise(resolve => { resolveOld = resolve }))
+    const oldRefresh = kenn.refreshPluginSources()
+    vi.mocked(fetchPluginSources).mockRejectedValueOnce(new Error('Offline'))
+    await kenn.refreshPluginSources()
+    expect(kenn.selectedPluginGrade.value).toBeUndefined()
+    resolveOld([{ ...sources[0]!, grading: insertGrade() } as typeof sources[number]])
+    await oldRefresh
+    expect(kenn.selectedPluginGrade.value).toBeUndefined()
+    expect(kenn.pluginAudioStatus.value).toBe('Source unavailable')
   })
 
   it('ordinary browser pages keep a fresh chat and send no insert identity', async () => {

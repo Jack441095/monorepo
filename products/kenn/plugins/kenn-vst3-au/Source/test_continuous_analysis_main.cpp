@@ -17,9 +17,10 @@ void* operator new[](size_t bytes) { return ::operator new(bytes); }
 void operator delete(void* memory) noexcept { std::free(memory); }
 void operator delete[](void* memory) noexcept { std::free(memory); }
 
-static int failures = 0;
+static int checks = 0, failures = 0;
 static void require(bool condition, const char* behavior)
 {
+    ++checks;
     if (! condition) { ++failures; std::cerr << "FAIL: " << behavior << '\n'; }
 }
 
@@ -94,8 +95,104 @@ static KENNAnalysisSnapshot sineWindow(double rate, int blockSize, bool inverted
     return analyser.snapshot();
 }
 
+static void pushConstant(KENNContinuousAnalysis& analyser, int channels, int samples, float left, float right = 0.0f)
+{
+    juce::AudioBuffer<float> audio(channels, samples);
+    for (int channel = 0; channel < channels; ++channel)
+        juce::FloatVectorOperations::fill(audio.getWritePointer(channel), channel == 0 ? left : right, samples);
+    watchCallback = true; analyser.push(audio, true); watchCallback = false;
+}
+
+static void verifyCorrelationUsesActualInputLayout()
+{
+    // A duplicated mono buffer and silent-channel fallback used to look like
+    // measured +1 stereo correlation once the input layout had been discarded.
+    KENNContinuousAnalysis analyser;
+    analyser.prepare(48000.0, false);
+    require(analyser.snapshot().inputChannels == 0 && ! analyser.snapshot().correlationValid,
+        "Unpublished audio has neither an invented input layout nor phase evidence");
+    struct Example { int channels; float left, right, expected; bool correlationValid; };
+    for (const auto& example : {
+        Example { 1, 0.5f, 0.0f, 1.0f, false },
+        Example { 1, 0.0f, 0.0f, 1.0f, false },
+        Example { 2, 0.5f, 0.5f, 1.0f, true },
+        Example { 2, 0.5f, -0.5f, -1.0f, true },
+        Example { 2, 0.5f, 0.0f, 1.0f, false },
+        Example { 2, 0.0f, 0.5f, 1.0f, false },
+        Example { 2, 0.0f, 0.0f, 1.0f, false },
+        Example { 2, 1e-9f, -1e-9f, 1.0f, false }, // Accumulated channel energy remains below the existing 1e-12 floor.
+        Example { 2, 1e-7f, -1e-7f, -1.0f, true } })
+    {
+        analyser.prepare(48000.0, false);
+        pushConstant(analyser, example.channels, 4800, example.left, example.right); analyser.drainPending();
+        const auto frame = analyser.snapshot();
+        require(frame.valid && frame.inputChannels == example.channels && frame.correlationValid == example.correlationValid,
+            "Each complete window retains its actual input layout and defined-energy correlation validity");
+        require(std::abs(frame.features.correlation-example.expected) < 1e-6f,
+            "Adding correlation validity preserves the measured number and legacy +1 fallback");
+        require(! frame.streamingMeter.momentaryReady && ! frame.streamingMeter.truePeakReady,
+            "Input metadata does not enable the unqualified streaming meter candidate");
+        for (const auto& captured : analyser.recentSnapshots())
+            if (captured.valid)
+                require(captured.inputChannels == frame.inputChannels && captured.correlationValid == frame.correlationValid,
+                    "Retained feature history carries the owning window's channel and phase metadata");
+    }
+
+    analyser.prepare(48000.0, false);
+    pushConstant(analyser, 2, 4800, 0.5f, -0.5f); analyser.drainPending();
+    const auto stereo = analyser.snapshot();
+    pushConstant(analyser, 1, 2400, 0.5f);
+    require(! analyser.snapshot().valid && ! analyser.snapshot().correlationValid,
+        "A stereo-to-mono change retires earlier phase evidence before the worker drains");
+    for (const auto& captured : analyser.recentSnapshots())
+        require(! captured.valid && ! captured.correlationValid, "A layout change immediately retires every retained window");
+    analyser.drainPending();
+    require(! analyser.snapshot().valid, "Half a mono window cannot reuse the earlier stereo half");
+    pushConstant(analyser, 1, 2400, 0.5f); analyser.drainPending();
+    auto mono = analyser.snapshot();
+    require(mono.valid && mono.inputChannels == 1 && ! mono.correlationValid && mono.generation > stereo.generation
+        && mono.firstSample == 4800 && mono.endSample == 9600,
+        "A complete mono window recovers with new source provenance and no stereo grade evidence");
+    require(! mono.lowSpectrum.valid, "A layout change also retires cached long spectra until fresh warm-up");
+
+    analyser.prepare(48000.0, false);
+    pushConstant(analyser, 2, 2400, 0.5f, -0.5f);
+    pushConstant(analyser, 1, 2400, 0.5f); analyser.drainPending();
+    require(! analyser.snapshot().valid, "Queued old-layout packets cannot complete a mixed-layout window");
+    pushConstant(analyser, 1, 2400, 0.5f); analyser.drainPending();
+    mono = analyser.snapshot();
+    require(mono.valid && mono.inputChannels == 1 && ! mono.correlationValid
+        && mono.firstSample == 2400 && mono.endSample == 7200,
+        "Only the new layout contributes after old queued packets are discarded");
+    pushConstant(analyser, 2, 2400, 0.5f, -0.5f); analyser.drainPending();
+    require(! analyser.snapshot().valid, "A mono-to-stereo change waits for a whole new stereo window");
+    pushConstant(analyser, 2, 2400, 0.5f, -0.5f); analyser.drainPending();
+    require(analyser.snapshot().valid && analyser.snapshot().inputChannels == 2 && analyser.snapshot().correlationValid
+        && analyser.snapshot().features.correlation < -0.999f,
+        "Stereo correlation recovers after a full new-layout window");
+    for (const auto& captured : analyser.recentSnapshots())
+        if (captured.valid)
+            require(captured.inputChannels == 2 && captured.correlationValid && captured.generation == analyser.snapshot().generation,
+                "Recovered stereo history contains no earlier mono windows");
+
+    KENNContinuousAnalysis other; other.prepare(48000.0, false);
+    pushConstant(other, 1, 4800, 0.5f); other.drainPending();
+    const auto independent = analyser.snapshot();
+    other.invalidate();
+    require(! other.snapshot().valid && ! other.snapshot().correlationValid
+        && analyser.snapshot().valid && analyser.snapshot().correlationValid
+        && analyser.snapshot().generation == independent.generation,
+        "Source reset and channel validity remain isolated between inserts");
+    analyser.release();
+    require(! analyser.snapshot().correlationValid, "Released input cannot retain phase evidence");
+    analyser.prepare(48000.0, false);
+    require(analyser.snapshot().inputChannels == 0 && ! analyser.snapshot().correlationValid,
+        "Prepare clears the former input layout before new audio arrives");
+}
+
 int main()
 {
+    verifyCorrelationUsesActualInputLayout();
     verifyFFTAgainstTimeDomainPower<2048>(); verifyFFTAgainstTimeDomainPower<8192>();
     for (const double rate : { 44100.0, 48000.0, 96000.0 })
     {
@@ -104,6 +201,7 @@ int main()
         {
             const auto frame = sineWindow(rate, block);
             require(frame.valid && frame.sequence == 10 && frame.endSample == static_cast<juce::int64>(rate), "Exactly ten contiguous 100 ms windows independent of block size");
+            require(frame.inputChannels == 2 && frame.correlationValid, "Positive stereo remains defined across rates and buffer partitions");
             require(std::abs(frame.features.rmsDbfs + 9.0309f) < 0.001f && std::abs(frame.features.crestDb-3.0103f) < 0.001f, "Sine RMS and crest use the same exact window");
             require(std::abs(frame.features.transientRatio-reference.features.transientRatio) < 1e-6f, "Envelope time constants do not depend on host blocks");
             for (size_t band = 0; band < AudioTooRealtimeSpectrumBandCount; ++band)
@@ -114,6 +212,7 @@ int main()
                 require(std::abs(frame.lowSpectrum.energy[band]-reference.lowSpectrum.energy[band]) < 1e-8, "Cached FFT power is independent of host buffer partitioning");
         }
         const auto inverted = sineWindow(rate, 128, true);
+        require(inverted.inputChannels == 2 && inverted.correlationValid, "Negative stereo remains defined at every supported test rate");
         require(inverted.features.correlation < -0.999f && inverted.features.stereoWidth > 0.999f, "Opposite-phase stereo reports phase risk");
         require(inverted.spectrum.energy[8] > 0.001f, "Opposite-phase stereo retains measured channel spectral energy");
     }
@@ -180,6 +279,8 @@ int main()
     require(std::abs(audio.getSample(0, 123)-original) < 1e-7f && processor.getLatencySamples() == 0, "Production callback preserves samples and declares zero latency");
     for (int attempt = 0; attempt < 200 && ! processor.analysisSnapshot().valid; ++attempt) juce::Thread::sleep(2); // At most 400 ms to observe the shared worker.
     require(processor.analysisSnapshot().valid, "Shared worker publishes with the editor closed");
+    require(processor.analysisSnapshot().inputChannels == 1 && ! processor.analysisSnapshot().correlationValid,
+        "The actual production callback retains mono attribution without inventing stereo phase evidence");
     require(processor.analysisSnapshot().hostTimelineValid, "Production callback obtains playing host sample time without allocation");
     playHead.playing = false;
     watchCallback = true; processor.processBlock(audio, midi); watchCallback = false;
@@ -193,6 +294,7 @@ int main()
     KENNContinuousAnalysis other;
     other.prepare(48000.0, false);
     require(other.snapshot().sequence == 0 && ! other.snapshot().valid, "A second insert cannot inherit another insert's publication");
-    std::cout << "Continuous analysis: " << failures << " failures; queue storage " << KENNContinuousAnalysis::queueStorageBytes() << " bytes per insert\n";
+    std::cout << "Continuous analysis: " << checks << " checks, " << failures << " failures; queue storage " << KENNContinuousAnalysis::queueStorageBytes()
+        << " bytes per insert; snapshot " << sizeof(KENNAnalysisSnapshot) << " bytes; analyser " << sizeof(KENNContinuousAnalysis) << " bytes\n";
     return failures == 0 ? 0 : 1;
 }

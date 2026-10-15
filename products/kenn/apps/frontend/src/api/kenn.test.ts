@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { askKenn, confirmKennAction, fetchPluginSources, getAnswerUpgrade, parseAdviceFindings, requestPluginAudio, revokeKennConfirmation, summarizeAdviceAnswer } from './kenn'
+import { insertGrade } from './__fixtures__/pluginInsertGrade'
 
 describe('native browser audio association', () => {
   it('sends the selected insert with the conversation instead of a feature snapshot or latest-source request', async () => {
@@ -28,6 +29,21 @@ describe('native browser audio association', () => {
       const pause = fetchMock.mock.calls.filter(([, options]) => options?.method === 'POST').at(-1)!
       expect(JSON.parse(String(pause[1]?.body))).toEqual({ session_id: 'insert', conversation_id: 'owner & one',
         parameters: { analysis_enabled: false, live_context_enabled: false } })
+    } finally { vi.unstubAllGlobals() }
+  })
+
+  it('keeps only the selected owner-associated grade and withholds a sibling or foreign grade', async () => {
+    const source = { insert_id: 'kick-insert', host_track_name: 'Kick', audio_age_seconds: 0.1,
+      current_for_diagnosis: true, requested_parameters: {}, reported_parameters: {}, grading: insertGrade() }
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ ok: true, sources: [source,
+      { ...source, insert_id: 'bass-insert', grading: insertGrade('native-owner', 'bass-insert') },
+      { ...source, insert_id: 'foreign', grading: insertGrade('another-owner', 'foreign') },
+    ] })))
+    vi.stubGlobal('fetch', fetchMock)
+    try {
+      const sources = await fetchPluginSources('native-owner', 'kick-insert')
+      expect(sources[0]?.grading?.grade.points).toBe(5.1)
+      expect(sources.slice(1).every(item => item.grading === undefined)).toBe(true)
     } finally { vi.unstubAllGlobals() }
   })
 })

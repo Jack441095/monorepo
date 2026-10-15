@@ -42,6 +42,7 @@ def combine_grade(
             "points": technical.get("mqm_score"),
             "points_available": technical.get("points_available"),
             "note": technical.get("meaning", ""),
+            "unscored": technical.get("unscored", []),
         },
         "declared_target": declared_target,
         "reference_match": reference_match,

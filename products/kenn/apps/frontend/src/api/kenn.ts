@@ -3,6 +3,7 @@
 import { getApiBase, ApiError, parseApiErrorMessage } from './client'
 import { API_PATHS } from './paths'
 import { ensureAuthSession, withCsrf } from './mixReview'
+import { parsePluginInsertGrade, type KennInsertGrade } from './pluginInsertGrade'
 
 async function parseJson(res: Response): Promise<Record<string, unknown>> {
   return (await res.json().catch(() => ({}))) as Record<string, unknown>
@@ -520,6 +521,7 @@ export type KennPluginSource = {
   current_for_diagnosis: boolean
   requested_parameters: Partial<KennPluginParameters>
   reported_parameters: Partial<KennPluginParameters>
+  grading?: KennInsertGrade
 }
 
 /** Read compact source status for this native conversation, without choosing a source. */
@@ -529,7 +531,18 @@ export async function fetchPluginSources(conversationId: string, selectedInsert:
   const res = await fetch(`${getApiBase()}${API_PATHS.kenn.pluginInserts}?${query}`, { credentials: 'include' })
   const data = await parseJson(res)
   if (!res.ok || !data.ok) throw new ApiError(parseApiErrorMessage(data, 'Audio source status is unavailable.'), res.status)
-  return (Array.isArray(data.sources) ? data.sources : []) as KennPluginSource[]
+  return (Array.isArray(data.sources) ? data.sources : []).filter((source): source is KennPluginSource =>
+    !!source && typeof source === 'object' && typeof source.insert_id === 'string'
+    && typeof source.host_track_name === 'string' && typeof source.audio_age_seconds === 'number'
+    && Number.isFinite(source.audio_age_seconds) && source.audio_age_seconds >= 0
+    && typeof source.current_for_diagnosis === 'boolean'
+    && !!source.requested_parameters && typeof source.requested_parameters === 'object'
+    && !!source.reported_parameters && typeof source.reported_parameters === 'object',
+  ).map(source => ({ ...source,
+    // A response may list siblings, but a grade is meaningful only for the requested insert.
+    grading: source.insert_id === selectedInsert
+      ? parsePluginInsertGrade(source.grading, conversationId, selectedInsert, source.host_track_name) : undefined,
+  }))
 }
 
 /** Request local KENN analysis controls; only a subsequent feature frame confirms host state. */

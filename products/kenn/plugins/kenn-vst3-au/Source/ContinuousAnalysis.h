@@ -29,6 +29,8 @@ struct KENNAnalysisSnapshot
     double workerMilliseconds = 0.0;
     int queuedPackets = 0;
     bool valid = false;
+    int inputChannels = 0; // Unknown until a complete mono or stereo window is published.
+    bool correlationValid = false; // Mono duplication and undefined stereo energy retain only the legacy numeric fallback.
 };
 
 class KENNAnalysisWorker;
@@ -66,6 +68,7 @@ private:
         uint64_t transportEpoch = 0;
         juce::int64 hostFirstSample = 0;
         bool hostTimelineValid = false;
+        uint8_t inputChannels = 0; // Mono/stereo layout fits the packet's existing alignment padding.
         int count = 0;
     };
     void resetWindow(bool resetFilters);
@@ -78,6 +81,7 @@ private:
     std::atomic<double> workerMilliseconds { 0.0 }; // Worker elapsed DSP time, not process CPU accounting.
     juce::int64 producerSamples = 0;
     bool previouslyEnabled = true, registered = false;
+    int producerInputChannels = 0;
     bool producerHostValid = false;
     juce::int64 producerExpectedHost = 0;
     double rate = 0.0, ticksPerSample = 0.0;

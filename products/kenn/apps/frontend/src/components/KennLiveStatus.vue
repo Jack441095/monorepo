@@ -39,6 +39,36 @@
       </button>
       <small v-if="pluginSourceError" role="alert">{{ pluginSourceError }}</small>
       <small v-else>Measurements from this insert; raw audio stays local. Keep its editor open to receive Start/Pause requests.</small>
+      <div class="live-status__grade" role="region" aria-label="Selected insert grade">
+        <strong>Selected insert · {{ selectedPluginSource?.host_track_name || 'Unnamed insert' }} · 100 ms window</strong>
+        <template v-if="selectedPluginGrade">
+          <p v-if="selectedPluginGrade.status === 'graded'" class="live-status__grade-score">
+            {{ selectedPluginGrade.grade.points }} of {{ selectedPluginGrade.grade.points_available }} points available · {{ selectedPluginGrade.grade.full_marks }} possible
+          </p>
+          <p v-else><strong>Not graded.</strong> {{ selectedPluginGrade.reason }}</p>
+          <p>{{ selectedPluginGrade.grade.meaning }}</p>
+          <p v-if="selectedPluginGrade.stereo">
+            Stereo correlation {{ selectedPluginGrade.stereo.correlation.toFixed(3) }} · {{ selectedPluginGrade.stereo.points }} of 6 stereo points.
+            {{ selectedPluginGrade.stereo.points_lost }} points deducted · {{ selectedPluginGrade.stereo.threshold_band }}.
+            Source: {{ selectedPluginGrade.stereo.source }} · Tier: {{ selectedPluginGrade.stereo.tier }}.
+          </p>
+          <ul>
+            <li v-for="part in selectedPluginGrade.grade.parts" :key="part.part">
+              {{ partNames[part.part] }}: {{ part.points_available ? `${part.points} of ${part.points_available} points available` : 'Not graded' }}.
+              {{ part.full_marks - part.points_available }} of {{ part.full_marks }} possible points left out. {{ part.note }}
+            </li>
+            <li v-for="part in selectedPluginGrade.grade.ungraded" :key="part.part">
+              {{ partNames[part.part as keyof typeof partNames] || part.part }}: Not graded. {{ part.reason }}
+            </li>
+          </ul>
+          <ul>
+            <li v-for="dimension in selectedPluginGrade.unscored_dimensions" :key="dimension.dimension">
+              {{ dimensionNames[dimension.dimension] || dimension.dimension }} — Not graded: {{ dimension.reason }}
+            </li>
+          </ul>
+        </template>
+        <p v-else><strong>Not graded.</strong> A grade needs current stereo evidence from the selected insert.</p>
+      </div>
     </div>
     <small v-else class="live-status__audio-hint">Open KENN from a plug-in insert to analyse its live audio.</small>
   </section>
@@ -50,7 +80,11 @@ import { useKenn } from '../composables/useKenn'
 
 const { project, lastActionAt, refreshSessionCard, realtimeAnalysisEnabled, toggleRealtimeAnalysis,
   pluginInsertId, pluginSources, selectedPluginSource, pluginAudioStatus, pluginAudioRequestedEnabled,
-  pluginSourceError, pluginAudioBusy, refreshPluginSources, selectPluginInsert, setPluginAudioEnabled } = useKenn()
+  pluginSourceError, pluginAudioBusy, selectedPluginGrade, refreshPluginSourceAge,
+  refreshPluginSources, selectPluginInsert, setPluginAudioEnabled } = useKenn()
+const partNames = { technical_health: 'Technical health', declared_target: 'Declared target', reference_match: 'Reference match' }
+const dimensionNames: Record<string, string> = { dynamic_health: 'Dynamic health', low_end_control: 'Low-end control',
+  spectral_balance: 'Spectral balance', stem_separation: 'Stem separation', stereo_imaging: 'Stereo imaging' }
 const refreshing = ref(false)
 let sourceRefreshing = false
 
@@ -83,6 +117,7 @@ async function refresh() {
 let refreshTimer: number | undefined
 let sourceTimer: number | undefined
 onMounted(() => {
+  document.addEventListener('visibilitychange', refreshPluginSourceAge)
   void refreshSources()
   if (pluginInsertId.value) sourceTimer = window.setInterval(() => {
     if (!document.hidden) void refreshSources()
@@ -94,6 +129,7 @@ onMounted(() => {
   }, 10_000)
 })
 onBeforeUnmount(() => {
+  document.removeEventListener('visibilitychange', refreshPluginSourceAge)
   if (refreshTimer != null) window.clearInterval(refreshTimer)
   if (sourceTimer != null) window.clearInterval(sourceTimer)
 })
@@ -121,6 +157,17 @@ onBeforeUnmount(() => {
   }
 
   &__audio-hint { display: block; margin-top: 0.08rem; font-size: 0.1rem; color: var(--muted-text); }
+
+  &__grade {
+    flex-basis: 100%;
+    padding: 0.08rem;
+    border: 1px solid var(--floating-border);
+    border-radius: 0.06rem;
+    color: var(--muted-text);
+    strong, &-score { color: var(--text-color); }
+    p { margin: 0.04rem 0; }
+    ul { margin: 0.04rem 0; padding-left: 0.16rem; }
+  }
 
   &__connection {
     display: flex;

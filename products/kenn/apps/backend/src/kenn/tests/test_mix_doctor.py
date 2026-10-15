@@ -2,8 +2,120 @@
 
 from __future__ import annotations
 
+import math
+
 import pytest
-from kenn.core.mix_doctor import MixDoctor, get_mix_doctor
+from kenn.core import mix_doctor
+from kenn.core.mix_doctor import (
+    CORRELATION_SIGN_RULE,
+    HOUSE_RULE,
+    MixDoctor,
+    get_mix_doctor,
+    score_stereo_correlation,
+)
+
+
+@pytest.mark.parametrize(
+    "correlation,points,lost,source,tier,band",
+    [
+        (-1, 1.5, 4.5, CORRELATION_SIGN_RULE, "convention", "[-1, 0)"),
+        (math.nextafter(0.0, -math.inf), 1.5, 4.5, CORRELATION_SIGN_RULE, "convention", "[-1, 0)"),
+        (-0.0, 3.6, 2.4, HOUSE_RULE, "judgement", "[0, 0.25)"),
+        (0, 3.6, 2.4, HOUSE_RULE, "judgement", "[0, 0.25)"),
+        (math.nextafter(0.25, -math.inf), 3.6, 2.4, HOUSE_RULE, "judgement", "[0, 0.25)"),
+        (0.25, 5.1, 0.9, HOUSE_RULE, "judgement", "[0.25, 0.5)"),
+        (math.nextafter(0.5, -math.inf), 5.1, 0.9, HOUSE_RULE, "judgement", "[0.25, 0.5)"),
+        (0.5, 6.0, 0.0, HOUSE_RULE, "judgement", "[0.5, 1]"),
+        (1, 6.0, 0.0, HOUSE_RULE, "judgement", "[0.5, 1]"),
+    ],
+)
+def test_score_stereo_correlation_preserves_each_six_point_boundary(correlation, points, lost, source, tier, band):
+    # Exact edges preserve the existing 20-to-6-point rule without treating zero as negative correlation.
+    assert score_stereo_correlation(correlation) == {
+        "points": points,
+        "points_available": 6.0,
+        "points_lost": lost,
+        "source": source,
+        "tier": tier,
+        "threshold_band": band,
+    }
+
+
+@pytest.mark.parametrize(
+    "correlation",
+    [
+        None, True, False, "0.5", "n/a", {}, [], math.nan, math.inf, -math.inf,
+        math.nextafter(-1.0, -math.inf), math.nextafter(1.0, math.inf),
+        pytest.param(10 ** 1000, id="oversized-positive-integer"),
+        pytest.param(-(10 ** 1000), id="oversized-negative-integer"),
+    ],
+)
+def test_score_stereo_correlation_abstains_from_invalid_or_coerced_readings(correlation):
+    assert score_stereo_correlation(correlation) is None
+
+
+def test_score_stereo_correlation_is_pure_and_returns_independent_results(monkeypatch):
+    def reject_stateful_audit(*args, **kwargs):
+        pytest.fail("A numeric correlation rule must not create or read a session audit")
+
+    monkeypatch.setattr(mix_doctor, "get_mix_doctor", reject_stateful_audit)
+    monkeypatch.setattr(MixDoctor, "audit_session", reject_stateful_audit)
+    first = score_stereo_correlation(-0.1)
+    expected = dict(first)
+    first["points"] = 6.0
+    first["threshold_band"] = "mutated caller copy"
+    score_stereo_correlation(0.9)
+
+    assert score_stereo_correlation(-0.1) == expected
+    assert score_stereo_correlation(-0.1) is not first
+    assert "deduction size is our own judgement" in expected["source"]
+    assert "does not establish audible severity" in expected["source"]
+
+
+@pytest.mark.parametrize("correlation", [-1.0, -0.01, 0.0, 0.249, 0.25, 0.499, 0.5, 1.0])
+def test_session_stereo_audit_keeps_shared_rule_scores_and_costs(correlation):
+    rule = score_stereo_correlation(correlation)
+    report = MixDoctor().audit_session({"tracks": []}, {"phase_correlation": correlation})
+
+    assert report.dimension_scores["stereo_imaging"] == pytest.approx(rule["points"])
+    assert report.points_available == rule["points_available"]
+    assert sum(issue.points_lost for issue in report.all_issues) == rule["points_lost"]
+    if rule["points_lost"]:
+        issue, = report.all_issues
+        assert issue.source == rule["source"]
+        assert issue.tier == rule["tier"]
+
+
+def test_session_stereo_audit_reuses_shared_numeric_rule_instead_of_copying_thresholds(monkeypatch):
+    seen = []
+
+    def substituted_rule(correlation):
+        seen.append(correlation)
+        # Deliberately disagree with the coefficient so a copied legacy threshold chain cannot pass.
+        return {
+            "points": 3.0, "points_available": 6.0, "points_lost": 3.0,
+            "source": HOUSE_RULE, "tier": "judgement", "threshold_band": "[0, 0.25)",
+        }
+
+    monkeypatch.setattr(mix_doctor, "score_stereo_correlation", substituted_rule)
+    report = MixDoctor().audit_session({"tracks": []}, {"phase_correlation": 0.8})
+
+    assert seen == [0.8]
+    assert report.dimension_scores["stereo_imaging"] == 3.0
+    assert report.points_available == 6.0
+    issue, = report.all_issues
+    assert issue.points_lost == 3.0
+    assert issue.source == HOUSE_RULE
+    assert issue.severity == "WARNING"
+
+
+def test_session_stereo_audit_respects_shared_rule_abstention(monkeypatch):
+    monkeypatch.setattr(mix_doctor, "score_stereo_correlation", lambda correlation: None)
+    report = MixDoctor().audit_session({"tracks": []}, {"phase_correlation": 0.8})
+
+    assert report.dimension_scores["stereo_imaging"] is None
+    assert report.points_available == 0.0
+    assert not report.all_issues
 
 
 def _build_synthetic_16_track_session():

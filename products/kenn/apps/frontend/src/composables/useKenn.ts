@@ -195,7 +195,23 @@ const pluginSources = ref<KennPluginSource[]>([])
 const pluginSourceError = ref('')
 const pluginAudioBusy = ref(false)
 const pluginAudioRequest = ref<{ insert: string; enabled: boolean } | null>(null)
+const pluginGradeClock = ref(performance.now())
+const pluginGradeReceivedAt = ref(0)
+let pluginSelectionRevision = 0
+let pluginSourceRequestRevision = 0
+let pluginGradeExpiry: ReturnType<typeof setTimeout> | undefined
 const selectedPluginSource = computed(() => pluginSources.value.find(source => source.insert_id === pluginInsertId.value))
+const selectedPluginGrade = computed(() => {
+  const grading = selectedPluginSource.value?.grading
+  if (!grading || pluginSourceError.value || pluginAudioRequest.value?.enabled === false
+      || grading.conversation_id !== sessionId || grading.insert_id !== pluginInsertId.value) return undefined // A retired source or pending pause cannot retain a score.
+  if (grading.status === 'ungraded') return grading // An abstention may explain a paused or stale source, but carries no score.
+  const source = selectedPluginSource.value!
+  if ([source.requested_parameters, source.reported_parameters].some(parameters =>
+    parameters.analysis_enabled === false || parameters.live_context_enabled === false)) return undefined // Host acknowledgement cannot override an outstanding pause.
+  const age = grading.freshness.age_seconds + Math.max(0, pluginGradeClock.value - pluginGradeReceivedAt.value) / 1000
+  return source.current_for_diagnosis && age < grading.freshness.max_age_seconds ? grading : undefined
+})
 const pluginAudioRequestedEnabled = computed(() => pluginAudioRequest.value?.insert === pluginInsertId.value
   ? pluginAudioRequest.value.enabled : selectedPluginSource.value?.requested_parameters.live_context_enabled === true)
 const pluginAudioStatus = computed(() => {
@@ -210,23 +226,44 @@ const pluginAudioStatus = computed(() => {
 
 export function selectPluginInsert(insert: string) {
   if (!pluginSources.value.some(source => source.insert_id === insert)) return // Never select a global/latest source.
+  pluginSelectionRevision += 1
   pluginInsertId.value = insert
   pluginAudioRequest.value = null
+  // A→B→A must wait for a new A response, not restore A's previous observation.
+  pluginSources.value = pluginSources.value.map(source => ({ ...source, grading: undefined }))
+  if (pluginGradeExpiry !== undefined) clearTimeout(pluginGradeExpiry)
+}
+
+export function refreshPluginSourceAge() {
+  pluginGradeClock.value = performance.now()
 }
 
 export async function refreshPluginSources() {
   if (!pluginLaunch) return // Standalone chat has no declared native conversation.
   const selected = pluginInsertId.value
+  const selectionRevision = pluginSelectionRevision
+  const requestRevision = ++pluginSourceRequestRevision
+  const requestedAt = performance.now()
   try {
     const sources = await fetchPluginSources(sessionId, selected)
-    if (selected !== pluginInsertId.value) return // A slow previous selection must not replace the current status.
+    if (selectionRevision !== pluginSelectionRevision || requestRevision !== pluginSourceRequestRevision) return // Even an A→B→A cycle retires the first A request.
     pluginSources.value = sources
     pluginSourceError.value = ''
+    pluginGradeReceivedAt.value = requestedAt
+    refreshPluginSourceAge()
+    if (pluginGradeExpiry !== undefined) clearTimeout(pluginGradeExpiry)
+    const grading = selectedPluginSource.value?.grading
+    if (grading?.status === 'graded') {
+      // Expiry is independent of the visible-page HTTP poll. The request's start
+      // time conservatively includes network delay in the one-second evidence age.
+      const remainingMs = (grading.freshness.max_age_seconds - grading.freshness.age_seconds) * 1000 - (performance.now() - requestedAt)
+      pluginGradeExpiry = setTimeout(refreshPluginSourceAge, Math.max(0, remainingMs) + 1)
+    }
     const source = selectedPluginSource.value
     if (source?.current_for_diagnosis && pluginAudioRequest.value?.enabled
         && source.reported_parameters.live_context_enabled === true) pluginAudioRequest.value = null
   } catch (e) {
-    if (selected !== pluginInsertId.value) return // Ignore a retired selection's response.
+    if (selectionRevision !== pluginSelectionRevision || requestRevision !== pluginSourceRequestRevision) return // Ignore errors from a retired selection or older poll.
     pluginSources.value = []
     pluginSourceError.value = userFacingKennError(e, 'Audio source status is unavailable. Refresh before analysing.')
   }
@@ -236,9 +273,9 @@ export async function setPluginAudioEnabled(enabled: boolean) {
   if (!pluginLaunch || !pluginInsertId.value || pluginAudioBusy.value || pluginSourceError.value) return // A source error blocks controls until a successful refresh.
   const insert = pluginInsertId.value
   pluginAudioBusy.value = true
+  pluginAudioRequest.value = { insert, enabled }
   try {
     await requestPluginAudio(sessionId, insert, enabled)
-    pluginAudioRequest.value = { insert, enabled }
     await refreshPluginSources()
   } catch (e) {
     pluginSourceError.value = userFacingKennError(e, 'Audio analysis request failed. Refresh and try again.')
@@ -581,6 +618,8 @@ export function useKenn() {
     pluginInsertId,
     pluginSources,
     selectedPluginSource,
+    selectedPluginGrade,
+    refreshPluginSourceAge,
     pluginAudioStatus,
     pluginAudioRequestedEnabled,
     pluginSourceError,

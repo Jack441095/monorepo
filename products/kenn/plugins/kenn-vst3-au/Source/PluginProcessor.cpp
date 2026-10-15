@@ -332,6 +332,11 @@ juce::var KENNMixAssistantAudioProcessor::handoffPayload() const
         auto window = std::make_unique<juce::DynamicObject>();
         window->setProperty("schema", "kenn.continuous_window.v1");
         window->setProperty("valid", captured.valid);
+        if (captured.inputChannels > 0)
+        {
+            window->setProperty("input_channels", captured.inputChannels);
+            window->setProperty("correlation_valid", captured.correlationValid);
+        } // Before the first complete window, omit both fields rather than publish half a metadata pair.
         window->setProperty("sequence", static_cast<juce::int64>(captured.sequence));
         window->setProperty("source_generation", static_cast<juce::int64>(captured.generation));
         window->setProperty("start_sample", captured.firstSample); window->setProperty("end_sample", captured.endSample);
@@ -381,6 +386,7 @@ juce::var KENNMixAssistantAudioProcessor::handoffPayload() const
             entry->setProperty("fft_spectra", juce::var(spectra.release()));
             entry->setProperty("peak_dbfs", captured.features.peakDbfs); entry->setProperty("rms_dbfs", captured.features.rmsDbfs);
             entry->setProperty("stereo_correlation", captured.features.correlation); entry->setProperty("stereo_width", captured.features.stereoWidth);
+            entry->setProperty("input_channels", captured.inputChannels); entry->setProperty("correlation_valid", captured.correlationValid);
             entry->setProperty("analysed_samples", captured.features.analysedSamples);
             entry->setProperty("audio_age_seconds", juce::jmax(0.0, juce::Time::highResolutionTicksToSeconds(juce::Time::getHighResolutionTicks()-captured.capturedTicks)));
             pairedWindows.add(juce::var(entry.release()));
@@ -395,6 +401,12 @@ juce::var KENNMixAssistantAudioProcessor::handoffPayload() const
     message->setProperty("plugin_state", juce::var(pluginState.release()));
     message->setProperty("peak_dbfs", data.peakDb); message->setProperty("rms_dbfs", data.rmsDb);
     message->setProperty("stereo_correlation", data.correlation); message->setProperty("stereo_width", data.stereoWidth);
+    // Unknown layout omits the pair; a lone validity flag would fail the wire contract.
+    if (frame.inputChannels > 0)
+    {
+        message->setProperty("input_channels", frame.inputChannels);
+        message->setProperty("correlation_valid", frame.correlationValid);
+    }
     message->setProperty("sample_rate", data.sampleRate); message->setProperty("analysed_samples", data.analysedSamples);
     message->setProperty("low_energy", features.lowEnergy); message->setProperty("mid_energy", features.midEnergy); message->setProperty("high_energy", features.highEnergy);
     message->setProperty("crest_db", features.crestDb); message->setProperty("transient_ratio", features.transientRatio); message->setProperty("clipped_samples", features.clippedSamples);

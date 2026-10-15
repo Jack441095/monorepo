@@ -54,7 +54,7 @@ void KENNContinuousAnalysis::prepare(double sampleRate, bool startWorker, bool e
     windowSamples = juce::jmax(1, static_cast<int>(std::round(rate * windowSeconds)));
     ticksPerSample = static_cast<double>(juce::Time::getHighResolutionTicksPerSecond()) / rate;
     fifo.reset(); producerSamples = analysedSamples = 0; sequence = 0;
-    dropped.store(0); invalid.store(0); previouslyEnabled = true;
+    dropped.store(0); invalid.store(0); previouslyEnabled = true; producerInputChannels = 0;
     workerMilliseconds.store(0.0);
     workerGeneration = sourceGeneration.load(); workerDropped = 0; expectedSample = -1;
     workerTransportEpoch = transportEpoch.fetch_add(1) + 1;
@@ -102,6 +102,10 @@ void KENNContinuousAnalysis::push(const juce::AudioBuffer<float>& buffer, bool e
     const int samples = buffer.getNumSamples();
     if (samples <= 0 || buffer.getNumChannels() == 0)
         return; // Empty host callbacks neither fabricate progress nor change playback.
+    const int inputChannels = juce::jmin(2, buffer.getNumChannels());
+    if (producerInputChannels != 0 && inputChannels != producerInputChannels)
+        invalidate(); // Retire queued/published stereo evidence before a new layout can complete a window.
+    producerInputChannels = inputChannels;
     if (host.valid != producerHostValid || (host.valid && host.firstSample != producerExpectedHost))
         transportEpoch.fetch_add(1); // Seek/loop/clock loss retires evidence, without expiring the track binding.
     producerHostValid = host.valid;
@@ -130,6 +134,7 @@ void KENNContinuousAnalysis::push(const juce::AudioBuffer<float>& buffer, bool e
         packet.count = juce::jmin(packetSamples, samples - offset);
         packet.firstSample = first + offset; packet.generation = generation; packet.dropped = lost;
         packet.transportEpoch = epoch; packet.hostTimelineValid = host.valid;
+        packet.inputChannels = static_cast<uint8_t>(inputChannels);
         packet.hostFirstSample = host.firstSample + offset;
         packet.endTicks = ticks - static_cast<juce::int64>((samples - offset - packet.count) * ticksPerSample);
         std::copy_n(left + offset, packet.count, packet.left.begin());
@@ -237,6 +242,10 @@ void KENNContinuousAnalysis::publish(const Packet& packet, int lastSample)
     f.crestDb = juce::jmax(0.0f, f.peakDbfs-f.rmsDbfs); f.clippedSamples = clipped;
     const auto denominator = std::sqrt(ll*rr);
     f.correlation = denominator > 1e-12 ? static_cast<float>(juce::jlimit(-1.0, 1.0, lr/denominator)) : 1.0f; // Silence has no phase evidence.
+    frame.inputChannels = packet.inputChannels;
+    // Reuse the existing accumulated-energy floor; duplicated mono and the
+    // +1 fallback for a silent channel must not become scored stereo evidence.
+    frame.correlationValid = frame.inputChannels == 2 && denominator > 1e-12;
     f.stereoWidth = static_cast<float>(juce::jlimit(0.0, 1.0, 2.0*side/juce::jmax(1e-12, ll+rr)));
     f.transientRatio = static_cast<float>(juce::jmin(10.0, std::sqrt(onsetEnergy/juce::jmax(1e-12, sustainEnergy)))); // Bounded fast-envelope excess over sustain.
     frame.spectrum = spectrum;
@@ -275,7 +284,11 @@ std::array<KENNAnalysisSnapshot, 6> KENNContinuousAnalysis::recentSnapshots() co
     {
         frame.valid = frame.valid && frame.generation == generation && frame.transportEpoch == epoch
             && frame.droppedSamples == lost && frame.invalidSamples == invalidCount;
-        if (!frame.valid) frame.streamingMeter = {}; // Candidate readiness cannot outlive its owning passage.
+        if (!frame.valid)
+        {
+            // Neither phase evidence nor candidate readiness may outlive its owning passage.
+            frame.correlationValid = false; frame.streamingMeter = {};
+        }
     }
     return frames;
 }
@@ -292,6 +305,10 @@ KENNAnalysisSnapshot KENNContinuousAnalysis::snapshot() const
         && frame.droppedSamples == lost && frame.invalidSamples == invalidCount;
     frame.droppedSamples = lost; frame.invalidSamples = invalidCount;
     frame.workerMilliseconds = workerMilliseconds.load(); frame.queuedPackets = fifo.getNumReady();
-    if (!frame.valid) frame.streamingMeter = {}; // Retire candidate readings immediately, before the next worker drain.
+    if (!frame.valid)
+    {
+        // Readers retire evidence immediately, before the next worker drain.
+        frame.correlationValid = false; frame.streamingMeter = {};
+    }
     return frame; // A gap retires evidence until a full contiguous window recovers.
 }

@@ -323,6 +323,15 @@ def test_http_native_features_to_chat_card_to_confirmed_fake_write(live, monkeyp
         native_binary = os.environ.get("KENN_NATIVE_COMMAND_TEST_BINARY")
         if native_binary:
             # Opt in after compiling JUCE; ordinary backend runs need no native toolchain.
+            native_frames = []
+            ingest = handoff.ingest_live_context
+
+            def record_native_frame(payload, **kwargs):
+                if payload.get("conversation_id") == "vst3-command-integration-test" and payload.get("measurement_window", {}).get("valid"):
+                    native_frames.append(deepcopy(payload))
+                return ingest(payload, **kwargs)
+
+            monkeypatch.setattr(server, "ingest_live_context", record_native_frame)
             native = subprocess.run([native_binary], env={**os.environ,
                 "KENN_TEST_ENDPOINT": f"http://127.0.0.1:{httpd.server_port}",
                 "KENN_TEST_ANALYSIS_TRACK": "Kick", "KENN_TEST_OFFLINE_ONLY": "0"},
@@ -330,6 +339,14 @@ def test_http_native_features_to_chat_card_to_confirmed_fake_write(live, monkeyp
             assert native.returncode == 0, native.stdout + native.stderr
             assert "SUCCESS: native insert analysis" in native.stdout
             assert "SUCCESS: two native inserts" in native.stdout
+            # Check the actual C++ wire fields, including retained paired windows;
+            # Python-generated stereo fixtures cannot prove native attribution.
+            assert {frame["host_track_name"] for frame in native_frames} == {"Kick", "Bass"}
+            assert any(frame.get("paired_windows") for frame in native_frames)
+            for frame in native_frames:
+                for captured in [frame, *frame.get("paired_windows", [])]:
+                    assert captured["input_channels"] == captured["measurement_window"]["input_channels"] == 2
+                    assert captured["correlation_valid"] is captured["measurement_window"]["correlation_valid"] is True
             assert live.writes == []
         response = post("/api/ask", {"question": "Analyse the kick", "session_id": "http-analysis", "plugin_handoff": _payload(host_track_name="Kick", peak_dbfs=-0.5)})
         assert response["route"] == "live_track_analysis"

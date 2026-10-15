@@ -83,8 +83,8 @@ SPOTIFY_PEAK_RULE = (
     "the -0.2 and -0.8 dBTP steps are our own margin for meter error"
 )
 CORRELATION_SIGN_RULE = (
-    "Correlation meter convention: a reading below 0 means the channels cancel when summed to mono; "
-    "it is a convention, not a published standard, and the cost is our own"
+    "Correlation meter convention: a reading below 0 indicates possible cancellation and reduced mono-sum power; "
+    "it does not establish audible severity, and the deduction size is our own judgement, not a published standard"
 )
 HOUSE_RULE = "house rule: our own threshold with no published basis, to be checked against the owner's ears under E9"
 
@@ -96,6 +96,38 @@ TIER_LEGEND = {
     "judgement": "our own rule of thumb, not yet checked against the owner's ears or any reference",
 }
 _TIER_BY_SOURCE = {SPOTIFY_PEAK_RULE: "published", CORRELATION_SIGN_RULE: "convention"}
+
+
+def score_stereo_correlation(correlation: Any) -> Optional[Dict[str, Any]]:
+    """Score one dimensionless correlation coefficient out of 6, or return None for an invalid reading.
+
+    Callers must qualify the measured channel layout, signal activity, capture identity and interval first; this
+    numeric rule cannot distinguish genuine stereo evidence from a mono/silence placeholder. The sign follows a
+    meter convention, but every point cost and the positive-correlation cutoffs are our judgement, pending E9.
+    The result is a fresh dict with no session, master-bus or audible-severity claim.
+    """
+    if isinstance(correlation, bool) or not isinstance(correlation, (int, float)):
+        return None  # Missing or coerced values cannot establish a measured correlation.
+    if not -1.0 <= correlation <= 1.0 or not math.isfinite(correlation):
+        # Check the dimensionless range before finite conversion, so oversized JSON integers abstain safely too.
+        return None
+
+    if correlation < 0.0:
+        lost, source, band = 4.5, CORRELATION_SIGN_RULE, "[-1, 0)"
+    elif correlation < 0.25:
+        lost, source, band = 2.4, HOUSE_RULE, "[0, 0.25)"
+    elif correlation < 0.5:
+        lost, source, band = 0.9, HOUSE_RULE, "[0.25, 0.5)"
+    else:
+        lost, source, band = 0.0, HOUSE_RULE, "[0.5, 1]"
+    return {
+        "points": round(_POINTS_PER_DIMENSION - lost, 1),
+        "points_available": _POINTS_PER_DIMENSION,
+        "points_lost": lost,
+        "source": source,
+        "tier": _TIER_BY_SOURCE.get(source, "judgement"),
+        "threshold_band": band,
+    }
 
 
 class MixDoctor:
@@ -536,20 +568,21 @@ class MixDoctor:
         telemetry: Dict[str, Optional[float]],
     ) -> Tuple[Optional[float], List[MixIssue], List[Dict[str, Any]]]:
         """Audit Stereo Imaging & Mono Compatibility (Max 20 pts). Scores None when there is no correlation reading."""
-        score = 20.0
         issues: List[MixIssue] = []
         recs: List[Dict[str, Any]] = []
 
         corr = telemetry["phase_correlation"]
+        correlation_score = score_stereo_correlation(corr)
+        # The shared rule returns final 6-point units; the enclosing legacy audit converts all dimensions together.
+        score = (None if correlation_score is None else
+                 correlation_score["points"] * _WORKING_POINTS / _POINTS_PER_DIMENSION)
 
-        if corr is None:
-            pass
-        elif corr < 0.0:
-            cost = 15.0
-            score -= cost
+        if correlation_score is None:
+            pass  # No valid coefficient means no stereo points or meter-derived finding.
+        elif correlation_score["threshold_band"] == "[-1, 0)":
             issues.append(MixIssue(
-                points_lost=cost,
-                source=CORRELATION_SIGN_RULE,
+                points_lost=correlation_score["points_lost"] * _WORKING_POINTS / _POINTS_PER_DIMENSION,
+                source=correlation_score["source"],
                 severity="CRITICAL",
                 category="stereo",
                 message=f"Destructive out-of-phase audio detected on master bus (correlation {corr:+.2f} < 0.0). Mix will cancel out in mono.",
@@ -558,22 +591,18 @@ class MixDoctor:
                     "rationale": "Inspect stereo wideners and out-of-phase stereo delays; narrow sub and mid width to restore mono summing compatibility.",
                 }
             ))
-        elif corr < 0.25:
-            cost = 8.0
-            score -= cost
+        elif correlation_score["threshold_band"] == "[0, 0.25)":
             issues.append(MixIssue(
-                points_lost=cost,
-                source=HOUSE_RULE,
+                points_lost=correlation_score["points_lost"] * _WORKING_POINTS / _POINTS_PER_DIMENSION,
+                source=correlation_score["source"],
                 severity="WARNING",
                 category="stereo",
                 message=f"Weak phase correlation ({corr:+.2f}). Mix is at risk of comb-filtering when played on phones or club mono systems.",
             ))
-        elif corr < 0.50:
-            cost = 3.0
-            score -= cost
+        elif correlation_score["threshold_band"] == "[0.25, 0.5)":
             issues.append(MixIssue(
-                points_lost=cost,
-                source=HOUSE_RULE,
+                points_lost=correlation_score["points_lost"] * _WORKING_POINTS / _POINTS_PER_DIMENSION,
+                source=correlation_score["source"],
                 severity="ADVISORY",
                 category="stereo",
                 message=f"Phase correlation is moderate ({corr:+.2f}). Recommended target is >= +0.60 for commercial releases.",
@@ -603,7 +632,7 @@ class MixDoctor:
                     }
                 ))
 
-        return (max(0.0, score) if corr is not None else None), issues, recs
+        return score, issues, recs
 
     @staticmethod
     def _meaning(points: float, available: float, scored: int, total: int, issues: List[MixIssue]) -> str:
