@@ -1040,6 +1040,46 @@ def test_main_chat_can_combine_explicit_mix_review_and_plugin_evidence(running_s
     assert "Scope-labelled comparison" in stream_metadata["answer"]
 
 
+@pytest.mark.parametrize("quiet_source", ["live", "uploaded"])
+def test_realtime_comparison_endpoint_withholds_either_quiet_source(running_server: str, monkeypatch, quiet_source):
+    # A current hot-peak snapshot must not expose deltas when either source has insufficient activity.
+    import kenn.server as server_module
+    from kenn.plugin_handoff import ingest_live_context
+    import kenn.plugin_handoff as plugin_handoff
+
+    monkeypatch.setattr(plugin_handoff, "_live_contexts", {})
+
+    class ReviewFake:
+        def mix_review_status(self, review_id):
+            assert review_id == "quiet-comparison"
+            return {"review": {
+                "status": "completed",
+                "metrics": {"peak_dbfs": -1.0, "rms_dbfs": -60.0 if quiet_source == "uploaded" else -18.0},
+            }}
+
+    monkeypatch.setattr(server_module, "mix_review", ReviewFake())
+    session_id = f"quiet-comparison-{uuid.uuid4().hex}"
+    ingested = ingest_live_context({
+        "schema": "kenn.plugin_handoff.v1", "audio_feature_schema": "audio_feature_frame.v1",
+        "kind": "mix_review_snapshot", "assistant_mode": "ask",
+        "peak_dbfs": -0.1, "rms_dbfs": -80.0 if quiet_source == "live" else -16.0,
+        "stereo_correlation": 0.8, "stereo_width": 0.2,
+        "sample_rate": 48000.0, "analysed_samples": 48000,
+        "plugin_state": {"assistant_mode": "ask", "analysis_enabled": True},
+    }, session_id=session_id)
+    assert ingested["ok"]
+
+    with urllib.request.urlopen(
+        f"{running_server}/api/realtime-mix-comparison?review_id=quiet-comparison&session_id={session_id}", timeout=10,
+    ) as response:
+        result = json.loads(response.read())
+    assert result["ok"] and result["schema"] == "kenn.realtime_mix_comparison.v1"
+    assert result["review_id"] == "quiet-comparison" and result["plugin_session_id"] == session_id
+    assert not result["comparison_available"]
+    assert result["comparisons"] == [] and result["pink_noise_shape"] is None
+    assert any(item.startswith("Live RMS" if quiet_source == "live" else "Uploaded RMS") for item in result["limitations"])
+
+
 def test_sample_import_proposal_endpoint_requires_session_id(running_server: str) -> None:
     request = urllib.request.Request(
         f"{running_server}/api/ableton/sample-import/proposal",

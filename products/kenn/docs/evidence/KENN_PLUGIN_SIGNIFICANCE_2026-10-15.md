@@ -45,7 +45,7 @@ No additional full-suite failures appeared. `git diff --check` passed.
 
 ## Remaining scope and exact changed files
 
-The E2 checkbox remains open. `build_realtime_mix_comparison` still derives live-versus-uploaded deltas and pink-shape details from raw context, and `proposals_from_live_context` still derives delivery-target proposals from peak alone. Those consumers need separate significance gates. The comparison must check both sides; uploaded `metrics.rms_dbfs` uses per-channel power whereas the reference scorer uses mono-downmixed RMS, so reusing one as the other would silently change the anti-phase policy. This slice does not qualify meter accuracy, listening usefulness, uploaded non-reference health or all raw transport consumers.
+The E2 checkbox remains open. `build_realtime_mix_comparison` still derives live-versus-uploaded deltas and pink-shape details from raw context, and `proposals_from_live_context` still derives delivery-target proposals from peak alone. Those consumers need separate significance gates. The comparison must check both sides; uploaded `metrics.rms_dbfs` uses the arithmetic mean of channel RMS amplitudes whereas the reference scorer uses mono-downmixed RMS, so reusing one as the other would silently change the anti-phase policy. This slice does not qualify meter accuracy, listening usefulness, uploaded non-reference health or all raw transport consumers.
 
 - `apps/backend/src/kenn/core/evidence.py`: gate signal facts while retaining capture provenance.
 - `apps/backend/src/kenn/plugin_handoff.py`: gate plug-in review observations after validation.

@@ -8,6 +8,8 @@ import math
 import time
 from uuid import uuid4
 
+from kenn.core.evidence import LIVE_ACTIVITY_FLOOR_DBFS
+
 
 SCHEMA = "kenn.action_proposal.v1"
 BATCH_SCHEMA = "kenn.batch_action_proposal.v1"
@@ -85,9 +87,24 @@ def proposals_from_live_context(context: dict[str, Any] | None, *, target_lufs: 
     This does not claim to identify sources or third-party plug-in parameters.
     The sole current action target is the KENN plug-in's own target setting.
     """
-    if not context:
+    if not isinstance(context, dict):
+        # A missing or malformed context is not measured authority for an action.
         return []
-    peak = float(context.get("peak_dbfs", -100.0))
+    try:
+        rms_raw = context.get("rms_dbfs")
+        peak_raw = context.get("peak_dbfs")
+        if (isinstance(rms_raw, bool) or not isinstance(rms_raw, (int, float))
+                or isinstance(peak_raw, bool) or not isinstance(peak_raw, (int, float))):
+            # Both measurements must be present as numeric values before peak advice is considered.
+            return []
+        rms = float(rms_raw)
+        peak = float(peak_raw)
+    except OverflowError:
+        # An unrepresentable measurement cannot authorize a measured proposal.
+        return []
+    if not math.isfinite(rms) or rms <= LIVE_ACTIVITY_FLOOR_DBFS or not math.isfinite(peak):
+        # Quiet or non-finite measurements cannot justify advice derived from the bus peak.
+        return []
     proposals: list[ActionProposal] = []
     if peak > -0.3:
         proposals.append(ActionProposal(

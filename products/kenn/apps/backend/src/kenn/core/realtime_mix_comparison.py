@@ -4,14 +4,25 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from kenn.core.evidence import LIVE_ACTIVITY_FLOOR_DBFS
+
 
 SCHEMA = "kenn.realtime_mix_comparison.v1"
+# Mirror reference_matching.REFERENCE_MIN_RMS_DBFS (-60 dBFS) without loading
+# the optional file-based matching engine just to compare existing report metrics.
+# The upload uses its reported mean channel RMS, not the reference scorer's mono sum.
+UPLOADED_ACTIVITY_FLOOR_DBFS = -60.0
 
 
 def _number(value: Any) -> float | None:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
+        # Missing or nonnumeric evidence stays unavailable rather than becoming a default measurement.
         return None
-    number = float(value)
+    try:
+        number = float(value)
+    except OverflowError:
+        # An unrepresentable integer cannot establish activity or a comparable measurement.
+        return None
     return number if math.isfinite(number) else None
 
 
@@ -97,7 +108,7 @@ def build_realtime_mix_comparison(
     review_id: str,
     plugin_session_id: str,
 ) -> dict[str, Any]:
-    """Compare two evidence sources without assigning a Live cause or target."""
+    """Compare active sources without assigning a Live cause or target; retain provenance on abstention."""
     review = review if isinstance(review, dict) else {}
     live_context = live_context if isinstance(live_context, dict) else {}
     freshness = live_context.get("freshness") if isinstance(live_context.get("freshness"), dict) else {}
@@ -107,6 +118,11 @@ def build_realtime_mix_comparison(
         and float(freshness["age_seconds"]) > 15.0
     )
     uploaded_metrics = review.get("metrics") if isinstance(review.get("metrics"), dict) else {}
+    live_rms = _number(live_context.get("rms_dbfs"))
+    uploaded_rms = _number(uploaded_metrics.get("rms_dbfs"))
+    live_active = live_rms is not None and live_rms > LIVE_ACTIVITY_FLOOR_DBFS
+    uploaded_active = uploaded_rms is not None and uploaded_rms > UPLOADED_ACTIVITY_FLOOR_DBFS
+    can_compare = live_current and live_active and uploaded_active
     comparisons: list[dict[str, Any]] = []
     metric_specs = (
         ("peak_dbfs", "Sample peak", "dBFS"),
@@ -114,7 +130,8 @@ def build_realtime_mix_comparison(
         ("crest_factor_db", "Crest factor", "dB"),
     )
     for key, label, unit in metric_specs:
-        if not live_current:
+        if not can_compare:
+            # Withhold both sides together: even a valid peak row would expose the quiet source.
             break
         live_key = "crest_db" if key == "crest_factor_db" else key
         live_value = _number(live_context.get(live_key))
@@ -147,11 +164,15 @@ def build_realtime_mix_comparison(
     if live_window and (live_window.get("dropped_samples") or live_window.get("invalid_samples")):
         # The plug-in dropped or discarded audio around this window, so its levels may miss part of the signal.
         limitations.append("The live window had dropped or invalid samples; treat its levels as approximate.")
-    pink_shape = _pink_shape_summary(live_context, review) if live_current else None
+    pink_shape = _pink_shape_summary(live_context, review) if can_compare else None
     if pink_shape is None:
         limitations.append("No paired pink-noise-style shape observation was available from both sources.")
     if not live_current:
         limitations.append("The retained plug-in context is stale_or_unknown for current diagnosis; comparison is withheld.")
+    if not live_active:
+        limitations.append("Live RMS is missing, invalid or at/below -80 dBFS; signal-derived comparisons are withheld.")
+    if not uploaded_active:
+        limitations.append("Uploaded RMS is missing, invalid or at/below -60 dBFS; signal-derived comparisons are withheld.")
     return {
         "ok": bool(review) and bool(live_context),
         "schema": SCHEMA,

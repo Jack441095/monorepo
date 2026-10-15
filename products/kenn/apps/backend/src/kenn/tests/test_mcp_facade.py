@@ -156,6 +156,8 @@ class FakeKennHTTP:
                     "review": {
                         "schema": "kenn.mix_review.reference_comparison.v1",
                         "status": "completed",
+                        # Whole-file activity qualifies the populated spectral comparison.
+                        "metrics": {"rms_dbfs": -18.0},  # dBFS, active uploaded render.
                         "reference_comparison": {
                             "comparison_basis": "Each LTAS is normalised around 1 kHz.",
                             "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
@@ -2171,6 +2173,35 @@ def test_mcp_realtime_mix_comparison_is_scope_labelled_and_read_only() -> None:
         ("GET", "/api/mix-review-status", {"id": "reference-review"}),
         ("GET", "/api/plugin-live-review", {"session_id": "mix-session"}),
     ]
+    assert all(method == "GET" for method, _path, _query in client.calls)
+
+
+@pytest.mark.parametrize("quiet_source", ["live", "uploaded"])
+def test_mcp_comparison_withholds_signal_details_for_either_quiet_source(quiet_source: str) -> None:
+    # Populated shape details must not bypass activity checks at the MCP boundary.
+    class QuietSourceHTTP(FakeKennHTTP):
+        def get(self, path: str, query: dict | None = None) -> dict:
+            response = super().get(path, query)
+            if quiet_source == "live" and path == "/api/plugin-live-review":
+                response["live_context"]["rms_dbfs"] = -80.0  # dBFS, live activity floor.
+            if quiet_source == "uploaded" and path == "/api/mix-review-status":
+                response["review"]["metrics"]["rms_dbfs"] = -60.0  # dBFS, uploaded activity floor.
+            return response
+
+    client = QuietSourceHTTP()
+    response = _call(
+        KennMCPFacade(client),
+        13,
+        "compare_realtime_mix_review",
+        {"review_id": "reference-review", "plugin_session_id": "mix-session"},
+    )
+    payload = json.loads(response["result"]["content"][0]["text"])
+
+    assert payload["comparison_available"] is False
+    assert payload["comparisons"] == []
+    assert payload["pink_noise_shape"] is None
+    assert payload["advisory_only"] is True
+    assert payload["live_target_inference_allowed"] is False
     assert all(method == "GET" for method, _path, _query in client.calls)
 
 
