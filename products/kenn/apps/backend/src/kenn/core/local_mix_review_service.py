@@ -148,6 +148,7 @@ def _review_from_report(
     filename: str,
     source_sha256: str,
     project_id: str,
+    reference_match: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     findings = [
         flag for flag in (_safe_flag(item) for item in report.get("findings") or [] if isinstance(item, dict))
@@ -167,7 +168,7 @@ def _review_from_report(
         "flags": findings,
         "action_plan": report.get("action_plan", []) if isinstance(report.get("action_plan"), list) else [],
         "technical_rating": _text(report.get("technical_rating"), 128),
-        "grade": _grade_from_report(report),
+        "grade": _grade_from_report(report, reference_match=reference_match),
         "limitations": report.get("limitations", ""),
         "qualified_fault_families": report.get("qualified_fault_families", []),
         "not_evaluated_fault_families": report.get("not_evaluated_fault_families", []),
@@ -332,6 +333,8 @@ def compare_reference_audio(
         "note": "reference supplied, but reference-match analysis unavailable",
     }
     ref_comp: dict[str, Any] = {
+        # Keep an unavailable result explicit so callers cannot mistake it for an omitted reference.
+        "reference_match_score": reference_score,
         "largest_spectral_difference": largest,
         "largest_ltas_difference": largest_ltas,
         "ltas_40_band_deltas": ltas_deltas[:8],
@@ -447,7 +450,9 @@ class LocalMixReviewService:
         *,
         project_id_override: str = "",
         mix_goal: str = "general",
+        reference_audio: tuple[bytes, str] | None = None,
     ) -> dict[str, Any]:
+        """Analyze a mix and optional reference, then persist measurements without either WAV payload."""
         if not isinstance(file_bytes, (bytes, bytearray)) or not file_bytes:
             return {"ok": False, "error": "Mix Review audio is empty."}
         if len(file_bytes) > self.MAX_UPLOAD_BYTES:
@@ -459,6 +464,16 @@ class LocalMixReviewService:
         validation = _engine.validate_wav_upload(payload, clean_filename, label="Local mix")
         if not validation.get("ok"):
             return {"ok": False, "error": str(validation.get("error") or "WAV validation failed.")}
+        comparison = None
+        if reference_audio is not None:
+            reference_bytes, reference_filename = reference_audio
+            if len(reference_bytes) > self.MAX_UPLOAD_BYTES:
+                # The request allows two files, but each still has the same per-WAV byte limit.
+                return {"ok": False, "error": f"Reference WAV is too large. {TOO_LARGE_ADVICE}"}
+            comparison = compare_reference_audio(payload, clean_filename, reference_bytes, reference_filename)
+            if not comparison.get("ok"):
+                # Reject the pair before saving: a mix-only receipt would hide the supplied reference's failure.
+                return comparison
         try:
             report = dict(_engine.analyze_wav(payload, filename=clean_filename, mix_goal=_text(mix_goal, 64)))
         except Exception as exc:
@@ -470,7 +485,12 @@ class LocalMixReviewService:
             filename=clean_filename,
             source_sha256=hashlib.sha256(payload).hexdigest(),
             project_id=project_id_override,
+            reference_match=comparison["reference_comparison"]["reference_match_score"] if comparison else None,
         )
+        if comparison:
+            # Keep the normal review's goal-specific findings; the comparison contributes only its own evidence.
+            review["reference"] = comparison["source_reference"]
+            review["reference_comparison"] = comparison["reference_comparison"]
         with self._lock:
             self._reviews[review_id] = review
             self._prune_reviews()
@@ -495,11 +515,19 @@ class LocalMixReviewService:
 
     def handle_multipart_review(self, content_type: str, body: bytes, *, project_id_override: str = "") -> dict[str, Any]:
         parts = self._multipart_parts(content_type, body)
-        audio = next(((value, filename) for name, value, filename in parts if filename and filename.lower().endswith(".wav")), None)
-        if audio is None:
-            return {"ok": False, "error": "Attach one WAV file for local Mix Review."}
+        # Select by role, not attachment order: a reference sent first must never become the mix.
+        # Older clients used other names for the sole mix file, so only "reference" is reserved here.
+        mixes = [(value, filename) for name, value, filename in parts if name != "reference" and (filename or name == "file")]
+        references = [(value, filename) for name, value, filename in parts if name == "reference"]
+        if len(mixes) != 1 or len(references) > 1 or any(not filename for _, filename in [*mixes, *references]):
+            # Ambiguous or nameless attachments cannot produce a receipt tied to a known pair of sources.
+            return {"ok": False, "error": "Attach one mix WAV and at most one reference WAV for local Mix Review."}
+        audio = mixes[0]
         mix_goal = next((value.decode("utf-8", "replace") for name, value, filename in parts if name == "mix_goal" and not filename), "general")
-        return self.save_review(audio[0], audio[1], project_id_override=project_id_override, mix_goal=mix_goal)
+        return self.save_review(
+            audio[0], audio[1], project_id_override=project_id_override, mix_goal=mix_goal,
+            reference_audio=references[0] if references else None,
+        )
 
     def mix_review_status(self, review_id: str) -> dict[str, Any]:
         review_id = _text(review_id, 128)

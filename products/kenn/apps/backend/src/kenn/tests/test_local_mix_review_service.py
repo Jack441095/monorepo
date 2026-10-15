@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import stat
@@ -28,6 +29,161 @@ def _wav_bytes(*, amplitude: float = 0.99, sample_rate: int = 8000, seconds: int
         handle.setframerate(sample_rate)
         handle.writeframes(payload)
     return output.getvalue()
+
+
+def _multipart_upload(parts: list[tuple[str, str, bytes]]) -> tuple[str, bytes]:
+    """Encode browser field names while letting regressions vary attachment order and validity."""
+    boundary = "kenn-browser-upload"
+    body = bytearray()
+    for name, filename, payload in parts:
+        disposition = f'Content-Disposition: form-data; name="{name}"'
+        if filename:
+            disposition += f'; filename="{filename}"'
+        body.extend(f"--{boundary}\r\n{disposition}\r\n\r\n".encode())
+        body.extend(payload)
+        body.extend(b"\r\n")
+    body.extend(f"--{boundary}--\r\n".encode())
+    return f"multipart/form-data; boundary={boundary}", bytes(body)
+
+
+@pytest.mark.parametrize("reference_first", [False, True])
+def test_browser_upload_includes_its_attached_reference_in_the_grade(tmp_path, reference_first):
+    # The browser already sent both fields, but the handler silently discarded the reference.
+    mix = _wav_bytes(amplitude=0.2, frequency_hz=100)
+    reference = _wav_bytes(amplitude=0.4, frequency_hz=3000)
+    attachments = [("file", "mix.wav", mix), ("reference", "reference.wav", reference)]
+    if reference_first:
+        attachments.reverse()
+    request = _multipart_upload([*attachments, ("mix_goal", "", b"premaster")])
+    service = LocalMixReviewService(tmp_path)
+    ordinary = service.save_review(mix, "mix.wav", mix_goal="premaster")["review"]
+
+    result = service.handle_multipart_review(*request, project_id_override="project-1")
+
+    assert result["ok"] is True
+    review = result["review"]
+    assert review["source"]["sha256"] == hashlib.sha256(mix).hexdigest()
+    assert review["reference"] == {"filename": "reference.wav", "sha256": hashlib.sha256(reference).hexdigest()}
+    assert review["project_id"] == "project-1"
+    for key in ("metrics", "findings", "flags", "action_plan", "technical_rating"):
+        assert review[key] == ordinary[key]
+    ref_part = next(part for part in review["grade"]["parts"] if part["part"] == "reference_match")
+    assert ref_part["points"] == review["reference_comparison"]["reference_match_score"]["points"]
+    assert ref_part["points_available"] == 30.0  # These mono WAVs supply no stereo comparison.
+    assert review["grade"]["points_available"] == ordinary["grade"]["points_available"] + 30.0
+    assert review["storage"] == "metadata_only"
+    assert review["audio_retained"] is False
+    restored = LocalMixReviewService(tmp_path).mix_review_status(result["review_id"])["review"]
+    assert restored == review
+    assert {path.name for path in tmp_path.iterdir()} == {"reviews.json"}
+
+
+@pytest.mark.parametrize("filename,payload,error", [
+    ("empty.wav", b"", "empty"),
+    ("corrupt.wav", b"not WAV audio", "WAV"),
+    ("other.mp3", _wav_bytes(), "supported WAV"),
+    ("surround.wav", _wav_bytes(channels=4), "only mono or stereo"),
+])
+def test_invalid_browser_reference_rejects_the_pair_without_saving_a_mix_only_review(tmp_path, filename, payload, error):
+    service = LocalMixReviewService(tmp_path)
+    request = _multipart_upload([
+        ("file", "mix.wav", _wav_bytes()), ("reference", filename, payload),
+    ])
+
+    result = service.handle_multipart_review(*request)
+
+    assert result["ok"] is False
+    assert error.lower() in result["error"].lower()
+    assert service.list_reviews() == []
+    assert not (tmp_path / "reviews.json").exists()
+
+
+def test_browser_reference_keeps_the_per_file_byte_limit(tmp_path):
+    service = LocalMixReviewService(tmp_path)
+    mix = _wav_bytes()
+    service.MAX_UPLOAD_BYTES = len(mix)
+    request = _multipart_upload([
+        ("file", "mix.wav", mix), ("reference", "long.wav", _wav_bytes(seconds=2)),
+    ])
+
+    result = service.handle_multipart_review(*request)
+
+    assert result["ok"] is False
+    assert "Reference WAV is too large" in result["error"]
+    assert service.list_reviews() == []
+
+
+@pytest.mark.parametrize("fields", [
+    [("reference", "reference.wav")],
+    [("file", "mix.mp3"), ("reference", "reference.wav")],
+    [("file", "mix.wav"), ("file", "other.wav")],
+    [("file", "mix.wav"), ("reference", "first.wav"), ("reference", "second.wav")],
+    [("file", "mix.wav"), ("reference", "")],
+    [("file", "mix.wav"), ("reference", "first.wav"), ("reference", "")],
+    [("file", ""), ("reference", "reference.wav")],
+    [("file", "mix.wav"), ("file", "")],
+    [("audio", "legacy.wav"), ("file", "")],
+])
+def test_browser_upload_never_substitutes_a_reference_or_chooses_an_ambiguous_pair(tmp_path, fields):
+    # Picking the first valid WAV hid bad mix attachments and reversed reference-first uploads.
+    service = LocalMixReviewService(tmp_path)
+    request = _multipart_upload([(name, filename, _wav_bytes()) for name, filename in fields])
+
+    assert service.handle_multipart_review(*request)["ok"] is False
+    assert service.list_reviews() == []
+
+
+def test_browser_reference_grade_changes_with_the_reference_and_does_not_leak(tmp_path):
+    service = LocalMixReviewService(tmp_path)
+    mix = _wav_bytes(amplitude=0.2, frequency_hz=100)
+
+    def upload(reference=None):
+        attachments = [("file", "mix.wav", mix)]
+        if reference is not None:
+            attachments.append(("reference", "reference.wav", reference))
+        return service.handle_multipart_review(*_multipart_upload(attachments))["review"]
+
+    matched = upload(mix)
+    changed = upload(_wav_bytes(amplitude=0.2, frequency_hz=3000))
+    repeated = upload(mix)
+    ordinary = upload()
+
+    assert matched["grade"]["points"] > changed["grade"]["points"]
+    assert repeated["grade"] == matched["grade"]
+    assert all(part["part"] != "reference_match" for part in ordinary["grade"]["parts"])
+    assert "reference" not in ordinary and "reference_comparison" not in ordinary
+
+
+def test_browser_reference_matching_failure_stays_explicit_in_the_saved_grade(tmp_path, monkeypatch):
+    def unavailable(*args, **kwargs):
+        raise RuntimeError("optional matching unavailable")
+
+    monkeypatch.setattr(mix_review._matching_engine(), "compare_mix_to_reference", unavailable)
+    # Stereo correlation is available even when optional loudness dependencies are absent.
+    audio = _wav_bytes(amplitude=0.2, frequency_hz=100, channels=2)
+    request = _multipart_upload([
+        ("file", "mix.wav", audio), ("reference", "reference.wav", audio),
+    ])
+
+    result = LocalMixReviewService(tmp_path).handle_multipart_review(*request)
+
+    assert result["ok"] is True
+    grade = result["review"]["grade"]
+    assert any(part["part"] == "technical_health" for part in grade["parts"])
+    reference = next(part for part in grade["ungraded"] if part["part"] == "reference_match")
+    assert reference["reason"] == "reference supplied, but reference-match analysis unavailable"
+    restored = LocalMixReviewService(tmp_path).mix_review_status(result["review_id"])["review"]
+    assert restored["grade"] == grade
+    assert restored["reference"]["filename"] == "reference.wav"
+
+
+def test_legacy_single_file_field_still_produces_an_ordinary_review(tmp_path):
+    request = _multipart_upload([("audio", "mix.wav", _wav_bytes())])
+
+    result = LocalMixReviewService(tmp_path).handle_multipart_review(*request)
+
+    assert result["ok"] is True
+    assert "reference" not in result["review"]
 
 
 def test_local_service_creates_metadata_only_review_and_persists_it(tmp_path) -> None:

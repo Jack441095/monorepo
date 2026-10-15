@@ -34,6 +34,27 @@ describe('normalizeMixReview grade', () => {
     expect(normalizeMixReview({ flags: [], grade }).grade).toMatchObject({ points: 17.5, points_available: 22 })
   })
 
+  it('keeps an uploaded reference and its grade beside the normal mix metrics', () => {
+    const combined = {
+      ...grade,
+      points: 40,
+      points_available: 52,
+      parts: [...grade.parts, { part: 'reference_match', points: 22.5, points_available: 30, full_marks: 40 }],
+      ungraded: [],
+      meaning: '40 of 52 points available, out of a possible 100.',
+    }
+    const reference = { filename: 'reference.wav', sha256: 'reference-content-hash' }
+    const review = normalizeMixReview({
+      ok: true,
+      status: 'completed',
+      review: { review_id: 'review-upload', metrics: { peak_dbfs: -8 }, flags: [], reference, grade: combined },
+    })
+
+    expect(review.grade).toEqual(combined)
+    expect(review.reference).toEqual(reference)
+    expect(review.metrics?.peak_dbfs).toBe(-8)
+  })
+
   it('does not invent a score when the backend sent no grade', () => {
     // The old fallback turned any flagged review into 50-98 / 100 and a "Solid with checks" label.
     const review = normalizeMixReview({ metrics: { peak_dbfs: -0.5 }, flags: [{ severity: 'high', label: 'Clipping' }] })

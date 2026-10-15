@@ -1140,6 +1140,60 @@ def test_audio_analysis_compare_returns_hashes_and_measured_deltas(running_serve
     assert "rms_dbfs" in result["metric_deltas"]
 
 
+def test_browser_mix_upload_keeps_reference_grade_in_status_and_export(running_server: str, tmp_path, monkeypatch) -> None:
+    import math
+    import kenn.server as server_module
+    from kenn.core.local_mix_review_service import LocalMixReviewService
+
+    def wav_bytes(frequency_hz: float) -> bytes:
+        # One second of PCM16 at 8 kHz; 32000 counts approaches full scale to exercise the headroom next step.
+        audio = io.BytesIO()
+        with wave.open(audio, "wb") as wav:
+            wav.setnchannels(1)
+            wav.setsampwidth(2)
+            wav.setframerate(8000)
+            wav.writeframes(b"".join(
+                struct.pack("<h", int(32000 * math.sin(2 * math.pi * frequency_hz * index / 8000)))
+                for index in range(8000)
+            ))
+        return audio.getvalue()
+
+    mix, reference = wav_bytes(100), wav_bytes(3000)
+    service = LocalMixReviewService(tmp_path)
+    # Shrink the per-file budget: the actual two-WAV body must exceed it and still reach the service.
+    service.MAX_UPLOAD_BYTES = len(mix)
+    monkeypatch.setattr(server_module, "mix_review", service)
+    boundary = f"kenn-{uuid.uuid4().hex}"
+    body = (
+        f'--{boundary}\r\nContent-Disposition: form-data; name="reference"; filename="reference.wav"\r\n\r\n'.encode()
+        + reference
+        + f'\r\n--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="mix.wav"\r\n\r\n'.encode()
+        + mix
+        + f'\r\n--{boundary}\r\nContent-Disposition: form-data; name="mix_goal"\r\n\r\npremaster\r\n--{boundary}--\r\n'.encode()
+    )
+    request = urllib.request.Request(
+        f"{running_server}/api/mix-review", data=body,
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"}, method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=10) as response:
+        result = json.loads(response.read())
+
+    review = result["review"]
+    assert result["ok"] is True
+    assert review["source"]["filename"] == "mix.wav"
+    assert review["reference"]["filename"] == "reference.wav"
+    assert "peak_dbfs" in review["metrics"]
+    assert any(part["part"] == "reference_match" for part in review["grade"]["parts"])
+    assert review["next_step"]["kind"] == "question"
+    for path in (f"/api/mix-review-status?id={result['review_id']}", f"/api/mix-review-report/{result['review_id']}.json"):
+        with urllib.request.urlopen(f"{running_server}{path}", timeout=10) as response:
+            stored = json.loads(response.read())
+        receipt = stored.get("review", stored)
+        assert receipt["grade"] == review["grade"]
+        assert receipt["reference"] == review["reference"]
+        assert receipt["audio_retained"] is False
+
+
 def test_mix_reference_endpoint_persists_metadata_only_receipt(running_server: str) -> None:
     def wav_bytes(frequency_hz: float) -> bytes:
         import math
@@ -1675,7 +1729,8 @@ def test_small_json_routes_refuse_a_huge_body_before_reading_it(running_server: 
 
 
 def test_an_oversized_mix_upload_says_the_limit_and_what_to_do(running_server: str) -> None:
-    status, body = _claim_length(running_server, "/api/mix-review", 200 * 1024 * 1024, "multipart/form-data; boundary=x")
+    # Two 150 MiB WAVs plus their multipart envelope fit; a larger claim is refused before reading.
+    status, body = _claim_length(running_server, "/api/mix-review", 303 * 1024 * 1024, "multipart/form-data; boundary=x")
     assert status == 413
     assert "150 MB" in body["error"] and "shorter section" in body["error"]
 
