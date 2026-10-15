@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 
 from kenn.core.audiogen_artifacts import safe_artifact_metadata
+from kenn.core.evidence import UPLOADED_SIGNAL_LIMITATION, uploaded_metrics_have_activity
 
 
 def safe_error_payload(status: int, payload: dict, error_id: str) -> dict:
@@ -128,25 +129,37 @@ def _format_genre_classification(mix_style: object) -> str:
 
 
 def mix_review_context_turn(context: dict | None) -> dict | None:
+    """Build uploaded-review history, withholding signal claims unless whole-file RMS qualifies."""
     if not isinstance(context, dict):
+        # An absent upload adds no history turn to an otherwise valid chat.
         return None
     if context.get("schema") == "kenn_mix_review_handoff.v1":
-        lines = [str(line).strip() for line in context.get("context_lines") or [] if str(line).strip()]
         title = str(context.get("title", "Uploaded mix")).strip()[:120] or "Uploaded mix"
+        session_context = context.get("session_context") if isinstance(context.get("session_context"), dict) else {}
+        mix_goal_label = str(context.get("mix_goal_label") or session_context.get("mix_goal_label") or "").strip()
+        session_goal = str(context.get("session_goal") or session_context.get("session_goal") or "").strip()
+        metrics = context.get("metrics") if isinstance(context.get("metrics"), dict) else {}
+        if not uploaded_metrics_have_activity(metrics):
+            # Older handoffs can carry cached prose and repairs alongside quiet
+            # metrics. Rebuild from identity and explicit intent so none of those
+            # signal claims can bypass the typed evidence publication gate.
+            lines = [f"Mix Review Lab context for {title}.", UPLOADED_SIGNAL_LIMITATION]
+            if mix_goal_label:
+                lines.append(f"Selected mix target: {mix_goal_label[:160]}")
+            if session_goal:
+                lines.append(f"Session goal: {session_goal[:300]}")
+            return {"role": "user", "content": "\n".join(lines)}
+        lines = [str(line).strip() for line in context.get("context_lines") or [] if str(line).strip()]
         if not lines:
             lines = [
                 f"Mix Review Lab context for {title}.",
                 str(context.get("context", "")).strip(),
             ]
         lines.insert(1, "Use this structured uploaded-track analysis before general retrieval notes.")
-        session_context = context.get("session_context") if isinstance(context.get("session_context"), dict) else {}
-        mix_goal_label = str(context.get("mix_goal_label") or session_context.get("mix_goal_label") or "").strip()
-        session_goal = str(context.get("session_goal") or session_context.get("session_goal") or "").strip()
         if mix_goal_label:
             lines.append(f"Selected mix target: {mix_goal_label[:160]}")
         if session_goal:
             lines.append(f"Session goal: {session_goal[:300]}")
-        metrics = context.get("metrics") if isinstance(context.get("metrics"), dict) else {}
         if metrics:
             lines.append(
                 "Structured metrics: "

@@ -4,14 +4,14 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from kenn.core.evidence import LIVE_ACTIVITY_FLOOR_DBFS
+from kenn.core.evidence import (
+    LIVE_ACTIVITY_FLOOR_DBFS,
+    UPLOADED_ACTIVITY_FLOOR_DBFS,  # Preserve the existing module-level threshold import for callers.
+    uploaded_metrics_have_activity,
+)
 
 
 SCHEMA = "kenn.realtime_mix_comparison.v1"
-# Mirror reference_matching.REFERENCE_MIN_RMS_DBFS (-60 dBFS) without loading
-# the optional file-based matching engine just to compare existing report metrics.
-# The upload uses its reported mean channel RMS, not the reference scorer's mono sum.
-UPLOADED_ACTIVITY_FLOOR_DBFS = -60.0
 
 
 def _number(value: Any) -> float | None:
@@ -119,9 +119,8 @@ def build_realtime_mix_comparison(
     )
     uploaded_metrics = review.get("metrics") if isinstance(review.get("metrics"), dict) else {}
     live_rms = _number(live_context.get("rms_dbfs"))
-    uploaded_rms = _number(uploaded_metrics.get("rms_dbfs"))
     live_active = live_rms is not None and live_rms > LIVE_ACTIVITY_FLOOR_DBFS
-    uploaded_active = uploaded_rms is not None and uploaded_rms > UPLOADED_ACTIVITY_FLOOR_DBFS
+    uploaded_active = uploaded_metrics_have_activity(review.get("metrics"))
     can_compare = live_current and live_active and uploaded_active
     comparisons: list[dict[str, Any]] = []
     metric_specs = (

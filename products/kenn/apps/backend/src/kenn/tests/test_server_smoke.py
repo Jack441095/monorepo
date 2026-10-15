@@ -1879,3 +1879,46 @@ def test_saying_yes_to_a_proposal_points_at_the_apply_button(monkeypatch) -> Non
     for said in ("yes", "Apply it", "go ahead!", "do it please"):
         assert _SAYS_YES.match(said), said
     assert not _SAYS_YES.match("yes but turn it down instead")
+
+
+@pytest.mark.parametrize("sample,active", [(1, False), (32, False), (33, True)])
+def test_uploaded_review_and_chat_withhold_quiet_signal_over_http(running_server, sample, active) -> None:
+    # Adjacent PCM amplitudes straddle -60 dBFS, exercising real analysis before both publication boundaries.
+    audio = io.BytesIO()
+    with wave.open(audio, "wb") as wav:
+        wav.setnchannels(1)
+        wav.setsampwidth(2)
+        wav.setframerate(8000)
+        wav.writeframes(struct.pack("<h", sample) * 8000)
+    boundary = f"kenn-{uuid.uuid4().hex}"
+    body = (
+        f'--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="activity.wav"\r\n'
+        'Content-Type: audio/wav\r\n\r\n'
+    ).encode() + audio.getvalue() + f"\r\n--{boundary}--\r\n".encode()
+    upload = urllib.request.Request(
+        f"{running_server}/api/mix-review", data=body,
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"}, method="POST",
+    )
+    with urllib.request.urlopen(upload, timeout=30) as response:
+        result = json.loads(response.read())
+    assert result["ok"] is True
+    review = result["review"]
+    assert review["source"]["filename"] == "activity.wav"
+    assert bool(review["metrics"]) is active
+    if not active:
+        assert review["grade"]["points_available"] == 0
+        assert review["findings"] == review["flags"] == review["action_plan"] == []
+        assert review["evidence"] is None and review["technical_rating"] == ""
+        assert "at/below -60 dBFS" in review["signal_limitation"]
+    ask = urllib.request.Request(
+        f"{running_server}/api/ask",
+        data=json.dumps({"question": "What does the uploaded mix show about peak level?", "mix_review_id": result["review_id"]}).encode(),
+        headers={"Content-Type": "application/json"}, method="POST",
+    )
+    with urllib.request.urlopen(ask, timeout=30) as response:
+        answer = json.loads(response.read())
+    evidence = answer["mix_review_evidence"]
+    assert evidence["review_id"] == result["review_id"]
+    assert bool(evidence["facts"]) is active
+    if not active:
+        assert any("at/below -60 dBFS" in item for item in evidence["limitations"])

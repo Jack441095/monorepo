@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 import pytest
 
 from kenn.core.evidence import (
@@ -8,6 +10,7 @@ from kenn.core.evidence import (
     from_mix_review_context,
     from_plugin_context,
     live_context_has_activity,
+    uploaded_metrics_have_activity,
     plugin_context_for_advice,
     from_realtime_mix_comparison,
     from_stem_masking_context,
@@ -234,7 +237,7 @@ def test_plugin_context_just_above_activity_floor_keeps_signal_facts_and_pink_de
 def test_reference_ltas_measurement_is_rendered_as_a_listening_target() -> None:
     packet = from_mix_review_context({
         "schema": "kenn_mix_review_handoff.v1",
-        "metrics": {},
+        "metrics": {"rms_dbfs": -18.0},
         "reference_comparison": {
             "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
             "lufs_delta_db": 0.2,
@@ -250,7 +253,7 @@ def test_reference_ltas_measurement_is_rendered_as_a_listening_target() -> None:
 def test_pink_noise_measurement_is_rendered_as_bounded_shape_evidence() -> None:
     packet = from_mix_review_context({
         "schema": "kenn_mix_review_handoff.v1",
-        "metrics": {},
+        "metrics": {"rms_dbfs": -18.0},
         "reference_comparison": {
             "pink_noise_reference": {
                 "curve": "-3 dB per octave pink-noise-style spectral baseline",
@@ -451,3 +454,44 @@ def test_advice_context_keeps_active_signal_data_and_preserves_missing_context()
     assert plugin_context_for_advice(None) is None
     assert not live_context_has_activity(None)
     assert not live_context_has_activity({})
+
+
+@pytest.mark.parametrize("rms,active", [
+    ("missing", False), (None, False), (True, False), (False, False), ("-18", False),
+    (float("nan"), False), (float("inf"), False), (-float("inf"), False),
+    (10 ** 1000, False), (-100.0, False), (-60.0, False), (-59.9, True),
+])
+def test_uploaded_evidence_withholds_quiet_meters_and_nested_signal_facts(rms, active) -> None:
+    # Caller handoffs and older stored reviews can contain quiet RMS beside convincing peak/stem/reference values.
+    context = {
+        "schema": "kenn_mix_review_handoff.v1",
+        "metrics": {"rms_dbfs": rms, "peak_dbfs": -0.1, "stereo_correlation": -0.9},
+        "analysis_evidence": {
+            "transient_preservation": {"score": 0.9, "profile": "compressed"},
+            "stem_masking": {"lowest_visibility": 0.1, "lowest_visibility_stem": "Bass"},
+            "low_end_stems": [{"name": "Bass"}],
+        },
+        "reference_comparison": {
+            "largest_ltas_difference": {"center_hz": 315.0, "delta_db": 5.0},
+            "pink_noise_reference": {"curve": "pink baseline", "largest_deviation": {"center_hz": 315.0, "deviation_db": 5.0}},
+            "lufs_delta_db": 4.0,
+        },
+    }
+    if rms == "missing":
+        context["metrics"].pop("rms_dbfs")
+    saved = deepcopy(context)
+
+    packet = from_mix_review_context(context)
+
+    assert packet is not None and packet.source == "mix_review_upload"
+    assert uploaded_metrics_have_activity(context["metrics"]) is active
+    if active:
+        assert {fact.name for fact in packet.facts} >= {
+            "rms_dbfs", "peak_dbfs", "transient_preservation_score", "stem_masking_lowest_visibility",
+            "reference_largest_ltas_delta_db", "pink_noise_largest_deviation_db", "reference_lufs_delta_db",
+        }
+    else:
+        assert packet.facts == ()
+        assert any("at/below -60 dBFS" in item for item in packet.limitations)
+        assert relevant_observations("peak and pink reference bass masking", [packet]) == []
+    assert context == saved

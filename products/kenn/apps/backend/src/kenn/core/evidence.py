@@ -21,6 +21,10 @@ MARKER = "KENN_EVIDENCE_PACKET_V1:"
 MAX_PLUGIN_CONTEXT_AGE_SECONDS = 15.0
 # Match the existing per-insert analysis floor; this is activity in dBFS, not a mix-quality target.
 LIVE_ACTIVITY_FLOOR_DBFS = -80.0
+# Mirror reference_matching.REFERENCE_MIN_RMS_DBFS (-60 dBFS) without loading
+# the optional matching engine. Uploaded reports use mean channel RMS, not its mono sum.
+UPLOADED_ACTIVITY_FLOOR_DBFS = -60.0
+UPLOADED_SIGNAL_LIMITATION = "RMS is missing, invalid or at/below -60 dBFS; signal measurements, grading and recommendations are withheld."
 
 
 @dataclass(frozen=True)
@@ -74,6 +78,20 @@ def live_context_has_activity(context: dict[str, Any] | None) -> bool:
     except OverflowError:
         rms_value = None  # An unrepresentable integer cannot establish the activity floor.
     return rms_value is not None and math.isfinite(rms_value) and rms_value > LIVE_ACTIVITY_FLOOR_DBFS
+
+
+def uploaded_metrics_have_activity(metrics: dict[str, Any] | None) -> bool:
+    """Return whether reported whole-file RMS exceeds the existing -60 dBFS floor."""
+    if not isinstance(metrics, dict):
+        # Missing report metrics cannot establish activity in the uploaded source.
+        return False
+    rms = metrics.get("rms_dbfs")
+    try:
+        value = float(rms) if isinstance(rms, (int, float)) and not isinstance(rms, bool) else None
+    except OverflowError:
+        # An unrepresentable integer cannot qualify the source for publication.
+        return False
+    return value is not None and math.isfinite(value) and value > UPLOADED_ACTIVITY_FLOOR_DBFS
 
 
 def plugin_context_for_advice(context: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -198,6 +216,7 @@ def from_plugin_context(context: dict[str, Any] | None) -> EvidencePacket | None
 def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | None:
     """Convert a structured uploaded-track review into measured evidence.
 
+    Whole-file activity must qualify before any signal fact is published.
     Only numeric report metrics become measured facts.  Report flags and
     recommended actions remain interpretations in the existing Mix Review
     context, rather than being falsely elevated to raw measurements.
@@ -205,8 +224,12 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
     if not isinstance(context, dict) or context.get("schema") != "kenn_mix_review_handoff.v1":
         return None
     metrics = context.get("metrics")
-    if not isinstance(metrics, dict):
-        return None
+    if not uploaded_metrics_have_activity(metrics):
+        # Older stored reviews and caller handoffs can bypass current review publication.
+        return EvidencePacket(
+            source="mix_review_upload", captured_at_age_seconds=None, facts=(),
+            limitations=(UPLOADED_SIGNAL_LIMITATION,),
+        )
     facts: list[EvidenceFact] = []
     # These are calculated assessments/labels, not measurements.  They can
     # remain available in the Mix Review narrative, but must not gain the

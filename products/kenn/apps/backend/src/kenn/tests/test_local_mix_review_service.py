@@ -10,7 +10,7 @@ import wave
 import pytest
 
 from kenn.core import local_mix_review_service as mix_review
-from kenn.core.local_mix_review_service import MAX_REVIEWS, LocalMixReviewService, compare_reference_audio
+from kenn.core.local_mix_review_service import MAX_REVIEWS, LocalMixReviewService, _review_from_report, compare_reference_audio
 
 
 def _wav_bytes(*, amplitude: float = 0.99, sample_rate: int = 8000, seconds: int = 1, frequency_hz: float = 0.0, channels: int = 1) -> bytes:
@@ -225,6 +225,145 @@ def test_local_service_creates_metadata_only_review_and_persists_it(tmp_path) ->
     assert status["ok"] is True
     assert status["review"]["review_id"] == review_id
     assert restored.list_reviews(limit=1)[0]["review_id"] == review_id
+
+
+@pytest.mark.parametrize("rms", ["missing", None, True, float("nan"), float("inf"), -float("inf"), 10 ** 1000, -60.0, -60.01])
+def test_unqualified_uploaded_review_keeps_provenance_but_withholds_signal_output(rms):
+    metrics = {
+        "peak_dbfs": -0.1,
+        "integrated_lufs": -8.0,
+        "rms_dbfs": rms,
+    }
+    if rms == "missing":
+        metrics.pop("rms_dbfs")
+    report = {
+        "ok": True,
+        "timestamp": "2026-10-15T10:00:00Z",
+        "analysis_version": "test-v1",
+        "input_context": {"format": "wav", "duration_seconds": 2.0, "channel_layout": "stereo"},
+        "metrics": metrics,
+        "evidence": {"schema": "kenn.evidence.v1", "facts": [{"name": "peak_dbfs", "value": -0.1}]},
+        "findings": [{"type": "headroom", "fault_family": "headroom", "detected": True}],
+        "action_plan": [{"focus": "headroom"}],
+        "technical_rating": "Poor",
+        "limitations": "Existing analyzer limits.",
+    }
+
+    review = _review_from_report(
+        report, review_id="review-test", filename="quiet.wav", source_sha256="a" * 64, project_id="project-1",
+        reference_match={"points": 20.0, "points_available": 30.0},
+    )
+
+    assert review["status"] == "completed"
+    assert review["source"] == {"filename": "quiet.wav", "sha256": "a" * 64}
+    assert review["project_id"] == "project-1"
+    assert review["input_context"] == report["input_context"]
+    assert review["metrics"] == {}
+    assert review["evidence"] is None
+    assert review["findings"] == [] and review["flags"] == [] and review["action_plan"] == []
+    assert review["technical_rating"] == ""
+    assert review["signal_limitation"] and "at/below -60 dBFS" in review["signal_limitation"]
+    assert review["signal_limitation"] in review["limitations"]
+    assert review["grade"]["points"] == 0.0 and review["grade"]["points_available"] == 0.0
+
+
+def test_legacy_quiet_review_is_sanitized_on_read_without_rewriting_registry(tmp_path):
+    legacy = {
+        "schema": "kenn.mix_review.local_review.v1",
+        "review_id": "review-legacy-quiet",
+        "status": "completed",
+        "source": {"filename": "quiet.wav", "sha256": "a" * 64},
+        "reference": {"filename": "ref.wav", "sha256": "b" * 64},
+        "metrics": {"rms_dbfs": -80.0, "peak_dbfs": -0.1, "integrated_lufs": -8.0},
+        "evidence": {"facts": [{"name": "peak_dbfs", "value": -0.1}]},
+        "findings": [{"type": "legacy_signal_finding"}],
+        "flags": [{"label": "Legacy signal flag"}],
+        "action_plan": [{"focus": "legacy EQ"}],
+        "technical_rating": "Poor",
+        "qualified_fault_families": ["headroom"],
+        "not_evaluated_fault_families": ["stereo"],
+        "reference_comparison": {
+            "reference_match_score": {"points": 12.0, "points_available": 30.0},
+            "pink_noise_reference": {"largest_deviation": {"center_hz": 80.0}},
+            "recommendations": ["legacy EQ move"],
+        },
+        "grade": {"points": 87.0, "points_available": 100.0},
+        "input_context": {"channel_layout": "stereo"},
+    }
+    index_path = tmp_path / "reviews.json"
+    index_path.write_text(json.dumps({legacy["review_id"]: legacy}), encoding="utf-8")
+    service = LocalMixReviewService(tmp_path)
+
+    fetched = service.mix_review_status(legacy["review_id"])["review"]
+    listed = service.list_reviews()[0]
+    exported = json.loads(service.report_json_bytes(legacy["review_id"]))
+
+    for result in (fetched, listed, exported):
+        assert result["source"] == legacy["source"]
+        assert result["reference"] == legacy["reference"]
+        assert result["metrics"] == {} and result["evidence"] is None
+        assert result["findings"] == result["flags"] == result["action_plan"] == []
+        assert result["technical_rating"] == ""
+        assert "reference_comparison" not in result
+        assert result["signal_limitation"]
+        assert result["grade"]["points"] == result["grade"]["points_available"] == 0.0
+    # Fetching old metadata must not silently rewrite the on-disk source record.
+    assert json.loads(index_path.read_text(encoding="utf-8"))[legacy["review_id"]] == legacy
+
+
+def test_legacy_active_review_keeps_signal_fields_on_read(tmp_path):
+    active = {
+        "schema": "kenn.mix_review.local_review.v1",
+        "review_id": "review-legacy-active",
+        "status": "completed",
+        "metrics": {"rms_dbfs": -12.0, "peak_dbfs": -1.0},
+        "findings": [{"type": "headroom"}],
+        "reference_comparison": {"reference_match_score": {"points": 2.0}},
+        "grade": {"points": 80.0},
+    }
+    (tmp_path / "reviews.json").write_text(json.dumps({active["review_id"]: active}), encoding="utf-8")
+
+    fetched = LocalMixReviewService(tmp_path).mix_review_status(active["review_id"])["review"]
+
+    assert fetched["metrics"] == active["metrics"]
+    assert fetched["findings"] == active["findings"]
+    assert fetched["reference_comparison"] == active["reference_comparison"]
+
+
+def test_active_mix_with_quiet_reference_keeps_comparison_limitation(tmp_path):
+    audible = _wav_bytes(amplitude=0.2, frequency_hz=100)
+    quiet = _wav_bytes(amplitude=0.0005, frequency_hz=3000)
+
+    result = LocalMixReviewService(tmp_path).save_review(
+        audible, "mix.wav", reference_audio=(quiet, "quiet-reference.wav"),
+    )
+    review = result["review"]
+
+    assert review["metrics"]["rms_dbfs"] > -60.0
+    assert review["reference"] == {"filename": "quiet-reference.wav", "sha256": hashlib.sha256(quiet).hexdigest()}
+    assert "reference RMS" in review["limitations"]
+
+
+def test_uploaded_review_just_above_significance_floor_keeps_signal_output():
+    report = {
+        "ok": True,
+        "metrics": {"rms_dbfs": -59.99, "peak_dbfs": -0.1},
+        "evidence": {"schema": "kenn.evidence.v1", "facts": [{"name": "peak_dbfs", "value": -0.1}]},
+        "findings": [{"type": "headroom", "fault_family": "headroom", "detected": True, "severity": "high", "confidence": 0.9}],
+        "action_plan": [{"focus": "headroom"}],
+        "technical_rating": "Needs headroom",
+    }
+
+    review = _review_from_report(
+        report, review_id="review-active", filename="active.wav", source_sha256="b" * 64, project_id="",
+    )
+
+    assert review["metrics"]["rms_dbfs"] == -59.99
+    assert review["evidence"] == report["evidence"]
+    assert review["findings"] == report["findings"]
+    assert review["flags"][0]["fault_family"] == "headroom"
+    assert review["action_plan"] == report["action_plan"]
+    assert review["signal_limitation"] is None
 
 
 def test_local_service_rejects_invalid_audio_without_creating_review(tmp_path) -> None:

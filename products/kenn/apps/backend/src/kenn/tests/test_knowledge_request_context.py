@@ -232,7 +232,8 @@ def test_mcp_to_real_http_route_preserves_mix_review_and_all_context_identifiers
 
     def stored_review(review_id):
         assert review_id == "review-a"
-        return {"status": "completed", "review": {"metrics": {"integrated_lufs": -14.0}}}
+        # This routing example represents measured, active audio rather than an unqualified legacy receipt.
+        return {"status": "completed", "review": {"metrics": {"integrated_lufs": -14.0, "rms_dbfs": -18.0}}}
 
     monkeypatch.setattr(chat_answer, "_answer_payload_raw", raw)
     monkeypatch.setattr(server, "mix_review", SimpleNamespace(mix_review_status=stored_review))

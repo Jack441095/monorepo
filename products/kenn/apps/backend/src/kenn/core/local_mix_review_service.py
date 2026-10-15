@@ -12,6 +12,7 @@ from __future__ import annotations
 from email.parser import BytesParser
 from email.policy import default as email_default
 from datetime import datetime, timezone
+import copy
 import functools
 import hashlib
 import html
@@ -24,13 +25,18 @@ from threading import Lock
 import uuid
 from typing import Any
 
+from kenn.core.evidence import (
+    UPLOADED_ACTIVITY_FLOOR_DBFS,
+    UPLOADED_SIGNAL_LIMITATION,
+    uploaded_metrics_have_activity,
+)
 from kenn.core.grade import grade_session
 from kenn.core.mix_doctor import MixDoctor
 from kenn.paths import PACKAGES_ROOT
 
 
 _SERVICE_ROOT = PACKAGES_ROOT / "mix-review"
-_REFERENCE_MIN_RMS_DBFS = -60.0  # Match the existing reference scorer's significance boundary.
+_REFERENCE_MIN_RMS_DBFS = UPLOADED_ACTIVITY_FLOOR_DBFS
 _ENGINE_PATH = _SERVICE_ROOT / "core" / "local_engine.py"
 _MASKING_PATH = _SERVICE_ROOT / "core" / "masking_analysis.py"
 _MATCHING_PATH = _SERVICE_ROOT / "core" / "reference_matching.py"
@@ -126,19 +132,31 @@ def _grade_from_report(
     with 1.0, which would read as a perfect stereo image.
     """
     metrics = report.get("metrics") if isinstance(report.get("metrics"), dict) else {}
+    source_is_significant = uploaded_metrics_have_activity(metrics)
     meters: dict[str, float] = {}
-    for key in ("integrated_lufs", "true_peak_dbtp", "crest_factor_db"):
-        value = _finite(metrics.get(key))
-        if value is not None:
-            meters[key] = value
-    layout = (report.get("input_context") or {}).get("channel_layout")
-    timeline = metrics.get("correlation_timeline")
-    windows = [v for v in (timeline.get("correlation") if isinstance(timeline, dict) else None) or [] if _finite(v) is not None]
-    if layout == "stereo" and windows:
-        meters["phase_correlation"] = sum(windows) / len(windows)
+    if source_is_significant:
+        for key in ("integrated_lufs", "true_peak_dbtp", "crest_factor_db"):
+            value = _finite(metrics.get(key))
+            if value is not None:
+                meters[key] = value
+        layout = (report.get("input_context") or {}).get("channel_layout")
+        timeline = metrics.get("correlation_timeline")
+        windows = [v for v in (timeline.get("correlation") if isinstance(timeline, dict) else None) or [] if _finite(v) is not None]
+        if layout == "stereo" and windows:
+            meters["phase_correlation"] = sum(windows) / len(windows)
     # No session behind an uploaded file, so there are no tracks for the Doctor's name and fader advice to read.
     technical = MixDoctor().audit_session({"tracks": []}, meters=meters).to_dict()
     # Only the comparison for this upload may contribute reference points; ordinary reviews leave it absent.
+    if not source_is_significant:
+        # Keep the scorer's explicit quiet-side reason, but never let a stale or inconsistent score through.
+        reason = None
+        if isinstance(reference_match, dict) and _finite(reference_match.get("points_available")) == 0.0:
+            reason = reference_match.get("note")
+        reference_match = {
+            "points": 0.0,
+            "points_available": 0.0,
+            "note": reason if isinstance(reason, str) and reason else UPLOADED_SIGNAL_LIMITATION,
+        }
     return grade_session(technical, meters, reference_match=reference_match)
 
 
@@ -151,10 +169,18 @@ def _review_from_report(
     project_id: str,
     reference_match: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    findings = [
-        flag for flag in (_safe_flag(item) for item in report.get("findings") or [] if isinstance(item, dict))
-        if flag is not None
-    ]
+    raw_metrics = report.get("metrics") if isinstance(report.get("metrics"), dict) else {}
+    source_is_significant = uploaded_metrics_have_activity(raw_metrics)
+    signal_limitation = UPLOADED_SIGNAL_LIMITATION if not source_is_significant else None
+    findings = []
+    if source_is_significant:
+        findings = [
+            flag for flag in (_safe_flag(item) for item in report.get("findings") or [] if isinstance(item, dict))
+            if flag is not None
+        ]
+    limitations = report.get("limitations", "")
+    if signal_limitation:
+        limitations = f"{limitations} {signal_limitation}".strip()
     return {
         "schema": "kenn.mix_review.local_review.v1",
         "review_id": review_id,
@@ -163,20 +189,66 @@ def _review_from_report(
         "analysis_version": _text(report.get("analysis_version"), 128),
         "source": {"filename": Path(filename).name[:256], "sha256": source_sha256},
         "project_id": _text(project_id, 128),
-        "metrics": report.get("metrics", {}) if isinstance(report.get("metrics"), dict) else {},
-        "evidence": report.get("evidence") if isinstance(report.get("evidence"), dict) else None,
-        "findings": report.get("findings", []) if isinstance(report.get("findings"), list) else [],
+        "input_context": report.get("input_context", {}) if isinstance(report.get("input_context"), dict) else {},
+        "metrics": raw_metrics if source_is_significant else {},
+        "evidence": report.get("evidence") if source_is_significant and isinstance(report.get("evidence"), dict) else None,
+        "findings": report.get("findings", []) if source_is_significant and isinstance(report.get("findings"), list) else [],
         "flags": findings,
-        "action_plan": report.get("action_plan", []) if isinstance(report.get("action_plan"), list) else [],
-        "technical_rating": _text(report.get("technical_rating"), 128),
+        "action_plan": report.get("action_plan", []) if source_is_significant and isinstance(report.get("action_plan"), list) else [],
+        "technical_rating": _text(report.get("technical_rating"), 128) if source_is_significant else "",
         "grade": _grade_from_report(report, reference_match=reference_match),
-        "limitations": report.get("limitations", ""),
+        "signal_limitation": signal_limitation,
+        "limitations": limitations,
         "qualified_fault_families": report.get("qualified_fault_families", []),
         "not_evaluated_fault_families": report.get("not_evaluated_fault_families", []),
         "storage": "metadata_only",
         "audio_retained": False,
         "external_network": False,
     }
+
+
+def _published_review(review: dict[str, Any]) -> dict[str, Any]:
+    """Return a publication-safe copy of a stored review, including legacy receipts."""
+    published = copy.deepcopy(review)
+    if published.get("schema") != "kenn.mix_review.local_review.v1":
+        # Standalone reference-comparison receipts have their own two-source significance gate.
+        return published
+    metrics = published.get("metrics") if isinstance(published.get("metrics"), dict) else {}
+    if uploaded_metrics_have_activity(metrics):
+        return published
+
+    original_metrics = review.get("metrics") if isinstance(review.get("metrics"), dict) else {}
+    reference_match = None
+    comparison = review.get("reference_comparison")
+    score = comparison.get("reference_match_score") if isinstance(comparison, dict) else None
+    if isinstance(score, dict):
+        reference_match = score
+    report = {
+        "metrics": original_metrics,
+        "input_context": review.get("input_context") if isinstance(review.get("input_context"), dict) else {},
+    }
+    for key in (
+        "metrics", "evidence", "findings", "flags", "action_plan", "technical_rating",
+        "qualified_fault_families", "not_evaluated_fault_families",
+    ):
+        if key in {"metrics", "evidence"}:
+            published[key] = {} if key == "metrics" else None
+        elif key == "technical_rating":
+            published[key] = ""
+        else:
+            published[key] = []
+    # A legacy comparison bundles spectral deltas, tonal profiles, and EQ actions in one object.
+    published.pop("reference_comparison", None)
+    published["grade"] = _grade_from_report(report, reference_match=reference_match)
+    published["signal_limitation"] = UPLOADED_SIGNAL_LIMITATION
+    limitations = published.get("limitations")
+    if not isinstance(limitations, str):
+        # Legacy records without narrative limitations still need an explicit abstention reason.
+        limitations = ""
+    if UPLOADED_SIGNAL_LIMITATION not in limitations:
+        limitations = f"{limitations} {UPLOADED_SIGNAL_LIMITATION}".strip()
+    published["limitations"] = limitations
+    return published
 
 
 def _number(value: Any) -> float | None:
@@ -507,6 +579,12 @@ class LocalMixReviewService:
             # Keep the normal review's goal-specific findings; the comparison contributes only its own evidence.
             review["reference"] = comparison["source_reference"]
             review["reference_comparison"] = comparison["reference_comparison"]
+            score = comparison["reference_comparison"].get("reference_match_score")
+            if isinstance(score, dict) and _finite(score.get("points_available")) == 0.0:
+                reason = _text(score.get("note"), 512)
+                if reason:
+                    review["limitations"] = f'{review.get("limitations", "")} Reference comparison unavailable: {reason}.'.strip()
+        review = _published_review(review)
         with self._lock:
             self._reviews[review_id] = review
             self._prune_reviews()
@@ -551,7 +629,7 @@ class LocalMixReviewService:
             review = self._reviews.get(review_id)
         if review is None:
             return {"ok": False, "error": "Mix Review was not found.", "review": None, "review_id": review_id}
-        return {"ok": True, "review_id": review_id, "status": review.get("status", "unknown"), "review": dict(review)}
+        return {"ok": True, "review_id": review_id, "status": review.get("status", "unknown"), "review": _published_review(review)}
 
     def list_reviews(self, limit: int = 20) -> list[dict[str, Any]]:
         try:
@@ -560,7 +638,7 @@ class LocalMixReviewService:
             bounded = 20
         with self._lock:
             values = list(self._reviews.values())[-bounded:]
-        return [dict(item) for item in reversed(values)]
+        return [_published_review(item) for item in reversed(values)]
 
     def runtime_state_counts(self) -> dict[str, int]:
         """Expose counts and limits without review IDs, names, or content."""

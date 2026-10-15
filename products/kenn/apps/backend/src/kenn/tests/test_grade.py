@@ -1,5 +1,7 @@
 """The combined E2 grade: parts add up, and what was not graded is named instead of rescaled."""
 
+import pytest
+
 from kenn.core.declared_target import score_declared_target
 from kenn.core.grade import combine_grade, grade_session, stated_target_from_text
 from kenn.core.local_mix_review_service import _grade_from_report
@@ -81,7 +83,7 @@ def test_a_session_grade_scores_the_default_ceiling_when_no_target_was_given():
 
 def _file_report(layout):
     return {
-        "metrics": {"integrated_lufs": -18.7, "true_peak_dbtp": -0.64, "crest_factor_db": 14.0,
+        "metrics": {"rms_dbfs": -18.0, "integrated_lufs": -18.7, "true_peak_dbtp": -0.64, "crest_factor_db": 14.0,
                     "correlation_timeline": {"correlation": [1.0]}},
         "input_context": {"channel_layout": layout},
     }
@@ -101,3 +103,30 @@ def test_a_mono_files_placeholder_correlation_is_not_read_as_a_perfect_stereo_im
     technical = next(p for p in _grade_from_report(_file_report("mono"))["parts"] if p["part"] == "technical_health")
 
     assert technical["points_available"] == 6.0
+
+
+@pytest.mark.parametrize("rms", ["missing", None, True, float("nan"), float("inf"), -float("inf"), 10 ** 1000, -60.0, -60.01])
+def test_an_unqualified_uploaded_source_has_no_grade_points(rms):
+    report = _file_report("stereo")
+    if rms == "missing":
+        report["metrics"].pop("rms_dbfs")
+    else:
+        report["metrics"]["rms_dbfs"] = rms
+
+    grade = _grade_from_report(report, reference_match={"points": 20.0, "points_available": 30.0})
+
+    assert grade["points"] == 0.0
+    assert grade["points_available"] == 0.0
+    assert grade["parts"] == []
+    assert {part["part"] for part in grade["ungraded"]} == {
+        "technical_health", "declared_target", "reference_match",
+    }
+
+
+def test_an_uploaded_source_just_above_significance_floor_retains_its_grade():
+    report = _file_report("stereo")
+    report["metrics"]["rms_dbfs"] = -59.99
+
+    grade = _grade_from_report(report)
+
+    assert next(part for part in grade["parts"] if part["part"] == "technical_health")["points_available"] == 12.0

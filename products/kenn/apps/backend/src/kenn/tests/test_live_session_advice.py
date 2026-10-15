@@ -223,6 +223,7 @@ def test_audio_advice_reports_loudness_and_flags_true_peak_over_ceiling() -> Non
 
     analysis = {"ok": True, "findings": [{"type": "clipping", "severity": "high", "confidence": 0.95,
                                            "explanation": "x", "suggested_listening_test": "y"}],
+                "metrics": {"rms_dbfs": -14.0},
                 "loudness": {"integrated_lufs": -9.2, "true_peak_dbtp": 0.4, "loudness_range_lu": 5.0}}
     result = _audio_advice(analysis, scope="vocal")
     assert [f["type"] for f in result["findings"]] == ["clipping", "true_peak_over_ceiling"]
@@ -232,6 +233,63 @@ def test_audio_advice_reports_loudness_and_flags_true_peak_over_ceiling() -> Non
 def test_audio_advice_skips_true_peak_finding_under_the_ceiling() -> None:
     from kenn.core.live_session_advice import _audio_advice
 
-    analysis = {"ok": True, "findings": [], "metrics": {}, "loudness": {"integrated_lufs": -14.0, "true_peak_dbtp": -1.5}}
+    analysis = {"ok": True, "findings": [], "metrics": {"rms_dbfs": -14.0}, "loudness": {"integrated_lufs": -14.0, "true_peak_dbtp": -1.5}}
     result = _audio_advice(analysis, scope="mix")
     assert result["findings"] == [] and "true peak -1.5 dBTP" in result["answer"]
+
+
+_MISSING_RMS = object()
+
+
+@pytest.mark.parametrize("rms", [
+    pytest.param(_MISSING_RMS, id="missing"),
+    pytest.param(None, id="null"),
+    pytest.param(True, id="boolean"),
+    pytest.param(float("nan"), id="nan"),
+    pytest.param(float("inf"), id="positive-infinity"),
+    pytest.param(-float("inf"), id="negative-infinity"),
+    pytest.param(10**1000, id="overflowing-integer"),
+    pytest.param(-100.0, id="quiet"),
+    pytest.param(-60.0, id="at-whole-file-floor"),
+    pytest.param(-59.9, id="above-whole-file-floor"),
+])
+def test_quiet_captured_wav_withholds_signal_advice_but_keeps_capture_and_structure(monkeypatch, rms) -> None:
+    payload = b"RIFF-quiet-capture"
+    live = AdviceLive(capture=payload)
+    metrics = {"sample_peak_dbfs": -0.1, "rms_dbfs": rms}
+    if rms is _MISSING_RMS:
+        metrics.pop("rms_dbfs")
+    analysis = {
+        "ok": True,
+        "analysis_status": "complete",
+        "metrics": metrics,
+        "findings": [{"type": "fabricated_hot_finding", "severity": "high", "confidence": 1.0}],
+        "loudness": {"integrated_lufs": -8.0, "true_peak_dbtp": 0.2},
+        "spectral": {"pink_noise_reference": {"largest_deviation": {"center_hz": 80.0, "deviation_db": 8.0}}},
+    }
+    monkeypatch.setattr(live_session_advice, "_analyze_cached", lambda *_args, **_kwargs: (analysis, "capture-digest", False))
+
+    result = live_session_advice.mix_advice_from_session(
+        service=LiveActionService(live), snapshot=live.state, question="How does my mix sound?",
+    )
+
+    if rms == -59.9:
+        assert result["advice_mode"] == "audio_analysis"
+        assert result["metrics"] == metrics
+        assert result["findings"][0]["type"] == "fabricated_hot_finding"
+        return
+
+    assert result["advice_mode"] == "arrangement_fallback"
+    assert result["findings"][0]["type"] == "arrangement_structure_check"
+    assert "A capture was available" in result["answer"]
+    assert "Audio was not available" not in result["answer"]
+    assert "signal measurements, grading and recommendations are withheld" in result["answer"]
+    assert "fabricated_hot_finding" not in str(result)
+    assert "sample_peak_dbfs" not in str(result)
+    assert "integrated_lufs" not in str(result)
+    assert "pink_noise_reference" not in str(result)
+    assert result["analysis_source"] == {
+        "filename": "live-session-capture.wav",
+        "sha256": "capture-digest",
+        "cache_hit": False,
+    }

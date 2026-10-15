@@ -13,6 +13,10 @@ from typing import Any
 
 from kenn.core.arrangement_doctor import get_arrangement_doctor
 from kenn.core.audio_analysis import analyze_wav
+from kenn.core.evidence import (
+    UPLOADED_SIGNAL_LIMITATION,
+    uploaded_metrics_have_activity,
+)
 
 
 _ANALYSIS_CACHE_MAX_ENTRIES = 4
@@ -228,6 +232,10 @@ def _loudness_line(loudness: Any) -> str:
 def _audio_advice(analysis: dict[str, Any], *, scope: str, snapshot: dict[str, Any] | None = None) -> dict[str, Any] | None:
     if not analysis.get("ok"):
         return None
+    metrics = analysis.get("metrics") if isinstance(analysis.get("metrics"), dict) else {}
+    if not uploaded_metrics_have_activity(metrics):
+        # Keep quiet captures out of every signal-derived field; the caller can still offer structural advice.
+        return None
     findings = [dict(item) for item in analysis.get("findings") or [] if isinstance(item, dict)]
     true_peak = _true_peak_finding(analysis)
     if true_peak is not None:
@@ -278,7 +286,9 @@ def _audio_advice(analysis: dict[str, Any], *, scope: str, snapshot: dict[str, A
     }
 
 
-def _arrangement_advice(snapshot: dict[str, Any], *, scope: str) -> dict[str, Any]:
+def _arrangement_advice(
+    snapshot: dict[str, Any], *, scope: str, audio_limitation: str | None = None,
+) -> dict[str, Any]:
     tracks = [track for track in snapshot.get("tracks") or [] if isinstance(track, dict)]
     timeline_sections = snapshot.get("timeline_sections")
     observed_sections = timeline_sections if isinstance(timeline_sections, list) and timeline_sections else None
@@ -289,7 +299,10 @@ def _arrangement_advice(snapshot: dict[str, Any], *, scope: str) -> dict[str, An
         total_bars=total_bars,
     )
     evidence_scope = "observed timeline sections" if observed_sections else "track and clip inventory with a generic arrangement heuristic"
-    if scope == "vocal":
+    if audio_limitation:
+        unavailable = audio_limitation
+        listening_test = "Use a representative, audible passage and remeasure before drawing tonal, masking, or clipping conclusions."
+    elif scope == "vocal":
         unavailable = "An isolated vocal capture was not available, so I could not attribute clipping to the vocal."
         listening_test = "Render or provide an isolated vocal stem, then inspect its loudest phrase with a sample- and true-peak meter."
     else:
@@ -364,6 +377,19 @@ def mix_advice_from_session(
             analysis = {}
         result = _audio_advice(analysis, scope=scope, snapshot=current)
         if result is not None:
+            result["analysis_source"] = {
+                "filename": filename,
+                "sha256": digest,
+                "cache_hit": cache_hit,
+            }
+            return result
+        if analysis.get("ok"):
+            # A quiet capture is real provenance, but it supports only the structural fallback.
+            result = _arrangement_advice(
+                current,
+                scope=scope,
+                audio_limitation=f"A capture was available; {UPLOADED_SIGNAL_LIMITATION}",
+            )
             result["analysis_source"] = {
                 "filename": filename,
                 "sha256": digest,
