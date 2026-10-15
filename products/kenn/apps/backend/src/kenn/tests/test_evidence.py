@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 
 import pytest
 
 from kenn.core.evidence import (
+    MARKER,
     from_ableton_session,
     from_audio_classification_context,
     from_mix_review_context,
@@ -16,54 +18,250 @@ from kenn.core.evidence import (
     from_realtime_mix_comparison,
     from_stem_masking_context,
     relevant_observations,
+    history_turn,
+    packets_from_history,
 )
 from kenn.core.realtime_mix_comparison import build_realtime_mix_comparison
 
 
-def test_stem_masking_evidence_preserves_proxy_limits() -> None:
-    packet = from_stem_masking_context({
-        "schema": "kenn.mix_review_masking_analysis.v1",
-        "ok": True,
+def _masking_context():
+    return {
+        "schema": "kenn.mix_review_masking_analysis.v1", "ok": True,
+        "activity": {
+            "schema": "kenn.stem_masking.activity.v1", "active_floor_dbfs": -50.0, "frame_count": 100,
+            "sources": [{"name": "Bass", "active_frame_count": 80}, {"name": "Piano", "active_frame_count": 70}],
+            "pairs": [{"stems": ["Bass", "Piano"], "simultaneously_active_frame_count": 60}],
+        },
+        "findings": [{"fault_family": "masking", "detected": True, "stems": ["Bass", "Piano"], "band": "bass", "evidence": {
+            "competing_frame_fraction": 0.454, "active_floor_dbfs": -50.0, "competing_within_db": 6.0,
+        }}],
         "evidence": {
-            "schema": "kenn.evidence.v1",
-            "source": "stem_masking_analysis",
-            "facts": [{
-                "name": "masking_highest_competing_frame_fraction",
-                "value": 0.454,
-                "unit": "ratio",
-                "source": "stem_masking_analysis",
-                "confidence": "measured_proxy",
-            }],
+            "schema": "kenn.evidence.v1", "source": "stem_masking_analysis",
+            "facts": [
+                {"name": "stem_count", "value": 2, "unit": "stems"},
+                {"name": "sample_rate", "value": 44100, "unit": "Hz"},
+                {"name": "analyzed_seconds", "value": 5.0, "unit": "seconds"},
+                {"name": "masking_candidate_count", "value": 999},
+                {"name": "masking_highest_pair", "value": "Cached wrong pair"},
+            ],
             "limitations": ["Not a perceptual masking model."],
         },
-    })
+    }
+
+
+def test_stem_masking_evidence_preserves_proxy_limits() -> None:
+    packet = from_stem_masking_context(_masking_context())
     assert packet is not None
     assert packet.source == "stem_masking_analysis"
-    assert packet.facts[0].value == 0.454
+    values = {fact.name: fact.value for fact in packet.facts}
+    assert values["masking_highest_competing_frame_fraction"] == 0.454
+    assert values["masking_candidate_count"] == 1
+    assert values["masking_highest_pair"] == "Bass + Piano"
     assert "perceptual" in packet.limitations[0]
 
 
 def test_stem_masking_evidence_generates_bounded_follow_up_observation() -> None:
-    packet = from_stem_masking_context({
-        "schema": "kenn.mix_review_masking_analysis.v1",
-        "ok": True,
-        "evidence": {
-            "schema": "kenn.evidence.v1",
-            "source": "stem_masking_analysis",
-            "facts": [
-                {"name": "masking_candidate_count", "value": 2, "unit": "candidates"},
-                {"name": "masking_highest_competing_frame_fraction", "value": 0.454, "unit": "ratio"},
-                {"name": "masking_highest_pair", "value": "Bass + Piano"},
-                {"name": "masking_highest_band", "value": "bass"},
-            ],
-            "limitations": ["Not a perceptual masking model."],
-        },
-    })
-
+    packet = from_stem_masking_context(_masking_context())
     assert packet is not None
     observations = relevant_observations("what is competing in the low end?", [packet])
     assert any("Bass + Piano" in item and "45.4%" in item for item in observations)
     assert any("not proof of audible masking" in item for item in observations)
+
+
+def test_active_stem_pair_with_no_candidates_keeps_zero_as_a_measured_result():
+    context = _masking_context()
+    context["findings"] = []
+    packet = from_stem_masking_context(context)
+    values = {fact.name: fact.value for fact in packet.facts}
+    assert values["masking_candidate_count"] == 0
+    assert "masking_highest_pair" not in values
+    assert any("no flagged competing pair" in item for item in relevant_observations("check masking", [packet]))
+
+
+@pytest.mark.parametrize("activity", [None, {}, "old cached activity"])
+def test_legacy_masking_scalars_cannot_replace_missing_source_activity(activity):
+    # Cached positive/zero facts once reached reasoning without proving either stem was active.
+    context = _masking_context()
+    context["activity"] = activity
+    before = deepcopy(context)
+    packet = from_stem_masking_context(context)
+    assert {fact.name for fact in packet.facts} == {"stem_count", "sample_rate", "analyzed_seconds"}
+    assert any("withheld" in item for item in packet.limitations)
+    assert relevant_observations("check masking", [packet]) == []
+    assert context == before
+
+
+@pytest.mark.parametrize("field,value", [
+    ("schema", "unknown"), ("active_floor_dbfs", -60.0), ("active_floor_dbfs", True),
+    ("active_floor_dbfs", float("nan")), ("frame_count", True), ("frame_count", 0),
+    ("frame_count", -1), ("frame_count", 100.0), ("frame_count", float("inf")),
+    ("sources", []), ("sources", [{}]), ("pairs", []), ("pairs", None),
+])
+def test_masking_activity_requires_the_versioned_complete_capture_contract(field, value):
+    context = _masking_context()
+    context["activity"][field] = value
+    packet = from_stem_masking_context(context)
+    assert not any(fact.name.startswith("masking_") for fact in packet.facts)
+    assert any("withheld" in item for item in packet.limitations)
+
+
+@pytest.mark.parametrize("count", [True, -1, 101, 1.0, float("nan"), float("inf"), 10**400, "80"])
+def test_masking_source_counts_must_be_integer_subsets_of_captured_frames(count):
+    context = _masking_context()
+    context["activity"]["sources"][0]["active_frame_count"] = count
+    packet = from_stem_masking_context(context)
+    assert not any(fact.name.startswith("masking_") for fact in packet.facts)
+
+
+@pytest.mark.parametrize("count", [0, 49, True, -1, 71, 1.0, float("nan"), float("inf"), 10**400])
+def test_masking_pair_counts_require_simultaneous_frames_within_both_source_counts(count):
+    context = _masking_context()
+    context["activity"]["pairs"][0]["simultaneously_active_frame_count"] = count
+    packet = from_stem_masking_context(context)
+    assert not any(fact.name.startswith("masking_") for fact in packet.facts)
+
+
+@pytest.mark.parametrize("names", [["Bass", "Unknown"], ["Bass", "Bass"], ["Bass"], ["Bass", []]])
+def test_masking_pair_identity_must_name_two_measured_sources(names):
+    context = _masking_context()
+    context["activity"]["pairs"][0]["stems"] = names
+    packet = from_stem_masking_context(context)
+    assert not any(fact.name.startswith("masking_") for fact in packet.facts)
+
+
+def test_masking_duplicate_pairs_and_missing_third_source_pairs_cannot_prove_zero():
+    context = _masking_context()
+    context["findings"] = []
+    context["activity"]["sources"].append({"name": "Kick", "active_frame_count": 90})
+    context["activity"]["pairs"] *= 3
+    packet = from_stem_masking_context(context)
+    assert not any(fact.name.startswith("masking_") for fact in packet.facts)
+
+
+@pytest.mark.parametrize("fraction", [True, "0.454", None, float("nan"), float("inf"), 10**400, -0.1, 0.199, 0.601, 1.1])
+def test_masking_candidates_need_finite_fraction_supported_by_pair_activity(fraction):
+    context = _masking_context()
+    context["findings"][0]["evidence"]["competing_frame_fraction"] = fraction
+    packet = from_stem_masking_context(context)
+    assert not any(fact.name.startswith("masking_") for fact in packet.facts)
+
+
+@pytest.mark.parametrize("fraction", [0.20, 0.60])
+def test_masking_candidate_fraction_accepts_existing_threshold_and_pair_upper_bound(fraction):
+    context = _masking_context()
+    context["findings"][0]["evidence"]["competing_frame_fraction"] = fraction
+    packet = from_stem_masking_context(context)
+    assert next(fact.value for fact in packet.facts if fact.name == "masking_highest_competing_frame_fraction") == fraction
+
+
+def test_masking_candidate_fraction_keeps_the_producers_three_decimal_rounding():
+    context = _masking_context()
+    context["activity"]["frame_count"] = 337
+    context["activity"]["sources"] = [{"name": "Bass", "active_frame_count": 200}, {"name": "Piano", "active_frame_count": 200}]
+    context["activity"]["pairs"][0]["simultaneously_active_frame_count"] = 100
+    context["findings"][0]["evidence"]["competing_frame_fraction"] = 0.297
+    packet = from_stem_masking_context(context)
+    assert any(fact.name == "masking_candidate_count" for fact in packet.facts)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("stems", ["Bass", "Unknown"]), ("band", "unknown"), ("evidence", {}), ("band", []),
+    ("fault_family", "other"), ("detected", False), ("detected", 1),
+])
+def test_malformed_masking_candidate_abstains_instead_of_becoming_zero(field, value):
+    context = _masking_context()
+    context["findings"][0][field] = value
+    packet = from_stem_masking_context(context)
+    assert not any(fact.name.startswith("masking_") for fact in packet.facts)
+
+
+def test_masking_candidate_from_quiet_third_stem_is_withheld_even_with_an_active_pair():
+    context = _masking_context()
+    context["activity"]["sources"].append({"name": "Quiet", "active_frame_count": 0})
+    context["activity"]["pairs"].extend([
+        {"stems": ["Bass", "Quiet"], "simultaneously_active_frame_count": 0},
+        {"stems": ["Piano", "Quiet"], "simultaneously_active_frame_count": 0},
+    ])
+    context["findings"][0]["stems"] = ["Bass", "Quiet"]
+    packet = from_stem_masking_context(context)
+    assert not any(fact.name.startswith("masking_") for fact in packet.facts)
+
+
+def test_masking_provenance_rejects_nonfinite_and_malformed_fact_values():
+    context = _masking_context()
+    context["activity"] = None
+    context["evidence"]["facts"].extend([
+        {"name": [], "value": 4}, {"name": "sample_rate", "value": float("inf")},
+        {"name": "analyzed_seconds", "value": 10**400}, {"name": "stem_count", "value": True},
+        {"name": "stem_count", "value": 13},
+    ])
+    packet = from_stem_masking_context(context)
+    assert len(packet.facts) == 3
+
+
+def test_active_masking_projection_leaves_input_and_nested_identity_unchanged():
+    context = _masking_context()
+    before = deepcopy(context)
+    packet = from_stem_masking_context(context)
+    context["findings"][0]["stems"][0] = "Changed"
+    assert next(fact.value for fact in packet.facts if fact.name == "masking_highest_pair") == "Bass + Piano"
+    context["findings"][0]["stems"][0] = "Bass"
+    assert context == before
+
+
+@pytest.mark.parametrize("findings", [None, []])
+def test_masking_history_retains_activity_to_requalify_positive_and_zero_results(findings):
+    context = _masking_context()
+    if findings is not None:
+        context["findings"] = findings
+    packet = from_stem_masking_context(context)
+    recovered, = packets_from_history([history_turn(packet)])
+    assert recovered.facts == packet.facts
+    assert recovered.stem_masking_provenance == packet.stem_masking_provenance
+    assert recovered.limitations == packet.limitations
+
+
+def test_legacy_masking_history_with_positive_scalar_claims_keeps_only_capture_provenance():
+    # Stored evidence predating activity metadata must not regain a sonic claim on replay.
+    raw = _masking_context()["evidence"]
+    recovered, = packets_from_history([{"role": "user", "content": MARKER + json.dumps(raw)}])
+    assert {fact.name for fact in recovered.facts} == {"stem_count", "sample_rate", "analyzed_seconds"}
+    assert relevant_observations("check masking", [recovered]) == []
+    assert any("withheld" in item for item in recovered.limitations)
+
+
+def test_masking_history_rechecks_quiet_activity_and_does_not_trust_replayed_scalar_facts():
+    packet = from_stem_masking_context(_masking_context())
+    payload = packet.payload()
+    payload["stem_masking_provenance"]["activity"]["pairs"][0]["simultaneously_active_frame_count"] = 0
+    recovered, = packets_from_history([{"role": "user", "content": MARKER + json.dumps(payload)}])
+    assert not any(fact.name.startswith("masking_") for fact in recovered.facts)
+    assert any("withheld" in item for item in recovered.limitations)
+
+
+def test_masking_history_rebuilds_facts_from_provenance_instead_of_tampered_scalars():
+    packet = from_stem_masking_context(_masking_context())
+    payload = packet.payload()
+    payload["facts"].append({"name": "masking_candidate_count", "value": 999})
+    recovered, = packets_from_history([{"role": "user", "content": MARKER + json.dumps(payload)}])
+    assert [fact.value for fact in recovered.facts if fact.name == "masking_candidate_count"] == [1]
+
+
+def test_masking_payload_copies_only_bounded_activity_and_normalized_finding_fields():
+    context = _masking_context()
+    context["activity"]["raw_fft"] = [123.0]
+    context["findings"][0]["suggested_next_step"] = "Unvalidated prose must not survive history"
+    before = deepcopy(context)
+    packet = from_stem_masking_context(context)
+    payload = packet.payload()
+    provenance = payload["stem_masking_provenance"]
+    assert set(provenance["activity"]) == {"schema", "active_floor_dbfs", "frame_count", "sources", "pairs"}
+    assert set(provenance["findings"][0]) == {"fault_family", "detected", "stems", "band", "evidence"}
+    provenance["activity"]["sources"][0]["active_frame_count"] = 0
+    provenance["findings"][0]["stems"][0] = "Changed"
+    assert packet.stem_masking_provenance["activity"]["sources"][0]["active_frame_count"] == 80
+    assert packet.stem_masking_provenance["findings"][0]["stems"] == ["Bass", "Piano"]
+    assert context == before
 
 
 def test_audio_classification_evidence_keeps_prediction_streams_separate() -> None:

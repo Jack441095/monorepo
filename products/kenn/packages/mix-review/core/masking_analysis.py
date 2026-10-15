@@ -83,6 +83,7 @@ def _evidence_packet(
     framerate: int,
     overlap_seconds: float,
     findings: list[dict[str, Any]],
+    activity: dict[str, Any],
     limitations: list[str],
 ) -> dict[str, Any]:
     """Expose masking candidates through KENN's shared evidence contract."""
@@ -90,8 +91,13 @@ def _evidence_packet(
         {"name": "stem_count", "value": len(labels), "unit": "stems", "source": "stem_masking_analysis", "confidence": "measured"},
         {"name": "sample_rate", "value": framerate, "unit": "Hz", "source": "stem_masking_analysis", "confidence": "measured"},
         {"name": "analyzed_seconds", "value": float(round(overlap_seconds, 2)), "unit": "seconds", "source": "stem_masking_analysis", "confidence": "measured"},
-        {"name": "masking_candidate_count", "value": len(findings), "unit": "candidates", "source": "stem_masking_analysis", "confidence": "measured_proxy"},
     ]
+    has_qualified_pair = any(
+        item["simultaneously_active_frame_count"] > 0 for item in activity["pairs"]
+    )
+    if has_qualified_pair:
+        # Zero candidates is meaningful only after at least one pair had frames to compare.
+        facts.append({"name": "masking_candidate_count", "value": len(findings), "unit": "candidates", "source": "stem_masking_analysis", "confidence": "measured_proxy"})
     strongest = max(
         (
             item for item in findings
@@ -249,6 +255,32 @@ def analyze_stem_masking(stems: list[tuple[str, bytes]]) -> dict[str, Any]:
     implementation = implementations.pop() if len(implementations) == 1 else "mixed"
     band_energy_db = {label: _to_dbfs(energy) for label, energy in band_energy.items()}
 
+    frame_count = next(iter(band_energy_db.values())).shape[0]
+    # Pair activity spans any measured band: two playing stems in separate
+    # frequency ranges can support a measured zero without competing in one band.
+    active_frames = {
+        label: (db_energy > ACTIVE_FLOOR_DBFS).any(axis=1)
+        for label, db_energy in band_energy_db.items()
+    }
+    activity_pairs = [
+        {
+            "stems": [label_a, label_b],
+            "simultaneously_active_frame_count": int((active_frames[label_a] & active_frames[label_b]).sum()),
+        }
+        for index, label_a in enumerate(labels)
+        for label_b in labels[index + 1 :]
+    ]
+    activity = {
+        "schema": "kenn.stem_masking.activity.v1",
+        "active_floor_dbfs": ACTIVE_FLOOR_DBFS,
+        "frame_count": int(frame_count),
+        "sources": [
+            {"name": label, "active_frame_count": int(active_frames[label].sum())}
+            for label in labels
+        ],
+        "pairs": activity_pairs,
+    }
+
     findings: list[dict[str, Any]] = []
     for i, label_a in enumerate(labels):
         for label_b in labels[i + 1 :]:
@@ -301,6 +333,11 @@ def analyze_stem_masking(stems: list[tuple[str, bytes]]) -> dict[str, Any]:
         "Stems of different lengths are compared only over their shared overlapping duration.",
         "Requires stems that are already time-aligned (e.g. exported from the same session at the same start point).",
     ]
+    if not any(item["simultaneously_active_frame_count"] > 0 for item in activity_pairs):
+        # Without an active pair, no candidate count can distinguish no conflict from no signal.
+        limitations.append(
+            f"No stem pair was simultaneously active above {ACTIVE_FLOOR_DBFS:g} dBFS; masking candidate count and strongest-pair evidence are withheld."
+        )
     return {
         "schema": SCHEMA,
         "ok": True,
@@ -310,6 +347,7 @@ def analyze_stem_masking(stems: list[tuple[str, bytes]]) -> dict[str, Any]:
         "truncated_stems": truncated_labels,
         "bands": [{"name": name, "low_hz": lo, "high_hz": hi} for name, lo, hi in MASKING_BANDS],
         "implementation": implementation,
+        "activity": activity,
         "findings": findings,
         "limitations": limitations,
         "evidence": _evidence_packet(
@@ -317,6 +355,7 @@ def analyze_stem_masking(stems: list[tuple[str, bytes]]) -> dict[str, Any]:
             framerate=framerate,
             overlap_seconds=overlap_seconds,
             findings=findings,
+            activity=activity,
             limitations=limitations,
         ),
     }

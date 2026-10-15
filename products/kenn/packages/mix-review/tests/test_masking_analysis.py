@@ -41,6 +41,22 @@ def _finding_bands(result: dict) -> set[str]:
     return {f["band"] for f in result["findings"]}
 
 
+def _controlled_activity(monkeypatch, arrays: list[list[list[float]]]) -> dict:
+    """Run the real publication path with deterministic per-frame band levels."""
+    n = int(2.0 * 44100)
+    silence = _wav_bytes([0.0] * n)
+    queued = iter(arrays)
+    monkeypatch.setattr(
+        masking_analysis,
+        "_band_energy_over_time_with_backend",
+        lambda _signal, _rate: (masking_analysis._np.asarray(next(queued), dtype=float), "test"),
+    )
+    monkeypatch.setattr(masking_analysis, "_to_dbfs", lambda levels: levels)
+    return masking_analysis.analyze_stem_masking(
+        [(f"s{index}", silence) for index in range(len(arrays))]
+    )
+
+
 def test_same_frequency_range_stems_are_flagged_as_competing() -> None:
     n = int(5.0 * 44100)
     a = _wav_bytes(_sine(n, 440.0, 44100))
@@ -53,6 +69,8 @@ def test_same_frequency_range_stems_are_flagged_as_competing() -> None:
     assert result["evidence"]["schema"] == "kenn.evidence.v1"
     assert result["evidence"]["source"] == "stem_masking_analysis"
     assert any(fact["name"] == "masking_highest_competing_frame_fraction" for fact in result["evidence"]["facts"])
+    assert result["activity"]["schema"] == "kenn.stem_masking.activity.v1"
+    assert result["activity"]["active_floor_dbfs"] == masking_analysis.ACTIVE_FLOOR_DBFS
 
 
 def test_well_separated_frequency_stems_are_not_flagged() -> None:
@@ -62,6 +80,10 @@ def test_well_separated_frequency_stems_are_not_flagged() -> None:
     result = masking_analysis.analyze_stem_masking([("low", low), ("high", high)])
     assert result["ok"] is True
     assert result["findings"] == []
+    assert any(
+        fact["name"] == "masking_candidate_count" and fact["value"] == 0
+        for fact in result["evidence"]["facts"]
+    )
 
 
 def test_one_stem_playing_alone_is_not_flagged_against_silence() -> None:
@@ -71,6 +93,68 @@ def test_one_stem_playing_alone_is_not_flagged_against_silence() -> None:
     result = masking_analysis.analyze_stem_masking([("a", a), ("silence", silence)])
     assert result["ok"] is True
     assert result["findings"] == []
+
+
+def test_quiet_stems_withhold_signal_facts_but_keep_activity_provenance(monkeypatch) -> None:
+    quiet = [[[-90.0] * len(masking_analysis.MASKING_BANDS) for _ in range(3)]] * 2
+    result = _controlled_activity(monkeypatch, quiet)
+    assert result["activity"]["frame_count"] == 3
+    assert [source["active_frame_count"] for source in result["activity"]["sources"]] == [0, 0]
+    assert result["activity"]["pairs"][0]["simultaneously_active_frame_count"] == 0
+    names = {fact["name"] for fact in result["evidence"]["facts"]}
+    assert "stem_count" in names and "sample_rate" in names
+    assert "masking_candidate_count" not in names
+    assert not any(name.startswith("masking_highest_") for name in names)
+    assert any("withheld" in item for item in result["limitations"])
+
+
+def test_one_active_stem_does_not_qualify_a_pair(monkeypatch) -> None:
+    quiet = [-90.0] * len(masking_analysis.MASKING_BANDS)
+    active = [-20.0, *([-90.0] * (len(masking_analysis.MASKING_BANDS) - 1))]
+    result = _controlled_activity(monkeypatch, [[active, active, active], [quiet, quiet, quiet]])
+    assert [source["active_frame_count"] for source in result["activity"]["sources"]] == [3, 0]
+    assert result["activity"]["pairs"][0]["simultaneously_active_frame_count"] == 0
+    assert not any(fact["name"] == "masking_candidate_count" for fact in result["evidence"]["facts"])
+
+
+def test_exact_activity_floor_is_inactive(monkeypatch) -> None:
+    boundary = [-50.0] * len(masking_analysis.MASKING_BANDS)
+    result = _controlled_activity(monkeypatch, [[boundary] * 2, [boundary] * 2])
+    assert result["activity"]["pairs"][0]["simultaneously_active_frame_count"] == 0
+    assert not any(fact["name"] == "masking_candidate_count" for fact in result["evidence"]["facts"])
+
+
+def test_signal_facts_return_after_quiet_capture(monkeypatch) -> None:
+    quiet = [-90.0] * len(masking_analysis.MASKING_BANDS)
+    active = [-20.0, *([-90.0] * (len(masking_analysis.MASKING_BANDS) - 1))]
+    quiet_result = _controlled_activity(monkeypatch, [[quiet] * 2, [quiet] * 2])
+    assert not any(fact["name"] == "masking_candidate_count" for fact in quiet_result["evidence"]["facts"])
+
+    active_result = _controlled_activity(monkeypatch, [[active] * 2, [active] * 2])
+    assert any(
+        fact["name"] == "masking_candidate_count" and fact["value"] > 0
+        for fact in active_result["evidence"]["facts"]
+    )
+
+
+def test_three_stems_count_only_the_pair_with_shared_active_frames(monkeypatch) -> None:
+    quiet = [-90.0] * len(masking_analysis.MASKING_BANDS)
+    a = [-20.0, *([-90.0] * (len(masking_analysis.MASKING_BANDS) - 1))]
+    b = [-40.0, *([-90.0] * (len(masking_analysis.MASKING_BANDS) - 1))]
+    c = [-20.0, *([-90.0] * (len(masking_analysis.MASKING_BANDS) - 1))]
+    result = _controlled_activity(
+        monkeypatch,
+        [[a, quiet], [b, quiet], [quiet, c]],
+    )
+    assert result["activity"]["pairs"] == [
+        {"stems": ["s0", "s1"], "simultaneously_active_frame_count": 1},
+        {"stems": ["s0", "s2"], "simultaneously_active_frame_count": 0},
+        {"stems": ["s1", "s2"], "simultaneously_active_frame_count": 0},
+    ]
+    assert any(
+        fact["name"] == "masking_candidate_count" and fact["value"] == 0
+        for fact in result["evidence"]["facts"]
+    )
 
 
 def test_requires_at_least_two_stems() -> None:

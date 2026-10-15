@@ -10,6 +10,7 @@ serialisable so it can travel through the existing chat-history transport.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from copy import deepcopy
 import json
 import math
 import re
@@ -44,6 +45,7 @@ class EvidencePacket:
     facts: tuple[EvidenceFact, ...]
     limitations: tuple[str, ...]
     observed_at_epoch: float | None = None
+    stem_masking_provenance: dict[str, Any] | None = None
 
     def payload(self) -> dict[str, Any]:
         payload = {
@@ -54,6 +56,9 @@ class EvidencePacket:
             "facts": [asdict(fact) for fact in self.facts],
             "limitations": list(self.limitations),
         }
+        if self.source == "stem_masking_analysis" and self.stem_masking_provenance is not None:
+            # History must retain the source counts needed to requalify cached masking facts.
+            payload["stem_masking_provenance"] = deepcopy(self.stem_masking_provenance)
         if self.source in {"plugin_bus_snapshot", "realtime_mix_comparison"}:
             age = self.captured_at_age_seconds
             if self.observed_at_epoch is not None:
@@ -406,36 +411,162 @@ def from_realtime_mix_comparison(comparison: dict[str, Any] | None) -> EvidenceP
     )
 
 
-def from_stem_masking_context(context: dict[str, Any] | None) -> EvidencePacket | None:
-    """Convert bounded stem-energy competition into advisory evidence."""
-    if not isinstance(context, dict) or context.get("schema") != "kenn.mix_review_masking_analysis.v1" or context.get("ok") is not True:
+def _qualified_masking_findings(context: dict[str, Any]) -> list[tuple[list[str], str, float]] | None:
+    """Return validated candidates, or None when source activity cannot support a signal conclusion."""
+    activity = context.get("activity")
+    if not isinstance(activity, dict) or activity.get("schema") != "kenn.stem_masking.activity.v1":
+        # Older cached facts cannot establish whether any supplied pair was active.
         return None
+    floor = activity.get("active_floor_dbfs")
+    if isinstance(floor, bool) or not isinstance(floor, (int, float)) or floor != -50.0:
+        # -50 dBFS is the existing masking analyser's band-activity floor.
+        return None
+    frames = activity.get("frame_count")
+    if isinstance(frames, bool) or not isinstance(frames, int) or frames <= 0:
+        # Fractions need a measured positive number of overlapping FFT frames.
+        return None
+    sources, pairs = activity.get("sources"), activity.get("pairs")
+    if not isinstance(sources, list) or not 2 <= len(sources) <= 12 or not isinstance(pairs, list) or len(pairs) > 66:
+        # Match the analyser's 12-stem limit and its 66 unordered pairs.
+        return None
+    source_counts: dict[str, int] = {}
+    for source in sources:
+        name = source.get("name") if isinstance(source, dict) else None
+        count = source.get("active_frame_count") if isinstance(source, dict) else None
+        if not isinstance(name, str) or not name.strip() or name in source_counts:
+            # Ambiguous source identities cannot qualify a named finding.
+            return None
+        if isinstance(count, bool) or not isinstance(count, int) or not 0 <= count <= frames:
+            # Activity counts must be a subset of the captured frames.
+            return None
+        source_counts[name] = count
+    pair_counts: dict[frozenset[str], int] = {}
+    for pair in pairs:
+        names = pair.get("stems") if isinstance(pair, dict) else None
+        count = pair.get("simultaneously_active_frame_count") if isinstance(pair, dict) else None
+        if not isinstance(names, list) or len(names) != 2 or any(not isinstance(name, str) or name not in source_counts for name in names):
+            # Each pair must refer to two of these exact measured sources.
+            return None
+        identity = frozenset(names)
+        if len(identity) != 2 or identity in pair_counts:
+            # Reversed duplicates must not stand in for a missing pair.
+            return None
+        if isinstance(count, bool) or not isinstance(count, int) or not 0 <= count <= min(source_counts[name] for name in names):
+            # A simultaneous count cannot exceed either source's active count.
+            return None
+        if count < max(0, sum(source_counts[name] for name in names) - frames):
+            # Two active subsets must overlap once their combined count exceeds the capture.
+            return None
+        pair_counts[identity] = count
+    if len(pair_counts) != len(sources) * (len(sources) - 1) // 2 or not any(pair_counts.values()):
+        # A partial grid or no simultaneous activity cannot justify an aggregate zero.
+        return None
+    findings = context.get("findings")
+    bands = {"sub_bass", "bass", "low_mid", "mid", "upper_mid", "presence", "brilliance"}
+    if not isinstance(findings, list) or len(findings) > len(pair_counts) * len(bands):
+        # The analyser emits at most one candidate for each pair/band relationship.
+        return None
+    validated: list[tuple[list[str], str, float]] = []
+    seen: set[tuple[frozenset[str], str]] = set()
+    for finding in findings:
+        if not isinstance(finding, dict) or finding.get("fault_family") != "masking" or finding.get("detected") is not True:
+            # A scalar lookalike or explicitly undetected result is not a masking candidate.
+            return None
+        names = finding.get("stems") if isinstance(finding, dict) else None
+        band = finding.get("band") if isinstance(finding, dict) else None
+        evidence = finding.get("evidence") if isinstance(finding, dict) else None
+        if not isinstance(names, list) or len(names) != 2 or any(not isinstance(name, str) for name in names) or not isinstance(band, str) or band not in bands or not isinstance(evidence, dict):
+            # Dropping malformed candidates would falsely turn an invalid result into zero.
+            return None
+        identity = frozenset(names)
+        fraction = evidence.get("competing_frame_fraction")
+        if isinstance(fraction, bool) or not isinstance(fraction, (int, float)):
+            # A candidate must carry a numeric measured fraction, not prose or a flag.
+            return None
+        try:
+            fraction = float(fraction)
+        except OverflowError:
+            # Unrepresentable fractions cannot describe captured frame counts.
+            return None
+        if not math.isfinite(fraction) or not 0.20 <= fraction <= 1.0 or len(identity) != 2 or not pair_counts.get(identity):
+            # 20% is the analyser's existing candidate threshold; inactive pairs abstain.
+            return None
+        if fraction > pair_counts[identity] / frames + 0.0005 or (identity, band) in seen:
+            # Producer fractions round to three decimals (at most 0.0005 ratio upward).
+            return None
+        if evidence.get("active_floor_dbfs") != -50.0 or evidence.get("competing_within_db") != 6.0:
+            # These are the analyser's existing -50 dBFS activity and 6 dB competition rules.
+            return None
+        seen.add((identity, band))
+        validated.append((names, band, fraction))
+    return validated
+
+
+def from_stem_masking_context(context: dict[str, Any] | None) -> EvidencePacket | None:
+    """Rebuild masking facts from activity-qualified findings, retaining capture dimensions on abstention."""
+    if not isinstance(context, dict) or context.get("schema") != "kenn.mix_review_masking_analysis.v1" or context.get("ok") is not True:
+        return None  # Other result schemas cannot supply masking evidence.
     packet = context.get("evidence")
     if (
         not isinstance(packet, dict)
         or packet.get("schema") != "kenn.evidence.v1"
         or packet.get("source") != "stem_masking_analysis"
     ):
-        return None
+        return None  # The packet must identify the same analyser as the result.
     raw_facts = packet.get("facts")
     raw_limitations = packet.get("limitations")
     if not isinstance(raw_facts, list) or not isinstance(raw_limitations, list):
-        return None
+        return None  # A malformed evidence envelope cannot be projected safely.
     facts: list[EvidenceFact] = []
+    provenance_units = {"stem_count": "stems", "sample_rate": "Hz", "analyzed_seconds": "seconds"}
     for item in raw_facts[:32]:
-        if not isinstance(item, dict) or not isinstance(item.get("name"), str):
+        if not isinstance(item, dict) or not isinstance(item.get("name"), str) or item["name"] not in provenance_units:
+            # Signal claims are rebuilt below; only the three capture metadata names survive here.
             continue
         value = item.get("value")
-        if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            # Flags and prose cannot replace measured capture dimensions.
+            continue
+        try:
+            value = float(value)
+        except OverflowError:
+            # Keep the other capture metadata if one legacy number is unrepresentable.
+            continue
+        if not math.isfinite(value) or value <= 0 or (item["name"] == "stem_count" and (value > 12 or not value.is_integer())):
+            # Invalid dimensions remain absent without discarding other capture provenance.
             continue
         facts.append(EvidenceFact(
-            item["name"][:128], value, str(item.get("unit") or "")[:32],
-            "stem_masking_analysis", str(item.get("confidence") or "measured")[:32],
+            item["name"], value, provenance_units[item["name"]], "stem_masking_analysis",
         ))
-    if not facts:
-        return None
     limitations = tuple(str(item)[:512] for item in raw_limitations[:8] if str(item).strip())
-    return EvidencePacket("stem_masking_analysis", None, tuple(facts), limitations)
+    findings = _qualified_masking_findings(context)
+    provenance = None
+    if findings is None:
+        # Missing activity, quiet pairs and malformed candidates must not become a reassuring zero.
+        limitations += ("No valid simultaneously active stem pair is established above the existing -50 dBFS band floor, or candidate provenance is invalid; masking measurements and recommendations are withheld.",)
+    else:
+        activity = context["activity"]
+        provenance = {
+            "activity": {
+                "schema": "kenn.stem_masking.activity.v1", "active_floor_dbfs": -50.0,
+                "frame_count": activity["frame_count"],
+                "sources": [{"name": item["name"], "active_frame_count": item["active_frame_count"]} for item in activity["sources"]],
+                "pairs": [{"stems": list(item["stems"]), "simultaneously_active_frame_count": item["simultaneously_active_frame_count"]} for item in activity["pairs"]],
+            },
+            "findings": [{
+                "fault_family": "masking", "detected": True, "stems": list(names), "band": band,
+                "evidence": {"competing_frame_fraction": fraction, "active_floor_dbfs": -50.0, "competing_within_db": 6.0},
+            } for names, band, fraction in findings],
+        }
+        facts.append(EvidenceFact("masking_candidate_count", len(findings), "candidates", "stem_masking_analysis", "measured_proxy"))
+        if findings:
+            names, band, fraction = max(findings, key=lambda item: item[2])
+            facts.extend([
+                EvidenceFact("masking_highest_competing_frame_fraction", fraction, "ratio", "stem_masking_analysis", "measured_proxy"),
+                EvidenceFact("masking_highest_pair", " + ".join(name[:96] for name in names), "", "stem_masking_analysis", "measured_proxy"),
+                EvidenceFact("masking_highest_band", band, "", "stem_masking_analysis", "measured_proxy"),
+            ])
+    return EvidencePacket("stem_masking_analysis", None, tuple(facts), limitations, stem_masking_provenance=provenance)
 
 
 def from_audio_classification_context(context: dict[str, Any] | None) -> EvidencePacket | None:
@@ -552,6 +683,18 @@ def packets_from_history(history: list | None) -> list[EvidencePacket]:
         source = str(raw.get("source") or "")
         raw_facts = raw.get("facts")
         if not source or not isinstance(raw_facts, list):
+            continue
+        if source == "stem_masking_analysis":
+            # Old scalar facts cannot bypass the current source-activity contract on replay.
+            provenance = raw.get("stem_masking_provenance")
+            provenance = provenance if isinstance(provenance, dict) else {}
+            packet = from_stem_masking_context({
+                "schema": "kenn.mix_review_masking_analysis.v1", "ok": True,
+                "activity": provenance.get("activity"), "findings": provenance.get("findings"),
+                "evidence": raw,
+            })
+            if packet is not None:
+                packets.append(packet)
             continue
         facts: list[EvidenceFact] = []
         for item in raw_facts:

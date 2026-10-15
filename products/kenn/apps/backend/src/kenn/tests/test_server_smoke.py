@@ -1371,10 +1371,20 @@ def test_mix_reference_endpoint_handles_32_bit_float_wavs(running_server: str) -
     assert len(stored["review"]["reference_comparison"]["eq_bands"]) > 0
 
 
-def test_mix_review_masking_endpoint_flags_competing_stems(running_server: str) -> None:
+@pytest.mark.parametrize("reference_frequency,reference_amplitude,expected", [
+    (445.0, 0.5, "competition"),
+    (10000.0, 0.5, "active_zero"),
+    (445.0, 0.0, "inactive"),
+])
+def test_mix_review_masking_endpoint_qualifies_pair_before_chat_evidence(
+    running_server: str, reference_frequency: float, reference_amplitude: float, expected: str,
+) -> None:
     import math
+    from kenn.core.evidence import (
+        from_stem_masking_context, history_turn, packets_from_history, relevant_observations,
+    )
 
-    def sine_wav_bytes(freq: float, seconds: float = 3.0, rate: int = 44100) -> bytes:
+    def sine_wav_bytes(freq: float, amplitude: float = 0.5, seconds: float = 3.0, rate: int = 44100) -> bytes:
         n = int(seconds * rate)
         audio = io.BytesIO()
         with wave.open(audio, "wb") as wav:
@@ -1383,7 +1393,7 @@ def test_mix_review_masking_endpoint_flags_competing_stems(running_server: str) 
             wav.setframerate(rate)
             frames = bytearray()
             for i in range(n):
-                value = int(0.5 * math.sin(2 * math.pi * freq * i / rate) * 32767)
+                value = int(amplitude * math.sin(2 * math.pi * freq * i / rate) * 32767)
                 frames += struct.pack("<h", value)
             wav.writeframes(bytes(frames))
         return audio.getvalue()
@@ -1393,7 +1403,7 @@ def test_mix_review_masking_endpoint_flags_competing_stems(running_server: str) 
         f'--{boundary}\r\nContent-Disposition: form-data; name="stem_a"; filename="stem_a.wav"\r\nContent-Type: audio/wav\r\n\r\n'.encode()
         + sine_wav_bytes(440.0)
         + f'\r\n--{boundary}\r\nContent-Disposition: form-data; name="stem_b"; filename="stem_b.wav"\r\nContent-Type: audio/wav\r\n\r\n'.encode()
-        + sine_wav_bytes(445.0)
+        + sine_wav_bytes(reference_frequency, reference_amplitude)
         + f"\r\n--{boundary}--\r\n".encode()
     )
     request = urllib.request.Request(
@@ -1407,8 +1417,24 @@ def test_mix_review_masking_endpoint_flags_competing_stems(running_server: str) 
     assert result["ok"] is True
     assert result["schema"] == "kenn.mix_review_masking_analysis.v1"
     assert set(result["stems"]) == {"stem_a", "stem_b"}
-    assert result["findings"]
+    assert bool(result["findings"]) is (expected == "competition")
     assert all(f["fault_family"] == "masking" for f in result["findings"])
+    # The HTTP producer and chat adapter must agree: silence is not a measured zero.
+    packet = from_stem_masking_context(result)
+    assert packet is not None
+    facts = {fact.name: fact.value for fact in packet.facts}
+    producer_facts = {fact["name"]: fact["value"] for fact in result["evidence"]["facts"]}
+    active = expected != "inactive"
+    assert (result["activity"]["pairs"][0]["simultaneously_active_frame_count"] > 0) is active
+    assert ("masking_candidate_count" in facts) is active
+    assert ("masking_candidate_count" in producer_facts) is active
+    restored = packets_from_history([history_turn(packet)])
+    observations = relevant_observations("check these stems for masking", restored)
+    if expected == "active_zero":
+        assert facts["masking_candidate_count"] == 0
+        assert any("no flagged competing" in item for item in observations)
+    elif expected == "inactive":
+        assert observations == []
 
 
 def test_mix_review_masking_endpoint_rejects_a_single_stem(running_server: str) -> None:
