@@ -46,7 +46,7 @@ window; they are not a continuously refreshed score in chat history.
 
   ```sh
   KENN_LIVE_BACKEND=fake \
-  KENN_NATIVE_COMMAND_TEST_BINARY=/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/monorepo/workspace/builds/kenn-plugin-e1/TestCommandIntegration \
+  KENN_NATIVE_COMMAND_TEST_BINARY="$(git rev-parse --show-toplevel)/workspace/builds/kenn-plugin-e1/TestCommandIntegration" \
   .venv/bin/python -m pytest -q \
     src/kenn/tests/test_plugin_insert_grade_ask.py \
     src/kenn/tests/test_plugin_insert_grade.py \
@@ -108,10 +108,14 @@ callback cells, delayed/memory/65-second publisher profiles, five-minute workloa
 qualification remain open. The StreamingMeter loudness candidate stays disabled;
 its remaining conformance and promotion gates are unchanged.
 
-GitHub Actions on the preceding `d2c1179e` checkpoint still could not start jobs
-because account payments/spending limits blocked them: [core run 38742613212](https://github.com/Nite-DSP/monorepo/actions/runs/38742613212).
-No CI settings were changed. Publication must still verify the matching
-`kenn-app` branch's exact committed product-tree equality.
+GitHub Actions on code checkpoint `03d359c5` could not start jobs because account
+payments/spending limits blocked them: [core run 38747082001](https://github.com/Nite-DSP/monorepo/actions/runs/38747082001),
+[native run 38747082135](https://github.com/Nite-DSP/monorepo/actions/runs/38747082135)
+and [sync run 38747081974](https://github.com/Nite-DSP/monorepo/actions/runs/38747081974).
+No CI settings were changed. The first manual mirror attempt rejected this
+receipt's machine-specific test path; the command above now resolves the
+repository root. Publication must still verify the matching `kenn-app` branch's
+exact committed product-tree equality.
 
 Owned paths: backend `core/live_track_analysis.py`, `core/plugin_grade.py`,
 `plugin_handoff.py`, `tests/test_plugin_insert_grade_ask.py`,
