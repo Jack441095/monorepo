@@ -698,23 +698,6 @@ def _live_context_summary(session_id: str) -> dict[str, Any] | None:
     packet = from_plugin_context(result)
     if packet is not None:
         result["evidence"] = packet.payload()
-    try:
-        from kenn.core.mix_doctor import get_mix_doctor
-        report = get_mix_doctor().get_latest_report()
-        if report:
-            result["mqm"] = {
-                "score": report.mqm_score,
-                "points_available": report.points_available,
-                "meaning": report.meaning,
-                "critical_issues": len(report.critical_issues),
-            }
-            # The plug-in has no request text, so only the default -1 dBTP ceiling is scored for the target part.
-            from kenn.audio_telemetry import get_telemetry_manager
-            from kenn.core.grade import grade_session
-            latest = get_telemetry_manager().get_latest()
-            result["grade"] = grade_session(report.to_dict(), latest.to_dict() if latest else None)
-    except Exception:
-        pass
     return result
 
 

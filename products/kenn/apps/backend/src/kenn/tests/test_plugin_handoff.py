@@ -376,3 +376,17 @@ def test_ingested_context_exposes_band_metrics_without_audio() -> None:
     assert context["evidence"]["source"] == "plugin_bus_snapshot"
     assert any(fact["name"] == "peak_dbfs" for fact in context["evidence"]["facts"])
     assert "raw_audio" not in context
+
+
+def test_plugin_context_does_not_attach_the_process_wide_latest_grade(monkeypatch) -> None:
+    from types import SimpleNamespace
+    from kenn.core import mix_doctor
+
+    monkeypatch.setattr(plugin_handoff, "_live_contexts", {})
+    report = mix_doctor.MixDoctor().audit_session({"tracks": []}, meters={})
+    monkeypatch.setattr(mix_doctor, "get_mix_doctor", lambda: SimpleNamespace(get_latest_report=lambda: report))
+
+    context = ingest_live_context(_payload(session_id="unrelated-grade"), session_id="unrelated-grade")["live_context"]
+
+    assert "grade" not in context
+    assert "mqm" not in context
