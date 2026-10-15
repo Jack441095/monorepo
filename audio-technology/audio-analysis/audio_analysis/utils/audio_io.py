@@ -147,7 +147,8 @@ def read_wav_mono(
     needs both a full-rate decode (max_samples=0) and a masking-analysis-style
     preview (e.g. analyze_stems_masking's ~65536-sample preview) can get both
     from one pass instead of decoding the file twice. Returned under
-    "preview_samples" (mono) / "preview_sample_rate"; omitted entirely when
+    "preview_samples" (mono), "preview_sample_rate" (native Hz), and
+    "preview_analysis_sample_rate" (effective Hz after decimation); omitted when
     preview_max_samples <= 0, so every existing caller is unaffected.
     """
     file_bytes = _ensure_pcm_wav_bytes(file_bytes)
@@ -408,12 +409,10 @@ def read_wav_mono(
             # consuming this preview shouldn't have to care which path produced it.
             preview = np.concatenate(_preview_chunks) if _preview_chunks else np.asarray([], dtype=np.float64)
             result["preview_samples"] = preview.tolist()
-            # The NATIVE rate, matching "sample_rate" above -- NOT sample_rate/step2.
-            # A standalone read_wav_mono(file_bytes, max_samples=preview_max_samples)
-            # call's "sample_rate" key (what analyze_stems_masking actually reads as
-            # `fs`) is always the native rate too, even though "samples" is decimated;
-            # this must match that exactly for a caller to treat the two as equivalent.
+            # Keep native Hz for existing preview consumers; masking uses the
+            # separate effective-rate key to place decimated samples in time.
             result["preview_sample_rate"] = sample_rate
+            result["preview_analysis_sample_rate"] = sample_rate / step2
         return result
 
 

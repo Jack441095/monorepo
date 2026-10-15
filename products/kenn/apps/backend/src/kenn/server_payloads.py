@@ -17,6 +17,9 @@ import json
 from kenn.core.audiogen_artifacts import safe_artifact_metadata
 from kenn.core.evidence import (
     REFERENCE_SIGNAL_LIMITATION,
+    ERB_PREVIEW_LIMITATION,
+    STEM_MASKING_SIGNAL_LIMITATION,
+    qualified_stem_masking_summary,
     TRANSIENT_SIGNAL_LIMITATION,
     UPLOADED_SIGNAL_LIMITATION,
     reference_comparison_has_activity,
@@ -135,12 +138,14 @@ def _format_genre_classification(mix_style: object) -> str:
     return f"{name}-leaning ({confidence * 100:.0f}% confidence, source: {evidence_id})"
 
 
-def _handoff_metrics_without_transient_claims(metrics: dict) -> dict:
-    """Keep own-upload metrics while dropping cached transient-comparison scalars."""
+def _handoff_metrics_without_optional_claims(metrics: dict) -> dict:
+    """Keep own-upload metrics while dropping unvalidated optional-analysis scalars."""
     return {
         key: value for key, value in metrics.items()
         if "transient_preservation" not in str(key).lower()
         and "matched_event_count" not in str(key).lower()
+        and "stem_masking" not in str(key).lower()
+        and "visibility" not in str(key).lower()
     }
 
 
@@ -166,6 +171,9 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
             or "transient_preservation" in context
         )
         transient_active = transient_preservation_has_activity(transient_summary)
+        erb_summary = analysis_evidence.get("stem_masking", context.get("stem_masking"))
+        erb_present = "stem_masking" in analysis_evidence or "stem_masking" in context
+        safe_erb = qualified_stem_masking_summary(erb_summary)
 
         def validated_transient_summary() -> dict | None:
             if not transient_active:
@@ -211,35 +219,38 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
             not transient_present and legacy_transient_claim
         )
 
-        if uploaded_metrics_have_activity(metrics) and transient_unqualified:
-            # Cached handoff prose cannot identify which claims used an unqualified pre/post render.
-            lines = [f"Mix Review Lab context for {title}.", TRANSIENT_SIGNAL_LIMITATION]
-            if mix_goal_label:
-                lines.append(f"Selected mix target: {mix_goal_label[:160]}")
-            if session_goal:
-                lines.append(f"Session goal: {session_goal[:300]}")
-            safe_metrics = _handoff_metrics_without_transient_claims(metrics)
-            lines.append("Structured metrics: " + json.dumps(safe_metrics, ensure_ascii=False))
-            if isinstance(comparison, dict) and reference_comparison_has_activity(comparison):
-                lines.append("Qualified reference comparison: " + json.dumps(comparison, ensure_ascii=False))
-            elif isinstance(comparison, dict):
+        legacy_erb_claim = any(
+            marker in cached_text for marker in (
+                "stem_masking", "stem masking", "erb masking", "lowest_visibility",
+                "overall_visibility", "carving_suggestions", "clarity_prediction",
+                "simultaneous-masking", "masking visibility", "erb preview", "clarity improvement",
+            )
+        ) or any("stem_masking" in str(key).lower() for key in context)
+        erb_unqualified = (erb_present and safe_erb is None) or (not erb_present and legacy_erb_claim)
+        reference_unqualified = isinstance(comparison, dict) and not reference_comparison_has_activity(comparison)
+        if uploaded_metrics_have_activity(metrics) and (transient_unqualified or erb_unqualified or reference_unqualified):
+            # Cached prose mixes optional analyses, so rebuild once and preserve
+            # each independently qualified section rather than trusting sentences.
+            lines = [f"Mix Review Lab context for {title}."]
+            if transient_unqualified:
+                lines.append(TRANSIENT_SIGNAL_LIMITATION)
+            if erb_unqualified:
+                lines.append(STEM_MASKING_SIGNAL_LIMITATION)
+            if reference_unqualified:
                 lines.append(REFERENCE_SIGNAL_LIMITATION)
-            return {"role": "user", "content": "\n".join(lines)}
-
-        if uploaded_metrics_have_activity(metrics) and isinstance(comparison, dict) and not reference_comparison_has_activity(comparison):
-            # Cached prose can mix valid own-source observations with obsolete
-            # reference advice. Rebuild from measured fields rather than guessing
-            # which sentences depended on the unqualified reference.
-            lines = [f"Mix Review Lab context for {title}.", REFERENCE_SIGNAL_LIMITATION]
             if mix_goal_label:
                 lines.append(f"Selected mix target: {mix_goal_label[:160]}")
             if session_goal:
                 lines.append(f"Session goal: {session_goal[:300]}")
-            safe_metrics = _handoff_metrics_without_transient_claims(metrics)
-            lines.append("Structured metrics: " + json.dumps(safe_metrics, ensure_ascii=False))
+            lines.append("Structured metrics: " + json.dumps(_handoff_metrics_without_optional_claims(metrics), ensure_ascii=False))
+            if isinstance(comparison, dict) and not reference_unqualified:
+                lines.append("Qualified reference comparison: " + json.dumps(comparison, ensure_ascii=False))
             safe_transient = validated_transient_summary()
             if safe_transient is not None:
                 lines.append("Qualified transient-preservation summary: " + json.dumps(safe_transient, ensure_ascii=False))
+            if safe_erb is not None:
+                lines.append("Qualified ERB stem-masking summary: " + json.dumps(safe_erb, ensure_ascii=False))
+                lines.append(ERB_PREVIEW_LIMITATION)
             return {"role": "user", "content": "\n".join(lines)}
         if not uploaded_metrics_have_activity(metrics):
             # Older handoffs can carry cached prose and repairs alongside quiet
@@ -263,7 +274,7 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
         if session_goal:
             lines.append(f"Session goal: {session_goal[:300]}")
         if metrics:
-            safe_metrics = _handoff_metrics_without_transient_claims(metrics)
+            safe_metrics = _handoff_metrics_without_optional_claims(metrics)
             lines.append(
                 "Structured metrics: "
                 + ", ".join(
@@ -275,6 +286,9 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
         safe_transient = validated_transient_summary()
         if safe_transient is not None:
             lines.append("Qualified transient-preservation summary: " + json.dumps(safe_transient, ensure_ascii=False))
+        if safe_erb is not None:
+            lines.append("Qualified ERB stem-masking summary: " + json.dumps(safe_erb, ensure_ascii=False))
+            lines.append(ERB_PREVIEW_LIMITATION)
         flags = context.get("flags") if isinstance(context.get("flags"), list) else []
         if flags:
             lines.append(

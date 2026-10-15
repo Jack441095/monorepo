@@ -8,6 +8,10 @@ import pytest
 from kenn.core.evidence import (
     MARKER,
     TRANSIENT_SIGNAL_LIMITATION,
+    STEM_MASKING_SIGNAL_LIMITATION,
+    ERB_PREVIEW_LIMITATION,
+    qualified_stem_masking_summary,
+    stem_masking_has_activity,
     from_ableton_session,
     from_audio_classification_context,
     from_mix_review_context,
@@ -36,6 +40,16 @@ def _transient_summary(*, pre_rms=-18.0, post_rms=-20.0, score=0.0, count=1, pro
             "pre_rms_dbfs": pre_rms,
             "post_rms_dbfs": post_rms,
         },
+    }
+
+
+def _erb_summary():
+    return {
+        "stem_count": 2, "lowest_visibility": 0.0, "lowest_visibility_stem": "Bass",
+        "activity": {"schema": "kenn.erb_masking.activity.v1", "active_floor_dbfs": -60.0,
+                     "frame_size_samples": 4096,
+                     "sources": [{"name": name, "sample_rate": 44100, "frame_count": 16, "active_frame_count": 8} for name in ("Bass", "Kick")],
+                     "pairs": [{"stems": ["Bass", "Kick"], "simultaneously_active_frame_count": 4}]},
     }
 
 
@@ -682,7 +696,7 @@ def test_uploaded_evidence_withholds_quiet_meters_and_nested_signal_facts(rms, a
         "metrics": {"rms_dbfs": rms, "peak_dbfs": -0.1, "stereo_correlation": -0.9},
         "analysis_evidence": {
             "transient_preservation": _transient_summary(score=0.9, profile="compressed"),
-            "stem_masking": {"lowest_visibility": 0.1, "lowest_visibility_stem": "Bass"},
+            "stem_masking": _erb_summary(),
             "low_end_stems": [{"name": "Bass"}],
         },
         "reference_comparison": {"dynamics": {"mix": {"rms_dbfs": -18.0}, "reference": {"rms_dbfs": -20.0}},
@@ -842,3 +856,85 @@ def test_reference_facts_require_activity_in_both_uploaded_sources(side, rms):
 @pytest.mark.parametrize("comparison", [None, {}, {"dynamics": None}, {"dynamics": {"mix": {"rms_dbfs": -18.0}}}])
 def test_legacy_comparison_without_both_source_readings_cannot_qualify(comparison):
     assert not reference_comparison_has_activity(comparison)
+
+
+def test_erb_visibility_preserves_zero_and_rebuilds_history_from_bounded_sources():
+    # A real zero visibility must survive while cached contradictory scalars never win.
+    summary = _erb_summary()
+    packet = from_mix_review_context({"schema": "kenn_mix_review_handoff.v1", "metrics": {"rms_dbfs": -18.0}, "analysis_evidence": {"stem_masking": summary}})
+    assert packet is not None and stem_masking_has_activity(summary)
+    assert packet.erb_masking_provenance == summary
+    payload = packet.payload()
+    payload["facts"].append({"name": "stem_masking_lowest_visibility", "value": 0.99})
+    payload["limitations"] = []
+    recovered, = packets_from_history([{"content": MARKER + json.dumps(payload)}])
+    assert [fact.value for fact in recovered.facts if fact.name == "stem_masking_lowest_visibility"] == [0.0]
+    assert recovered.erb_masking_provenance == summary
+    assert ERB_PREVIEW_LIMITATION in packet.limitations
+    assert ERB_PREVIEW_LIMITATION in recovered.limitations
+    assert "relative ERB preview visibility" in " ".join(relevant_observations("bass masking", [recovered]))
+    payload["erb_masking_provenance"]["activity"]["pairs"][0]["stems"][0] = "altered"
+    assert packet.erb_masking_provenance == summary
+
+
+@pytest.mark.parametrize("path,value", [
+    (("activity",), None), (("activity", "schema"), "wrong"),
+    (("activity", "active_floor_dbfs"), -80.0), (("activity", "frame_size_samples"), 2048),
+    (("activity", "sources", 0, "active_frame_count"), 0),
+    (("activity", "sources", 0, "active_frame_count"), True),
+    (("activity", "sources", 0, "frame_count"), 17),
+    (("activity", "sources", 0, "name"), "Kick"),
+    (("activity", "sources", 0, "name"), " Bass"),
+    (("activity", "sources", 0, "sample_rate"), 48000),
+    (("activity", "sources", 0, "sample_rate"), float("nan")),
+    (("activity", "sources", 0, "sample_rate"), True),
+    (("activity", "sources", 0, "sample_rate"), 10**1000),
+    (("activity", "pairs"), []),
+    (("activity", "pairs", 0, "simultaneously_active_frame_count"), 0),
+    (("activity", "pairs", 0, "simultaneously_active_frame_count"), 9),
+    (("activity", "pairs", 0, "simultaneously_active_frame_count"), True),
+    (("activity", "pairs", 0, "stems"), ["Bass", "Bass"]),
+    (("lowest_visibility",), float("inf")), (("lowest_visibility",), float("nan")),
+    (("lowest_visibility",), -0.1), (("lowest_visibility",), 1.1),
+    (("lowest_visibility",), True), (("lowest_visibility",), 10**1000),
+    (("lowest_visibility_stem",), "Unmeasured"), (("stem_count",), 3), (("stem_count",), True),
+])
+def test_erb_visibility_requires_real_joint_activity_on_input_and_history(path, value):
+    # Quiet, synthetic, aliased or malformed previews used to retain normalized visibility.
+    summary = _erb_summary()
+    target = summary
+    for part in path[:-1]:
+        target = target[part]
+    target[path[-1]] = value
+    assert qualified_stem_masking_summary(summary) is None
+    packet = from_mix_review_context({"schema": "kenn_mix_review_handoff.v1", "metrics": {"rms_dbfs": -18.0, "peak_dbfs": -1.0}, "analysis_evidence": {"stem_masking": summary, "transient_preservation": _transient_summary()}})
+    assert packet is not None
+    assert not any(fact.name.startswith("stem_masking_") for fact in packet.facts)
+    assert STEM_MASKING_SIGNAL_LIMITATION in packet.limitations
+    raw = packet.payload()
+    raw["erb_masking_provenance"] = summary
+    raw["facts"].append({"name": "stem_masking_lowest_visibility", "value": 0.99})
+    recovered, = packets_from_history([{"content": MARKER + json.dumps(raw)}])
+    assert not any(fact.name.startswith("stem_masking_") for fact in recovered.facts)
+    assert {fact.name for fact in recovered.facts} >= {"rms_dbfs", "peak_dbfs", "transient_preservation_score"}
+    assert STEM_MASKING_SIGNAL_LIMITATION in recovered.limitations
+
+
+def test_erb_legacy_scalars_and_metric_aliases_cannot_bypass_source_proof():
+    # Older receipts and flattened metric aliases cannot acquire measured status.
+    aliases = {"stem_masking_lowest_visibility": 0.9, "overall_visibility": 0.9, "lowest_visibility": 0.9, "stem_count": 2}
+    packet = from_mix_review_context({"schema": "kenn_mix_review_handoff.v1", "metrics": {"rms_dbfs": -18.0, **aliases}, "analysis_evidence": {"stem_masking": {"lowest_visibility": 0.9, "lowest_visibility_stem": "Bass"}}})
+    assert packet is not None and {fact.name for fact in packet.facts} == {"rms_dbfs"}
+    raw = {"schema": "kenn.evidence.v1", "source": "mix_review_upload", "facts": [{"name": name, "value": value} for name, value in aliases.items()] + [{"name": "peak_dbfs", "value": -1.0}], "limitations": []}
+    recovered, = packets_from_history([{"content": MARKER + json.dumps(raw)}])
+    assert {fact.name for fact in recovered.facts} == {"peak_dbfs"}
+    assert STEM_MASKING_SIGNAL_LIMITATION in recovered.limitations
+
+
+def test_erb_visibility_isolates_unpaired_quiet_preview_sources():
+    # A quiet extra stem cannot erase a real pair or become the measured minimum.
+    summary = _erb_summary()
+    summary["activity"]["sources"].append({"name": "Quiet", "sample_rate": 44100, "frame_count": 16, "active_frame_count": 0})
+    assert qualified_stem_masking_summary(summary) == summary
+    summary["lowest_visibility_stem"] = "Quiet"
+    assert qualified_stem_masking_summary(summary) is None

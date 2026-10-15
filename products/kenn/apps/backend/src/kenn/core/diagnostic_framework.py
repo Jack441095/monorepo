@@ -586,7 +586,7 @@ def rank_with_evidence(plan: DiagnosticPlan, packets: list["EvidencePacket"]) ->
         stem = facts.get("stem_masking_lowest_visibility_stem")
         if isinstance(visibility, (int, float)) and isinstance(stem, str) and visibility < 0.6:
             preferred_cause = "Overlapping fundamentals or excessive bass sustain" if "kick loses" in plan.symptom else "Fundamentals are masking or cancelling"
-            rationale = f"The uploaded stem analysis measured low simultaneous-masking visibility ({visibility:.2f}) for '{stem}', so testing overlap first is the most informative discriminator; it does not prove which source, frequency, timing, or processing caused the audible problem."
+            rationale = f"The relative ERB preview visibility ({visibility:.2f}) for '{stem}' prioritises an overlap check on jointly active preview frames. This uncalibrated proxy does not establish audible masking severity or which source, frequency, timing, or processing caused the problem."
     elif plan.symptom == "The drums are described as flat or lacking punch.":
         score = facts.get("transient_preservation_score")
         if isinstance(score, (int, float)) and score < 0.75:

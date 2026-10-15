@@ -5,13 +5,12 @@ from email import policy
 from email.parser import BytesParser
 
 from audio_analysis.analysis_core.dsp_metrics import spectrum_magnitudes
+from audio_analysis.analysis_core.analysis_features import rms_db
 from audio_analysis.analysis_core.erb_masking import (
     get_erb_bands,
     compute_erb_profile,
     compute_combined_masking_threshold,
     calculate_visibility,
-    generate_carving_suggestions,
-    simulate_clarity_improvement
 )
 
 def _correlation(v1: list[float], v2: list[float]) -> float:
@@ -35,249 +34,155 @@ def _correlation(v1: list[float], v2: list[float]) -> float:
     return num / math.sqrt(den1 * den2)
 
 def analyze_stems_masking(stems: list[dict], *, read_wav_mono: Callable, spectral_bands: Callable) -> dict:
-    results = []
+    """Return relative ERB previews only for actually co-active decoded frames.
+
+    Preview frames share the upload origin; differing effective sample rates
+    cannot be compared without resampling. Activity gates publication, not
+    psychoacoustic severity, and the existing ERB model remains uncalibrated.
+    """
     bands_keys = ["sub", "bass", "low_mids", "mids", "presence", "sibilance", "air"]
     erb_bands = get_erb_bands(num_bands=40)
-    
-    # We will analyze up to 16 frames of size 4096 samples (approx 1.5 seconds of audio)
-    frame_size = 4096
-    num_frames = 16
-    max_samples = frame_size * num_frames # 65536
-
-    for stem in stems:
-        name = stem["name"]
-        # Only needed on the fallback (re-decode) path below -- a stem dict
-        # that already carries a precomputed preview (see below) need not
-        # supply file_bytes at all.
-        file_bytes = stem.get("file_bytes", b"")
-        
-        # Default fallback profiles in case reading fails
-        name_lower = name.lower()
-        if "kick" in name_lower or "sub" in name_lower:
-            default_bands = {"sub": 0.50, "bass": 0.35, "low_mids": 0.10, "mids": 0.03, "presence": 0.01, "sibilance": 0.005, "air": 0.005}
-        elif "drum" in name_lower or "beat" in name_lower or "perc" in name_lower:
-            default_bands = {"sub": 0.20, "bass": 0.30, "low_mids": 0.20, "mids": 0.15, "presence": 0.10, "sibilance": 0.03, "air": 0.02}
-        elif "bass" in name_lower:
-            default_bands = {"sub": 0.30, "bass": 0.45, "low_mids": 0.18, "mids": 0.05, "presence": 0.01, "sibilance": 0.005, "air": 0.005}
-        elif "vocal" in name_lower or "voice" in name_lower or "vox" in name_lower:
-            default_bands = {"sub": 0.01, "bass": 0.05, "low_mids": 0.20, "mids": 0.40, "presence": 0.25, "sibilance": 0.06, "air": 0.03}
-        elif "synth" in name_lower or "pad" in name_lower or "guitar" in name_lower or "key" in name_lower or "inst" in name_lower:
-            default_bands = {"sub": 0.02, "bass": 0.10, "low_mids": 0.30, "mids": 0.35, "presence": 0.15, "sibilance": 0.05, "air": 0.03}
-        else:
-            default_bands = {"sub": 0.14, "bass": 0.20, "low_mids": 0.20, "mids": 0.20, "presence": 0.14, "sibilance": 0.06, "air": 0.06}
-            
-        time_series: dict[str, list[float]] = {k: [] for k in bands_keys}
-        average_bands = {k: 0.0 for k in bands_keys}
-        erb_profiles = []
-        average_erb = [0.0] * 40
-        
+    frame_size = 4096  # Samples per complete preview frame; no padded or repeated tails.
+    max_frames = 16  # Preview budget, not an assertion that all uploads contain 16 frames.
+    active_floor_dbfs = -60.0  # Existing upload publication floor, before spectral normalization.
+    results = []
+    sources = []
+    abstentions = []
+    names = [str(stem.get("name", "")).rsplit(".", 1)[0] for stem in stems]
+    for stem, name in zip(stems, names):
+        if not name or names.count(name) != 1:
+            # Ambiguous identities cannot support a pair, but do not invalidate other uploads.
+            abstentions.append({"name": name, "reason": "Missing or duplicate stem identity."})
+            continue
         try:
-            # If the caller already ran prepare_stems with
-            # masking_preview_max_samples=max_samples on this same stem (see
-            # that function's docstring), reuse its piggybacked preview
-            # instead of re-parsing file_bytes a second time -- same
-            # algorithm, verified bit-identical (tests/audio_analysis/
-            # test_stem_analysis_masking_preview.py). Falls back to an
-            # independent decode when no precomputed preview is attached
-            # (e.g. this stem dict came straight from raw upload bytes).
-            precomputed_samples = stem.get("masking_preview_samples")
-            if precomputed_samples is not None:
-                samples = precomputed_samples
-                fs = stem.get("masking_preview_sample_rate") or 44100
+            # Older piggyback previews label decimated samples with their native rate.
+            # Re-decode those rather than manufacture a common time/frequency basis.
+            if stem.get("masking_preview_samples") is not None and stem.get("masking_preview_analysis_sample_rate") is not None:
+                samples = stem["masking_preview_samples"]
+                fs = stem["masking_preview_analysis_sample_rate"]
             else:
-                wav_data = read_wav_mono(file_bytes, max_samples=max_samples)
+                wav_data = read_wav_mono(stem.get("file_bytes", b""), max_samples=frame_size * max_frames)
                 samples = wav_data.get("samples", [])
-                fs = wav_data.get("sample_rate", 44100)
-            
-            if len(samples) >= frame_size:
-                # Divide samples into frames and analyze envelopes
-                for f in range(num_frames):
-                    start = f * frame_size
-                    end = start + frame_size
-                    if end <= len(samples):
-                        frame_samples = samples[start:end]
-                        fb = spectral_bands(frame_samples, fs, size=frame_size)
-                        for k in bands_keys:
-                            val = float(fb.get(k, 0.0))
-                            time_series[k].append(val)
-                            average_bands[k] += val
-                            
-                        # ERB Profile
-                        mags, n = spectrum_magnitudes(frame_samples, fs, size=frame_size)
-                        erb_prof = compute_erb_profile(mags, fs, n, num_bands=40)
-                        erb_profiles.append(erb_prof)
-                        for b_idx in range(40):
-                            average_erb[b_idx] += erb_prof[b_idx]
-                            
-                # Normalize average bands
-                total = sum(average_bands.values()) or 1.0
-                average_bands = {k: v / total for k, v in average_bands.items()}
-                
-                # Normalize ERB
-                total_erb = sum(average_erb) or 1.0
-                average_erb = [v / total_erb for v in average_erb]
-            else:
-                # Fallback to single pass
-                fb = spectral_bands(samples, fs, size=min(4096, len(samples))) if samples else {}
-                average_bands = {k: float(fb.get(k, default_bands[k])) for k in bands_keys}
-                total = sum(average_bands.values()) or 1.0
-                average_bands = {k: v / total for k, v in average_bands.items()}
-                # Duplicate time series for fallback
-                for k in bands_keys:
-                    time_series[k] = [average_bands[k]] * num_frames
-                    
-                # ERB fallback
-                mags, n = spectrum_magnitudes(samples, fs, size=min(4096, len(samples))) if samples else ([], 0)
-                if mags:
-                    erb_prof = compute_erb_profile(mags, fs, n, num_bands=40)
-                else:
-                    erb_prof = [0.0] * 40
-                    for b_idx, (fc, _, _) in enumerate(erb_bands):
-                        if fc < 60:
-                            val = default_bands.get("sub", 0.0)
-                        elif fc < 150:
-                            val = default_bands.get("bass", 0.0)
-                        elif fc < 400:
-                            val = default_bands.get("low_mids", 0.0)
-                        elif fc < 2000:
-                            val = default_bands.get("mids", 0.0)
-                        elif fc < 6000:
-                            val = default_bands.get("presence", 0.0)
-                        elif fc < 8000:
-                            val = default_bands.get("sibilance", 0.0)
-                        else:
-                            val = default_bands.get("air", 0.0)
-                        erb_prof[b_idx] = val
-                    total_erb = sum(erb_prof) or 1.0
-                    erb_prof = [v / total_erb for v in erb_prof]
-                average_erb = erb_prof
-                erb_profiles = [erb_prof] * num_frames
+                fs = wav_data.get("analysis_sample_rate", wav_data.get("sample_rate"))
+            if isinstance(fs, bool) or not isinstance(fs, (int, float)) or not math.isfinite(fs) or fs <= 0:
+                raise ValueError("Missing finite effective sample rate.")
+            preview = [float(value) for value in samples[:frame_size * max_frames]]
+            if any(not math.isfinite(value) for value in preview):
+                raise ValueError("Preview has non-finite decoded samples.")
+            frame_count = len(preview) // frame_size
+            frames = []
+            for frame_index in range(frame_count):
+                frame = preview[frame_index * frame_size:(frame_index + 1) * frame_size]
+                frame_rms_dbfs = rms_db(frame)
+                if not math.isfinite(frame_rms_dbfs):
+                    # Overflow cannot establish valid raw-level evidence for normalized spectra.
+                    raise ValueError("Preview RMS is non-finite.")
+                active = frame_rms_dbfs > active_floor_dbfs
+                if not active:
+                    # Quiet frames retain their timeline slot but contribute no normalized spectrum.
+                    frames.append(None)
+                    continue
+                fb = spectral_bands(frame, fs, size=frame_size)
+                band_values = {key: float(fb.get(key, 0.0)) for key in bands_keys}
+                mags, fft_size = spectrum_magnitudes(frame, fs, size=frame_size)
+                erb_profile = compute_erb_profile(mags, fs, fft_size, num_bands=40)
+                if any(not math.isfinite(value) or value < 0 for value in [*band_values.values(), *erb_profile]):
+                    raise ValueError("Preview spectrum is not finite non-negative energy.")
+                frames.append({"bands": band_values, "erb_profile": erb_profile})
+            active_count = sum(frame is not None for frame in frames)
+            sources.append({"name": name, "sample_rate": float(fs), "frame_count": frame_count, "active_frame_count": active_count})
+            results.append({"name": name, "sample_rate": fs, "frames": frames})
+            if not active_count:
+                # Names remain visible as abstentions; silence is not measured masking.
+                abstentions.append({"name": name, "reason": "No complete preview frame exceeds -60 dBFS RMS."})
         except Exception:
-            average_bands = default_bands
-            for k in bands_keys:
-                time_series[k] = [average_bands[k]] * num_frames
-                
-            # ERB Exception fallback
-            erb_prof = [0.0] * 40
-            for b_idx, (fc, _, _) in enumerate(erb_bands):
-                if fc < 60:
-                    val = default_bands.get("sub", 0.0)
-                elif fc < 150:
-                    val = default_bands.get("bass", 0.0)
-                elif fc < 400:
-                    val = default_bands.get("low_mids", 0.0)
-                elif fc < 2000:
-                    val = default_bands.get("mids", 0.0)
-                elif fc < 6000:
-                    val = default_bands.get("presence", 0.0)
-                elif fc < 8000:
-                    val = default_bands.get("sibilance", 0.0)
-                else:
-                    val = default_bands.get("air", 0.0)
-                erb_prof[b_idx] = val
-            total_erb = sum(erb_prof) or 1.0
-            erb_prof = [v / total_erb for v in erb_prof]
-            average_erb = erb_prof
-            erb_profiles = [erb_prof] * num_frames
+            # A failed decode/measurement has no spectral substitute; names never manufacture evidence.
+            abstentions.append({"name": name, "reason": "Decoded preview or effective sample rate is unavailable or invalid."})
 
-        results.append({
-            "name": name.rsplit(".", 1)[0],
-            "bands": average_bands,
-            "time_series": time_series,
-            "erb_profile": average_erb,
-            "erb_profiles": erb_profiles
-        })
-
-    # Compute masking matrix
-    masking_matrix = {}
-    for s1 in results:
-        name1 = s1["name"]
-        masking_matrix[name1] = {}
-        for s2 in results:
-            name2 = s2["name"]
-            if name1 == name2:
-                masking_matrix[name1][name2] = 1.0
-            else:
-                # Sum the masking index across all bands: correlation * overlap
-                masking_index = 0.0
-                for k in bands_keys:
-                    corr = _correlation(s1["time_series"][k], s2["time_series"][k])
-                    corr_clamped = max(0.0, corr)
-                    
-                    # Overlap is the minimum energy presence
-                    overlap = min(s1["bands"][k], s2["bands"][k])
-                    masking_index += corr_clamped * overlap
-                    
-                masking_matrix[name1][name2] = round(min(1.0, masking_index), 3)
-
-    # Compute simultaneous masking & clarity scores
-    for s in results:
-        s["overall_visibility"] = 0.0
-        s["visibility_per_band"] = [0.0] * 40
-        
-    for f_idx in range(num_frames):
-        for s in results:
-            name = s["name"]
-            other_stems_energies = []
-            for other in results:
-                if other["name"] != name:
-                    f_i = min(f_idx, len(other["erb_profiles"]) - 1)
-                    other_stems_energies.append(other["erb_profiles"][f_i])
-            
-            f_i_s = min(f_idx, len(s["erb_profiles"]) - 1)
-            threshold_spl = compute_combined_masking_threshold(other_stems_energies, erb_bands)
-            vis, band_vis = calculate_visibility(s["erb_profiles"][f_i_s], threshold_spl)
-            
-            s["overall_visibility"] += vis
-            for b_idx in range(40):
-                s["visibility_per_band"][b_idx] += band_vis[b_idx]
-                
-    for s in results:
-        s["overall_visibility"] = round(s["overall_visibility"] / num_frames, 3)
-        s["visibility_per_band"] = [round(v / num_frames, 3) for v in s["visibility_per_band"]]
-
-    # Compute 2D ERB Heatmap
-    erb_heatmap = {}
-    for s1 in results:
-        name1 = s1["name"]
-        erb_heatmap[name1] = {}
-        for s2 in results:
-            name2 = s2["name"]
-            if name1 == name2:
-                erb_heatmap[name1][name2] = [1.0] * 40
-            else:
-                band_masking = [0.0] * 40
-                for f_idx in range(num_frames):
-                    f_i1 = min(f_idx, len(s1["erb_profiles"]) - 1)
-                    f_i2 = min(f_idx, len(s2["erb_profiles"]) - 1)
-                    e1 = s1["erb_profiles"][f_i1]
-                    e2 = s2["erb_profiles"][f_i2]
-                    for b_idx in range(40):
-                        if e1[b_idx] + e2[b_idx] > 1e-15:
-                            band_masking[b_idx] += e1[b_idx] / (e1[b_idx] + e2[b_idx])
-                erb_heatmap[name1][name2] = [round(v / num_frames, 3) for v in band_masking]
-
-    suggestions = generate_carving_suggestions(results, erb_heatmap, erb_bands)
-    improvements = simulate_clarity_improvement(results, suggestions, erb_bands)
-
-    erb_details = {
-        "erb_frequencies": [round(fc, 1) for fc, _, _ in erb_bands],
-        "heatmap": erb_heatmap,
-        "carving_suggestions": suggestions,
-        "clarity_improvement": improvements
-    }
+    pairs = []
+    pair_frames = {}
+    for index, first in enumerate(results):
+        for second in results[index + 1:]:
+            if first["sample_rate"] != second["sample_rate"]:
+                # Equal frame numbers represent different times at different effective sample rates.
+                continue
+            shared = [frame_index for frame_index, (left, right) in enumerate(zip(first["frames"], second["frames"])) if left is not None and right is not None]
+            if shared:
+                pair_frames[(first["name"], second["name"])] = shared
+                pairs.append({"stems": [first["name"], second["name"]], "simultaneously_active_frame_count": len(shared)})
+    qualified_names = {name for pair in pairs for name in pair["stems"]}
+    for result in results:
+        if result["name"] not in qualified_names and any(frame is not None for frame in result["frames"]):
+            # An active solo source still cannot establish a simultaneous masking comparison.
+            abstentions.append({"name": result["name"], "reason": "No co-active complete frame at a shared effective sample rate."})
+    results = [result for result in results if result["name"] in qualified_names]
+    matrix = {result["name"]: {result["name"]: 1.0} for result in results}
+    heatmap = {result["name"]: {result["name"]: [1.0] * len(erb_bands)} for result in results}
+    for first in results:
+        name = first["name"]
+        visible = []
+        joint_frames = []
+        for frame_index, frame in enumerate(first["frames"]):
+            others = [other["frames"][frame_index]["erb_profile"] for other in results
+                      if other["name"] != name and other["sample_rate"] == first["sample_rate"]
+                      and frame_index < len(other["frames"]) and other["frames"][frame_index] is not None]
+            if frame is None or not others:
+                # Do not describe solo or missing tails as compared audio.
+                continue
+            threshold = compute_combined_masking_threshold(others, erb_bands)
+            visible.append(calculate_visibility(frame["erb_profile"], threshold))
+            joint_frames.append(frame)
+        total_bands = {key: sum(frame["bands"][key] for frame in joint_frames) for key in bands_keys}
+        total = sum(total_bands.values())
+        # An active frame can lie outside these seven bands; zero band energy
+        # stays zero rather than inventing a normalized frequency profile.
+        first["bands"] = {key: value / total if total else 0.0 for key, value in total_bands.items()}
+        first["overall_visibility"] = round(sum(value for value, _ in visible) / len(visible), 3)
+        first["visibility_per_band"] = [round(sum(values[index] for _, values in visible) / len(visible), 3) for index in range(len(erb_bands))]
+        for second in results:
+            other_name = second["name"]
+            if name == other_name:
+                # The diagonal is an identity marker, never a measured conflict.
+                continue
+            shared = pair_frames.get((name, other_name), pair_frames.get((other_name, name), []))
+            if not shared:
+                # Omit unknown pairs instead of publishing zero as a measured clearance.
+                continue
+            index_sum = 0.0
+            for key in bands_keys:
+                left = [first["frames"][index]["bands"][key] for index in shared]
+                right = [second["frames"][index]["bands"][key] for index in shared]
+                left_total = sum(sum(first["frames"][index]["bands"].values()) for index in shared)
+                right_total = sum(sum(second["frames"][index]["bands"].values()) for index in shared)
+                overlap = min(sum(left) / left_total if left_total else 0.0, sum(right) / right_total if right_total else 0.0)
+                index_sum += max(0.0, _correlation(left, right)) * overlap
+            matrix[name][other_name] = round(min(1.0, index_sum), 3)
+            band_masking = []
+            for band in range(len(erb_bands)):
+                fractions = []
+                for index in shared:
+                    left = first["frames"][index]["erb_profile"][band]
+                    right = second["frames"][index]["erb_profile"][band]
+                    # Preserve the ERB model's 1e-15 energy floor; numerical
+                    # residue in an empty band must not become full overlap.
+                    fractions.append(left / (left + right) if left + right > 1e-15 else 0.0)
+                band_masking.append(round(sum(fractions) / len(shared), 3))
+            heatmap[name][other_name] = band_masking
 
     return {
-        "stems": [
-            {
-                "name": r["name"],
-                "bands": r["bands"],
-                "overall_visibility": r["overall_visibility"],
-                "visibility_per_band": r["visibility_per_band"]
-            } for r in results
-        ],
-        "masking_matrix": masking_matrix,
-        "erb_details": erb_details
+        "stems": [{key: result[key] for key in ("name", "bands", "overall_visibility", "visibility_per_band")} for result in results],
+        "masking_matrix": matrix,
+        "erb_details": {
+            "erb_frequencies": [round(fc, 1) for fc, _, _ in erb_bands],
+            "heatmap": heatmap,
+            # Relative preview spectra do not qualify calibrated EQ repairs or predicted gains.
+            "carving_suggestions": [],
+            "clarity_improvement": {},
+        },
+        "activity": {"schema": "kenn.erb_masking.activity.v1", "active_floor_dbfs": active_floor_dbfs,
+                     "frame_size_samples": frame_size, "sources": sources, "pairs": pairs},
+        "abstentions": abstentions,
+        "limitations": ["Relative ERB preview candidate only; no calibrated masking severity, EQ repair, or predicted clarity improvement. Bounded decimated previews compare only matching effective sample rates and upload origins."],
     }
 
 def handle_stems_upload(content_type: str, body: bytes, *, analyze_stems_masking: Callable) -> dict:

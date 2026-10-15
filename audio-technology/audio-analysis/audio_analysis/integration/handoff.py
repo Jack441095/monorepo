@@ -41,6 +41,120 @@ def _transient_preservation_evidence(transient: dict) -> dict:
     }
 
 
+def qualified_stem_masking_summary(summary: object) -> dict[str, object] | None:
+    """Return bounded ERB preview evidence backed by jointly active source frames."""
+    if not isinstance(summary, dict):
+        # Legacy visibility scalars do not establish which real audio was compared.
+        return None
+    activity = summary.get("activity")
+    if (
+        not isinstance(activity, dict) or activity.get("schema") != "kenn.erb_masking.activity.v1"
+        or activity.get("active_floor_dbfs") != -60.0 or activity.get("frame_size_samples") != 4096
+    ):
+        # The proof describes the existing 4096-sample preview and -60 dBFS RMS floor.
+        return None
+    sources = activity.get("sources")
+    pairs = activity.get("pairs")
+    if (
+        not isinstance(sources, list) or not 2 <= len(sources) <= 64
+        or not isinstance(pairs, list) or not pairs
+        or len(pairs) > len(sources) * (len(sources) - 1) // 2
+    ):
+        # Bound replay to 64 source identities and one entry per unordered pair.
+        return None
+    normalized_sources = []
+    by_name = {}
+    for source in sources:
+        if not isinstance(source, dict):
+            # A malformed source cannot be matched safely to a measured pair.
+            return None
+        name, rate = source.get("name"), source.get("sample_rate")
+        count, active = source.get("frame_count"), source.get("active_frame_count")
+        try:
+            rate = float(rate) if isinstance(rate, (int, float)) and not isinstance(rate, bool) else None
+        except OverflowError:
+            # Unrepresentable rates cannot establish aligned preview frames.
+            return None
+        if (
+            not isinstance(name, str) or not name.strip() or name != name.strip()
+            or len(name) > 96 or name in by_name
+            or rate is None or not math.isfinite(rate) or rate <= 0
+            or not isinstance(count, int) or isinstance(count, bool) or not 0 <= count <= 16
+            or not isinstance(active, int) or isinstance(active, bool) or not 0 <= active <= count
+        ):
+            # Exact unique names avoid aliasing; only the first 16 complete frames are measured.
+            return None
+        normalized = {"name": name, "sample_rate": rate, "frame_count": count, "active_frame_count": active}
+        by_name[name] = normalized
+        normalized_sources.append(normalized)
+    normalized_pairs, seen, paired_names = [], set(), set()
+    for pair in pairs:
+        names = pair.get("stems") if isinstance(pair, dict) else None
+        count = pair.get("simultaneously_active_frame_count") if isinstance(pair, dict) else None
+        if (
+            not isinstance(names, list) or len(names) != 2
+            or not all(isinstance(name, str) and name in by_name for name in names)
+            or names[0] == names[1]
+        ):
+            # Both distinct sources must refer to the exact decoded preview identities.
+            return None
+        key = tuple(sorted(names))
+        first, second = (by_name[name] for name in names)
+        if (
+            key in seen or first["sample_rate"] != second["sample_rate"]
+            or not isinstance(count, int) or isinstance(count, bool)
+            or not 0 < count <= min(first["active_frame_count"], second["active_frame_count"])
+        ):
+            # Unequal frame durations or no shared active frame cannot support masking.
+            return None
+        seen.add(key)
+        paired_names.update(names)
+        normalized_pairs.append({"stems": list(names), "simultaneously_active_frame_count": count})
+    visibility = summary.get("lowest_visibility")
+    name, stem_count = summary.get("lowest_visibility_stem"), summary.get("stem_count")
+    try:
+        visibility = float(visibility) if isinstance(visibility, (int, float)) and not isinstance(visibility, bool) else None
+    except OverflowError:
+        # An overflowing value cannot describe a visibility ratio.
+        return None
+    if (
+        visibility is None or not math.isfinite(visibility) or not 0 <= visibility <= 1
+        or not isinstance(name, str) or name not in paired_names
+        or not isinstance(stem_count, int) or isinstance(stem_count, bool)
+        or stem_count != len(paired_names)
+    ):
+        # The selected visibility must belong to a measured stem, including a valid zero.
+        return None
+    return {
+        "stem_count": stem_count, "lowest_visibility": visibility, "lowest_visibility_stem": name,
+        "activity": {"schema": "kenn.erb_masking.activity.v1", "active_floor_dbfs": -60.0,
+                     "frame_size_samples": 4096, "sources": normalized_sources, "pairs": normalized_pairs},
+    }
+
+
+
+def stem_masking_evidence(masking: object) -> dict:
+    """Select visibility only from the producer's real jointly active preview group."""
+    if not isinstance(masking, dict) or masking.get("ok") is not True or not isinstance(masking.get("stems"), list):
+        # Preserve a sentinel so cached critique cannot bypass this abstention.
+        return {}
+    candidates = masking["stems"]
+    if not candidates or not all(isinstance(item, dict) for item in candidates):
+        # Empty or malformed stem lists cannot identify a measured minimum.
+        return {}
+    checked = []
+    for item in candidates:
+        summary = qualified_stem_masking_summary({"stem_count": len(candidates), "lowest_visibility": item.get("overall_visibility"), "lowest_visibility_stem": item.get("name"), "activity": masking.get("activity")})
+        if summary is None:
+            # Reject the entire ranking when any candidate lacks matching activity.
+            return {}
+        checked.append(summary)
+    if len({item["lowest_visibility_stem"] for item in checked}) != len(checked):
+        # Duplicate identities must not hide a missing participant in the ranking.
+        return {}
+    return min(checked, key=lambda item: item["lowest_visibility"])
+
+
 def _measured_analysis_evidence(report: dict) -> dict:
     """Select compact *measurements* from optional deeper analyses.
 
@@ -54,19 +168,9 @@ def _measured_analysis_evidence(report: dict) -> dict:
         # Keep an empty section for invalid/legacy results: its presence tells
         # KENN that cached prose may contain an unqualified comparison claim.
         evidence["transient_preservation"] = _transient_preservation_evidence(transient) if isinstance(transient, dict) else {}
-    masking = report.get("stem_masking")
-    if isinstance(masking, dict) and masking.get("ok") and isinstance(masking.get("stems"), list):
-        candidates = [
-            item for item in masking["stems"]
-            if isinstance(item, dict) and isinstance(item.get("overall_visibility"), (int, float))
-        ]
-        if candidates:
-            lowest = min(candidates, key=lambda item: float(item["overall_visibility"]))
-            evidence["stem_masking"] = {
-                "stem_count": len(candidates),
-                "lowest_visibility": float(lowest["overall_visibility"]),
-                "lowest_visibility_stem": str(lowest.get("name") or "stem"),
-            }
+    if "stem_masking" in report:
+        # Invalid legacy sections still mark cached prose as unqualified.
+        evidence["stem_masking"] = stem_masking_evidence(report.get("stem_masking"))
     stem_solo = report.get("stem_solo")
     if isinstance(stem_solo, dict):
         low_end = stem_solo.get("low_end_summary")

@@ -30,6 +30,8 @@ from __future__ import annotations
 import os
 from typing import Any, Protocol
 
+from audio_analysis.integration.handoff import qualified_stem_masking_summary, stem_masking_evidence
+
 
 def _critique_env_enabled() -> bool:
     return os.environ.get("MIX_REVIEW_CRITIQUE_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
@@ -84,7 +86,9 @@ def critique_metrics_payload(report: dict) -> dict:
         "loudness_range_lu": metrics.get("loudness_range_lu"),
         "loudness_range_by_section": metrics.get("loudness_range_by_section"),
         "transient_preservation": metrics.get("transient_preservation"),
-        "stem_masking": metrics.get("stem_masking"),
+        # Share handoff qualification so neither deterministic nor LLM critique
+        # receives name-derived profiles or unsupported repair predictions.
+        "stem_masking": stem_masking_evidence(metrics.get("stem_masking")) if "stem_masking" in metrics else None,
         "style_classification": metrics.get("style_classification"),
         "tonal_balance": metrics.get("tonal_balance"),
         "flags": [flag.get("label") for flag in (report.get("flags") or []) if flag.get("label")][:6],
@@ -163,15 +167,18 @@ def deterministic_critique(payload: dict) -> str:
             )
         )
 
-    masking = payload.get("stem_masking") or {}
-    if masking.get("ok") and masking.get("stems"):
-        low_vis = min(masking["stems"], key=lambda s: s.get("overall_visibility", 1.0))
-        if low_vis.get("overall_visibility", 1.0) < 0.6:
-            lines.append(
-                f"Among the supplied stems, '{low_vis.get('name')}' has the lowest simultaneous-masking "
-                f"visibility ({low_vis.get('overall_visibility')}) — it's the stem most likely getting "
-                f"buried by the others; consider carving space for it."
-            )
+    masking = payload.get("stem_masking")
+    summary = qualified_stem_masking_summary(masking) or stem_masking_evidence(masking)
+    if summary:
+        lines.append(
+            f"Among jointly active stem preview frames, '{summary['lowest_visibility_stem']}' "
+            f"has the lowest relative ERB preview visibility ({summary['lowest_visibility']}). "
+            "This uncalibrated relative-spectrum proxy suggests a listening check; "
+            "it does not establish audible masking severity, a whole-song result, or an EQ repair."
+        )
+    elif masking is not None:
+        # Legacy profiles cannot qualify from the enclosing mix's activity.
+        lines.append("Stem visibility withheld: no qualifying jointly active real preview frames.")
 
     style = payload.get("style_classification") or {}
     if style.get("era_label"):
@@ -222,7 +229,8 @@ def generate_critique(
         system = (
             "You are Audio_Too's mix review assistant. Write a concise, practical critique "
             "(120-200 words) using ONLY the supplied JSON metrics. Do not claim to hear the "
-            "audio. Do not invent instrumentation, genre, or causes not implied by the data. "
+            "audio. ERB preview visibility is an uncalibrated relative-spectrum proxy, not audible "
+            "masking severity or an EQ repair recommendation. Do not invent instrumentation, genre, or causes not implied by the data. "
             "Cover: overall technical read, any section-to-section loudness-range inconsistency, "
             "stereo balance, transient preservation (if present), and stem masking (if present). "
             "End with one concrete, actionable next step."

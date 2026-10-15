@@ -526,6 +526,7 @@ def prepare_stems(
           - ``"sample_rate"``
           - ``"original_sample_rate"``
           - ``"masking_preview_samples"`` / ``"masking_preview_sample_rate"``
+            and ``"masking_preview_analysis_sample_rate"`` (effective preview Hz)
             (only when masking_preview_max_samples > 0)
           - ``"original_duration_seconds"``
     """
@@ -563,6 +564,7 @@ def prepare_stems(
             right = wav_data.get("right_samples", [])
             preview_samples = wav_data.get("preview_samples")
             preview_sample_rate = wav_data.get("preview_sample_rate")
+            preview_analysis_sample_rate = wav_data.get("preview_analysis_sample_rate")
         except Exception as exc:
             # Fail loudly: a stem that cannot be decoded must not become a silent
             # empty stem that crashes cryptically several stages later (e.g. the
@@ -582,6 +584,7 @@ def prepare_stems(
             "right_samples": right if channels >= 2 and len(right) == len(samples) else [],
             "masking_preview_samples": preview_samples,
             "masking_preview_sample_rate": preview_sample_rate,
+            "masking_preview_analysis_sample_rate": preview_analysis_sample_rate,
         }
 
     _n_decode_workers = _decode_worker_count(len(stems))
@@ -638,6 +641,7 @@ def prepare_stems(
             "right_samples": right if preserve_stereo else [],
             "masking_preview_samples": stem_data.get("masking_preview_samples"),
             "masking_preview_sample_rate": stem_data.get("masking_preview_sample_rate"),
+            "masking_preview_analysis_sample_rate": stem_data.get("masking_preview_analysis_sample_rate"),
         }
 
     if _n_decode_workers > 1:

@@ -868,13 +868,13 @@ def _process_job(job: dict) -> None:
         # so masking analysis keeps seeing pre-correction audio -- exactly
         # what the independent re-decode below has always analyzed.
         _preview_by_name = {
-            s["name"]: (s.get("masking_preview_samples"), s.get("masking_preview_sample_rate"))
+            s["name"]: (s.get("masking_preview_samples"), s.get("masking_preview_sample_rate"), s.get("masking_preview_analysis_sample_rate"))
             for s in prepared_stems
         }
         for _s in stems_raw:
             _preview = _preview_by_name.get(_s.get("name"))
             if _preview and _preview[0] is not None:
-                _s["masking_preview_samples"], _s["masking_preview_sample_rate"] = _preview
+                _s["masking_preview_samples"], _s["masking_preview_sample_rate"], _s["masking_preview_analysis_sample_rate"] = _preview
 
         # Validate prepared duration limit
         for stem in prepared_stems:

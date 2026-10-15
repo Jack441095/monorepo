@@ -451,19 +451,17 @@ def compare_transient_preservation(
 
 
 def stem_frequency_masking(stems: list[dict], *, read_wav_mono: Callable | None = None) -> dict:
-    """Stage 10 metric: frequency-band isolation/masking detection between stems.
+    """Return relative ERB previews for stems with co-active decoded audio.
 
-    Thin wrapper around the existing ERB-based masking engine in
-    :mod:`audio_analysis.mixdown.stem_analysis` (``analyze_stems_masking``),
-    which already computes per-stem band energy, a pairwise masking-index
-    matrix, per-band simultaneous-masking visibility (via ERB critical
-    bands and an absolute-threshold-of-hearing model), and EQ-carving
-    suggestions. Reused here rather than reimplemented, per this module's
-    convention of composing existing DSP primitives.
+    Reuses ``analyze_stems_masking`` with its raw -60 dBFS RMS activity
+    gate, complete-frame provenance, and matching effective sample rates.
+    Values are preview candidates, not calibrated masking severity or EQ
+    repair predictions. Undecodable, quiet, short, or unaligned sources
+    retain identity in abstentions and cannot create measured stem scores.
 
-    ``stems`` is a list of ``{"name": str, "file_bytes": bytes}`` dicts.
-    Returns ``{"ok": False, "reason": ...}`` when fewer than two stems are
-    supplied (masking is undefined for a single stem).
+    ``stems`` contains ``{"name": str, "file_bytes": bytes}`` entries.
+    Fewer than two uploads returns ``ok=False``; an accepted multi-upload
+    request can still abstain from all comparisons (``stems=[]``).
     """
     if not stems or len(stems) < 2:
         return {"ok": False, "reason": "At least two stems are required to detect masking between them.", "stems": stems or []}

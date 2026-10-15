@@ -6,7 +6,18 @@ Covers:
 
 from __future__ import annotations
 
+from copy import deepcopy
+
+import pytest
+
 from audio_analysis.integration.handoff import kenn_handoff
+
+
+def _erb_report():
+    return {"ok": True, "stems": [{"name": "Kick", "overall_visibility": 0.81}, {"name": "Bass", "overall_visibility": 0.0}],
+            "activity": {"schema": "kenn.erb_masking.activity.v1", "active_floor_dbfs": -60.0, "frame_size_samples": 4096,
+                         "sources": [{"name": name, "sample_rate": 44100, "frame_count": 16, "active_frame_count": 8} for name in ("Kick", "Bass")],
+                         "pairs": [{"stems": ["Kick", "Bass"], "simultaneously_active_frame_count": 4}]}}
 
 
 def _make_report(overrides: dict | None = None) -> dict:
@@ -92,10 +103,7 @@ class TestKennHandoff:
             "transient_preservation": {"preservation_score": 0.42, "matched_event_count": 18, "profile": "Smearing", "activity": {
                 "schema": "kenn.transient_preservation.activity.v1", "pre_rms_dbfs": -18.0, "post_rms_dbfs": -14.0,
             }},
-            "stem_masking": {"ok": True, "stems": [
-                {"name": "Kick", "overall_visibility": 0.81},
-                {"name": "Bass", "overall_visibility": 0.31},
-            ]},
+            "stem_masking": _erb_report(),
             "stem_solo": {"low_end_summary": {"ranked": [
                 {"name": "Kick", "low_end_share": 0.44}, {"name": "Bass", "low_end_share": 0.39},
             ]}},
@@ -171,3 +179,46 @@ class TestKennHandoff:
         result = kenn_handoff(_make_report())
         ctx = "\n".join(result["context_lines"])
         assert "Reference deltas" in ctx
+
+
+def test_erb_handoff_keeps_zero_visibility_and_detaches_activity_proof():
+    # Peak-normalized previews need their original activity proof at the chat boundary.
+    masking = _erb_report()
+    saved = deepcopy(masking)
+    evidence = kenn_handoff(_make_report({"stem_masking": masking}))["analysis_evidence"]["stem_masking"]
+    assert evidence["lowest_visibility"] == 0.0
+    assert evidence["stem_count"] == 2
+    assert evidence["activity"] == masking["activity"]
+    evidence["activity"]["pairs"][0]["stems"][0] = "changed"
+    assert masking == saved
+
+
+@pytest.mark.parametrize("path,value", [
+    (("activity",), None), (("activity", "schema"), "wrong"),
+    (("activity", "sources", 0, "active_frame_count"), 0),
+    (("activity", "sources", 0, "sample_rate"), 48000),
+    (("activity", "sources", 0, "frame_count"), 17),
+    (("activity", "pairs", 0, "simultaneously_active_frame_count"), 0),
+    (("activity", "pairs", 0, "simultaneously_active_frame_count"), True),
+    (("stems", 0, "name"), "Unmeasured"),
+    (("stems", 0, "name"), "Bass"),
+    (("stems", 0, "overall_visibility"), float("nan")),
+    (("stems", 0, "overall_visibility"), True),
+    (("stems", 0, "overall_visibility"), 1.1),
+])
+def test_erb_handoff_retains_abstention_marker_for_unqualified_previews(path, value):
+    # Keep the invalid section visible so cached prose cannot revive an ERB claim.
+    masking = _erb_report()
+    target = masking
+    for part in path[:-1]:
+        target = target[part]
+    target[path[-1]] = value
+    evidence = kenn_handoff(_make_report({"stem_masking": masking}))["analysis_evidence"]
+    assert evidence["stem_masking"] == {}
+
+
+def test_erb_handoff_drops_legacy_name_based_visibility():
+    # Older fallback profiles carried realistic visibility despite having no decoded frames.
+    masking = _erb_report()
+    masking.pop("activity")
+    assert kenn_handoff(_make_report({"stem_masking": masking}))["analysis_evidence"]["stem_masking"] == {}

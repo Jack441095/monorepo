@@ -153,13 +153,13 @@ def run_local_automix(
     # analysis keeps seeing pre-correction audio -- same as the independent
     # re-decode it replaces.
     _preview_by_name = {
-        s["name"]: (s.get("masking_preview_samples"), s.get("masking_preview_sample_rate"))
+        s["name"]: (s.get("masking_preview_samples"), s.get("masking_preview_sample_rate"), s.get("masking_preview_analysis_sample_rate"))
         for s in prepared_stems
     }
     for _s in stems_raw:
         _preview = _preview_by_name.get(_s.get("name"))
         if _preview and _preview[0] is not None:
-            _s["masking_preview_samples"], _s["masking_preview_sample_rate"] = _preview
+            _s["masking_preview_samples"], _s["masking_preview_sample_rate"], _s["masking_preview_analysis_sample_rate"] = _preview
 
     try:
         polarity_sr = prepared_stems[0].get("sample_rate", 44100) if prepared_stems else 44100

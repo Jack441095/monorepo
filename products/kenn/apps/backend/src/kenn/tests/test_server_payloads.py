@@ -204,3 +204,89 @@ def test_invalid_transient_section_type_is_rebuilt_without_cached_claims():
     assert "score 0.91" not in content
     assert "Cached peak warning" not in content
     assert '"rms_dbfs": -18.0' in content
+
+
+def _erb_summary():
+    return {
+        "stem_count": 2, "lowest_visibility": 0.0, "lowest_visibility_stem": "Bass",
+        "activity": {
+            "schema": "kenn.erb_masking.activity.v1", "active_floor_dbfs": -60.0,
+            "frame_size_samples": 4096,
+            "sources": [{"name": name, "sample_rate": 44100, "frame_count": 1,
+                         "active_frame_count": 1} for name in ("Bass", "Kick")],
+            "pairs": [{"stems": ["Bass", "Kick"], "simultaneously_active_frame_count": 1}],
+        },
+    }
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda summary: summary.pop("activity"),
+    lambda summary: summary["activity"].update(schema="legacy"),
+    lambda summary: summary["activity"]["pairs"][0].update(simultaneously_active_frame_count=0),
+    lambda summary: summary["activity"]["sources"][0].update(sample_rate=48000),
+    lambda summary: summary.update(lowest_visibility_stem="Invented"),
+    lambda summary: summary.update(lowest_visibility=float("nan")),
+])
+def test_unqualified_erb_rebuilds_cached_prose_and_preserves_other_measurements(mutate):
+    # A real upload and valid transient/reference evidence cannot qualify synthetic stem profiles.
+    context = _handoff()
+    summary = _erb_summary()
+    mutate(summary)
+    context["analysis_evidence"] = {"stem_masking": summary, "transient_preservation": _transient_summary()}
+    context["metrics"]["stem_masking_lowest_visibility"] = 0.99
+    before = deepcopy(context)
+    content = server_payloads.mix_review_context_turn(context)["content"]
+    assert "jointly active real preview frames" in content
+    assert "Cached" not in content
+    assert '"rms_dbfs": -18.0' in content
+    assert "Qualified reference comparison" in content
+    assert "Qualified transient-preservation summary" in content
+    assert "Qualified ERB" not in content
+    assert "0.99" not in content
+    assert context == before
+
+
+@pytest.mark.parametrize("other_invalid", ["reference", "transient"])
+def test_valid_zero_erb_survives_an_unqualified_optional_comparison(other_invalid):
+    context = _handoff()
+    summary = _erb_summary()
+    summary["unexpected"] = "unvalidated prose"
+    context["analysis_evidence"] = {"stem_masking": summary}
+    if other_invalid == "reference":
+        context["reference_comparison"] = {}
+    else:
+        context["analysis_evidence"]["transient_preservation"] = {}
+    content = server_payloads.mix_review_context_turn(context)["content"]
+    assert "Qualified ERB stem-masking summary" in content
+    assert '"lowest_visibility": 0.0' in content
+    assert "unvalidated prose" not in content
+    assert "Cached" not in content
+
+
+@pytest.mark.parametrize("legacy_location", ["context_lines", "metrics", "top_level"])
+def test_legacy_erb_claims_cannot_bypass_missing_activity(legacy_location):
+    context = _handoff()
+    if legacy_location == "context_lines":
+        context["context_lines"] = ["Stem masking says carve the bass"]
+    elif legacy_location == "metrics":
+        context["metrics"]["stem_masking_lowest_visibility"] = 0.97
+    else:
+        context["stem_masking_lowest_visibility"] = 0.97
+    content = server_payloads.mix_review_context_turn(context)["content"]
+    assert "jointly active real preview frames" in content
+    assert "carve the bass" not in content
+    assert "0.97" not in content
+
+
+def test_actual_legacy_masking_critique_is_withheld_without_activity():
+    # Historical critique prose carried neither a stem_masking key nor structured provenance.
+    context = _handoff()
+    context["context_lines"] = [
+        "Among the supplied stems, 'Bass' has the lowest simultaneous-masking "
+        "visibility (0.2) — it's the stem most likely getting buried by the others; "
+        "consider carving space for it."
+    ]
+    content = server_payloads.mix_review_context_turn(context)["content"]
+    assert "jointly active real preview frames" in content
+    assert "getting buried" not in content
+    assert "carving space" not in content

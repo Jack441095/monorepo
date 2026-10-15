@@ -27,6 +27,8 @@ LIVE_ACTIVITY_FLOOR_DBFS = -80.0
 UPLOADED_ACTIVITY_FLOOR_DBFS = -60.0
 UPLOADED_SIGNAL_LIMITATION = "RMS is missing, invalid or at/below -60 dBFS; signal measurements, grading and recommendations are withheld."
 REFERENCE_SIGNAL_LIMITATION = "Mix and reference RMS must both be finite numeric values above -60 dBFS; reference comparison measurements and recommendations are withheld."
+ERB_PREVIEW_LIMITATION = "ERB visibility is a relative-spectrum proxy for jointly active preview frames, not calibrated audible masking severity or a whole-song assessment."
+STEM_MASKING_SIGNAL_LIMITATION = "ERB stem visibility lacks qualifying jointly active real preview frames; visibility and stem claims are withheld. Preview frames must exceed -60 dBFS RMS. Name-based fallback profiles are not measurements."
 TRANSIENT_SIGNAL_LIMITATION = "Transient comparison lacks qualifying pre/post activity or valid matched-event evidence; score, profile and event count are withheld. Pre/post RMS must be finite and above -60 dBFS."
 
 
@@ -48,6 +50,7 @@ class EvidencePacket:
     observed_at_epoch: float | None = None
     stem_masking_provenance: dict[str, Any] | None = None
     transient_preservation_provenance: dict[str, Any] | None = None
+    erb_masking_provenance: dict[str, Any] | None = None
 
     def payload(self) -> dict[str, Any]:
         payload = {
@@ -64,6 +67,9 @@ class EvidencePacket:
         if self.source == "mix_review_upload" and self.transient_preservation_provenance is not None:
             # Replay must requalify the pre/post captures instead of trusting cached score facts.
             payload["transient_preservation_provenance"] = deepcopy(self.transient_preservation_provenance)
+        if self.source == "mix_review_upload" and self.erb_masking_provenance is not None:
+            # Replay requalifies real preview sources instead of trusting cached visibility.
+            payload["erb_masking_provenance"] = deepcopy(self.erb_masking_provenance)
         if self.source in {"plugin_bus_snapshot", "realtime_mix_comparison"}:
             age = self.captured_at_age_seconds
             if self.observed_at_epoch is not None:
@@ -149,6 +155,102 @@ def _qualified_transient_preservation(summary: Any) -> dict[str, Any] | None:
             "post_rms_dbfs": float(activity["post_rms_dbfs"]),
         },
     }
+
+
+def qualified_stem_masking_summary(summary: Any) -> dict[str, Any] | None:
+    """Return bounded ERB preview evidence backed by jointly active source frames."""
+    if not isinstance(summary, dict):
+        # Legacy visibility scalars do not establish which real audio was compared.
+        return None
+    activity = summary.get("activity")
+    if (
+        not isinstance(activity, dict) or activity.get("schema") != "kenn.erb_masking.activity.v1"
+        or activity.get("active_floor_dbfs") != -60.0 or activity.get("frame_size_samples") != 4096
+    ):
+        # The proof describes the existing 4096-sample preview and -60 dBFS RMS floor.
+        return None
+    sources = activity.get("sources")
+    pairs = activity.get("pairs")
+    if (
+        not isinstance(sources, list) or not 2 <= len(sources) <= 64
+        or not isinstance(pairs, list) or not pairs
+        or len(pairs) > len(sources) * (len(sources) - 1) // 2
+    ):
+        # Bound replay to 64 source identities and one entry per unordered pair.
+        return None
+    normalized_sources = []
+    by_name = {}
+    for source in sources:
+        if not isinstance(source, dict):
+            # A malformed source cannot be matched safely to a measured pair.
+            return None
+        name, rate = source.get("name"), source.get("sample_rate")
+        count, active = source.get("frame_count"), source.get("active_frame_count")
+        try:
+            rate = float(rate) if isinstance(rate, (int, float)) and not isinstance(rate, bool) else None
+        except OverflowError:
+            # Unrepresentable rates cannot establish aligned preview frames.
+            return None
+        if (
+            not isinstance(name, str) or not name.strip() or name != name.strip()
+            or len(name) > 96 or name in by_name
+            or rate is None or not math.isfinite(rate) or rate <= 0
+            or not isinstance(count, int) or isinstance(count, bool) or not 0 <= count <= 16
+            or not isinstance(active, int) or isinstance(active, bool) or not 0 <= active <= count
+        ):
+            # Exact unique names avoid aliasing; only the first 16 complete frames are measured.
+            return None
+        normalized = {"name": name, "sample_rate": rate, "frame_count": count, "active_frame_count": active}
+        by_name[name] = normalized
+        normalized_sources.append(normalized)
+    normalized_pairs, seen, paired_names = [], set(), set()
+    for pair in pairs:
+        names = pair.get("stems") if isinstance(pair, dict) else None
+        count = pair.get("simultaneously_active_frame_count") if isinstance(pair, dict) else None
+        if (
+            not isinstance(names, list) or len(names) != 2
+            or not all(isinstance(name, str) and name in by_name for name in names)
+            or names[0] == names[1]
+        ):
+            # Both distinct sources must refer to the exact decoded preview identities.
+            return None
+        key = tuple(sorted(names))
+        first, second = (by_name[name] for name in names)
+        if (
+            key in seen or first["sample_rate"] != second["sample_rate"]
+            or not isinstance(count, int) or isinstance(count, bool)
+            or not 0 < count <= min(first["active_frame_count"], second["active_frame_count"])
+        ):
+            # Unequal frame durations or no shared active frame cannot support masking.
+            return None
+        seen.add(key)
+        paired_names.update(names)
+        normalized_pairs.append({"stems": list(names), "simultaneously_active_frame_count": count})
+    visibility = summary.get("lowest_visibility")
+    name, stem_count = summary.get("lowest_visibility_stem"), summary.get("stem_count")
+    try:
+        visibility = float(visibility) if isinstance(visibility, (int, float)) and not isinstance(visibility, bool) else None
+    except OverflowError:
+        # An overflowing value cannot describe a visibility ratio.
+        return None
+    if (
+        visibility is None or not math.isfinite(visibility) or not 0 <= visibility <= 1
+        or not isinstance(name, str) or name not in paired_names
+        or not isinstance(stem_count, int) or isinstance(stem_count, bool)
+        or stem_count != len(paired_names)
+    ):
+        # The selected visibility must belong to a measured stem, including a valid zero.
+        return None
+    return {
+        "stem_count": stem_count, "lowest_visibility": visibility, "lowest_visibility_stem": name,
+        "activity": {"schema": "kenn.erb_masking.activity.v1", "active_floor_dbfs": -60.0,
+                     "frame_size_samples": 4096, "sources": normalized_sources, "pairs": normalized_pairs},
+    }
+
+
+def stem_masking_has_activity(summary: dict[str, Any] | None) -> bool:
+    """Return whether a visibility summary retains jointly active real preview sources."""
+    return qualified_stem_masking_summary(summary) is not None
 
 
 def reference_comparison_has_activity(comparison: dict[str, Any] | None) -> bool:
@@ -301,6 +403,7 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
         )
     facts: list[EvidenceFact] = []
     transient_provenance: dict[str, Any] | None = None
+    erb_provenance: dict[str, Any] | None = None
     limitations: list[str] = []
     # These are calculated assessments/labels, not measurements.  They can
     # remain available in the Mix Review narrative, but must not gain the
@@ -310,8 +413,9 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
         "transient_preservation", "transient_preservation_score", "transient_preservation_profile",
         "transient_preservation_matched_event_count", "matched_event_count",
     }
+    erb_metric_names = {"stem_masking", "stem_masking_lowest_visibility", "stem_masking_lowest_visibility_stem", "lowest_visibility", "overall_visibility", "lowest_visibility_stem", "stem_count"}
     for name, value in metrics.items():
-        if str(name).lower() in derived_metric_names | transient_metric_names:
+        if str(name).lower() in derived_metric_names | transient_metric_names | erb_metric_names:
             continue
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             continue
@@ -339,14 +443,16 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
                     EvidenceFact("transient_preservation_profile", transient_provenance["profile"], "", "mix_review_upload"),
                     EvidenceFact("transient_preservation_matched_event_count", transient_provenance["matched_event_count"], "events", "mix_review_upload"),
                 ])
-        masking = analysis.get("stem_masking")
-        if isinstance(masking, dict):
-            visibility = masking.get("lowest_visibility")
-            if isinstance(visibility, (int, float)) and not isinstance(visibility, bool):
-                facts.append(EvidenceFact("stem_masking_lowest_visibility", float(visibility), "ratio", "mix_review_upload"))
-            stem = masking.get("lowest_visibility_stem")
-            if isinstance(stem, str) and stem.strip():
-                facts.append(EvidenceFact("stem_masking_lowest_visibility_stem", stem.strip(), "", "mix_review_upload"))
+        if "stem_masking" in analysis:
+            erb_provenance = qualified_stem_masking_summary(analysis.get("stem_masking"))
+            if erb_provenance is None:
+                limitations.append(STEM_MASKING_SIGNAL_LIMITATION)
+            else:
+                limitations.append(ERB_PREVIEW_LIMITATION)
+                facts.extend([
+                    EvidenceFact("stem_masking_lowest_visibility", erb_provenance["lowest_visibility"], "ratio", "mix_review_upload"),
+                    EvidenceFact("stem_masking_lowest_visibility_stem", erb_provenance["lowest_visibility_stem"], "", "mix_review_upload"),
+                ])
         low_end = analysis.get("low_end_stems")
         if isinstance(low_end, list):
             names = [str(item.get("name") or "").strip() for item in low_end if isinstance(item, dict)]
@@ -355,6 +461,8 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
                 facts.append(EvidenceFact("low_end_measured_stems", ", ".join(names), "", "mix_review_upload"))
     if transient_provenance is None and any(str(name).lower() in transient_metric_names for name in metrics):
         limitations.append(TRANSIENT_SIGNAL_LIMITATION)
+    if erb_provenance is None and any(str(name).lower() in erb_metric_names for name in metrics):
+        limitations.append(STEM_MASKING_SIGNAL_LIMITATION)
     comparison = context.get("reference_comparison")
     if reference_comparison_has_activity(comparison):
         largest = comparison.get("largest_spectral_difference")
@@ -403,6 +511,7 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
             *((REFERENCE_SIGNAL_LIMITATION,) if isinstance(comparison, dict) and not reference_comparison_has_activity(comparison) else ()),
         ),
         transient_preservation_provenance=transient_provenance,
+        erb_masking_provenance=erb_provenance,
     )
 
 
@@ -782,13 +891,28 @@ def packets_from_history(history: list | None) -> list[EvidencePacket]:
                     EvidenceFact("transient_preservation_profile", transient_provenance["profile"], "", source),
                     EvidenceFact("transient_preservation_matched_event_count", transient_provenance["matched_event_count"], "events", source),
                 ])
+            erb_provenance = qualified_stem_masking_summary(raw.get("erb_masking_provenance"))
+            erb_names = {"stem_masking", "stem_masking_lowest_visibility", "stem_masking_lowest_visibility_stem", "lowest_visibility", "overall_visibility", "lowest_visibility_stem", "stem_count"}
+            had_erb = "erb_masking_provenance" in raw or any(isinstance(item, dict) and str(item.get("name")).lower() in erb_names for item in raw_facts)
+            stale_names.update(erb_names)
+            if erb_provenance is None and had_erb:
+                limitations.append(STEM_MASKING_SIGNAL_LIMITATION)
+            if erb_provenance is not None:
+                if ERB_PREVIEW_LIMITATION not in limitations:
+                    # Even a caller-edited receipt must retain the proxy's measurement scope.
+                    limitations.append(ERB_PREVIEW_LIMITATION)
+                facts.extend([
+                    EvidenceFact("stem_masking_lowest_visibility", erb_provenance["lowest_visibility"], "ratio", source),
+                    EvidenceFact("stem_masking_lowest_visibility_stem", erb_provenance["lowest_visibility_stem"], "", source),
+                ])
         else:
             transient_provenance = None
+            erb_provenance = None
             limitations = [str(value) for value in raw.get("limitations") or []]
         for item in raw_facts:
             if not isinstance(item, dict) or not isinstance(item.get("name"), str):
                 continue
-            if source == "mix_review_upload" and item["name"] in stale_names:
+            if source == "mix_review_upload" and item["name"].lower() in stale_names:
                 continue
             value = item.get("value")
             if isinstance(value, (str, int, float, bool)):
@@ -803,6 +927,7 @@ def packets_from_history(history: list | None) -> list[EvidencePacket]:
                 tuple(limitations),
                 float(observed_at) if isinstance(observed_at, (int, float)) else None,
                 transient_preservation_provenance=transient_provenance,
+                erb_masking_provenance=erb_provenance,
             ))
     return packets
 
@@ -957,7 +1082,7 @@ def relevant_observations(query: str, packets: list[EvidencePacket]) -> list[str
             stem = values.get("stem_masking_lowest_visibility_stem")
             names = values.get("low_end_measured_stems")
             if isinstance(visibility, (int, float)) and isinstance(stem, str):
-                observations.append(f"Measured across the supplied stems: lowest simultaneous-masking visibility was {visibility:.2f} for '{stem}'. This prioritises checking that relationship, not assuming it is the audible cause.")
+                observations.append(f"Measured across jointly active stem preview frames: lowest relative ERB preview visibility was {visibility:.2f} for '{stem}'. This relative-spectrum proxy prioritises a listening check; it does not measure calibrated audible masking severity or the whole song.")
             if isinstance(names, str) and names:
                 observations.append(f"Measured low-end spectrum summaries were supplied for: {names}. These identify analysed stems, not which one should dominate creatively.")
         if packet.source == "stem_masking_analysis" and (wants_masking or wants_low_end):

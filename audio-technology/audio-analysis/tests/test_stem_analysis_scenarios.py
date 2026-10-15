@@ -1,7 +1,7 @@
 """Tests for stem_analysis.py — multi-stem masking analysis.
 
 Covers:
-- analyze_stems_masking()          — name-based classification
+- analyze_stems_masking()          — missing-source abstention
 - analyze_stems_masking()          — spectral_bands fallback
 - analyze_stems_masking()          — masking matrix computation
 - handle_stems_upload()            — multipart parsing
@@ -19,14 +19,14 @@ from audio_analysis.mixdown.stem_analysis import analyze_stems_masking, handle_s
 # ==============================================================================
 
 def _empty_read(file_bytes: bytes, max_samples: int = 8192) -> dict:
-    """Mock read_wav_mono that returns no samples (name-based defaults used)."""
+    """Return an empty decode, which cannot support masking evidence."""
     return {"samples": [], "sample_rate": 44100}
 
 
 def _full_read(file_bytes: bytes, max_samples: int = 8192) -> dict:
-    """Mock read_wav_mono that returns samples (spectral_bands fallback used)."""
+    """Return four complete active preview frames at 44.1 kHz."""
     return {
-        "samples": [0.1, -0.05, 0.2, -0.15] * 1000,
+        "samples": [0.1, -0.05, 0.2, -0.15] * 4096,
         "sample_rate": 44100,
         "channels": 1,
         "duration_seconds": 0.1,
@@ -43,83 +43,34 @@ def _generic_bands(samples: list[float], sample_rate: int, size: int = 4096) -> 
 
 
 # ==============================================================================
-#  Name-based classification (no samples returned)
+#  Missing decoded audio
 # ==============================================================================
 
-class TestNameBasedClassification:
+class TestMissingDecodedMeasurements:
 
-    def test_kick(self):
-        """'kick' in name → sub-heavy."""
-        stems = [{"name": "kick_01.wav", "file_bytes": b"fake"}]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
-        bands = result["stems"][0]["bands"]
-        assert bands["sub"] > 0.30, f"Expected sub-heavy kick, got sub={bands['sub']:.3f}"
-
-    def test_bass(self):
-        """'bass' in name → bass-heavy."""
-        stems = [{"name": "808_bass.wav", "file_bytes": b"fake"}]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
-        bands = result["stems"][0]["bands"]
-        assert bands["bass"] > 0.35, f"Expected bass-heavy, got bass={bands['bass']:.3f}"
-
-    def test_vocal(self):
-        """'vocal' in name → mids/presence-heavy."""
-        stems = [{"name": "lead_vocal.wav", "file_bytes": b"fake"}]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
-        bands = result["stems"][0]["bands"]
-        assert bands["mids"] > 0.30, f"Expected mids-heavy vocal, got mids={bands['mids']:.3f}"
-        assert bands["presence"] > 0.15
-
-    def test_drums(self):
-        """'drum' in name → percussion distribution."""
-        stems = [{"name": "drum_loop.wav", "file_bytes": b"fake"}]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
-        bands = result["stems"][0]["bands"]
-        assert bands["sub"] > 0.10
-
-    def test_synth(self):
-        """'synth' in name → synth distribution."""
-        stems = [{"name": "synth_pad.wav", "file_bytes": b"fake"}]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
-        bands = result["stems"][0]["bands"]
-        assert bands["low_mids"] > 0.20
-
-    def test_unknown(self):
-        """Unknown stem name → generic 'other' bands."""
-        stems = [{"name": "sfx_noise.wav", "file_bytes": b"fake"}]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
-        bands = result["stems"][0]["bands"]
-        assert abs(sum(bands.values()) - 1.0) < 0.01, "Bands should sum to ~1.0"
-        assert 0.10 <= bands["sub"] <= 0.20
-        assert 0.15 <= bands["bass"] <= 0.25
-
-    def test_self_mask(self):
-        """Single stem → self-mask = 1.0."""
-        stems = [{"name": "kick.wav", "file_bytes": b"fake"}]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
-        assert result["masking_matrix"]["kick"]["kick"] == 1.0
-
-    def test_name_stripped_extension(self):
-        """File extension stripped from stem name."""
-        stems = [{"name": "kick.wav", "file_bytes": b"fake"}]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
-        assert result["stems"][0]["name"] == "kick"
+    @pytest.mark.parametrize("name", ["kick_01.wav", "808_bass.wav", "lead_vocal.wav", "drum_loop.wav", "synth_pad.wav", "sfx_noise.wav"])
+    def test_names_never_substitute_for_decoded_spectra(self, name):
+        # The old fallback invented spectra and repair suggestions from filenames.
+        result = analyze_stems_masking([{"name": name, "file_bytes": b"fake"}], read_wav_mono=_empty_read, spectral_bands=_generic_bands)
+        assert result["stems"] == []
+        assert result["masking_matrix"] == {}
+        assert result["abstentions"][0]["name"] == name.rsplit(".", 1)[0]
+        assert result["erb_details"]["carving_suggestions"] == []
 
 
 # ==============================================================================
-#  Spectral_bands fallback (samples returned)
+#  Decoded spectral measurements
 # ==============================================================================
 
-class TestSpectralFallback:
+class TestDecodedSpectra:
 
-    def test_spectral_fallback_overrides_name(self):
-        """When samples are returned, spectral_bands overrides name defaults."""
-        stems = [{"name": "vocal.wav", "file_bytes": b"fake"}]
+    def test_decoded_spectrum_is_independent_of_name(self):
+        """A filename cannot override the actual decoded band measurements."""
+        stems = [{"name": "vocal.wav", "file_bytes": b"fake"}, {"name": "other.wav", "file_bytes": b"fake"}]
         result = analyze_stems_masking(stems, read_wav_mono=_full_read, spectral_bands=_generic_bands)
         bands = result["stems"][0]["bands"]
-        # _generic_bands returns sub=0.15, vocal name defaults sub=0.01
         assert bands["sub"] == pytest.approx(0.15, abs=0.01), (
-            f"Expected spectral_bands to override name-based, got sub={bands['sub']:.3f}"
+            f"Expected decoded spectral_bands, got sub={bands['sub']:.3f}"
         )
 
     def test_spectral_bands_called_with_correct_params(self):
@@ -131,14 +82,14 @@ class TestSpectralFallback:
             seen_args["sample_rate"] = sample_rate
             return _generic_bands(samples, sample_rate, size)
 
-        stems = [{"name": "track.wav", "file_bytes": b"fake"}]
+        stems = [{"name": "track.wav", "file_bytes": b"fake"}, {"name": "other.wav", "file_bytes": b"fake"}]
         analyze_stems_masking(stems, read_wav_mono=_full_read, spectral_bands=tracking_bands)
         assert len(seen_args["samples"]) > 0
         assert seen_args["sample_rate"] == 44100
 
     def test_bands_normalized(self):
         """Output bands always sum to ~1.0 after normalization."""
-        stems = [{"name": "kick.wav", "file_bytes": b"fake"}]
+        stems = [{"name": "kick.wav", "file_bytes": b"fake"}, {"name": "other.wav", "file_bytes": b"fake"}]
         result = analyze_stems_masking(stems, read_wav_mono=_full_read, spectral_bands=_generic_bands)
         bands = result["stems"][0]["bands"]
         assert abs(sum(bands.values()) - 1.0) < 0.01, f"Bands sum to {sum(bands.values())}"
@@ -168,7 +119,7 @@ class TestMaskingMatrix:
             {"name": "bass.wav", "file_bytes": b"fake"},
             {"name": "kick.wav", "file_bytes": b"fake"},
         ]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
+        result = analyze_stems_masking(stems, read_wav_mono=_full_read, spectral_bands=_generic_bands)
         matrix = result["masking_matrix"]
         names = list(matrix.keys())
         for i, n1 in enumerate(names):
@@ -186,10 +137,9 @@ class TestMaskingMatrix:
             {"name": "kick_main.wav", "file_bytes": b"fake"},
             {"name": "kick_layer.wav", "file_bytes": b"fake"},
         ]
-        # Use name-based only (no samples returned)
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
+        # Identical decoded previews retain their measured overlap independent of names.
+        result = analyze_stems_masking(stems, read_wav_mono=_full_read, spectral_bands=_generic_bands)
         matrix = result["masking_matrix"]
-        # Both named 'kick' → same name-based bands → high overlap
         assert matrix["kick_main"]["kick_layer"] > 0.5
 
 
@@ -275,7 +225,7 @@ class TestEndToEnd:
             {"name": "bass.wav", "file_bytes": b"fake"},
             {"name": "vocal.wav", "file_bytes": b"fake"},
         ]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
+        result = analyze_stems_masking(stems, read_wav_mono=_full_read, spectral_bands=_generic_bands)
         assert len(result["stems"]) == 3
         assert set(s["name"] for s in result["stems"]) == {"kick", "bass", "vocal"}
         assert set(result["masking_matrix"].keys()) == {"kick", "bass", "vocal"}
@@ -289,7 +239,7 @@ class TestEndToEnd:
             {"name": "kick.wav", "file_bytes": b"fake"},
             {"name": "vocal.wav", "file_bytes": b"fake"},
         ]
-        result = analyze_stems_masking(stems, read_wav_mono=_empty_read, spectral_bands=_generic_bands)
+        result = analyze_stems_masking(stems, read_wav_mono=_full_read, spectral_bands=_generic_bands)
         for stem in result["stems"]:
             for key in ("sub", "bass", "low_mids", "mids", "presence", "sibilance", "air"):
                 assert key in stem["bands"], f"Missing band key {key} in {stem['name']}"

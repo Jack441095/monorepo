@@ -2,8 +2,8 @@
 its own full-rate decode (masking_preview_max_samples=), so a caller running
 both stages only parses each WAV once instead of twice. This must produce
 IDENTICAL analyze_stems_masking results to the original independent-re-decode
-path, since it changes what audio gets analyzed for real mixing decisions
-(masking matrix, EQ carving suggestions) if it's wrong -- not just speed.
+path, since it changes the preview's time/frequency basis and activity-qualified
+masking matrix if it's wrong, not just speed.
 """
 
 from __future__ import annotations
@@ -64,14 +64,14 @@ def _piggybacked_result(stems_raw: list[dict]) -> dict:
         trim=True, normalise=False, max_samples=0, masking_preview_max_samples=65536,
     )
     preview_by_name = {
-        s["name"]: (s.get("masking_preview_samples"), s.get("masking_preview_sample_rate"))
+        s["name"]: (s.get("masking_preview_samples"), s.get("masking_preview_sample_rate"), s.get("masking_preview_analysis_sample_rate"))
         for s in prepared
     }
     annotated = [dict(s) for s in stems_raw]
     for s in annotated:
         preview = preview_by_name.get(s["name"])
         if preview and preview[0] is not None:
-            s["masking_preview_samples"], s["masking_preview_sample_rate"] = preview
+            s["masking_preview_samples"], s["masking_preview_sample_rate"], s["masking_preview_analysis_sample_rate"] = preview
     return analyze_stems_masking(annotated, read_wav_mono=read_wav_mono, spectral_bands=spectral_bands)
 
 
@@ -91,9 +91,7 @@ def test_piggybacked_preview_matches_independent_redecode(stems_raw: list[dict])
 
 
 def test_piggyback_falls_back_cleanly_when_preview_absent(stems_raw: list[dict]) -> None:
-    """A caller that never ran prepare_stems (e.g. a standalone masking-only
-    endpoint) must get byte-for-byte today's behavior -- the precomputed-
-    preview lookup only activates when the key is actually present."""
+    """Standalone masking decodes qualifying previews without prior preparation."""
     result = analyze_stems_masking(stems_raw, read_wav_mono=read_wav_mono, spectral_bands=spectral_bands)
     names = {s["name"] for s in result["stems"]}
     assert names == {"kick", "bass", "vocal", "hat"}  # extension stripped internally
@@ -102,9 +100,39 @@ def test_piggyback_falls_back_cleanly_when_preview_absent(stems_raw: list[dict])
 
 
 def test_piggyback_matches_on_mixed_short_stem_lengths() -> None:
-    """A stem shorter than one frame_size*num_frames window exercises
-    analyze_stems_masking's fallback single-pass branch -- must still match.
-    Include a second longer stem: the ERB simulation must safely reuse the
-    shorter stem's last frame rather than indexing past it."""
+    """Different lengths compare only complete shared frames, without repeating tails."""
     stems_raw = [_synth_stem("kick.wav", 10, 0.2), _synth_stem("bass.wav", 5000, 0.15)]
     _assert_identical(_independent_decode_result(stems_raw), _piggybacked_result(stems_raw))
+
+
+def test_decimated_tone_keeps_its_frequency_axis_and_piggyback_geometry() -> None:
+    # Four seconds forces 2x decimation; native-Hz interpretation would move
+    # this 100 Hz bass tone to 200 Hz and publish the wrong spectral band.
+    sample_rate = 44100
+    time = np.arange(sample_rate * 4) / sample_rate
+    mono = 0.2 * np.sin(2 * np.pi * 100 * time)
+    wav_bytes = _make_wav(np.stack([mono, mono], axis=1), sample_rate)
+    raw = [{"name": "bass.wav", "file_bytes": wav_bytes}, {"name": "keys.wav", "file_bytes": wav_bytes}]
+    independent = _independent_decode_result(raw)
+    piggybacked = _piggybacked_result(raw)
+    _assert_identical(independent, piggybacked)
+    assert independent["activity"] == piggybacked["activity"]
+    assert {source["sample_rate"] for source in independent["activity"]["sources"]} == {22050.0}
+    for stem in independent["stems"]:
+        assert stem["bands"]["bass"] > 0.99
+        assert stem["bands"]["low_mids"] < 0.01
+
+
+def test_different_decimation_steps_do_not_publish_simultaneous_pairs() -> None:
+    raw = [_synth_stem("kick.wav", 10, 1.0), _synth_stem("bass.wav", 20, 4.0)]
+    independent = _independent_decode_result(raw)
+    _assert_identical(independent, _piggybacked_result(raw))
+    assert independent["stems"] == []
+    assert independent["activity"]["pairs"] == []
+    assert {source["sample_rate"] for source in independent["activity"]["sources"]} == {44100.0, 22050.0}
+
+
+def test_legacy_piggyback_metadata_redecodes_instead_of_guessing_effective_rate() -> None:
+    stems = [_synth_stem("kick.wav", 10, 4.0), _synth_stem("bass.wav", 20, 4.0)]
+    annotated = [dict(stem, masking_preview_samples=[0.0] * 65536, masking_preview_sample_rate=44100) for stem in stems]
+    _assert_identical(_independent_decode_result(stems), _independent_decode_result(annotated))
