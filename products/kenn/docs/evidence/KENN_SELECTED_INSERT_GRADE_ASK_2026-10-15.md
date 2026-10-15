@@ -158,8 +158,9 @@ dependency changes. The scoped unit command remains the one listed above;
 the E2E command used the owned isolated FakeLive companion on port 18938, which
 was stopped after the passing run.
 
-The real host check is still incomplete: the last owner-scoped source response
-had no published features and reported `waiting_for_publication`. The owner
+At the styling checkpoint the real host check was still incomplete: the last
+owner-scoped source response had no published features and reported
+`waiting_for_publication`. The owner
 still could not see the green button after closing and reopening only the editor;
 a full Live restart is the next check. Retention of the old embedded page is a
 hypothesis, not a demonstrated cache diagnosis. The companion's served index was
@@ -178,3 +179,65 @@ insert/conversation identifiers are excluded from this receipt.
 This follow-up changes only `KennLiveStatus.vue`, `KENN_PLAN.md` and this receipt.
 It changes CSS presentation, with no DSP, callback, memory, HTTP cadence,
 dependency or permission change.
+
+The subsequent full-host restart exposed the green Pause control and fresh native
+100 ms stereo publication. During a short audible passage the owner-scoped source
+endpoint returned a current six-point stereo grade. The embedded panel
+intermittently remained ungraded despite that endpoint response; the cause is not
+established. Actual embedded grounded Ask was not submitted or verified. The
+quiet panel correctly withheld a grade at the existing activity floor. These
+observations do not establish a dependable end-to-end demo.
+
+Playback was stopped when the owner requested analysis without playing a passage.
+The UI requested Pause before the offline export. The later source response had
+`requested_parameters.analysis_enabled=false`, but still reported
+`reported_parameters.analysis_enabled=true`; it withheld the grade. Native Pause
+acknowledgment therefore remains open. The export dialog was closed after
+restoring the original 48 kHz and MP3 preferences; Live's Play control read off.
+
+## Offline-render feasibility rehearsal
+
+The owner requested Scan audio → render the full current track → analysis/advice
+→ delete the generated file. The existing `LocalMixReviewService.save_review`
+already validates and analyses a WAV and persists a metadata receipt without the
+audio payload. Project-audio discovery and bounce watching do not initiate a
+render. The reviewed [Live Song](https://docs.cycling74.com/apiref/lom/song/) and
+[Application](https://docs.cycling74.com/apiref/lom/application/) interfaces and
+[AbletonOSC](https://github.com/ideoforms/AbletonOSC) expose no audio-export command
+for this bridge. The vendored `/live/song/export/structure` handler exports JSON,
+not audio; the native insert only receives the samples the host processes. No new
+DSP, dependency, persistent automation helper or OS permission was added.
+
+In the scheduled disposable set, Live's normal Export Audio/Video dialog rendered
+Main to a newly created job-owned temporary directory. The output was validated
+as stereo 44.1 kHz, 24-bit PCM WAV. Normalize, loop rendering and MP3 were off;
+the existing triangular dither setting was retained. Playback remained stopped.
+The chosen dialog range matched the last clip endpoint in the saved set, but
+unsaved arrangement changes and effect-tail coverage were not independently
+qualified. This is not proof of automatic whole-track range selection.
+
+An isolated FakeLive process passed those exact bytes to the existing offline
+service. Analysis completed and produced measurements, findings and a deterministic
+action plan. The script checked the generated file's ownership, filename and
+SHA-256 against its local job receipt before deleting that WAV and removing its
+empty directory. A new service instance then reloaded the completed review with
+identical measurements and actions and `audio_retained=false`. No WAV was present
+in the review store. Private source audio, source hashes, mix measurements, set
+names and runtime paths are excluded from this receipt.
+
+This was a manual UI export and a direct service-level analysis/cleanup check.
+Neither the Scan button nor chat advice delivery is wired to this sequence.
+The legacy track diagnostic route can substitute the first discovered bounce,
+and its frontend can simulate a result on request failure; neither is admissible
+evidence for this job. The next implementation must bind an exact fresh render
+and fail visibly rather than reuse those fallbacks. Export completion, bounded
+jobs, cancellation/crash cleanup, range/tails, instance isolation and the actual
+button-to-report path remain open in `KENN_PLAN.md`.
+
+Live normally renders offline; external hardware can require real-time export
+([Live manual](https://www.ableton.com/en/manual/managing-files-and-sets/)).
+Conditions were battery power, 26% and discharging. No callback, publisher or
+render-performance qualification is claimed, and the loudness candidate remains
+disabled. A subsequent GitHub API recheck failed to connect; the earlier verified
+account payments/spending-limit block remains the last confirmed CI diagnosis.
+This documentation checkpoint changes only `KENN_PLAN.md` and this receipt.
