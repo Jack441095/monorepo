@@ -198,9 +198,14 @@ No audio callback code changed. WAV inspection still reads headers and seeks
 over payloads; the new duration/ownership checks do not allocate audio buffers.
 No CPU/RSS or real-render timing qualification is claimed. Conditions were
 battery power, 13% then 11%, discharging, with Live open; no mains gate closed.
-GitHub listed both workflows for `71daad3e` as failed; fetching their job details
-then failed to connect. The earlier billing/spending-limit annotations remain
-the last verified cause, rather than a verified diagnosis of these newer runs.
+Initial GitHub job-detail requests failed to connect. After publication, the
+[core run](https://github.com/Nite-DSP/monorepo/actions/runs/38760352612) and
+[sharing run](https://github.com/Nite-DSP/monorepo/actions/runs/38760352589) for
+`5e57d6ef` both failed with no steps started. Their current annotations explicitly
+identify failed account payments or the spending limit; no CI pass is claimed.
+The checkpoint was pushed to `feature/reference-review-grade` and manually mirrored
+to matching `kenn-app` commit `286fc389e90f`. Both committed product trees were
+`8e392035f1984324342fc9b30d70f8ae75318a6b`; both remote branch SHAs were verified.
 
 ## Remaining gate
 
