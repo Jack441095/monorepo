@@ -21,6 +21,7 @@ from typing import Any
 from kenn.ableton_osc_bridge import AbletonOSCClient, live_client
 from kenn.core import volume_law
 from kenn.core.confirmation import consume_confirmation, issue_confirmation, revoke_confirmation
+from kenn.core.actions.offline_scan_actions import OfflineScanActionsMixin, OFFLINE_SCAN_PROPOSAL_SCHEMA
 from kenn.core.idempotency_bounds import prune_if_needed
 from kenn.core.receipt_contract import StageTimer, classify_retry_safety, resolve_correlation_id
 from kenn.core.parameter_contract import (
@@ -489,9 +490,12 @@ def _recorded_parameter_undo_receipt(
     return copy.deepcopy(stored), ""
 
 
-class LiveActionService(Tier2Tier3ControlMixin):
-    def __init__(self, client: AbletonOSCClient | Any = None):
+class LiveActionService(OfflineScanActionsMixin, Tier2Tier3ControlMixin):
+    def __init__(self, client: AbletonOSCClient | Any = None, *, offline_scans: Any = None):
         self.client = client or live_client
+        # Production leaves this unset until the export profile and current-set
+        # provenance pass the supervised gates; HTTP cannot inject an exporter.
+        self.offline_scans = offline_scans
 
     def authenticate_undo_receipt(self, receipt: dict[str, Any], *, session_id: str) -> tuple[dict[str, Any], str]:
         """Resolve an Undo receipt before any action or HTTP schema dispatch."""
@@ -4491,6 +4495,11 @@ class LiveActionService(Tier2Tier3ControlMixin):
         correlation_id: str = "",
     ) -> dict[str, Any]:
         _cleanup_memory()
+        if isinstance(proposal, dict) and proposal.get("schema") == OFFLINE_SCAN_PROPOSAL_SCHEMA:
+            return self.execute_offline_scan(
+                proposal, confirm_token=confirm_token, session_id=session_id,
+                idempotency_key=idempotency_key, correlation_id=correlation_id,
+            )
         if isinstance(proposal, dict) and proposal.get("schema") == DEVICE_SETUP_PROPOSAL_SCHEMA:
             return self.execute_device_setup_action(
                 proposal,
