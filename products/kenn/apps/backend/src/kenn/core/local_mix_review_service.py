@@ -114,7 +114,9 @@ def _finite(value: Any) -> float | None:
     return number if number is not None and number == number and abs(number) != float("inf") else None
 
 
-def _grade_from_report(report: dict[str, Any]) -> dict[str, Any]:
+def _grade_from_report(
+    report: dict[str, Any], *, reference_match: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """The E2 grade for one uploaded file, from the readings the analyser actually took.
 
     Only integrated loudness, true peak, crest factor and (for stereo files) the mean windowed correlation are handed
@@ -135,8 +137,8 @@ def _grade_from_report(report: dict[str, Any]) -> dict[str, Any]:
         meters["phase_correlation"] = sum(windows) / len(windows)
     # No session behind an uploaded file, so there are no tracks for the Doctor's name and fader advice to read.
     technical = MixDoctor().audit_session({"tracks": []}, meters=meters).to_dict()
-    # Reference match is not scored here: compare_reference_audio runs only when a reference is uploaded.
-    return grade_session(technical, meters)
+    # Only the comparison for this upload may contribute reference points; ordinary reviews leave it absent.
+    return grade_session(technical, meters, reference_match=reference_match)
 
 
 def _review_from_report(
@@ -321,8 +323,14 @@ def compare_reference_audio(
             ref_name=Path(reference_filename).name[:256],
         )
     except Exception:
+        # Spectral/loudness comparisons remain useful if the optional matching engine fails; its grade stays absent.
         matching_result = None
 
+    reference_score = {
+        "points": 0.0,
+        "points_available": 0.0,
+        "note": "reference supplied, but reference-match analysis unavailable",
+    }
     ref_comp: dict[str, Any] = {
         "largest_spectral_difference": largest,
         "largest_ltas_difference": largest_ltas,
@@ -333,7 +341,10 @@ def compare_reference_audio(
         "comparison_basis": "Each 40-band logarithmic LTAS is normalised around 1 kHz; it is measured against the uploaded reference, not a universal pink-noise target.",
     }
     if matching_result and matching_result.get("ok"):
+        reference_score = matching_result.get("reference_match_score") or reference_score
         ref_comp.update({
+            # Keep the measured gaps and sources alongside the combined grade's summary of this part.
+            "reference_match_score": reference_score,
             "tonal_balance_7band": matching_result.get("tonal_balance"),
             "matching_gains_db": matching_result.get("matching_gains_db"),
             "dynamics": matching_result.get("dynamics"),
@@ -347,16 +358,8 @@ def compare_reference_audio(
         "schema": "kenn.mix_review.reference_comparison.v1",
         "ok": bool(mix_report.get("ok")) and bool(reference_report.get("ok")),
         "analysis_version": _text(mix_report.get("analysis_version"), 128),
-        "reference_comparison": {
-            "largest_spectral_difference": largest,
-            "largest_ltas_difference": largest_ltas,
-            "ltas_40_band_deltas": ltas_deltas[:8],
-            "eq_bands": _advisory_eq_moves(ltas_deltas),
-            "lufs_delta_db": lufs_delta,
-            "pink_noise_reference": pink_noise_summary,
-            "comparison_basis": "Each 40-band logarithmic LTAS is normalised around 1 kHz; it is measured against the uploaded reference, not a universal pink-noise target.",
-        },
         "reference_comparison": ref_comp,
+        "grade": _grade_from_report(mix_report, reference_match=reference_score),
         "source_mix": {"filename": Path(mix_filename).name[:256], "sha256": hashlib.sha256(mix_bytes).hexdigest()},
         "source_reference": {"filename": Path(reference_filename).name[:256], "sha256": hashlib.sha256(reference_bytes).hexdigest()},
         "storage": "in_memory_only",

@@ -32,6 +32,17 @@ def test_a_part_with_nothing_scorable_counts_as_not_graded():
     assert {u["part"] for u in grade["ungraded"]} == {"technical_health", "declared_target", "reference_match"}
 
 
+def test_a_supplied_but_unavailable_reference_keeps_its_failure_reason():
+    # "No reference supplied" hid analysis failures even though the producer had attached one.
+    grade = combine_grade(reference_match={
+        "points": 0.0, "points_available": 0.0, "note": "reference RMS at/below -60 dBFS",
+    })
+
+    reference = next(u for u in grade["ungraded"] if u["part"] == "reference_match")
+    assert reference["reason"] == "reference RMS at/below -60 dBFS"
+    assert "no reference track supplied" not in grade["meaning"]
+
+
 def test_the_parts_add_up_and_the_same_inputs_give_the_same_grade():
     reference = {"points": 31.5, "points_available": 35.0, "unscored": ["stereo_width"]}
     declared = score_declared_target(-9.0, -0.2, target="spotify")  # 5 LU loud and 0.8 dB over the ceiling

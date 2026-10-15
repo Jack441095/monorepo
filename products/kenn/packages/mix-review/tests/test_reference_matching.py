@@ -71,8 +71,8 @@ def test_compute_dynamics_profile():
 
 
 def test_compute_stereo_profile():
-    # Identical L and R -> correlation 1.0
-    mono_wav = _make_wav(duration_s=0.5, freq_left=200.0, freq_right=200.0)
+    # 80 Hz sits below the 120 Hz bass cutoff, so both correlation readings have energy to measure.
+    mono_wav = _make_wav(duration_s=0.5, freq_left=80.0, freq_right=80.0)
     from local_engine import _decode_channels
     ch, sr, _ = _decode_channels(mono_wav)
     stereo = compute_stereo_profile(ch, sr)
@@ -125,7 +125,7 @@ def _comparison(gains=None, crest_delta=0.0, mix_stereo=None, ref_stereo=None):
     stereo = {"low_mono_correlation": 0.95, "side_mid_ratio_db": -9.0, "is_mono": False}
     return {
         "matching_gains_db": gains if gains is not None else {b: 0.0 for b in ("sub", "bass", "mids", "air")},
-        "dynamics": {"crest_factor_delta_db": crest_delta},
+        "dynamics": {"crest_factor_delta_db": crest_delta, "mix": {"rms_dbfs": -18.0}, "reference": {"rms_dbfs": -18.0}},
         "stereo": {"mix": {**stereo, **(mix_stereo or {})}, "reference": {**stereo, **(ref_stereo or {})}},
     }
 
@@ -139,7 +139,8 @@ def test_a_mix_that_matches_its_reference_gets_all_forty():
 
 
 def test_a_mix_compared_with_itself_scores_full_marks():
-    wav = _make_wav(duration_s=0.5, freq_left=220.0, freq_right=330.0)
+    # Both tones sit below 120 Hz, and their difference gives measurable mid and side power.
+    wav = _make_wav(duration_s=0.5, freq_left=80.0, freq_right=110.0)
 
     score = compare_mix_to_reference(wav, wav)["reference_match_score"]
 
@@ -171,9 +172,9 @@ def test_a_squashed_mix_loses_dynamics_points():
 def test_a_mono_file_has_no_width_to_match_and_the_score_is_not_rescaled():
     score = score_reference_match(_comparison(mix_stereo={"is_mono": True, "side_mid_ratio_db": -90.0}))
 
-    assert "stereo_width" in score["unscored"]
-    assert score["points_available"] == 35.0
-    assert score["points"] == 35.0  # out of 35, not stretched to 40
+    assert set(score["unscored"]) == {"low_end_mono", "stereo_width"}
+    assert score["points_available"] == 30.0
+    assert score["points"] == 30.0  # mono placeholders earn neither of the two 5-point stereo parts
 
 
 def test_the_same_comparison_always_gets_the_same_score():
@@ -187,3 +188,79 @@ def test_a_missing_comparison_section_is_unscored_not_assumed_good():
 
     assert set(score["unscored"]) == {"tonal_balance", "dynamics", "low_end_mono", "stereo_width"}
     assert score["points_available"] == 0.0
+
+
+@pytest.mark.parametrize("source", ["mix", "reference"])
+@pytest.mark.parametrize("rms", [None, float("nan"), float("inf"), True, -90.0, -60.0])
+def test_missing_or_insignificant_source_rms_withholds_reference_points(source, rms):
+    # The old placeholders let two silent files earn full marks just by matching each other.
+    comparison = _comparison()
+    comparison["dynamics"][source]["rms_dbfs"] = rms
+
+    score = score_reference_match(comparison)
+
+    assert score["points"] == score["points_available"] == 0.0
+    assert set(score["unscored"]) == {"tonal_balance", "dynamics", "low_end_mono", "stereo_width"}
+    assert source in score["note"]
+
+
+def test_rms_above_the_significance_boundary_can_be_compared():
+    comparison = _comparison()
+    comparison["dynamics"]["mix"]["rms_dbfs"] = -59.99  # 0.01 dB above the -60 dBFS gate
+
+    assert score_reference_match(comparison)["points"] == 40.0
+
+
+@pytest.mark.parametrize("value", [None, float("nan"), float("inf"), True])
+def test_unavailable_measurements_remove_only_their_reference_parts(value):
+    comparison = _comparison(gains={"bass": value}, crest_delta=value,
+                             mix_stereo={"low_mono_correlation": value, "side_mid_ratio_db": value})
+
+    score = score_reference_match(comparison)
+
+    assert score["points"] == score["points_available"] == 0.0
+    assert len(score["unscored"]) == 4
+
+
+def test_silent_wavs_do_not_earn_a_reference_grade():
+    silent = _make_wav(gain_left=0.0, gain_right=0.0)
+
+    score = compare_mix_to_reference(silent, silent)["reference_match_score"]
+
+    assert score["points"] == score["points_available"] == 0.0
+
+
+def test_numpy_fallback_does_not_grade_its_uniform_spectrum(monkeypatch):
+    # The backend can load a second module instance; patch the instance that owns this imported function.
+    monkeypatch.setitem(compare_mix_to_reference.__globals__, "np", None)
+    wav = _make_wav()
+
+    score = compare_mix_to_reference(wav, wav)["reference_match_score"]
+
+    assert score["points"] == score["points_available"] == 0.0
+    assert "NumPy" in score["note"]
+
+
+@pytest.mark.parametrize("right_gain", [0.0, 1.0])
+def test_bass_free_stereo_does_not_earn_low_end_correlation_points(right_gain):
+    # Exact 1 kHz PCM periods at 8 kHz have no bass-bin energy; the old 1.0 fallback earned five points anyway.
+    period = [0, 4634, 6553, 4634, 0, -4634, -6553, -4634]
+    samples = [value for sample in period * 1000 for value in (sample, int(sample * right_gain))]
+    output = io.BytesIO()
+    with wave.open(output, "wb") as handle:
+        handle.setnchannels(2)
+        handle.setsampwidth(2)
+        handle.setframerate(8000)
+        handle.writeframes(struct.pack(f"<{len(samples)}h", *samples))
+
+    result = compare_mix_to_reference(output.getvalue(), output.getvalue())
+    score = result["reference_match_score"]
+
+    assert result["stereo"]["mix"]["low_mono_correlation"] is None
+    assert "low_end_mono" in score["unscored"]
+    assert all(p["part"] != "low_end_mono" for p in score["parts"])
+    assert "unavailable" in result["coaching_summary"]["stereo_assessment"]
+    if right_gain:
+        # Identical channels also have no side energy, so their old -90 dB width floor earns no points.
+        assert result["stereo"]["mix"]["side_mid_ratio_db"] is None
+        assert "stereo_width" in score["unscored"]

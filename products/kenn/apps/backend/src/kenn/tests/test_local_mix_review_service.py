@@ -6,20 +6,24 @@ import stat
 import struct
 import wave
 
+import pytest
+
+from kenn.core import local_mix_review_service as mix_review
 from kenn.core.local_mix_review_service import MAX_REVIEWS, LocalMixReviewService, compare_reference_audio
 
 
-def _wav_bytes(*, amplitude: float = 0.99, sample_rate: int = 8000, seconds: int = 1, frequency_hz: float = 0.0) -> bytes:
+def _wav_bytes(*, amplitude: float = 0.99, sample_rate: int = 8000, seconds: int = 1, frequency_hz: float = 0.0, channels: int = 1) -> bytes:
     samples = [
         int(max(-1.0, min(1.0, amplitude * (math.sin(2 * math.pi * frequency_hz * index / sample_rate) if frequency_hz else 1.0))) * 32767)
         for index in range(sample_rate * seconds)
     ]
-    payload = struct.pack("<" + "h" * len(samples), *samples)
+    interleaved = [sample for sample in samples for _ in range(channels)]
+    payload = struct.pack("<" + "h" * len(interleaved), *interleaved)
     from io import BytesIO
 
     output = BytesIO()
     with wave.open(output, "wb") as handle:
-        handle.setnchannels(1)
+        handle.setnchannels(channels)
         handle.setsampwidth(2)
         handle.setframerate(sample_rate)
         handle.writeframes(payload)
@@ -121,6 +125,12 @@ def test_reference_comparison_is_measured_in_memory_without_retaining_audio() ->
     assert result["audio_retained"] is False
     assert result["storage"] == "in_memory_only"
     assert "audio" not in json.dumps(result).lower().replace("audio_retained", "")
+    reference_score = comparison["reference_match_score"]
+    reference_part = next(p for p in result["grade"]["parts"] if p["part"] == "reference_match")
+    assert reference_part["points"] == reference_score["points"]
+    assert reference_part["points_available"] == 30.0  # mono sources have neither stereo part to compare
+    assert set(reference_part["left_out"]) == {"low_end_mono", "stereo_width"}
+    assert result["grade"]["points"] == round(sum(p["points"] for p in result["grade"]["parts"]), 1)
 
 
 def test_reference_comparison_is_persisted_as_metadata_only_receipt(tmp_path) -> None:
@@ -146,3 +156,58 @@ def test_reference_comparison_is_persisted_as_metadata_only_receipt(tmp_path) ->
     assert review["storage"] == "metadata_only"
     assert review["audio_retained"] is False
     assert "audio" not in json.dumps(review).lower().replace("audio_retained", "")
+    # The reference grade must survive the same restart as its source hashes and measured gaps.
+    restored = LocalMixReviewService(tmp_path / "runtime").mix_review_status(result["review_id"])["review"]
+    assert restored["grade"] == review["grade"]
+    assert any(p["part"] == "reference_match" for p in restored["grade"]["parts"])
+
+
+@pytest.mark.parametrize("response", [None, {"ok": False}, {"ok": True}])
+def test_unavailable_reference_matching_leaves_a_partial_grade_with_the_reason(monkeypatch, response):
+    def unavailable(*args, **kwargs):
+        if response is None:
+            # The real adapter also catches an optional engine's import or analysis failure.
+            raise RuntimeError("matching unavailable")
+        return response
+
+    monkeypatch.setattr(mix_review._matching_engine(), "compare_mix_to_reference", unavailable)
+    # Stereo correlation remains measurable even when optional loudness dependencies are absent.
+    wav = _wav_bytes(amplitude=0.2, frequency_hz=100, channels=2)
+
+    result = compare_reference_audio(wav, "mix.wav", wav, "reference.wav")
+
+    assert result["ok"] is True
+    grade = result["grade"]
+    technical = next(p for p in grade["parts"] if p["part"] == "technical_health")
+    assert technical["points_available"] > 0.0
+    assert all(p["part"] != "reference_match" for p in grade["parts"])
+    reference = next(u for u in grade["ungraded"] if u["part"] == "reference_match")
+    assert reference["reason"] == "reference supplied, but reference-match analysis unavailable"
+
+
+def test_silent_reference_is_ungraded_instead_of_a_perfect_match():
+    wav = _wav_bytes(amplitude=0.2, frequency_hz=100)
+
+    result = compare_reference_audio(wav, "mix.wav", _wav_bytes(amplitude=0.0), "silent.wav")
+
+    assert result["ok"] is True
+    assert result["reference_comparison"]["reference_match_score"]["points_available"] == 0.0
+    reference = next(u for u in result["grade"]["ungraded"] if u["part"] == "reference_match")
+    assert "reference RMS" in reference["reason"]
+
+
+def test_reference_points_follow_this_upload_and_do_not_leak_into_another_review(tmp_path):
+    # The service has a process-wide engine, but a previous comparison must never supply the next review's points.
+    mix = _wav_bytes(amplitude=0.2, frequency_hz=100)
+    different = _wav_bytes(amplitude=0.2, frequency_hz=3000)
+
+    matched = compare_reference_audio(mix, "mix.wav", mix, "same.wav")["grade"]
+    changed = compare_reference_audio(mix, "mix.wav", different, "different.wav")["grade"]
+    repeated = compare_reference_audio(mix, "mix.wav", mix, "same.wav")["grade"]
+    ordinary = LocalMixReviewService(tmp_path).save_review(mix, "other.wav")["review"]["grade"]
+
+    assert matched == repeated
+    assert matched["points"] > changed["points"]
+    assert matched["points_available"] == changed["points_available"]
+    assert all(p["part"] != "reference_match" for p in ordinary["parts"])
+    assert next(u for u in ordinary["ungraded"] if u["part"] == "reference_match")["reason"] == "no reference track supplied"

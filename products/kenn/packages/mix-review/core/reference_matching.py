@@ -153,13 +153,14 @@ def compute_dynamics_profile(samples: Any, sample_rate: int) -> dict[str, float]
     }
 
 
-def compute_stereo_profile(channels_list: list[Any], sample_rate: int) -> dict[str, float]:
-    """Compute overall stereo correlation, low-end mono correlation (<120Hz), and Side/Mid ratio."""
+def compute_stereo_profile(channels_list: list[Any], sample_rate: int) -> dict[str, Any]:
+    """Return existing stereo measurements, using None wherever channel energy cannot support a reading."""
     if len(channels_list) < 2:
+        # One channel has no stereo relationship to measure; numeric placeholders would earn grade points.
         return {
-            "stereo_correlation": 1.0,
-            "low_mono_correlation": 1.0,
-            "side_mid_ratio_db": -90.0,
+            "stereo_correlation": None,
+            "low_mono_correlation": None,
+            "side_mid_ratio_db": None,
             "is_mono": True,
         }
 
@@ -171,7 +172,8 @@ def compute_stereo_profile(channels_list: list[Any], sample_rate: int) -> dict[s
         r_arr = np.asarray(right, dtype=np.float64)
         min_len = min(len(l_arr), len(r_arr))
         if min_len == 0:
-            return {"stereo_correlation": 1.0, "low_mono_correlation": 1.0, "side_mid_ratio_db": -90.0, "is_mono": False}
+            # Empty channels leave no evidence for any stereo measurement.
+            return {"stereo_correlation": None, "low_mono_correlation": None, "side_mid_ratio_db": None, "is_mono": False}
         l_arr = l_arr[:min_len]
         r_arr = r_arr[:min_len]
 
@@ -181,14 +183,16 @@ def compute_stereo_profile(channels_list: list[Any], sample_rate: int) -> dict[s
         if l_std > 1e-7 and r_std > 1e-7:
             corr = float(np.corrcoef(l_arr, r_arr)[0, 1])
         else:
-            corr = 1.0
+            # Pearson correlation is undefined when either channel has no variance.
+            corr = None
 
         # Mid and Side
         mid = (l_arr + r_arr) * 0.5
         side = (l_arr - r_arr) * 0.5
         m_pow = float(np.mean(mid ** 2))
         s_pow = float(np.mean(side ** 2))
-        sm_ratio = _safe_db_pow(s_pow / (m_pow + 1e-12))
+        # The existing 1e-12 power floor prevents division/log errors; hitting it is not a measured width.
+        sm_ratio = _safe_db_pow(s_pow / (m_pow + 1e-12)) if m_pow > 1e-12 and s_pow > 1e-12 else None
 
         # Low-end mono correlation (FFT low-pass filter below 120 Hz)
         # Check sub 120Hz correlation
@@ -211,19 +215,21 @@ def compute_stereo_profile(channels_list: list[Any], sample_rate: int) -> dict[s
         if l_low_std > 1e-7 and r_low_std > 1e-7:
             low_corr = float(np.corrcoef(l_low, r_low)[0, 1])
         else:
-            low_corr = 1.0
+            # No bass in either channel is absent low-end evidence, not perfect mono compatibility.
+            low_corr = None
 
         return {
-            "stereo_correlation": round(float(np.clip(corr, -1.0, 1.0)), 3),
-            "low_mono_correlation": round(float(np.clip(low_corr, -1.0, 1.0)), 3),
-            "side_mid_ratio_db": round(sm_ratio, 2),
+            "stereo_correlation": round(float(np.clip(corr, -1.0, 1.0)), 3) if corr is not None else None,
+            "low_mono_correlation": round(float(np.clip(low_corr, -1.0, 1.0)), 3) if low_corr is not None else None,
+            "side_mid_ratio_db": round(sm_ratio, 2) if sm_ratio is not None else None,
             "is_mono": False,
         }
 
+    # The pure-Python fallback does not calculate stereo measurements.
     return {
-        "stereo_correlation": 1.0,
-        "low_mono_correlation": 1.0,
-        "side_mid_ratio_db": -90.0,
+        "stereo_correlation": None,
+        "low_mono_correlation": None,
+        "side_mid_ratio_db": None,
         "is_mono": False,
     }
 
@@ -305,6 +311,8 @@ LOW_CORR_TOLERANCE = 0.05  # correlation below 120 Hz may sit this far under the
 LOW_CORR_FULL_LOSS = 0.50  # a shortfall this large is a full loss
 WIDTH_TOLERANCE_DB = 3.0  # side/mid ratio difference we do not charge for
 WIDTH_FULL_LOSS_DB = 9.0
+# Same -60 dBFS significance boundary as local_engine's silence detector: a house rule, not an EBU limit.
+REFERENCE_MIN_RMS_DBFS = -60.0
 
 
 def _loss_fraction(gap: float, tolerance: float, full_loss: float) -> float:
@@ -312,15 +320,40 @@ def _loss_fraction(gap: float, tolerance: float, full_loss: float) -> float:
     return min(1.0, max(0.0, gap - tolerance) / (full_loss - tolerance))
 
 
+def _unscored_reference_match(reason: str) -> dict[str, Any]:
+    """Leave all reference points unavailable, retaining the reason for the combined grade."""
+    return {
+        "points": 0.0,
+        "points_available": 0.0,
+        "full_marks": sum(REFERENCE_MATCH_POINTS.values()),
+        "parts": [],
+        "unscored": list(REFERENCE_MATCH_POINTS),
+        "note": reason,
+    }
+
+
 def score_reference_match(comparison: dict[str, Any]) -> dict[str, Any]:
     """Score a `compare_mix_to_reference` result out of 40, from the producer's own reference only.
 
     Every point lost names the measured gap and that the source is the supplied reference. A part we could not
-    compare (a mono file has no stereo width to match) is listed in `unscored` and its points come off
-    `points_available`; the score is never rescaled up to 40.
+    compare (a mono file has no stereo image to match) is listed in `unscored` and its points come off
+    `points_available`; the score is never rescaled up to 40. Missing, non-finite or effectively silent source RMS
+    withholds the whole reference part, because matching silent placeholders is not evidence of similarity.
     """
     parts: list[dict[str, Any]] = []
     unscored: list[str] = []
+
+    def measured(value: Any) -> bool:
+        return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+    dynamics = comparison.get("dynamics") or {}
+    for source in ("mix", "reference"):
+        rms = (dynamics.get(source) or {}).get("rms_dbfs")
+        if not measured(rms) or rms <= REFERENCE_MIN_RMS_DBFS:
+            # Silence can compare perfectly with itself; that is no evidence of a good reference match.
+            return _unscored_reference_match(
+                f"{source} RMS missing, non-finite or at/below {REFERENCE_MIN_RMS_DBFS:g} dBFS"
+            )
 
     def add(name: str, gap: float, unit: str, tolerance: float, full_loss: float, detail: str) -> None:
         available = REFERENCE_MATCH_POINTS[name]
@@ -336,7 +369,7 @@ def score_reference_match(comparison: dict[str, Any]) -> dict[str, Any]:
         })
 
     bands = comparison.get("matching_gains_db") or {}
-    if bands:
+    if bands and all(measured(g) for g in bands.values()):
         # The matching gain is how far each band is from the reference, so the mean of its size is the tonal gap.
         # Per-band losses are averaged rather than summed so one bad band cannot zero the whole part by itself.
         losses = [_loss_fraction(abs(g), TONAL_TOLERANCE_DB, TONAL_FULL_LOSS_DB) for g in bands.values()]
@@ -352,11 +385,12 @@ def score_reference_match(comparison: dict[str, Any]) -> dict[str, Any]:
             "source": "the reference track you supplied",
         })
     else:
+        # An absent or non-finite spectrum cannot stand in for the reference's tonal balance.
         unscored.append("tonal_balance")
 
-    dynamics = comparison.get("dynamics") or {}
     crest_delta = dynamics.get("crest_factor_delta_db")
-    if crest_delta is None:
+    if not measured(crest_delta):
+        # Missing crest evidence removes these points instead of treating the gap as zero.
         unscored.append("dynamics")
     else:
         add("dynamics", crest_delta, "dB crest factor", CREST_TOLERANCE_DB, CREST_FULL_LOSS_DB,
@@ -364,20 +398,24 @@ def score_reference_match(comparison: dict[str, Any]) -> dict[str, Any]:
 
     stereo = comparison.get("stereo") or {}
     mix_st, ref_st = stereo.get("mix") or {}, stereo.get("reference") or {}
-    if "low_mono_correlation" in mix_st and "low_mono_correlation" in ref_st:
+    stereo_pair = bool(mix_st and ref_st and not mix_st.get("is_mono") and not ref_st.get("is_mono"))
+    if (stereo_pair and measured(mix_st.get("low_mono_correlation"))
+            and measured(ref_st.get("low_mono_correlation"))):
         shortfall = max(0.0, ref_st["low_mono_correlation"] - mix_st["low_mono_correlation"])
         add("low_end_mono", shortfall, "correlation below the reference", LOW_CORR_TOLERANCE, LOW_CORR_FULL_LOSS,
             f"correlation below 120 Hz is {mix_st['low_mono_correlation']:.2f} against {ref_st['low_mono_correlation']:.2f}")
     else:
+        # Neither mono files nor absent bass have a stereo correlation to compare.
         unscored.append("low_end_mono")
 
-    # A mono file reports a side/mid ratio of -90 dB as a placeholder, which is not a width we can compare.
-    if (mix_st and ref_st and not mix_st.get("is_mono") and not ref_st.get("is_mono")
-            and "side_mid_ratio_db" in mix_st and "side_mid_ratio_db" in ref_st):
+    # Width needs measurable mid and side energy in both stereo files.
+    if (stereo_pair and measured(mix_st.get("side_mid_ratio_db"))
+            and measured(ref_st.get("side_mid_ratio_db"))):
         width_gap = mix_st["side_mid_ratio_db"] - ref_st["side_mid_ratio_db"]
         add("stereo_width", width_gap, "dB side/mid", WIDTH_TOLERANCE_DB, WIDTH_FULL_LOSS_DB,
             f"side/mid ratio is {width_gap:+.1f} dB from the reference")
     else:
+        # Mono and unavailable width readings have no measured gap to grade.
         unscored.append("stereo_width")
 
     points_available = sum(p["points_available"] for p in parts)
@@ -387,6 +425,7 @@ def score_reference_match(comparison: dict[str, Any]) -> dict[str, Any]:
         "full_marks": sum(REFERENCE_MATCH_POINTS.values()),
         "parts": parts,
         "unscored": unscored,
+        "note": "reference supplied, but no comparable reference measurements" if not points_available else "",
     }
 
 
@@ -494,7 +533,10 @@ def compare_mix_to_reference(
         )
 
     # Low-end mono correlation coaching
-    if mix_stereo["low_mono_correlation"] < 0.85:
+    if mix_stereo["low_mono_correlation"] is None or ref_stereo["low_mono_correlation"] is None:
+        # The comparison needs bass evidence in both files before it can explain a correlation gap.
+        stereo_assessment = "Low-end mono comparison unavailable: both files need measurable bass in two channels."
+    elif mix_stereo["low_mono_correlation"] < 0.85:
         stereo_assessment = (
             f"Low-end phase cancellation alert: Sub/bass below 120 Hz has correlation {mix_stereo['low_mono_correlation']:.2f} "
             f"(reference is {ref_stereo['low_mono_correlation']:.2f}). Summing to mono will cause low-end loss."
@@ -549,5 +591,9 @@ def compare_mix_to_reference(
         "recommendations": recommendations,
         "eq8_preset_adv_base64": preset_b64,
     }
-    result["reference_match_score"] = score_reference_match(result)
+    # Without NumPy the legacy comparison returns uniform bands and placeholder stereo values, not measurements.
+    result["reference_match_score"] = (
+        score_reference_match(result) if np is not None
+        else _unscored_reference_match("reference-match analysis requires NumPy")
+    )
     return result

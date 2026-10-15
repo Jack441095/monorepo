@@ -48,7 +48,8 @@ def combine_grade(
     ungraded: list[dict[str, str]] = []
     for name, part in given.items():
         if not part or not part["points_available"]:
-            ungraded.append({"part": name, "reason": _WHY_UNGRADED[name]})
+            # A supplied reference can fail analysis; saying none was supplied would hide that failure.
+            ungraded.append({"part": name, "reason": (part or {}).get("note") or _WHY_UNGRADED[name]})
             continue
         parts.append({
             "part": name,
@@ -111,8 +112,8 @@ def grade_session(
     """The combined grade for one audit: `technical` is `MixAuditReport.to_dict()`, `meters` a telemetry frame dict.
 
     `request` is whatever the producer typed; any target they named or stated in it is scored, otherwise only the
-    default ceiling is. `reference_match` stays None until a reference track is supplied (the scorer lives in the
-    mix-review package, which the backend does not import), so today the grade reads out of 54 at most.
+    default ceiling is. Pass the mix-review package's scored comparison as `reference_match` only for the reference
+    supplied with this audit; None leaves that part ungraded.
     """
     meters = meters or {}
     declared = score_declared_target(
