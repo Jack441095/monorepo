@@ -321,7 +321,11 @@ def render_report_html(
     It is theme-light by design (a client-facing document), responsive, and
     never scrolls horizontally.
     """
-    review = review or {}
+    # Signed public reports need the same qualification as the detailed saved view;
+    # a token grants access, not authority for old cached analysis prose.
+    from audio_analysis.integration.handoff import project_report_publication
+
+    review = project_report_publication(review or {})
     metrics = review.get("metrics") or {}
     head = report_headline(review)
     score = head["score"]

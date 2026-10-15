@@ -20,7 +20,7 @@ from kenn.core.evidence import (
     reference_comparison_has_activity,
     uploaded_metrics_have_activity,
 )
-from kenn.core.session_context import MAX_CONTEXT_AGE_SECONDS, validate_session_context
+from kenn.core.session_context import MAX_CONTEXT_AGE_SECONDS, _safe_mix_review, validate_session_context
 
 
 SCHEMA = "kenn.session_intelligence.v1"
@@ -209,6 +209,9 @@ def _audio_evidence(context: dict[str, Any], reference_comparison: Any) -> list[
         uploaded_measurement = schema in {
             "kenn.mix_review.local_review.v1", "kenn.mix_review.reference_comparison.v1",
         } or kind == "mix_review"
+        if uploaded_measurement:
+            # Saved or manually edited canonical contexts can predate optional-source qualification.
+            measurement = {"kind": kind, **_safe_mix_review(measurement)}
         metrics = measurement.get("metrics") if isinstance(measurement.get("metrics"), dict) else {}
         if kind == "plugin_feature_frame" and not live_context_has_activity(metrics):
             # Older stored contexts can predate the ingress gate; neither their levels nor pink shape may ground advice.
@@ -220,11 +223,14 @@ def _audio_evidence(context: dict[str, Any], reference_comparison: Any) -> list[
             if uploaded_metrics_qualified and (number := _number(value)) is not None
         }
         if kind and numeric_metrics:
+            measurement_limits = measurement.get("limitations")
+            measurement_limits = measurement_limits if isinstance(measurement_limits, list) else []
             evidence.append({
                 "kind": kind,
                 "evidence_class": "session_measurement",
                 "metrics": numeric_metrics,
-                "limitations": ["Measurements describe their captured audio scope, not an unobserved Live cause."],
+                "limitations": ["Measurements describe their captured audio scope, not an unobserved Live cause.", *measurement_limits],
+                **({"analysis_evidence": measurement["analysis_evidence"]} if measurement.get("analysis_evidence") else {}),
             })
         trusted_comparison = measurement.get("reference_comparison")
         comparison_qualified = (

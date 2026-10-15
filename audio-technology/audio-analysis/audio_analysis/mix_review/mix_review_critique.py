@@ -30,7 +30,10 @@ from __future__ import annotations
 import os
 from typing import Any, Protocol
 
-from audio_analysis.integration.handoff import qualified_stem_masking_summary, stem_masking_evidence
+from audio_analysis.integration.handoff import (
+    project_report_publication, qualified_stem_masking_summary, stem_masking_evidence,
+    transient_preservation_evidence,
+)
 
 
 def _critique_env_enabled() -> bool:
@@ -64,6 +67,18 @@ def _default_provider() -> CritiqueLLMProvider | None:
         return None
 
 
+def _qualified_transient_payload(transient: object) -> dict:
+    """Retain the critique's historical score key only with raw source activity proof."""
+    qualified = transient_preservation_evidence(transient) if isinstance(transient, dict) else {}
+    if not qualified:
+        # Empty proof marks an attempted but unqualified comparison for both critique paths.
+        return {}
+    return {
+        "preservation_score": qualified["score"], "profile": qualified["profile"],
+        "matched_event_count": qualified["matched_event_count"], "activity": qualified["activity"],
+    }
+
+
 def critique_metrics_payload(report: dict) -> dict:
     """Extract the Stage 10 + core metrics a critique should reason about.
 
@@ -73,7 +88,13 @@ def critique_metrics_payload(report: dict) -> dict:
     stereo asymmetry, transient preservation, stem masking) plus the small
     set of core numbers needed to make those readable in context.
     """
+    # Cached flags can contain the same unqualified comparison prose as the report.
+    report = project_report_publication(report)
     metrics = report.get("metrics") or report
+    # The workflow stores optional analyses at the top level; explicit canonical
+    # abstention must take precedence over an older nested metrics cache.
+    transient = report.get("transient_preservation", metrics.get("transient_preservation"))
+    masking = report.get("stem_masking", metrics.get("stem_masking"))
     return {
         "technical_rating": metrics.get("technical_rating"),
         "technical_score": metrics.get("technical_score"),
@@ -85,10 +106,10 @@ def critique_metrics_payload(report: dict) -> dict:
         "stereo_asymmetry": metrics.get("stereo_asymmetry"),
         "loudness_range_lu": metrics.get("loudness_range_lu"),
         "loudness_range_by_section": metrics.get("loudness_range_by_section"),
-        "transient_preservation": metrics.get("transient_preservation"),
+        "transient_preservation": _qualified_transient_payload(transient) if transient is not None else None,
         # Share handoff qualification so neither deterministic nor LLM critique
         # receives name-derived profiles or unsupported repair predictions.
-        "stem_masking": stem_masking_evidence(metrics.get("stem_masking")) if "stem_masking" in metrics else None,
+        "stem_masking": stem_masking_evidence(masking) if masking is not None else None,
         "style_classification": metrics.get("style_classification"),
         "tonal_balance": metrics.get("tonal_balance"),
         "flags": [flag.get("label") for flag in (report.get("flags") or []) if flag.get("label")][:6],
@@ -153,19 +174,19 @@ def deterministic_critique(payload: dict) -> str:
     elif asym:
         lines.append("L/R channel balance looks even; no persistent one-sided bias detected.")
 
-    tp_data = payload.get("transient_preservation") or {}
-    score_tp = tp_data.get("preservation_score")
-    if score_tp is not None:
-        profile = tp_data.get("profile", "")
+    raw_transient = payload.get("transient_preservation")
+    tp_data = _qualified_transient_payload(raw_transient)
+    if tp_data:
         lines.append(
-            f"Transient preservation across the compared render is '{profile.lower()}' "
-            f"(score {score_tp:.2f}/1.0); "
-            + (
-                "attacks are coming through largely intact."
-                if score_tp >= 0.85
-                else "some attack smearing is measurable — check limiter/compressor attack and lookahead settings if punch feels softened."
-            )
+            f"Transient preservation across matched render events is '{tp_data['profile'].lower()}' "
+            f"(score {tp_data['preservation_score']:.2f}/1.0). "
+            "This matched-event proxy does not establish audible damage or its cause; "
+            "compare the renders at matched loudness."
         )
+    elif raw_transient is not None:
+        # Direct template callers need the same source gate as the LLM payload builder.
+        lines.append("Transient preservation withheld: both raw render RMS readings must "
+                     "exceed -60 dBFS and matched events must be available.")
 
     masking = payload.get("stem_masking")
     summary = qualified_stem_masking_summary(masking) or stem_masking_evidence(masking)
@@ -230,7 +251,9 @@ def generate_critique(
             "You are Audio_Too's mix review assistant. Write a concise, practical critique "
             "(120-200 words) using ONLY the supplied JSON metrics. Do not claim to hear the "
             "audio. ERB preview visibility is an uncalibrated relative-spectrum proxy, not audible "
-            "masking severity or an EQ repair recommendation. Do not invent instrumentation, genre, or causes not implied by the data. "
+            "masking severity or an EQ repair recommendation. Transient preservation is a matched-event proxy; "
+            "it does not establish audible damage, limiter settings or repair choices. "
+            "Do not invent instrumentation, genre, or causes not implied by the data. "
             "Cover: overall technical read, any section-to-section loudness-range inconsistency, "
             "stereo balance, transient preservation (if present), and stem masking (if present). "
             "End with one concrete, actionable next step."

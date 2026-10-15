@@ -412,3 +412,83 @@ def test_intelligence_keeps_signal_evidence_just_above_live_activity_floor() -> 
 
     assert brief["audio_evidence"][0]["metrics"] == {"peak_dbfs": -0.1, "rms_dbfs": -79.9}
     assert brief["audio_evidence"][1]["kind"] == "pink_noise_shape"
+
+
+def _optional_audio_receipt():
+    return {
+        "schema": "kenn.mix_review.local_review.v1", "status": "completed",
+        "metrics": {"rms_dbfs": -15.0, "peak_dbfs": -1.0, "low_end_share": 0.0,
+                    "stem_masking_lowest_visibility": 0.8, "transient_preservation_score": 0.8},
+        "findings": ["Cached mixed optional analysis"], "action_plan": ["Cached optional repair"],
+        "analysis_evidence": {
+            "stem_masking": {
+                "stem_count": 2, "lowest_visibility": 0.0, "lowest_visibility_stem": "Bass",
+                "activity": {"schema": "kenn.erb_masking.activity.v1", "active_floor_dbfs": -60.0,
+                             "frame_size_samples": 4096,
+                             "sources": [{"name": name, "sample_rate": 44100, "frame_count": 2, "active_frame_count": 2} for name in ("Bass", "Kick")],
+                             "pairs": [{"stems": ["Bass", "Kick"], "simultaneously_active_frame_count": 1}]},
+            },
+            "transient_preservation": {
+                "score": 0.0, "matched_event_count": 1, "profile": "clean",
+                "activity": {"schema": "kenn.transient_preservation.activity.v1", "pre_rms_dbfs": -18.0, "post_rms_dbfs": -20.0},
+            },
+            "low_end_stems": [{"name": "Bass", "low_end_share": 0.0, "activity": {
+                "schema": "kenn.low_end_stem.activity.v1", "active_floor_dbfs": -60.0,
+                "source_rms_dbfs": -18.0, "window_rms_dbfs": -20.0, "sample_rate": 44100,
+                "analysis_sample_count": 8192, "frame_size_samples": 4096, "window_start_sample": 2048,
+            }}],
+        },
+        "reference_comparison": {
+            "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
+            "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 0.0},
+        },
+    }
+
+
+@pytest.mark.parametrize("bad_section", [None, "stem_masking", "transient_preservation", "low_end_stems"])
+@pytest.mark.parametrize("edited_context", [False, True])
+def test_receipt_to_session_brief_requalifies_optional_audio_independently(bad_section, edited_context):
+    # An active whole mix cannot qualify legacy stem scalars or a quiet optional render.
+    receipt = _optional_audio_receipt()
+    if bad_section:
+        receipt["analysis_evidence"][bad_section] = [] if bad_section == "low_end_stems" else {}
+    before = deepcopy(receipt)
+    context = build_session_context(mix_review_receipts=[receipt])
+    if edited_context:
+        context["measurements"] = [{"kind": "mix_review", **receipt}]
+    brief = build_session_intelligence(context)
+    measured = next(item for item in brief["audio_evidence"] if item["kind"] == "mix_review")
+    assert measured["metrics"]["rms_dbfs"] == -15.0
+    assert measured["metrics"]["low_end_share"] == 0.0
+    for section, fact in (("stem_masking", "stem_masking_lowest_visibility"), ("transient_preservation", "transient_preservation_score")):
+        if section == bad_section:
+            assert fact not in measured["metrics"]
+        else:
+            assert measured["metrics"][fact] == 0.0
+    assert ("low_end_measured_stems" in measured["metrics"]) is False  # Names remain in bounded proof, not numeric metrics.
+    if bad_section != "low_end_stems":
+        assert measured["analysis_evidence"]["low_end_stems"][0]["low_end_share"] == 0.0
+        assert any("own centered FFT-window" in item for item in measured["limitations"])
+    if bad_section != "stem_masking":
+        assert any("calibrated" in item for item in measured["limitations"])
+    assert any(item["kind"] == "uploaded_reference_ltas" and item["largest_difference"]["delta_db"] == 0.0 for item in brief["audio_evidence"])
+    if bad_section:
+        assert any("withheld" in item for item in measured["limitations"])
+        if not edited_context:
+            assert context["measurements"][0]["findings"] == []
+            assert context["measurements"][0]["action_plan"] == []
+    assert receipt == before
+
+
+@pytest.mark.parametrize("metric", ["stem_masking_lowest_visibility", "overall_visibility", "stem_count", "transient_preservation_score", "matched_event_count", "low_end_overlap"])
+def test_legacy_receipt_metric_aliases_cannot_become_session_measurements(metric):
+    receipt = {"schema": "kenn.mix_review.local_review.v1", "status": "completed",
+               "metrics": {"rms_dbfs": -15.0, metric: 0.8},
+               "findings": ["Cached optional claim"], "action_plan": ["Cached optional repair"]}
+    context = build_session_context(mix_review_receipts=[receipt])
+    measurement = context["measurements"][0]
+    assert measurement["metrics"] == {"rms_dbfs": -15.0}
+    assert measurement["findings"] == measurement["action_plan"] == []
+    measured = build_session_intelligence(context)["audio_evidence"][0]
+    assert measured["metrics"] == {"rms_dbfs": -15.0}
+    assert any("withheld" in item for item in measured["limitations"])

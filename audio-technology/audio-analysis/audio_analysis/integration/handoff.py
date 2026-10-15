@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import math
+import json
+from copy import deepcopy
 
 
-def _transient_preservation_evidence(transient: dict) -> dict:
+def transient_preservation_evidence(transient: dict) -> dict:
     """Project qualified pre/post measurements, or retain an abstention marker."""
     activity = transient.get("activity")
     if not isinstance(activity, dict) or activity.get("schema") != "kenn.transient_preservation.activity.v1":
@@ -39,6 +41,10 @@ def _transient_preservation_evidence(transient: dict) -> dict:
         "score": score, "matched_event_count": count, "profile": profile.strip()[:160],
         "activity": {"schema": "kenn.transient_preservation.activity.v1", **levels},
     }
+
+
+# Keep the existing private entry point for older integration callers.
+_transient_preservation_evidence = transient_preservation_evidence
 
 
 def qualified_stem_masking_summary(summary: object) -> dict[str, object] | None:
@@ -271,8 +277,117 @@ def _measured_analysis_evidence(report: dict) -> dict:
     return evidence
 
 
+def project_report_publication(report: dict) -> dict:
+    """Copy a saved report for publication, rebuilding prose with unqualified inputs.
+
+    Cached narratives mix several analyses without per-sentence provenance.
+    When one optional analysis fails qualification we retain independent numeric
+    measurements and qualified optional sections, but cannot retain that prose.
+    This projection never decodes audio, calls a model, or changes the saved report.
+    """
+    projected = deepcopy(report)
+    limitation = "Optional comparison prose withheld: source activity or preview scope is unqualified."
+    rebuild = limitation in (projected.get("publication_limitations") or [])
+    qualified = set()
+    for container in (projected, projected.get("metrics")):
+        if not isinstance(container, dict):
+            # Older reports may omit the metrics container entirely.
+            continue
+        if "transient_preservation" in container:
+            raw = container["transient_preservation"]
+            safe = transient_preservation_evidence(raw) if isinstance(raw, dict) else {}
+            if safe:
+                if container is projected or "transient_preservation" not in projected:
+                    qualified.add("transient_preservation")
+                # Preserve the producer's score key so repeated projection uses
+                # the same raw contract rather than a handoff-only summary shape.
+                container["transient_preservation"] = {
+                    "preservation_score": safe["score"], "profile": safe["profile"],
+                    "matched_event_count": safe["matched_event_count"], "activity": safe["activity"],
+                }
+            else:
+                # An empty sentinel keeps the attempted comparison visible downstream.
+                container["transient_preservation"] = {}
+                rebuild = True
+        if "stem_masking" in container:
+            raw = container["stem_masking"]
+            if stem_masking_evidence(raw):
+                if container is projected or "stem_masking" not in projected:
+                    qualified.add("stem_masking")
+                if raw.get("carving_suggestions") or raw.get("clarity_prediction"):
+                    rebuild = True
+                # Activity qualifies a relative preview, never historical EQ or clarity predictions.
+                raw.pop("carving_suggestions", None)
+                raw.pop("clarity_prediction", None)
+            else:
+                # Legacy name-derived profiles cannot become measured through cached prose.
+                container["stem_masking"] = {}
+                rebuild = True
+        if "stem_solo" in container:
+            raw = container["stem_solo"]
+            summary = raw.get("low_end_summary") if isinstance(raw, dict) else None
+            ranked = summary.get("ranked") if isinstance(summary, dict) else None
+            if isinstance(summary, dict) and summary.get("overlap_warning"):
+                rebuild = True
+            names = [item.get("name") for item in ranked if isinstance(item, dict)] if isinstance(ranked, list) else []
+            safe = [entry for item in ranked if isinstance(item, dict) and names.count(item.get("name")) == 1
+                    for entry in qualified_low_end_stems([item])] if isinstance(ranked, list) else []
+            if safe:
+                if container is projected or "stem_solo" not in projected:
+                    qualified.add("stem_solo")
+            if not safe or len(safe) != len(ranked):
+                # One quiet or ambiguous stem does not erase independently qualified rows.
+                rebuild = True
+            container["stem_solo"] = {
+                "low_end_summary": {"ranked": safe, "overlap_warning": None},
+            }
+
+    metrics = projected.get("metrics")
+    if isinstance(metrics, dict):
+        for key in ("transient_preservation", "stem_masking", "stem_solo"):
+            if key in metrics and key not in projected:
+                # Older metrics-shaped reports use the same canonical optional sections.
+                projected[key] = deepcopy(metrics[key])
+
+    # Scan cached narratives before replacing them. Whole-mix low_end_share and
+    # ordinary transient_analysis metrics have separate meanings and stay intact.
+    narrative_keys = (
+        "summary", "flags", "action_plan", "ableton_repair_templates", "ableton_repair_chains",
+        "source_hypotheses", "frequency_repair_map", "revision_coaching", "revision_lesson",
+        "lesson_cards", "revision_agent", "revision_impact", "kenn_explanations", "mix_review_critique",
+        "mix_critique", "prose_summary", "next_revision_plan", "closed_loop_action_plan", "judgment",
+        "session_report", "kenn_handoff", "comparison_advice", "version_advice", "reference_coaching",
+    )
+    cached = json.dumps({key: report.get(key) for key in narrative_keys}, default=str).lower()
+    legacy_markers = {
+        "transient_preservation": ("transient_preservation", "transient preservation", "transient-preservation"),
+        "stem_masking": ("stem_masking", "stem masking", "erb masking", "lowest_visibility", "simultaneous-masking"),
+        "stem_solo": ("low_end_stems", "low_end_measured_stems", "low_end_summary", "low-end stem ranking"),
+    }
+    for key, markers in legacy_markers.items():
+        if key not in qualified and any(marker in cached for marker in markers):
+            # Some saved exports retained prose after dropping its optional source section.
+            projected.setdefault(key, {})
+            rebuild = True
+    if any(marker in cached for marker in (
+        "both carry substantial low-end", "low-end eq carving", "sidechain ducking",
+        "clarity_prediction", "carving_suggestions", "most likely getting buried",
+    )):
+        # Even active previews cannot validate the retired overlap/repair predictions.
+        rebuild = True
+    if not rebuild:
+        # Reports without unqualified optional inputs retain their independent narrative.
+        return projected
+    for key in narrative_keys:
+        projected.pop(key, None)
+    projected["publication_limitations"] = [limitation]
+    projected["summary"] = limitation + " Independent whole-mix measurements and qualified previews remain available."
+    return projected
+
+
 def kenn_handoff(report: dict) -> dict:
     """Build a compact chat context for KENN follow-up questions."""
+    report = project_report_publication(report)
     metrics = report.get("metrics") if isinstance(report.get("metrics"), dict) else {}
     flags = report.get("flags") if isinstance(report.get("flags"), list) else []
     actions = report.get("action_plan") if isinstance(report.get("action_plan"), list) else []

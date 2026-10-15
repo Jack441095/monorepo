@@ -1,5 +1,7 @@
 """The combined E2 grade: parts add up, and what was not graded is named instead of rescaled."""
 
+from copy import deepcopy
+
 import pytest
 
 from kenn.core.declared_target import score_declared_target
@@ -130,3 +132,86 @@ def test_an_uploaded_source_just_above_significance_floor_retains_its_grade():
     grade = _grade_from_report(report)
 
     assert next(part for part in grade["parts"] if part["part"] == "technical_health")["points_available"] == 12.0
+
+
+@pytest.mark.parametrize("part_name", ["technical_health", "declared_target", "reference_match"])
+@pytest.mark.parametrize("points,available", [
+    (float("nan"), 20.0), (20.0, float("inf")), (True, 20.0),
+    (20.0, True), (-1.0, 20.0), (21.0, 20.0), (0.0, -1.0),
+    (0.0, 41.0), (10 ** 1000, 20.0), (None, 20.0), ("20", 20.0),
+])
+def test_invalid_combined_part_is_withheld_without_clamping_or_erasing_other_parts(part_name, points, available):
+    reference = {"points": 20.0, "points_available": 30.0}
+    declared = score_declared_target(-14.0, -1.5, target="spotify")
+    technical = _technical()
+    parts = {"technical_health": technical, "declared_target": declared, "reference_match": reference}
+    bad = parts[part_name]
+    bad["mqm_score" if part_name == "technical_health" else "points"] = points
+    bad["points_available"] = available
+    before = deepcopy(parts)
+    result = combine_grade(technical=technical, declared_target=declared, reference_match=reference)
+    assert [part["part"] for part in result["ungraded"]] == [part_name]
+    assert "invalid" in result["ungraded"][0]["reason"]
+    assert {part["part"] for part in result["parts"]} == set(parts) - {part_name}
+    assert result["points"] == round(sum(part["points"] for part in result["parts"]), 1)
+    assert result["points_available"] == sum(part["points_available"] for part in result["parts"])
+    assert parts == before
+
+
+def _composed_session_grade(meters, request="aim for -14 LUFS and -1 dBTP", reference=None):
+    technical = MixDoctor().audit_session({"tracks": []}, meters=meters).to_dict()
+    return grade_session(technical, meters, request, reference)
+
+
+def _parts_by_name(grade):
+    return {part["part"]: part for part in grade["parts"]}
+
+
+def test_composed_grade_moves_with_measured_peak_and_repeats_after_intervening_analysis():
+    meters = {"integrated_lufs": -14.0, "true_peak_dbtp": -1.5, "phase_correlation": 0.8}
+    reference = {"points": 25.0, "points_available": 35.0}
+    original = deepcopy((meters, reference))
+    first = _composed_session_grade(meters, reference=reference)
+    changed = _composed_session_grade({**meters, "true_peak_dbtp": -0.1}, reference=reference)
+    repeated = _composed_session_grade(meters, reference=reference)
+    assert first == repeated
+    assert changed["points"] < first["points"]
+    assert changed["points_available"] == first["points_available"]
+    before, after = _parts_by_name(first), _parts_by_name(changed)
+    assert after["technical_health"]["points"] < before["technical_health"]["points"]
+    assert after["declared_target"]["points"] < before["declared_target"]["points"]
+    assert after["reference_match"] == before["reference_match"]
+    assert (meters, reference) == original
+
+
+def test_composed_target_change_moves_only_declared_part_and_does_not_stick():
+    meters = {"integrated_lufs": -14.0, "true_peak_dbtp": -1.5, "phase_correlation": 0.8}
+    first = _composed_session_grade(meters)
+    changed = _composed_session_grade(meters, "aim for -20 LUFS and -1 dBTP")
+    repeated = _composed_session_grade(meters)
+    before, after = _parts_by_name(first), _parts_by_name(changed)
+    assert repeated == first
+    assert changed["points"] < first["points"]
+    assert changed["points_available"] == first["points_available"]
+    assert after["technical_health"] == before["technical_health"]
+    assert after["declared_target"]["points"] == 10.0
+    assert changed["ungraded"] == first["ungraded"]
+
+
+def test_composed_missing_peak_removes_available_points_instead_of_rescaling():
+    meters = {"integrated_lufs": -14.0, "true_peak_dbtp": -1.5, "phase_correlation": 0.8}
+    full = _composed_session_grade(meters)
+    missing = _composed_session_grade({**meters, "true_peak_dbtp": None})
+    declared = _parts_by_name(missing)["declared_target"]
+    assert declared["points"] == declared["points_available"] == 20.0
+    assert declared["left_out"] == ["true_peak_ceiling"]
+    assert missing["points_available"] < full["points_available"]
+    assert missing["full_marks"] == full["full_marks"] == 100.0
+
+
+@pytest.mark.parametrize("peak", [True, float("nan"), float("inf"), "-1.5"])
+def test_session_grade_does_not_turn_invalid_peak_into_declared_ceiling_points(peak):
+    grade = grade_session(_technical(), {"integrated_lufs": -14.0, "true_peak_dbtp": peak}, "Spotify")
+    declared = _parts_by_name(grade)["declared_target"]
+    assert declared["points"] == declared["points_available"] == 20.0
+    assert declared["left_out"] == ["true_peak_ceiling"]

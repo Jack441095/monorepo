@@ -8,6 +8,7 @@ of the 100 it was judged against, and what was left out.
 
 from __future__ import annotations
 
+import math
 import re
 from typing import Any, Optional
 
@@ -33,13 +34,14 @@ def combine_grade(
 
     `technical` is `MixAuditReport.to_dict()`; the other two are the dicts `score_declared_target` and
     `score_reference_match` return. A part that was run but had nothing scorable (`points_available` of 0) is treated
-    the same as one that was not run. The same inputs always give the same payload.
+    the same as one that was not run. Non-finite, boolean or out-of-budget points withhold that part without
+    changing independently valid parts. The same inputs always give the same payload.
     """
     given = {
         "technical_health": None if technical is None else {
-            "points": technical["mqm_score"],
-            "points_available": technical["points_available"],
-            "note": technical["meaning"],
+            "points": technical.get("mqm_score"),
+            "points_available": technical.get("points_available"),
+            "note": technical.get("meaning", ""),
         },
         "declared_target": declared_target,
         "reference_match": reference_match,
@@ -47,6 +49,17 @@ def combine_grade(
     parts: list[dict[str, Any]] = []
     ungraded: list[dict[str, str]] = []
     for name, part in given.items():
+        if part:
+            values = (part.get("points"), part.get("points_available"))
+            try:
+                valid = all(isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) for value in values)
+            except OverflowError:
+                # Oversized legacy integers cannot produce a finite published grade.
+                valid = False
+            if not valid or not 0 <= values[0] <= values[1] <= FULL_MARKS[name]:
+                # Reject the whole malformed part; clamping would invent a scored result.
+                ungraded.append({"part": name, "reason": "invalid or out-of-range score for this part"})
+                continue
         if not part or not part["points_available"]:
             # A supplied reference can fail analysis; saying none was supplied would hide that failure.
             ungraded.append({"part": name, "reason": (part or {}).get("note") or _WHY_UNGRADED[name]})

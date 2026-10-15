@@ -19,7 +19,13 @@ from typing import Any, Iterable
 from kenn.core.audiogen_artifacts import safe_artifact_metadata
 from kenn.core.audio_classification import AudioClassificationError, normalize as normalize_audio_classification
 from kenn.core.evidence import (
+    ERB_PREVIEW_LIMITATION,
+    LOW_END_PREVIEW_LIMITATION,
     REFERENCE_SIGNAL_LIMITATION,
+    TRANSIENT_SIGNAL_LIMITATION,
+    STEM_MASKING_SIGNAL_LIMITATION,
+    LOW_END_SIGNAL_LIMITATION,
+    from_mix_review_context,
     UPLOADED_SIGNAL_LIMITATION,
     plugin_context_for_advice,
     reference_comparison_has_activity,
@@ -147,6 +153,48 @@ def _live_track(track: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
+def _qualified_mix_review_audio(receipt: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], list[str]]:
+    """Rebuild scalar facts and bounded optional proof before canonical publication."""
+    analysis = {}
+    for source in (receipt, receipt.get("evidence"), receipt.get("analysis_evidence")):
+        if isinstance(source, dict):
+            analysis.update({key: source[key] for key in ("transient_preservation", "stem_masking", "low_end_stems") if key in source})
+            if "stem_solo" in source and "low_end_stems" not in analysis:
+                # Raw producer rankings need their handoff projector; names alone cannot qualify here.
+                analysis["low_end_stems"] = []
+    cached = json.dumps({"keys": list(receipt), **{key: receipt.get(key) for key in ("metrics", "findings", "action_plan")}}, default=str).lower()
+    for key, markers in (
+        ("transient_preservation", ("transient_preservation", "transient preservation", "transient-preservation", "transient score", "matched_event_count")),
+        ("stem_masking", ("stem_masking", "stem masking", "erb masking", "lowest_visibility", "overall_visibility", "masking visibility", '"stem_count"')),
+        ("low_end_stems", ("low_end_stems", "low_end_measured_stems", "low_end_summary", "low_end_overlap", "low-end stem ranking", "both carry substantial low-end", "low-end eq carving")),
+    ):
+        if key not in analysis and any(marker in cached for marker in markers):
+            # Persisted prose and scalar aliases can survive after their source proof was discarded.
+            analysis[key] = [] if key == "low_end_stems" else {}
+    packet = from_mix_review_context({
+        "schema": "kenn_mix_review_handoff.v1", "metrics": receipt.get("metrics"),
+        "analysis_evidence": analysis,
+    })
+    if packet is None:
+        # No qualified render facts means there is no audio evidence to publish.
+        return {}, {}, []
+    metrics = {fact.name: fact.value for fact in packet.facts}
+    proven = {}
+    for key, provenance in (
+        ("transient_preservation", packet.transient_preservation_provenance),
+        ("stem_masking", packet.erb_masking_provenance),
+        ("low_end_stems", packet.low_end_stems_provenance),
+    ):
+        if key in analysis:
+            proven[key] = provenance if provenance is not None else ([] if key == "low_end_stems" else {})
+    # Valid preview limitations travel with their proof, even when another section abstains.
+    optional_limits = [item for item in packet.limitations if item in {
+        TRANSIENT_SIGNAL_LIMITATION, STEM_MASKING_SIGNAL_LIMITATION, LOW_END_SIGNAL_LIMITATION,
+        ERB_PREVIEW_LIMITATION, LOW_END_PREVIEW_LIMITATION,
+    }]
+    return metrics, proven, optional_limits
+
+
 def _safe_mix_review(receipt: dict[str, Any]) -> dict[str, Any]:
     """Project a receipt into canonical context while requalifying each uploaded source."""
     allowed = ("schema", "status", "analysis_version", "input_context", "metrics", "findings", "action_plan", "limitations")
@@ -161,6 +209,17 @@ def _safe_mix_review(receipt: dict[str, Any]) -> dict[str, Any]:
     standalone = receipt.get("schema") == "kenn.mix_review.reference_comparison.v1"
     own_activity = uploaded_metrics_have_activity(receipt.get("metrics"))
     limitations: list[str] = []
+    if own_activity and not standalone:
+        metrics, analysis, optional_limits = _qualified_mix_review_audio(receipt)
+        result["metrics"] = metrics
+        if analysis:
+            result["analysis_evidence"] = analysis
+        limitations.extend(optional_limits)
+        cached_actions = json.dumps([receipt.get("findings"), receipt.get("action_plan")], default=str).lower()
+        unsupported_low_end_repair = any(marker in cached_actions for marker in ("both carry substantial low-end", "low-end eq carving"))
+        if unsupported_low_end_repair or any(item in optional_limits for item in (TRANSIENT_SIGNAL_LIMITATION, STEM_MASKING_SIGNAL_LIMITATION, LOW_END_SIGNAL_LIMITATION)):
+            # Cached findings mix independent analyses; spectral shares cannot establish a carving repair either.
+            result.update({"findings": [], "action_plan": []})
     if standalone or not own_activity:
         # Legacy receipts can carry old findings even when no activity-qualified
         # whole-file measurement exists; source metadata remains useful on its own.
@@ -213,7 +272,9 @@ def _safe_mix_review(receipt: dict[str, Any]) -> dict[str, Any]:
         existing = result.get("limitations")
         existing = existing if isinstance(existing, list) else [existing] if isinstance(existing, str) else []
         result["limitations"] = list(dict.fromkeys(_text(item) for item in [*existing, *limitations] if _text(item)))
-        result["signal_limitation"] = " ".join(limitations)
+        signal_limits = [item for item in limitations if item not in (ERB_PREVIEW_LIMITATION, LOW_END_PREVIEW_LIMITATION)]
+        if signal_limits:
+            result["signal_limitation"] = " ".join(signal_limits)
     return result
 
 

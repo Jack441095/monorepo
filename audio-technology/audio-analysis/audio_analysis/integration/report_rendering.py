@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import html
 
-from audio_analysis.integration.handoff import qualified_low_end_stems
+from audio_analysis.integration.handoff import project_report_publication, qualified_low_end_stems
 
 
 def _escape(value: object) -> str:
@@ -476,6 +476,7 @@ def _chords_html(metrics: dict) -> str:
 
 
 def report_html(report: dict) -> str:
+    report = project_report_publication(report)
     metrics = report.get("metrics") or {}
     flags = report.get("flags") or []
     flag_labels = [flag.get("label", "") for flag in flags if flag.get("label")]

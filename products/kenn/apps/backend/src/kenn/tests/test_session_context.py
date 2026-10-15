@@ -381,3 +381,28 @@ def test_canonical_active_comparison_keeps_bounded_pair_rms_for_downstream_requa
     assert receipt == before
     comparison["dynamics"]["mix"]["rms_dbfs"] = -100.0
     assert receipt == before
+
+
+def test_canonical_plain_upload_does_not_acquire_optional_abstentions_on_replay():
+    # Reprojecting a plain render must not manufacture an attempted stem analysis.
+    receipt = {"schema": "kenn.mix_review.local_review.v1", "status": "completed",
+               "metrics": {"rms_dbfs": -15.0, "low_end_share": 0.0},
+               "findings": ["Whole-mix observation"], "action_plan": []}
+    first = build_session_context(mix_review_receipts=[receipt])["measurements"][0]
+    second = build_session_context(mix_review_receipts=[first])["measurements"][0]
+    assert first == second
+    assert "analysis_evidence" not in second
+    assert "signal_limitation" not in second
+    assert second["metrics"] == receipt["metrics"]
+    assert second["findings"] == receipt["findings"]
+
+
+def test_canonical_raw_stem_sections_preserve_abstention_instead_of_cached_prose():
+    receipt = {"schema": "kenn.mix_review.local_review.v1", "status": "completed",
+               "metrics": {"rms_dbfs": -15.0}, "evidence": {"stem_solo": {"low_end_summary": {"ranked": [{"name": "Bass", "low_end_share": 1.0}]}}},
+               "findings": ["Bass low-end stem ranking"], "action_plan": ["Apply low-end EQ carving"]}
+    measurement = build_session_context(mix_review_receipts=[receipt])["measurements"][0]
+    assert measurement["metrics"] == {"rms_dbfs": -15.0}
+    assert measurement["analysis_evidence"] == {"low_end_stems": []}
+    assert measurement["findings"] == measurement["action_plan"] == []
+    assert "withheld" in measurement["signal_limitation"]

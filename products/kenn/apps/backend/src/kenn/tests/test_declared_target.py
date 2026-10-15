@@ -77,3 +77,25 @@ def test_an_unknown_target_name_is_an_error_not_a_silent_pass():
 def test_the_parts_add_up_to_thirty():
     assert sum(DECLARED_TARGET_POINTS.values()) == 30.0
     assert set(STREAMING_TARGETS) == {"spotify", "aes_streaming_music"}
+
+
+@pytest.mark.parametrize("invalid", [True, False, "-14", float("nan"), float("inf"), -float("inf"), 10 ** 1000])
+@pytest.mark.parametrize("field", ["integrated_lufs", "true_peak_dbtp"])
+def test_invalid_measured_levels_remove_only_their_target_points(field, invalid):
+    # NaN passed through min/max as zero loss and previously earned full marks.
+    readings = {"integrated_lufs": -14.0, "true_peak_dbtp": -1.5}
+    readings[field] = invalid
+    result = score_declared_target(**readings, target="spotify")
+    missing = "loudness" if field == "integrated_lufs" else "true_peak_ceiling"
+    remaining = 10.0 if field == "integrated_lufs" else 20.0
+    assert result["unscored"] == [missing]
+    assert result["points"] == result["points_available"] == remaining
+
+
+@pytest.mark.parametrize("field", ["stated_lufs", "stated_ceiling_dbtp"])
+@pytest.mark.parametrize("invalid", [True, "-14", float("nan"), float("inf"), 10 ** 1000])
+def test_invalid_explicit_target_is_unscored_instead_of_replaced_with_named_default(field, invalid):
+    result = score_declared_target(-14.0, -1.5, target="spotify", **{field: invalid})
+    missing = "loudness" if field == "stated_lufs" else "true_peak_ceiling"
+    assert result["unscored"] == [missing]
+    assert result["points_available"] == (10.0 if field == "stated_lufs" else 20.0)

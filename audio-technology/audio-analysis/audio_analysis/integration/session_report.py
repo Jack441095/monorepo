@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from audio_analysis.integration.handoff import project_report_publication
+
 
 def _clean(value: object, limit: int = 320) -> str:
     return " ".join(str(value or "").strip().split())[:limit]
@@ -40,6 +42,7 @@ def _repair_text(item: dict | None) -> str:
 
 def build_session_report(report: dict) -> dict:
     """Create a concise engineer-facing session report from a Mix Review payload."""
+    report = project_report_publication(report)
     metrics = report.get("metrics") if isinstance(report.get("metrics"), dict) else {}
     mix_goal = metrics.get("mix_goal") if isinstance(metrics.get("mix_goal"), dict) else {}
     actions = report.get("action_plan") if isinstance(report.get("action_plan"), list) else []

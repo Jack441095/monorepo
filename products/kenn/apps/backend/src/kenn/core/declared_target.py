@@ -8,6 +8,7 @@ measured against and where that figure came from. There are no genre targets: no
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 from typing import Any, Optional
 
 # Loudness 20 and ceiling 10 is a design choice made on 14 Oct 2026 with the 30/30/40 split, not a measurement.
@@ -63,6 +64,18 @@ def _loss_fraction(gap: float, tolerance: float, full_loss: float) -> float:
     return min(1.0, max(0.0, gap - tolerance) / (full_loss - tolerance))
 
 
+def _finite_reading(value: Any) -> Optional[float]:
+    """Keep unavailable or malformed readings out of target arithmetic."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        # Booleans and numeric strings are transport values, not measured levels.
+        return None
+    try:
+        return float(value) if math.isfinite(value) else None
+    except OverflowError:
+        # An integer outside float range cannot be compared in dB safely.
+        return None
+
+
 def score_declared_target(
     integrated_lufs: Optional[float],
     true_peak_dbtp: Optional[float],
@@ -75,14 +88,19 @@ def score_declared_target(
 
     The producer's stated loudness and ceiling override the named target's. With no loudness target at all (nothing
     named, nothing stated) the loudness part is `unscored`; a reading the meter did not send is `unscored` too.
+    Non-finite or boolean readings and malformed explicit targets are also unscored; an invalid explicit target
+    never falls back to a named/default target.
     Unscored points come off `points_available` and the score is never rescaled up to 30.
     Raises KeyError for a target name that is not in STREAMING_TARGETS, so a typo cannot silently score against nothing.
     """
     named = STREAMING_TARGETS[target] if target else None
+    integrated_lufs = _finite_reading(integrated_lufs)
+    true_peak_dbtp = _finite_reading(true_peak_dbtp)
     parts: list[dict[str, Any]] = []
     unscored: list[str] = []
 
     goal_lufs = stated_lufs if stated_lufs is not None else (named.integrated_lufs if named else None)
+    goal_lufs = _finite_reading(goal_lufs)
     if goal_lufs is None or integrated_lufs is None:
         unscored.append("loudness")
     else:
@@ -102,7 +120,7 @@ def score_declared_target(
 
     ceiling, ceiling_origin = DEFAULT_CEILING_DBTP, DEFAULT_CEILING_SOURCE
     if stated_ceiling_dbtp is not None:
-        ceiling, ceiling_origin = stated_ceiling_dbtp, "the ceiling you stated"
+        ceiling, ceiling_origin = _finite_reading(stated_ceiling_dbtp), "the ceiling you stated"
     elif named:
         ceiling, ceiling_origin = named.ceiling_dbtp, named.source
         # A louder-than-target master gets the stricter ceiling only when the source gives one and we know the loudness.
@@ -110,7 +128,7 @@ def score_declared_target(
                 and integrated_lufs > named.integrated_lufs):
             ceiling = named.louder_ceiling_dbtp
 
-    if true_peak_dbtp is None:
+    if true_peak_dbtp is None or ceiling is None:
         unscored.append("true_peak_ceiling")
     else:
         over = true_peak_dbtp - ceiling
