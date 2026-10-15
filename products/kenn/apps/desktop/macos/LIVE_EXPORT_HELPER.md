@@ -68,6 +68,17 @@ stopped, and the requested output WAV was absent. No render, save, preference
 change, full-range proof or end-to-end automatic scan occurred. The render candidate
 remains disabled and unwired.
 
+An additional owner-supervised UI check opened the native Save panel without
+starting a render. Its observed identifiers were `save-panel`,
+`saveAsNameTextField`, `where popup`, `CancelButton` and `OKButton`. The native
+Go To Folder sheet exposed `GoToWindow` and `PathTextField`. Navigation to a new
+private empty directory produced a column-view URL for that exact directory and
+retained `kenn-analysis.wav`. Save-panel Cancel returned to Export Audio/Video;
+its exact Cancel returned to the main set. Both transport and record remained
+stopped, and the directory stayed empty. This maps controls for future helper
+work; the helper still cannot press Export or operate the Save panel. No save,
+overwrite refusal, render progress or writer closure was qualified.
+
 ## Request and receipt boundary
 
 Requests use `schema: "kenn.live_export_request.v1"` and these fields:
@@ -77,7 +88,10 @@ Requests use `schema: "kenn.live_export_request.v1"` and these fields:
 - `expected_window_title`: exact current main-window title, at most 512 UTF-8 bytes.
 - `output_path`: canonical absolute path ending in `kenn-analysis.wav`.
 - `render_start`, `render_length`: explicit nonempty bars.beats.sixteenths values;
-  the helper never infers the full arrangement from Live's current selection.
+  ASCII digits with at most 6/2/2 digits respectively, a positive start bar and
+  numerically nonzero length. The helper never infers the full arrangement from
+  Live's current selection. Titles reject Unicode control/format characters in
+  all three request-validation layers.
 - `sample_rate`: exactly `48000` Hz.
 - `timeout_seconds`: from 1 to 600 seconds.
 
@@ -97,11 +111,14 @@ Neither implies that a file writer closed. All current export receipts have
 
 The completion checks prepared for a qualified profile require all four facts:
 observed export progress, disappearance of the owned export dialogs, a finalized
-stereo 48 kHz/24-bit PCM RIFF file within 150 MiB, and successful native inspection
+owned, single-link stereo 48 kHz/24-bit PCM RIFF file within 150 MiB and eight
+minutes, and successful native inspection
 showing that Live has no descriptor open for that exact device/inode. File-size
 stability and a missing/permission-denied process inspection do not count. The
 RIFF check reads chunk headers, not the entire audio file. Descriptor inspection
 is bounded to 16384 entries; an incomplete snapshot remains unknown.
+Numeric toggle readback accepts only exact zero or one; fractional or NaN AX
+values cannot be rounded into a qualified Off/On preference.
 
 The current cancellation marker is checked before the menu command and while
 waiting for its dialog. Only a newly opened, uniquely identified export dialog's
@@ -120,6 +137,10 @@ and export lifecycle/cancellation. Existing preferences must be verified
 rather than silently changed. Writer inspection must also work against the real
 Live process. Until then, the job service must show the unavailable reason and
 retain any uncertain owned file for recovery rather than publish an analysis.
+AX enumeration must also distinguish failed reads and truncated trees from an
+empty result before promotion. The WAV validation and Live descriptor checks
+still need a shared stable file identity across completion; separate path reads
+do not establish that contract.
 
 The optional Python `MacOSLiveExportHelper` adapter in backend `core/macos_live_export.py`
 accepts a fixed executable path and explicit `enabled` and `supervised_test` flags.

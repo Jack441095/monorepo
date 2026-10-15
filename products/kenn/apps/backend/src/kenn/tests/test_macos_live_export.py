@@ -146,3 +146,42 @@ def test_hardlinked_job_metadata_is_rejected_before_launch(tmp_path, request_pay
     result = _adapter(helper, monkeypatch)(request_payload, Event())
     assert result["error_code"] == "invalid_helper_request"
     assert source.read_text() == "{}"
+
+
+@pytest.mark.parametrize("change", [
+    {"render_start": "0.1.1"},
+    {"render_length": "00.00.00"},
+    {"render_start": "١.١.١"},
+    {"render_length": "１.０.０"},
+    {"render_start": "1000000.1.1"},
+    {"render_start": "1.100.1"},
+    {"render_length": "1.0.100"},
+])
+def test_invalid_musical_ranges_never_launch_the_helper(tmp_path, request_payload, monkeypatch, change):
+    # The adapter must enforce the same musical-string bounds as job confirmation.
+    marker = tmp_path / "launched"
+    helper = _helper(tmp_path, f"Path({str(marker)!r}).touch()\n" + _receipt_code())
+    result = _adapter(helper, monkeypatch)({**request_payload, **change}, Event())
+    assert result["error_code"] == "invalid_helper_request"
+    assert result["writer_closed"] is True
+    assert not marker.exists()
+
+
+@pytest.mark.parametrize("character", ["\x00", "\x1f", "\x7f", "\x85", "\u200b", "\u202e", "\U000e0001"])
+def test_control_and_format_characters_in_title_never_launch_the_helper(tmp_path, request_payload, monkeypatch, character):
+    marker = tmp_path / "launched"
+    helper = _helper(tmp_path, f"Path({str(marker)!r}).touch()\n" + _receipt_code())
+    result = _adapter(helper, monkeypatch)({**request_payload, "expected_window_title": f"Synthetic{character} set"}, Event())
+    assert result["error_code"] == "invalid_helper_request"
+    assert result["writer_closed"] is True
+    assert not marker.exists()
+
+
+@pytest.mark.parametrize("start,length", [("000001.01.01", "0.00.01"), ("999999.99.99", "999999.99.99")])
+def test_exact_bounded_ascii_ranges_and_unicode_titles_reach_helper_unchanged(tmp_path, request_payload, monkeypatch, start, length):
+    expected = {**request_payload, "render_start": start, "render_length": length, "expected_window_title": "Synthetic café 界 set"}
+    helper = _helper(tmp_path, f"assert request == {expected!r}\n" + _receipt_code())
+    result = _adapter(helper, monkeypatch)(expected, Event())
+    assert result["status"] == "completed"
+    assert result["render_start"] == start
+    assert result["render_length"] == length

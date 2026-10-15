@@ -57,7 +57,11 @@ struct LiveExportRequest: Codable {
 
     private static func validPosition(_ text: String, start: Bool) -> Bool {
         let parts = text.split(separator: ".", omittingEmptySubsequences: false)
-        guard parts.count == 3, parts.allSatisfy({ !$0.isEmpty && $0.count <= 6 && $0.allSatisfy(\.isNumber) }),
+        // Match the backend's ASCII 6/2/2 digit contract, including padded nonzero values.
+        guard parts.count == 3,
+              zip(parts, [6, 2, 2]).allSatisfy({ part, limit in
+                  !part.isEmpty && part.utf8.count <= limit && part.utf8.allSatisfy { (48...57).contains($0) }
+              }),
               let bars = Int(parts[0]), let beats = Int(parts[1]), let subdivisions = Int(parts[2]) else {
             // Ambiguous or locale-specific values cannot bind the requested arrangement range.
             return false
@@ -122,6 +126,17 @@ enum LiveExportProfile {
         "Base.VideoOptionsCardView.CreateVideoBox.CreateVideo": "Off",
     ]
 
+    /// Normalizes exact numeric toggle states; unknown values must fail profile comparison.
+    static func settingValue(identifier: String, value: CFTypeRef) -> String {
+        if ["On", "Off"].contains(fixedSettings[identifier]), let number = value as? NSNumber,
+           [0.0, 1.0].contains(number.doubleValue) {
+            // Truncating a fractional AX value would silently qualify an unknown toggle state.
+            return number.doubleValue == 0 ? "Off" : "On"
+        }
+        // Unknown toggle states and other settings reach profile comparison without coercion.
+        return String(describing: value)
+    }
+
     static func validate(values: [String: [String]], request: LiveExportRequest) throws {
         var expected = fixedSettings
         for (prefix, position) in [("Base.RenderStartBox.RenderStart", request.render_start),
@@ -157,12 +172,14 @@ struct ExportCompletionEvidence {
 /// Checks the exact PCM format without loading an entire arrangement into memory.
 enum ExportWAV {
     static let maximumBytes: UInt64 = 150 * 1_024 * 1_024 // 150 MiB matches the existing offline upload ceiling.
+    static let maximumFrames: UInt64 = 48_000 * 8 * 60 // Eight minutes at 48 kHz matches offline analysis.
 
     static func validate(_ path: String) throws {
         var info = stat()
         guard lstat(path, &info) == 0, info.st_mode & S_IFMT == S_IFREG,
+              info.st_uid == getuid(), info.st_nlink == 1,
               info.st_size >= 44, UInt64(info.st_size) <= maximumBytes else {
-            throw ExportProblem.invalid("The completed WAV must be a regular file within the 150 MiB limit.")
+            throw ExportProblem.invalid("The completed WAV must be an owned, single-link regular file within the 150 MiB limit.")
         }
         let descriptor = open(path, O_RDONLY | O_NOFOLLOW)
         guard descriptor >= 0 else { throw ExportProblem.invalid("The WAV could not be opened without following a symbolic link.") }
@@ -170,7 +187,7 @@ enum ExportWAV {
         defer { try? file.close() } // Validation owns only its read handle, never Live's writer.
         var opened = stat()
         guard fstat(descriptor, &opened) == 0, opened.st_dev == info.st_dev, opened.st_ino == info.st_ino,
-              opened.st_size == info.st_size else {
+              opened.st_size == info.st_size, opened.st_uid == getuid(), opened.st_nlink == 1 else {
             throw ExportProblem.invalid("The WAV identity changed during validation.")
         }
         func read(_ count: Int) throws -> Data {
@@ -202,7 +219,9 @@ enum ExportWAV {
                 // Stereo 24-bit PCM has six bytes per frame and 288000 bytes per second at 48 kHz.
                 guard validFormat else { throw ExportProblem.invalid("The WAV must be stereo 48000 Hz, 24-bit PCM.") }
             } else if name == "data" {
-                guard dataBytes == 0, length > 0, length % 6 == 0 else { throw ExportProblem.invalid("One nonempty, frame-aligned audio chunk is required.") }
+                guard dataBytes == 0, length > 0, length % 6 == 0, length / 6 <= maximumFrames else {
+                    throw ExportProblem.invalid("One nonempty, frame-aligned audio chunk of at most eight minutes is required.")
+                }
                 dataBytes = length
             }
             offset = payload + length + length % 2 // RIFF chunks use even-byte padding.
@@ -318,12 +337,7 @@ final class LiveExportAccessibility {
                 for node in [dialog] + descendants(dialog) {
                     if let identifier = attribute(node, kAXIdentifierAttribute) as? String,
                        let value = attribute(node, kAXValueAttribute) {
-                        let fixed = LiveExportProfile.fixedSettings[identifier]
-                        if ["On", "Off"].contains(fixed), let number = value as? NSNumber, [0, 1].contains(number.intValue) {
-                            values[identifier, default: []].append(number.intValue == 0 ? "Off" : "On")
-                        } else {
-                            values[identifier, default: []].append(String(describing: value))
-                        }
+                        values[identifier, default: []].append(LiveExportProfile.settingValue(identifier: identifier, value: value))
                     }
                 }
                 try LiveExportProfile.validate(values: values, request: request)

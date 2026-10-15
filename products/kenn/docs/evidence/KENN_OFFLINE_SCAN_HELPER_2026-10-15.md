@@ -144,9 +144,71 @@ both failed before their steps started; their annotations still identify failed
 account payments or the spending limit. No CI setting changed and no CI pass is
 claimed.
 
+## Save-panel and validation follow-up, later 15 October
+
+The owner reconfirmed the disposable set was open and supervised this check.
+UI automation opened Export Audio/Video, then its native Save panel. No export
+preference changed. The panel exposed `save-panel`, `saveAsNameTextField`,
+`where popup`, `CancelButton` and `OKButton`; Go To Folder exposed `GoToWindow`
+and `PathTextField`. Navigating to a fresh owned `0700` directory produced its
+full column-view URL and retained the exact filename `kenn-analysis.wav`.
+Save-panel Cancel returned to Export Audio/Video; its exact Cancel returned to
+the disposable set. Playback and Arrangement/Session Record read zero, and the
+temporary directory contained no file. The Save button was not pressed. This
+is control/destination observation only: it does not qualify helper navigation,
+overwrite refusal, a real render, completion or writer closure.
+
+Exact changed files for this follow-up, relative to `products/kenn`:
+
+- `apps/backend/src/kenn/core/offline_scan.py`
+- `apps/backend/src/kenn/core/macos_live_export.py`
+- `apps/backend/src/kenn/tests/test_offline_scan.py`
+- `apps/backend/src/kenn/tests/test_macos_live_export.py`
+- `apps/desktop/macos/KENNLiveExportHelper.swift`
+- `apps/desktop/macos/KENNLiveExportHelperTests.swift`
+- `apps/desktop/macos/LIVE_EXPORT_HELPER.md`
+- `docs/evidence/KENN_OFFLINE_SCAN_HELPER_2026-10-15.md`
+- `KENN_PLAN.md` (only the owned follow-up paragraph).
+
+Changed behavior:
+
+- All three request layers now use ASCII musical ranges with 6/2/2 digit bounds,
+  a positive start bar and numerically nonzero length. Padded nonzero ranges and
+  ordinary Unicode titles remain valid; Python now rejects Unicode control and
+  format characters like Foundation. Invalid adapter requests never launch the
+  helper.
+- Native toggle normalization accepts exact numeric zero/one. Fractional and NaN
+  values remain unqualified instead of truncating into Off/On.
+- Native WAV validation requires current-user ownership and a single link on both
+  path and opened descriptor, and enforces the existing eight-minute ceiling.
+  Sparse fixtures check exactly eight minutes and one extra frame without
+  allocating full-track buffers.
+
+The same nine-file FakeLive/backend command above passed **254 tests in 6.82
+seconds**. The Swift script passed native and malformed-executable checks. New
+range tests first reproduced an accepted over-wide musical component. Four
+native mutation copies were each detected: widened range components, integer
+toggle truncation, removed single-link checks and removed duration cap. Four
+Python mutation rounds detected Unicode-digit acceptance, removed positive/nonzero
+range checks, widened adapter components and restored C0-only title guards.
+All production code was restored before the final checks. Independent read-only
+review found no blocker for this disabled checkpoint.
+
+No audio callback code changed. WAV inspection still reads headers and seeks
+over payloads; the new duration/ownership checks do not allocate audio buffers.
+No CPU/RSS or real-render timing qualification is claimed. Conditions were
+battery power, 13% then 11%, discharging, with Live open; no mains gate closed.
+GitHub listed both workflows for `71daad3e` as failed; fetching their job details
+then failed to connect. The earlier billing/spending-limit annotations remain
+the last verified cause, rather than a verified diagnosis of these newer runs.
+
 ## Remaining gate
 
 `KENN_PLAN.md` remains the sole work queue. Qualify the real save/render lifecycle
 and independent fresh source/range evidence, then add the HTTP/frontend states and
 verify the complete button-to-report path on FakeLive and a supervised disposable
 set. Neither this probe nor the prior manual render qualifies automatic Scan audio.
+Before promotion, fix AX reads that collapse failure/truncation into empty results
+and bind WAV validation plus descriptor inspection to one stable file identity.
+Those known limitations do not become passing conformance because the candidate
+is disabled.

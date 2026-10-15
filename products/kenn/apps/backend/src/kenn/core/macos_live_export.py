@@ -13,6 +13,7 @@ import sys
 from threading import Event
 import time
 from typing import Any, Mapping
+import unicodedata
 
 
 class MacOSLiveExportHelper:
@@ -149,10 +150,11 @@ def _validated_request(request: Mapping[str, Any]) -> tuple[bytes, Path, int]:
     if type(pid) is not int or not 0 < pid <= 2_147_483_647 or type(timeout) is not int or not 1 <= timeout <= 600:
         raise ValueError("Invalid process identifier or bounded timeout.")
     title = request.get("expected_window_title")
-    if not isinstance(title, str) or not title or len(title.encode()) > 512 or any(ord(char) < 32 for char in title):
+    # Match Foundation controlCharacters, including C1 and invisible format controls.
+    if not isinstance(title, str) or not title or len(title.encode()) > 512 or any(unicodedata.category(char) in {"Cc", "Cf"} for char in title):
         raise ValueError("An exact bounded window title is required.")
     for field in ("render_start", "render_length"):
-        if not isinstance(request.get(field), str) or not re.fullmatch(r"[0-9]{1,6}\.[0-9]{1,6}\.[0-9]{1,6}", request[field]):
+        if not isinstance(request.get(field), str) or not re.fullmatch(r"[0-9]{1,6}\.[0-9]{1,2}\.[0-9]{1,2}", request[field]):
             raise ValueError("An explicit arrangement range is required.")
     if int(request["render_start"].split(".")[0]) == 0 or not any(int(part) for part in request["render_length"].split(".")):
         raise ValueError("The explicit arrangement range must have a positive start and length.")

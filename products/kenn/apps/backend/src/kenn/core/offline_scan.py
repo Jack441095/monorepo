@@ -20,6 +20,7 @@ import tempfile
 from threading import Event, Lock, Thread
 import time
 from typing import Any, Callable
+import unicodedata
 import uuid
 import wave
 
@@ -99,16 +100,18 @@ class OfflineScanService:
         if type(request.get("live_pid")) is not int or not 0 < request["live_pid"] <= 2_147_483_647:
             raise ValueError("A specific Live process is required.")
         title = request.get("expected_window_title")
-        if not isinstance(title, str) or not 1 <= len(title.encode("utf-8")) <= 512 or any(ord(char) < 32 for char in title):
+        # Foundation controlCharacters includes C1 and invisible format controls;
+        # accepting them here would authorize a title the native helper rejects.
+        if not isinstance(title, str) or not 1 <= len(title.encode("utf-8")) <= 512 or any(unicodedata.category(char) in {"Cc", "Cf"} for char in title):
             raise ValueError("A specific Live window title is required.")
         for key in ("render_start", "render_length"):
             value = request.get(key)
             # Live's musical-time strings are retained exactly; interpreting a
             # range from old file duration would silently scan a different mix.
-            if not isinstance(value, str) or not re.fullmatch(r"\d{1,6}\.\d{1,2}\.\d{1,2}", value):
+            if not isinstance(value, str) or not re.fullmatch(r"[0-9]{1,6}\.[0-9]{1,2}\.[0-9]{1,2}", value):
                 raise ValueError("Confirm exact Live render start and length strings.")
-        if request["render_length"] == "0.0.0":
-            raise ValueError("The confirmed arrangement range must not be empty.")
+        if int(request["render_start"].split(".")[0]) == 0 or not any(int(part) for part in request["render_length"].split(".")):
+            raise ValueError("The confirmed arrangement range must have a positive start and length.")
         if type(request.get("sample_rate")) is not int or request["sample_rate"] != 48000:
             raise ValueError("The scan candidate requires 48000 Hz stereo 24-bit PCM.")
         timeout = request.get("timeout_seconds")

@@ -143,6 +143,42 @@ def test_request_accepts_exact_pid_and_utf8_title_upper_bounds(tmp_path):
     assert len(validated["export_request"]["expected_window_title"].encode("utf-8")) == 512
 
 
+@pytest.mark.parametrize("change", [
+    {"render_start": "0.1.1"},
+    {"render_length": "00.00.00"},
+    {"render_start": "١.١.١"},
+    {"render_length": "１.０.０"},
+    {"render_start": "1000000.1.1"},
+    {"render_start": "1.100.1"},
+    {"render_length": "1.0.100"},
+])
+def test_scan_rejects_ranges_the_native_helper_cannot_bind(tmp_path, change):
+    # Unicode digits and padded zero lengths previously survived proposal validation.
+    service = _service(tmp_path)
+    with pytest.raises(ValueError):
+        service.validate_current(_source(), {**_request(), **change})
+    assert not list(tmp_path.glob("scan-*"))
+
+
+@pytest.mark.parametrize("character", ["\x00", "\x1f", "\x7f", "\x85", "\u200b", "\u202e", "\U000e0001"])
+def test_scan_rejects_control_and_format_characters_in_window_identity(tmp_path, character):
+    # Match Foundation's controlCharacters so the same title binds both processes.
+    service = _service(tmp_path)
+    with pytest.raises(ValueError):
+        service.validate_current(_source(), {**_request(), "expected_window_title": f"Synthetic{character} set"})
+    assert not list(tmp_path.glob("scan-*"))
+
+
+@pytest.mark.parametrize("start,length", [("000001.01.01", "0.00.01"), ("999999.99.99", "999999.99.99")])
+def test_scan_preserves_bounded_ascii_ranges_and_nonempty_unicode_titles(tmp_path, start, length):
+    service = _service(tmp_path)
+    title = "Synthetic café 界 set"
+    result = service.validate_current(_source(), {**_request(), "render_start": start, "render_length": length, "expected_window_title": title})
+    assert result["export_request"]["render_start"] == start
+    assert result["export_request"]["render_length"] == length
+    assert result["export_request"]["expected_window_title"] == title
+
+
 def test_foreign_owner_cannot_read_cancel_or_guess_a_job_and_other_instance_cannot_start(tmp_path):
     entered, release = Event(), Event()
 
