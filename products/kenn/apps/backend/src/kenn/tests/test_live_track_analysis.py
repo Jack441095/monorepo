@@ -117,6 +117,25 @@ def test_missing_stale_disabled_and_silent_input_abstain(live, monkeypatch):
     assert silent["analysis"]["recommendations"] == []
 
 
+@pytest.mark.parametrize("rms_dbfs", [-100.0, -80.0])
+def test_quiet_insert_withholds_measurements_and_proposals_at_the_activity_floor(live, rms_dbfs):
+    # Previously the quiet branch returned a caveat alongside every ratio and spectrum in `measured`.
+    result = _ask(live, rms_dbfs=rms_dbfs, stereo_correlation=-0.9, stereo_width=0.9)
+
+    assert result["status"] == "insufficient_signal"
+    assert result["analysis"]["measured"] == {}
+    assert result["analysis"]["interpretations"] == []
+    assert result["analysis"]["recommendations"] == []
+    assert "dB" not in result["answer"]
+    assert result["proposal"] is None and live.writes == []
+
+
+def test_insert_above_the_activity_floor_keeps_measured_evidence(live):
+    result = _ask(live, rms_dbfs=-79.9)
+
+    assert result["analysis"]["measured"]["rms_dbfs"] == -79.9
+
+
 @pytest.mark.parametrize("question", ["Is sidechain compression working on this track?", "Is the kick masking anything on this track?"])
 def test_sidechain_and_masking_never_invent_routing_or_offer_automatic_changes(live, question):
     result = _ask(live, question, crest_db=2.0, low_energy=1.0)

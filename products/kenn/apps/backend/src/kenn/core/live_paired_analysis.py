@@ -99,6 +99,10 @@ def answer_paired_analysis(question: str, *, owner: str, state: dict[str, Any], 
     # resulting upper edge is reported exactly, rather than calling it 250 Hz.
     bands = [i for i in range(32) if 20.0 * 1000.0 ** (i / 32) < 250.0]
     power_a = [fft_a["band_power"][i] for i in bands]; power_b = [fft_b["band_power"][i] for i in bands]
+    if min(sum(power_a), sum(power_b)) < 1e-8 or min(aframe["rms_dbfs"], bframe["rms_dbfs"]) <= -80.0:
+        # The existing -80 dBFS activity floor must withhold the measurements, not just their interpretation.
+        result.update(status="insufficient_signal", answer="The paired capture interval matches, but one part has too little measured low-frequency activity to judge overlap. Play a passage where both parts are audible.")
+        return result
     norm = math.sqrt(sum(p*p for p in power_a) * sum(p*p for p in power_b))
     clock = aframe["measurement_window"]["host_timeline"]
     lag_samples = aframe["measurement_window"]["end_sample"] - fft_a["end_sample"]
@@ -113,9 +117,6 @@ def answer_paired_analysis(question: str, *, owner: str, state: dict[str, Any], 
                 "capture_age_seconds": [aframe["age_seconds"] + lag_samples/a["context"]["sample_rate"], bframe["age_seconds"] + lag_samples/b["context"]["sample_rate"]]}
     analysis["measured"] = measured
     analysis["session"] = {"source": "fresh_live_snapshot_and_explicit_declarations", "track_indexes": targets, "project_identity": "producer_declared_current_set"}
-    if min(sum(power_a), sum(power_b)) < 1e-8 or min(aframe["rms_dbfs"], bframe["rms_dbfs"]) <= -80.0:
-        result["answer"] = "The paired capture interval matches, but one part has too little measured low-frequency activity to judge overlap. Play a passage where both parts are audible."
-        return result  # -80 dBFS mean-square/activity floor is an abstention threshold, not a mix target.
     overlap = min(1.0, max(0.0, sum(p*q for p, q in zip(power_a, power_b))/norm))
     measured["spectral_shape_similarity"] = overlap
     result.update(status="analysed", confidence="medium")

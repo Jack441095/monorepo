@@ -115,6 +115,30 @@ def test_bound_silent_low_end_has_no_shape_similarity(live):
     _bind(live, quiet, 1)
     result = _pair(live)
     assert result["confidence"] == "unknown" and "spectral_shape_similarity" not in result["analysis"]["measured"]
+    assert result["status"] == "insufficient_signal"
+    assert result["analysis"]["measured"] == {}
+
+
+@pytest.mark.parametrize("source", ["Kick", "Bass"])
+@pytest.mark.parametrize("rms_dbfs", [-100.0, -80.0, -79.9])
+def test_paired_rms_gate_withholds_both_sources_until_each_clears_the_floor(live, source, rms_dbfs):
+    # Neither source's spectral ratios may escape in a comparison that abstains for the other source.
+    for index, name in enumerate(("Kick", "Bass")):
+        frame = _frame(name)
+        if name == source:
+            frame["rms_dbfs"] = rms_dbfs
+        _bind(live, frame, index)
+    result = _pair(live)
+
+    if rms_dbfs <= -80.0:
+        assert result["status"] == "insufficient_signal"
+        assert result["analysis"]["measured"] == {}
+        assert result["analysis"]["interpretations"] == []
+        assert result["analysis"]["recommendations"] == []
+    else:
+        assert result["status"] == "analysed"
+        assert result["analysis"]["measured"]["spectral_shape_similarity"] == pytest.approx(1.0)
+    assert result["proposal"] is None and live.writes == []
 
 
 @pytest.mark.parametrize("field,value", [("size_samples", True), ("size_samples", 8192.0), ("size_samples", 2048), ("end_sample", 48001),

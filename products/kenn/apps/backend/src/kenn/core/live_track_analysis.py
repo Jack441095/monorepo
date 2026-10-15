@@ -91,6 +91,10 @@ def answer_track_analysis(question: str, *, session_id: str, plugin_session_id: 
     analysis["session"] = ({"source": "fresh_live_snapshot", "track_index": target["index"], "name": target["name"],
                             **{k: target[k] for k in ("volume", "muted", "soloed") if k in target}}
                            if target else {"source": "unavailable"})
+    if context["rms_dbfs"] <= -80.0:
+        # Keep the existing -80 dBFS activity floor ahead of publication: quiet ratios and spectra cannot ground advice.
+        reply.update(status="insufficient_signal", answer=f"The input at '{name}' is near silence; play an audible passage before judging tone or dynamics.")
+        return reply
     measured = {k: context[k] for k in ("peak_dbfs", "rms_dbfs", "crest_db", "clipped_samples", "stereo_correlation", "stereo_width", "transient_ratio", "sample_rate", "analysed_samples", "spectrum_bands", "low_energy", "mid_energy", "high_energy", "measurement_window", "fft_spectra") if k in context}
     measured["sample_headroom_db"] = round(-context["peak_dbfs"], 2)
     measured["freshness"] = context["freshness"]
@@ -108,10 +112,6 @@ def answer_track_analysis(question: str, *, session_id: str, plugin_session_id: 
         lines.append(f"Live reports track {target['index'] + 1} '{name}'" + (f", fader {target['volume']:.4f} (Live raw 0–1)." if isinstance(target.get('volume'), (int, float)) else "; its fader is unavailable.") )
     else:
         lines.append("Live track association is unavailable; this is an insert-only observation.")
-    if context["rms_dbfs"] <= -80.0:
-        # -80 dBFS is a conservative activity floor, not a recording-quality target.
-        reply.update(answer=" ".join(lines) + " The input is near silence; play an audible passage before judging tone or dynamics.")
-        return reply
     reply["confidence"] = "high"  # Confidence in the measurements, not artistic mix quality.
     if "crest_db" in context:
         lines.append(f"Meter crest factor is {context['crest_db']:.1f} dB; it cannot prove compression or limiting.")
