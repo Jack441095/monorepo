@@ -1,11 +1,7 @@
-"""Autonomous Session Doctor & Mix Auditor for Ableton Live.
+"""Audit Live track settings and report informational insert-meter observations.
 
-Audits live session topology and real-time metering telemetry:
-1. Headroom & clipping risk (fader levels, peak dBFS)
-2. Low-end phase cancellation & mono compatibility (correlation <= 0, wide sub bass)
-3. Low-end mud detection (non-bass tracks without high-pass filtering in 20-250 Hz)
-4. Gain staging disparities
-5. Formulates autonomous non-destructive remediation batches within safety limits (<= 3.0 dB delta).
+Meter observations carry no verified Live target. Recipe steps come from
+track-specific heuristics; their estimates are not measured repair outcomes.
 """
 
 from __future__ import annotations
@@ -58,7 +54,7 @@ class SessionAuditReport:
 
 
 class SessionDoctor:
-    """Diagnoses session-wide mix, headroom, phase, and frequency issues."""
+    """Combine structural track advice with capture-scoped meter observations."""
 
     # Nominal headroom limits (normalized volume: 0.85 ~= 0 dB in Ableton's tapered fader)
     NOMINAL_FADER_LIMIT = 0.85
@@ -74,31 +70,33 @@ class SessionDoctor:
         tracks = session_state.get("tracks", [])
         issues: List[Issue] = []
 
-        # 1. Master bus findings need an active source before peak or phase can support advice.
+        # This is an insert capture, with no verified binding to a Live track or master.
+        # Keep meter observations informational; a host track name is not a target identity.
         if isinstance(meters, dict) and live_context_has_activity(meters):
             peak = _finite_meter(meters.get("peak_dbfs"))
             corr = _finite_meter(meters.get("stereo_correlation"))
+            # Preserve the existing -0.5 dBFS warning line; it is not a true-peak ceiling.
             if peak is not None and peak > -0.5:
                 issues.append(Issue(
-                    code="MASTER_OVERLOAD_RISK",
-                    severity="critical",
+                    code="CAPTURE_SAMPLE_PEAK_RISK",
+                    severity="advisory",
                     track_index=-1,
-                    track_name="Master",
-                    description=f"Master bus peak level is dangerously high ({peak:.1f} dBFS). Inter-sample peaks will clip DAC.",
-                    suggested_action="Reduce track levels or master limiter ceiling by -1.0 dB.",
-                    target_param="volume",
+                    track_name="Captured insert",
+                    description=f"Captured insert sample peak is near digital full scale ({peak:.1f} dBFS). This reading does not measure true peak or establish master-bus clipping.",
+                    suggested_action="Check the captured insert's gain and downstream routing, then measure true peak separately before choosing an output ceiling.",
+                    target_param="",
                     proposed_value=None,
                 ))
             if corr is not None and corr < 0.0:
                 issues.append(Issue(
-                    code="STEREO_PHASE_CANCELLATION",
-                    severity="critical",
+                    code="CAPTURE_NEGATIVE_CORRELATION",
+                    severity="advisory",
                     track_index=-1,
-                    track_name="Master",
-                    description=f"Stereo correlation is negative ({corr:.2f}). Severe phase cancellation in mono playback.",
-                    suggested_action="Check stereo widening effects and collapse sub bass (< 120 Hz) to mono.",
-                    target_param="utility_bass_mono",
-                    proposed_value=True,
+                    track_name="Captured insert",
+                    description=f"Captured insert stereo correlation is negative ({corr:.2f}). Mono summing may reduce parts of this signal; this reading does not identify the affected frequencies or audible severity.",
+                    suggested_action="Audition this capture in mono and inspect its stereo processing before choosing a change.",
+                    target_param="",
+                    proposed_value=None,
                 ))
 
         # 2. Per-track audits
@@ -297,10 +295,14 @@ class SessionDoctor:
 
         steps: List[Dict[str, Any]] = []
         resolved_conflict_count = 0
-        total_conflict_count = len(audit_report.issues) + len(world_model_res.get("conflicts", []))
+        # Informational capture observations cannot count as repairable conflicts or
+        # trigger the recipe's existing baseline masking-improvement estimate.
+        repair_issues = [issue for issue in audit_report.issues if issue.target_param]
+        total_conflict_count = len(repair_issues) + len(world_model_res.get("conflicts", []))
 
-        # 1. Volume trims from audit (safety clamped to <= 3.0 dB)
-        for issue in audit_report.issues:
+        # Capture-only meter observations have no bound Live target or measured repair.
+        # Only the existing track-specific rules below can contribute proposal steps.
+        for issue in repair_issues:
             if issue.code in {"HEADROOM_CLIPPING_RISK", "MULTI_STEM_SUMMING_OVERLOAD"}:
                 trim_val = round(issue.proposed_value, 3)
                 steps.append({
@@ -328,20 +330,6 @@ class SessionDoctor:
                     "after_display": "Center (C)",
                     "after_label": f"Center {issue.track_name} pan",
                     "reason": issue.description,
-                })
-                resolved_conflict_count += 1
-            elif issue.code == "STEREO_PHASE_CANCELLATION":
-                steps.append({
-                    "action": "insert_device",
-                    "track_index": issue.track_index if issue.track_index >= 0 else 0,
-                    "track_name": issue.track_name,
-                    "device_name": "Utility",
-                    "parameter": "Utility Bass Mono",
-                    "parameters": {"bass_mono": True, "bass_mono_freq": 90.0},
-                    "before_display": "Stereo",
-                    "after_display": "Mono (<90 Hz)",
-                    "after_label": "Collapse sub frequencies to mono",
-                    "reason": "Collapse sub frequencies below 90 Hz to mono to resolve negative phase correlation.",
                 })
                 resolved_conflict_count += 1
             elif issue.code == "DYNAMIC_LOW_END_MASKING":

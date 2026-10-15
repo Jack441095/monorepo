@@ -1437,6 +1437,32 @@ def test_mix_review_masking_endpoint_qualifies_pair_before_chat_evidence(
         assert observations == []
 
 
+@pytest.mark.parametrize("method", ["GET", "POST"])
+def test_doctor_http_keeps_active_capture_observations_unbound(running_server: str, monkeypatch, method: str) -> None:
+    from kenn import mixing_doctor, plugin_handoff
+
+    # The actual HTTP response must not turn an insert labelled Master into a session-wide repair.
+    state = {"tracks": [{"index": 0, "name": "Unrelated Track", "volume": 0.7, "devices": []}]}
+    meters = {"scope": "plugin_bus", "host_track_name": "Master",
+              "rms_dbfs": -18.0, "peak_dbfs": -0.1, "stereo_correlation": -0.9}
+    monkeypatch.setattr(mixing_doctor, "get_latest_session_state", lambda: state)
+    monkeypatch.setattr(plugin_handoff, "live_context_summary", lambda _session_id: meters)
+    request = urllib.request.Request(
+        f"{running_server}/api/session/doctor/audit", method=method,
+        data=json.dumps({"session_state": state, "meters": meters}).encode() if method == "POST" else None,
+        headers={"Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(request, timeout=10) as response:
+        assert response.status == 200
+        result = json.loads(response.read())
+    assert result["ok"] is True
+    assert {item["code"] for item in result["issues"]} == {"CAPTURE_SAMPLE_PEAK_RISK", "CAPTURE_NEGATIVE_CORRELATION"}
+    assert all(item["track_index"] == -1 and item["track_name"] == "Captured insert" for item in result["issues"])
+    assert all(item["severity"] == "advisory" and item["proposed_value"] is None for item in result["issues"])
+    assert any("sample peak" in item["description"] and "does not measure true peak" in item["description"] for item in result["issues"])
+    assert result["remediation_batch"] == []
+
+
 def test_mix_review_masking_endpoint_rejects_a_single_stem(running_server: str) -> None:
     import math
 

@@ -83,6 +83,48 @@ def test_doctor_routes_withhold_quiet_meter_findings_and_keep_structural_advice(
     assert handler.status == 200 and handler.body["ok"]
     codes = {item["code"] for item in handler.body["issues"]}
     assert "HEADROOM_CLIPPING_RISK" in codes
-    assert ("MASTER_OVERLOAD_RISK" in codes) is active
-    assert ("STEREO_PHASE_CANCELLATION" in codes) is active
+    assert ("CAPTURE_SAMPLE_PEAK_RISK" in codes) is active
+    assert ("CAPTURE_NEGATIVE_CORRELATION" in codes) is active
     assert handler.body["remediation_batch"]
+
+
+@pytest.mark.parametrize("method", ["get", "post"])
+def test_active_capture_findings_keep_insert_scope_and_do_not_claim_master_or_true_peak(monkeypatch, method) -> None:
+    from kenn import mixing_doctor, plugin_handoff
+
+    # A host label can say "Master", but this payload still measures one KENN insert, not the rendered master.
+    state = {"status": "connected", "tracks": [
+        {"index": 0, "name": "Master", "volume": 0.8, "devices": []},
+        {"index": 1, "name": "Music", "volume": 0.8, "devices": []},
+    ]}
+    meters = {
+        "scope": "plugin_bus",
+        "host_track_name": "Master",
+        "rms_dbfs": -18.0,
+        "peak_dbfs": -0.1,
+        "stereo_correlation": -0.9,
+    }
+    monkeypatch.setattr(mixing_doctor, "get_latest_session_state", lambda: state)
+    monkeypatch.setattr(plugin_handoff, "live_context_summary", lambda session_id: meters)
+    handler = _Handler()
+    if method == "get":
+        doctor_handler.handle_get_doctor_audit(handler)
+    else:
+        doctor_handler.handle_post_doctor_audit(handler, {"session_state": state, "meters": meters})
+
+    assert handler.status == 200 and handler.body["ok"]
+    findings = {item["code"]: item for item in handler.body["issues"]}
+    peak = findings["CAPTURE_SAMPLE_PEAK_RISK"]
+    correlation = findings["CAPTURE_NEGATIVE_CORRELATION"]
+    for item in (peak, correlation):
+        assert item["track_index"] == -1 and item["track_name"] == "Captured insert"
+        assert item["severity"] == "advisory" and item["proposed_value"] is None
+    assert "sample peak" in peak["description"].lower()
+    assert "-0.1 dBFS" in peak["description"]
+    assert "does not measure true peak" in peak["description"].lower()
+    assert "or establish master-bus clipping" in peak["description"].lower()
+    assert not any(term in peak["description"].lower() for term in ("master bus peak", "inter-sample", "dac"))
+    assert not any(term in peak["suggested_action"].lower() for term in ("master", "track level", "limiter ceiling"))
+    assert "audition this capture in mono" in correlation["suggested_action"].lower()
+    assert not any(term in correlation["description"].lower() for term in ("master", "severe", "sub bass", "120 hz"))
+    assert handler.body["remediation_batch"] == []

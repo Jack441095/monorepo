@@ -41,9 +41,46 @@ def test_session_doctor_flags_negative_stereo_correlation():
     }
     meters = {"peak_dbfs": -2.0, "rms_dbfs": -18.0, "stereo_correlation": -0.45}
     report = SessionDoctor.audit(session_state, meters=meters)
-    phase_issues = [i for i in report.issues if i.code == "STEREO_PHASE_CANCELLATION"]
+    phase_issues = [i for i in report.issues if i.code == "CAPTURE_NEGATIVE_CORRELATION"]
     assert len(phase_issues) == 1
-    assert phase_issues[0].severity == "critical"
+    assert phase_issues[0].severity == "advisory"
+
+
+@pytest.mark.parametrize("host_name", ["", "Master", "Lead Vocal"])
+def test_active_insert_meters_stay_informational_without_a_verified_live_target(host_name):
+    # A capture name once became a master diagnosis and a Utility insertion on track 0.
+    meters = {"scope": "plugin_bus", "host_track_name": host_name,
+              "rms_dbfs": -18.0, "peak_dbfs": -0.2, "stereo_correlation": -0.45}
+    state = {"tracks": [{"index": 0, "name": "Unrelated Track", "volume": 0.7, "devices": []}]}
+    report = SessionDoctor.audit(state, meters=meters)
+    assert {issue.code for issue in report.issues} == {"CAPTURE_SAMPLE_PEAK_RISK", "CAPTURE_NEGATIVE_CORRELATION"}
+    assert all(issue.track_index == -1 and issue.track_name == "Captured insert" for issue in report.issues)
+    assert all(issue.severity == "advisory" and issue.proposed_value is None and not issue.target_param for issue in report.issues)
+    peak = next(issue for issue in report.issues if issue.code == "CAPTURE_SAMPLE_PEAK_RISK")
+    phase = next(issue for issue in report.issues if issue.code == "CAPTURE_NEGATIVE_CORRELATION")
+    assert "sample peak" in peak.description and "-0.2 dBFS" in peak.description
+    assert "does not measure true peak" in peak.description
+    assert "does not identify the affected frequencies or audible severity" in phase.description
+    assert "mono" in phase.suggested_action.lower()
+    assert report.remediation_batch == []
+    proposal = SessionDoctor.formulate_surgical_remediation_proposal(state, meters=meters)["proposal"]
+    assert proposal["steps"] == []
+    assert proposal["total_conflicts_analyzed"] == 0
+    assert proposal["resolved_conflict_count"] == 0
+    assert proposal["predicted_metrics"]["masking_reduction_percent"] == 0.0
+    assert proposal["predicted_metrics"]["mono_correlation_delta"] == 0.0
+
+
+@pytest.mark.parametrize("peak,correlation,expected", [
+    (-0.5, 0.0, set()),
+    (-0.49, 0.0, {"CAPTURE_SAMPLE_PEAK_RISK"}),
+    (-1.0, -0.01, {"CAPTURE_NEGATIVE_CORRELATION"}),
+])
+def test_capture_observations_preserve_existing_peak_and_correlation_thresholds(peak, correlation, expected):
+    report = SessionDoctor.audit({"tracks": []}, meters={
+        "rms_dbfs": -18.0, "peak_dbfs": peak, "stereo_correlation": correlation,
+    })
+    assert {issue.code for issue in report.issues} == expected
 
 
 # Hot peak and phase readings can persist when RMS is near silence, but structural fader checks still apply.
@@ -70,8 +107,8 @@ def test_session_doctor_gates_only_meter_findings_on_live_activity(rms, active) 
     codes = {issue.code for issue in report.issues}
     assert "HEADROOM_CLIPPING_RISK" in codes
     assert "LOW_END_MUD_RISK" in codes
-    assert ("MASTER_OVERLOAD_RISK" in codes) is active
-    assert ("STEREO_PHASE_CANCELLATION" in codes) is active
+    assert ("CAPTURE_SAMPLE_PEAK_RISK" in codes) is active
+    assert ("CAPTURE_NEGATIVE_CORRELATION" in codes) is active
     assert any(action["action"] == "set_volume" for action in report.remediation_batch)
 
 
@@ -87,8 +124,8 @@ def test_session_doctor_does_not_invent_missing_or_invalid_active_meter_values(f
     report = SessionDoctor.audit({"tracks": []}, meters=meters)
     codes = {issue.code for issue in report.issues}
 
-    assert ("MASTER_OVERLOAD_RISK" in codes) is (field != "peak_dbfs")
-    assert ("STEREO_PHASE_CANCELLATION" in codes) is (field != "stereo_correlation")
+    assert ("CAPTURE_SAMPLE_PEAK_RISK" in codes) is (field != "peak_dbfs")
+    assert ("CAPTURE_NEGATIVE_CORRELATION" in codes) is (field != "stereo_correlation")
 
 
 def test_session_doctor_flags_sub_bass_off_center():

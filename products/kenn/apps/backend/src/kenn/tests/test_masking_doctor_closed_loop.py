@@ -52,7 +52,7 @@ def test_formulate_surgical_remediation_low_mid_mud_and_vocal_masking():
     assert metrics["headroom_reclaimed_db"] >= 0.0
 
 
-def test_formulate_surgical_remediation_phase_and_fader_overload():
+def test_capture_phase_observation_does_not_add_an_unbound_device_to_structural_repairs():
     session_state = {
         "tracks": [
             {"index": 0, "name": "Overloaded Guitar", "volume": 0.94, "panning": 0.0, "devices": []},
@@ -67,7 +67,8 @@ def test_formulate_surgical_remediation_phase_and_fader_overload():
     actions = {s["action"] for s in prop["steps"]}
     assert "set_volume" in actions
     assert "set_pan" in actions
-    assert "insert_device" in actions
+    # Insert correlation cannot select a Live track or justify a bass-mono setting.
+    assert "insert_device" not in actions
 
     metrics = prop["predicted_metrics"]
     assert metrics["headroom_reclaimed_db"] >= 0.8
