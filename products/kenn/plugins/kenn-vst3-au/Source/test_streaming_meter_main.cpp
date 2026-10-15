@@ -263,6 +263,66 @@ static void verifyTech3341Loudness()
         }
         requireNear(worstMiss, 0.46, 0.05, label + "Tech 3341 case 13 off-grid starts read about 0.46 LU low, the cost of the 100 ms hop");
 
+        // Tech 3341 (Nov 2023), Table 1 p. 8 and the clarification on p. 9:
+        // https://tech.ebu.ch/docs/tech/tech3341.pdf
+        // Unlike cases 10/13, cases 11/14 are one continuous stream each. Resetting between tones would miss
+        // stale rolling history and would put every offset back onto the same artificial starting grid.
+        for (const bool momentary : { false, true })
+        {
+            const double toneSeconds = momentary ? 0.4 : 3.0; // Seconds; M and S rectangular-window lengths.
+            const double offsetSeconds = momentary ? 0.020 : 0.15; // Seconds per successive tone in cases 14/11.
+            const auto segmentFrames = static_cast<int64_t>(std::llround(2.0 * toneSeconds * rate));
+            Signal continuous;
+            for (int i = 0; i < 20; ++i)
+            {
+                appendSilence(continuous, rate, i * offsetSeconds);
+                appendTone(continuous, rate, -38.0 + i, toneSeconds);
+                appendSilence(continuous, rate, toneSeconds - i * offsetSeconds);
+            }
+            require(continuous.size() == static_cast<size_t>(20 * segmentFrames),
+                    "Live temporal cases preserve all twenty equal-duration segments without rounding drift");
+            std::array<double, 20> maxima;
+            maxima.fill(-200.0); // LUFS sentinel: a missing ready snapshot must fail rather than resemble silence.
+            for (const auto& snapshot : run(continuous, rate))
+            {
+                // A snapshot ending exactly at a segment boundary still describes the preceding segment.
+                const auto segment = static_cast<size_t>((snapshot.endSample - 1) / segmentFrames);
+                const auto reading = momentary ? snapshot.momentaryLUFS : snapshot.shortTermLUFS;
+                if (reading && segment < maxima.size()) maxima[segment] = std::max(maxima[segment], *reading);
+            }
+            double worstLiveMiss = 0.0;
+            int outsideTolerance = 0;
+            for (size_t i = 0; i < maxima.size(); ++i)
+            {
+                const double expected = -38.0 + static_cast<double>(i); // LUFS; successive targets from Table 1.
+                const auto miss = expected - maxima[i];
+                worstLiveMiss = std::max(worstLiveMiss, std::abs(miss));
+                if (std::abs(miss) > tolerance) ++outsideTolerance;
+                const auto behavior = label + "Tech 3341 case " + (momentary ? "14" : "11")
+                                    + " successive maximum " + std::to_string(i);
+                if (!momentary || i % 5 == 0)
+                    requireNear(maxima[i], expected, tolerance, behavior + " is within 0.1 LU");
+                else
+                {
+                    // Case 14 fails the same off-grid starts as case 13. Pin the measured window loss openly;
+                    // this is a regression for a known limitation, not a passing EBU conformance assertion.
+                    const auto offsetMs = static_cast<double>((i % 5) * 20); // Milliseconds within a 100 ms hop.
+                    const auto coveredMs = 400.0 - std::min(offsetMs, 100.0 - offsetMs);
+                    const auto expectedLoss = -10.0 * std::log10(coveredMs / 400.0); // LU from missing window energy.
+                    requireNear(miss, expectedLoss, 0.05, behavior + " documents the known off-grid under-read in LU");
+                }
+            }
+            if (momentary)
+            {
+                require(outsideTolerance == 16, "Known case 14 conformance gap affects sixteen off-grid maxima per rate");
+                requireNear(worstLiveMiss, 0.46, 0.05, label + "Known case 14 worst under-read remains about 0.46 LU");
+                std::cout << label << "KNOWN CONFORMANCE GAP: case 14 has " << outsideTolerance
+                          << "/20 maxima outside 0.1 LU; worst error " << worstLiveMiss << " LU\n";
+            }
+            else
+                std::cout << label << "Generated case 11: 20 successive maxima; worst error " << worstLiveMiss << " LU\n";
+        }
+
         // Integrated loudness, cases 1-5. Each reads the last snapshot, the whole programme's gated loudness.
         const auto integrated = [&](const Signal& signal) {
             const auto snapshots = run(signal, rate);
