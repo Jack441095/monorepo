@@ -85,6 +85,26 @@ int main()
             processor.processBlock(audio, midi); bass.processBlock(audio, midi);
             juce::Thread::sleep(10); // Pace 10 ms input blocks so the test qualifies the accepting queue path.
         }
+        // Grade comes before any analysis request: with background publication
+        // off, only this Ask can supply the selected insert's measured window.
+        if (processor.apvts.getRawParameterValue("live_context_enabled")->load() >= 0.5f)
+        {
+            std::cerr << "FAIL: native grade fixture requires background publication off.\n";
+            return 1;
+        }
+        for (const auto& question : { "Grade this insert", "Please can you grade this insert",
+                                      "Would you rate selected insert please", "Grade track 1", "Grade Kick" })
+        {
+            juce::String grade;
+            if (! processor.askKenn(question, grade)
+                || ! grade.contains("6 available") || ! grade.contains("100 ms")
+                || ! grade.containsIgnoreCase("stereo") || ! grade.containsIgnoreCase("ungraded"))
+            {
+                std::cerr << "FAIL: native selected-insert grade did not return scoped measured points and omissions: " << grade << '\n';
+                return 1;
+            }
+        }
+        std::cout << "SUCCESS: native selected-insert grade supplied its own fresh window with background publication off.\n";
         juce::String analysis;
         if (!processor.askKenn("Analyse " + analysisTrack, analysis)
             || !analysis.contains("sample peak") || !analysis.contains("Proposed Live fader")

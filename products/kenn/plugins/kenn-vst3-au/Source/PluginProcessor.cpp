@@ -141,6 +141,42 @@ bool questionNeedsAbletonContext(const juce::String& question)
     return false;
 }
 
+bool questionNeedsInsertGrade(const juce::String& question)
+{
+    auto request = juce::StringArray::fromTokens(question.toLowerCase(), false).joinIntoString(" ");
+    if (request.startsWith("please ")) request = request.substring(7);
+    for (const auto& prefix : { "can you ", "could you ", "would you " })
+        if (request.startsWith(prefix)) { request = request.substring(juce::String(prefix).length()).trimStart(); break; }
+    if (request.startsWith("grade ")) request = request.substring(6).trimStart();
+    else if (request.startsWith("rate ")) request = request.substring(5).trimStart();
+    else return false; // How-to questions retain retrieval; only explicit grading carries audio evidence.
+    // Instruction suffixes may follow a target; word boundaries preserve exact
+    // source words so, for example, "bassline" does not select the bass role.
+    const auto wordBoundary = [](const juce::String& text, int length)
+    {
+        return text.length() == length
+            || (! juce::CharacterFunctions::isLetterOrDigit(text[length]) && text[length] != '_');
+    };
+    const auto startsTarget = [&](const juce::String& target)
+    {
+        return request.startsWith(target) && wordBoundary(request, target.length());
+    };
+    for (const auto& position : { "this", "current", "selected" })
+        for (const auto& source : { "insert", "track", "channel", "bus" })
+            if (startsTarget(juce::String(position) + " " + source)) return true;
+    for (const auto& prefix : { "track ", "channel " })
+    {
+        if (! request.startsWith(prefix)) continue; // Named roles below need no numeric Live target.
+        const auto number = request.substring(juce::String(prefix).length());
+        const auto digits = number.initialSectionContainingOnly("0123456789").length();
+        if (digits > 0 && wordBoundary(number, digits)) return true;
+    }
+    if (request.startsWith("the ")) request = request.substring(4);
+    for (const auto& role : { "kick", "bass", "drum", "drums", "vocal", "vocals", "synth", "master" })
+        if (startsTarget(role)) return true;
+    return false; // A general mix grade has no selected-insert evidence contract.
+}
+
 kenn::LocalLiveTopology localTopology(const kenn::AbletonOscTopologyResult& source)
 {
     kenn::LocalLiveTopology topology;
@@ -627,13 +663,13 @@ bool KENNMixAssistantAudioProcessor::askKenn(const juce::String& question, juce:
     payload->setProperty("question", cleanQuestion);
     payload->setProperty("session_id", getKennSessionId());
     payload->setProperty("plugin_session_id", getKennInsertId());
-    // An explicit analysis question opts into a compact feature snapshot.
+    // An explicit analysis or grade request opts into a compact feature snapshot.
     // The chat worker builds it here; no audio or network work reaches the callback.
     const auto lowered = cleanQuestion.toLowerCase();
     if (lowered.contains("analys") || lowered.contains("analyz")
         || lowered.contains("masking") || lowered.contains("overlap") || lowered.contains("sidechain")
         || lowered.startsWith("bind this insert to ")
-        || lowered.contains("what should i change"))
+        || lowered.contains("what should i change") || questionNeedsInsertGrade(cleanQuestion))
         payload->setProperty("plugin_handoff", handoffPayload());
     // Asking KENN is an explicit user action. Include the latest cached Live
     // session structure for questions that actually refer to the current set;

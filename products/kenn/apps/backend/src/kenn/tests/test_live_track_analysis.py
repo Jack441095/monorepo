@@ -305,7 +305,16 @@ def test_http_native_features_to_chat_card_to_confirmed_fake_write(live, monkeyp
     monkeypatch.setattr(bridge, "live_client", live)
     monkeypatch.setattr(actions, "live_client", live)
     rate_limit.RATE_BUCKETS.clear()
-    httpd = server.ThreadingHTTPServer(("127.0.0.1", 0), server.Handler)
+    native_grades = []
+    native_frames = []
+
+    class RecordingHandler(server.Handler):
+        def send_json(self, status, payload):
+            if "grading" in payload:
+                native_grades.append((deepcopy(payload), len(native_frames)))
+            super().send_json(status, payload)
+
+    httpd = server.ThreadingHTTPServer(("127.0.0.1", 0), RecordingHandler)
     worker = threading.Thread(target=httpd.serve_forever, daemon=True)
     worker.start()
 
@@ -323,7 +332,6 @@ def test_http_native_features_to_chat_card_to_confirmed_fake_write(live, monkeyp
         native_binary = os.environ.get("KENN_NATIVE_COMMAND_TEST_BINARY")
         if native_binary:
             # Opt in after compiling JUCE; ordinary backend runs need no native toolchain.
-            native_frames = []
             ingest = handoff.ingest_live_context
 
             def record_native_frame(payload, **kwargs):
@@ -337,8 +345,23 @@ def test_http_native_features_to_chat_card_to_confirmed_fake_write(live, monkeyp
                 "KENN_TEST_ANALYSIS_TRACK": "Kick", "KENN_TEST_OFFLINE_ONLY": "0"},
                 capture_output=True, text=True, timeout=30)
             assert native.returncode == 0, native.stdout + native.stderr
+            assert "SUCCESS: native selected-insert grade" in native.stdout
             assert "SUCCESS: native insert analysis" in native.stdout
             assert "SUCCESS: two native inserts" in native.stdout
+            # The actual native Ask must carry its launch identities and window;
+            # answer text alone could pass after borrowing a sibling's snapshot.
+            assert len(native_grades) == 5  # All five supported native request spellings carry their own handoff.
+            for number, (graded, frame_count) in enumerate(native_grades, start=1):
+                assert frame_count == number  # Cached evidence alone must not make a missing handoff pass.
+                grading, grade_frame = graded["grading"], native_frames[number - 1]
+                assert grading["conversation_id"] == "vst3-command-integration-test"
+                assert grading["insert_id"] == grade_frame["session_id"]
+                assert grading["host_track_name"] == grade_frame["host_track_name"] == "Kick"
+                assert grading["measurement_window"] == grade_frame["measurement_window"]
+                assert grading["grade"]["points_available"] == 6.0
+                assert grading["grade"]["full_marks"] == 100.0
+                assert grading["status"] == "graded"
+                assert graded["proposal"] is None and not graded["requires_confirmation"]
             # Check the actual C++ wire fields, including retained paired windows;
             # Python-generated stereo fixtures cannot prove native attribution.
             assert {frame["host_track_name"] for frame in native_frames} == {"Kick", "Bass"}

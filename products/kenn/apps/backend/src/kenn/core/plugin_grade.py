@@ -85,3 +85,27 @@ def selected_insert_grade(
         "status": "graded" if stereo else "ungraded", "reason": reason,
         "grade": grade, "stereo": stereo, "unscored_dimensions": unscored,
     }
+
+
+def selected_insert_grade_answer(grading: dict[str, Any], name: str) -> str:
+    """Describe this captured window's partial grade without inventing mix advice."""
+    if grading["status"] != "graded":
+        # No available points means unavailable evidence, never a zero-quality
+        # verdict. Keep the reason even when the retained window has expired.
+        return (f"The selected insert '{name}' is ungraded: {grading['reason']} "
+                "No quality score is available. Other technical dimensions, declared targets and reference matching remain ungraded.")
+    grade, stereo, window = grading["grade"], grading["stereo"], grading["measurement_window"]
+    return (
+        f"At '{name}', the measured 100 ms stereo window earns {grade['points']:.1f} of "
+        f"{grade['points_available']:.0f} available points out of {grade['full_marks']:.0f} possible. "
+        f"This is a selected-insert window, not a whole-mix or release-readiness grade. "
+        f"Evidence: samples [{window['start_sample']}, {window['end_sample']}) at {grading['sample_rate']:g} Hz, "
+        f"sequence {window['sequence']}, source generation {window['source_generation']}; "
+        f"capture age {grading['freshness']['age_seconds']:.3f} seconds when read. "
+        f"Correlation {stereo['correlation']:.3f}, threshold band {stereo['threshold_band']}; "
+        f"rule {stereo['source']} ({stereo['tier']}). The point weighting is a design choice; "
+        f"correlation alone does not establish audible cancellation severity. "
+        "Ungraded: dynamic health (qualified LUFS and true peak unavailable), low-end control, "
+        "spectral balance, stem separation, declared targets and reference matching. "
+        "The live loudness candidate remains disabled."
+    )

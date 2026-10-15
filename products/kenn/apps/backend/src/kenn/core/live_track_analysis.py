@@ -16,13 +16,23 @@ from kenn.core.live_paired_analysis import answer_paired_analysis, wants_paired_
 from kenn.plugin_handoff import live_context_summary
 
 
+def wants_insert_grade(question: str) -> bool:
+    """Recognise explicit insert targets; leave mix uploads and grading how-tos alone."""
+    return bool(re.match(
+        r"\s*(?:please\s+)?(?:(?:can|could|would) you\s+)?(?:grade|rate)\s+"
+        r"(?:(?:this|current|selected)\s+(?:track|channel|bus|insert)\b|"
+        r"(?:track|channel)\s+\d+\b|(?:the\s+)?(?:kick|bass|drums?|vocals?|synth|master)\b)",
+        question.casefold(),
+    ))
+
+
 def wants_track_analysis(question: str) -> bool:
     """Recognise session analysis, leaving generic how-to questions to retrieval."""
     lowered = question.casefold()
     if re.match(r"\s*(?:how (?:do|can|should|to)|what is|explain)\b", lowered):
         # General engineering questions do not opt into session diagnosis.
         return False
-    return wants_paired_analysis(question) or bool(re.search(r"\b(?:analyse|analyze|analysis|masking)\b|what should i change|(?:is|does).*sidechain", lowered))
+    return wants_insert_grade(question) or wants_paired_analysis(question) or bool(re.search(r"\b(?:analyse|analyze|analysis|masking)\b|what should i change|(?:is|does).*sidechain", lowered))
 
 
 def answer_track_analysis(question: str, *, session_id: str, plugin_session_id: str = "", host: AbletonAnalysisHost | None = None) -> dict[str, Any] | None:
@@ -36,17 +46,22 @@ def answer_track_analysis(question: str, *, session_id: str, plugin_session_id: 
         "status": "analysed", "requires_confirmation": False, "proposal": None,
         "confirmation_token": "",
     }
-    context = live_context_summary(plugin_session_id or session_id)
-    if context and context.get("conversation_id", "") not in ("", session_id):
+    grade_request = wants_insert_grade(question)
+    adapter = host or AbletonAnalysisHost()
+    # Fresh topology can take time to read. Grade the window after that read so
+    # a Pause, reset or expiry while waiting cannot publish an earlier score.
+    state = adapter.observe() if grade_request else None
+    context = live_context_summary(plugin_session_id or session_id, grade_owner=session_id if grade_request else "")
+    if context and (context.get("conversation_id", "") not in ("", session_id)
+                    or grade_request and (not session_id or context.get("conversation_id") != session_id)):
         # Legacy snapshots have no owner; continuous native publishers do. Never
         # borrow a known sibling's evidence or prepare a card from another chat.
         reply.update(status="clarification_required", answer="Selected insert belongs to another conversation. Open KENN from that insert and select its audio source again.")
         return reply
-    adapter = host or AbletonAnalysisHost()
     if wants_insert_binding(question):
         return answer_insert_binding(question, owner=session_id, insert=plugin_session_id or session_id,
                                      state=adapter.observe(), context=context, adapter=adapter)
-    if wants_paired_analysis(question):
+    if not grade_request and wants_paired_analysis(question):
         return answer_paired_analysis(question, owner=session_id, state=adapter.observe(), adapter=adapter)
     analysis: dict[str, Any] = {"schema": "kenn.live_track_analysis.v1", "measured": {}, "session": {}, "interpretations": [], "recommendations": [], "unavailable": [
         "Other tracks' isolated audio and kick/bass overlap",
@@ -54,26 +69,42 @@ def answer_track_analysis(question: str, *, session_id: str, plugin_session_id: 
         "Integrated LUFS and oversampled true peak",
     ]}
     reply["analysis"] = analysis
-    if not context or "audio_age_seconds" not in context or not context.get("freshness", {}).get("current_for_diagnosis"):
+    if not context or "audio_age_seconds" not in context or (not grade_request and not context.get("freshness", {}).get("current_for_diagnosis")):
         # Retained or disabled meters cannot describe current playback.
         reply.update(status="clarification_required", answer="Play the passage with KENN's analysis enabled on the track you mean, then ask again with its exact name or number. I have no current audio measurement for this request.")
         return reply
-    state = adapter.observe()
+    state = state if state is not None else adapter.observe()
+    # The source selector calls it "selected"; the existing target resolver
+    # calls the same explicit insert "this". Neither phrase chooses a sibling.
+    target_question = re.sub(r"\bselected\s+(?=insert\b|track\b|channel\b|bus\b)", "this ", question, flags=re.I) if grade_request else question
     source_name = context.get("host_track_name", "")
     binding = check_binding(session_id, plugin_session_id or session_id, state, context)
     if binding and binding.get("stale"):
         # A stale explicit declaration cannot silently become an inferred identity.
         reply.update(status="clarification_required", answer="This insert's explicit association expired or changed. Play the passage and bind this insert to its actual track number again.")
         return reply
-    resolution = adapter.resolve(question, state, source_name)
-    if binding and re.search(r"\b(?:this|current)\s+(?:track|channel|bus|insert)\b", question.casefold()) and not re.search(r"\b(?:track|channel)\s+\d+\b|\b(?:kick|bass|drums?|vocals?|synth|master)\b", question.casefold()):
+    resolution = adapter.resolve(target_question, state, source_name)
+    if grade_request and binding and any(
+        track.get("index") != binding["track_index"] and track.get("name")
+        and re.search(r"(?<!\w)" + re.escape(str(track["name"])) + r"(?!\w)", target_question, re.I)
+        for track in state.get("tracks", []) if isinstance(track, dict)
+    ):
+        # 'This insert' may use a declaration, but it cannot erase a second
+        # explicit name such as Piano merely because that name is not a role.
+        reply.update(status="clarification_required", answer="Select one insert to grade. This request names another track; its audio cannot inherit the selected insert's points.")
+        return reply
+    if binding and re.search(r"\b(?:this|current)\s+(?:track|channel|bus|insert)\b", target_question.casefold()) and not re.search(r"\b(?:track|channel)\s+\d+\b|\b(?:kick|bass|drums?|vocals?|synth|master)\b", target_question.casefold()):
         # 'This insert' may use the declaration; named comparisons still resolve independently.
         resolution = {"target": next((t for t in state["tracks"] if t.get("index") == binding["track_index"]), None), "source_matched": True}
     target = resolution.get("target")
     if binding and target is not None and target["index"] == binding["track_index"]:
         resolution["source_matched"] = True
     master_insert = source_name.casefold() == "master" and bool(re.search(r"\bmaster\b", question.casefold()))
-    own_insert = master_insert or bool(re.search(r"\b(?:this|current)\s+(?:track|channel|bus|insert)\b", question.casefold()))
+    own_insert = master_insert or bool(re.search(r"\b(?:this|current)\s+(?:track|channel|bus|insert)\b", target_question.casefold()))
+    if grade_request and re.search(r"\b(?:track|channel)\s+\d+\b", target_question.casefold()) and target is None:
+        # An explicit unmatched number cannot fall back to 'this insert', even
+        # if Live is offline and its topology cannot confirm that number.
+        own_insert = False
     if target is None and not own_insert:
         # We can locate only tracks in the fresh snapshot, never guess from session IDs.
         reply.update(status="clarification_required", answer=resolution["reason"] + " KENN measures only the audio entering its own insert.")
@@ -91,6 +122,16 @@ def answer_track_analysis(question: str, *, session_id: str, plugin_session_id: 
     analysis["session"] = ({"source": "fresh_live_snapshot", "track_index": target["index"], "name": target["name"],
                             **{k: target[k] for k in ("volume", "muted", "soloed") if k in target}}
                            if target else {"source": "unavailable"})
+    if grade_request:
+        from kenn.core.plugin_grade import selected_insert_grade_answer
+
+        # Return before the advice/proposal policy: a grading question only
+        # explains supported points and cannot ask the producer to move a fader.
+        grading = context["grading"]
+        reply.update(grading=grading, status=grading["status"],
+                     confidence="high" if grading["status"] == "graded" else "unknown",
+                     answer=selected_insert_grade_answer(grading, name))
+        return reply
     if context["rms_dbfs"] <= -80.0:
         # Keep the existing -80 dBFS activity floor ahead of publication: quiet ratios and spectra cannot ground advice.
         reply.update(status="insufficient_signal", answer=f"The input at '{name}' is near silence; play an audible passage before judging tone or dynamics.")

@@ -607,10 +607,30 @@ def _ingest_live_context(payload: dict[str, Any], *, session_id: str = "", recei
     return {**review, "session_id": key, "assistant_mode": checked["assistant_mode"], "live_context": live_context, "action_proposals": proposals}
 
 
-def live_context_summary(session_id: str) -> dict[str, Any] | None:
-    """Read a consistent feature history; the native audio thread never calls here."""
+def live_context_summary(session_id: str, *, grade_owner: str = "") -> dict[str, Any] | None:
+    """Read consistent features, optionally grading this exact owner's selected window.
+
+    Grading is opt-in so generic chat evidence and process-wide reports cannot
+    acquire insert points. The native audio thread never calls this function.
+    """
     with _live_context_lock:
-        return _live_context_summary(session_id)
+        context = _live_context_summary(session_id)
+        if context is not None and grade_owner and context.get("conversation_id") == grade_owner:
+            # The same lock pins metrics, eligibility and currentness to one
+            # window, even if another publisher or Pause arrives during Ask.
+            context["grading"] = _selected_insert_grade(grade_owner, session_id, _live_contexts[session_id], time.time())
+        return context
+
+
+def _selected_insert_grade(owner: str, insert: str, item: dict[str, Any], now: float) -> dict[str, Any]:
+    """Project the selected window while the caller holds the handoff lock."""
+    from kenn.core.plugin_grade import selected_insert_grade
+
+    age, current = _audio_currentness(item, now)
+    return selected_insert_grade(
+        conversation_id=owner, insert_id=insert, item=item, age_seconds=age, current=current,
+        max_age_seconds=_MAX_CONTINUOUS_AGE_SECONDS if item.get("measurement_window") else _MAX_CURRENT_DIAGNOSIS_AGE_SECONDS,
+    )
 
 
 def _audio_currentness(item: dict[str, Any], now: float) -> tuple[float, bool]:
@@ -657,14 +677,9 @@ def plugin_insert_sources(conversation_id: str, selected_insert: str = "") -> di
                       "requested_parameters": dict(item["plugin_state"]),
                       "reported_parameters": dict(item.get("reported_plugin_state", item["plugin_state"]))}
             if key == selected:
-                from kenn.core.plugin_grade import selected_insert_grade
-
                 # Grade only the explicit selected source, under this same
                 # owner/capture lock. Siblings never contribute global points.
-                source["grading"] = selected_insert_grade(
-                    conversation_id=owner, insert_id=key, item=item, age_seconds=age, current=current,
-                    max_age_seconds=_MAX_CONTINUOUS_AGE_SECONDS if item.get("measurement_window") else _MAX_CURRENT_DIAGNOSIS_AGE_SECONDS,
-                )
+                source["grading"] = _selected_insert_grade(owner, key, item, now)
             sources.append(source)
         return {"ok": True, "conversation_id": owner, "sources": sources,
                 "selected_status": "known" if selected_item else "waiting_for_publication"}
