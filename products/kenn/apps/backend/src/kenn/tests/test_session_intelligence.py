@@ -37,6 +37,7 @@ def test_session_intelligence_keeps_evidence_classes_and_write_boundary_separate
         reference_comparison={
             "comparison_basis": "Each LTAS is normalised around 1 kHz.",
             "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
+            "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
         },
     )
 
@@ -203,6 +204,7 @@ def test_session_intelligence_uses_reference_measurement_from_trusted_mix_receip
             "reference_comparison": {
                 "comparison_basis": "Each LTAS is normalised around 1 kHz.",
                 "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
+                "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
                 "pink_noise_reference": {
                     "status": "complete",
                     "curve": "-3 dB per octave pink-noise-style spectral baseline",
@@ -239,6 +241,118 @@ def test_session_intelligence_does_not_create_mixdown_coach_from_caller_data_alo
 
     assert brief["mixdown_coach"] is None
     assert "measurement_guided_listening" not in {item["kind"] for item in explanation_sections(brief)}
+
+
+@pytest.mark.parametrize("quiet_side", ["mix", "reference"])
+def test_session_intelligence_withholds_unqualified_uploaded_comparison(quiet_side) -> None:
+    comparison = {
+        "comparison_basis": "uploaded whole-file comparison",
+        "dynamics": {
+            "mix": {"rms_dbfs": -15.0},
+            "reference": {"rms_dbfs": -16.0},
+        },
+        "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
+        "pink_noise_reference": {
+            "curve": "pink-noise-style baseline",
+            "anchor_frequency_hz": 1000.0,
+            "largest_deviation": {"center_hz": 300.0, "deviation_db": 5.0},
+        },
+    }
+    comparison["dynamics"][quiet_side]["rms_dbfs"] = -60.0
+    context = _context()
+    context["measurements"] = [{
+        "kind": "mix_review",
+        "schema": "kenn.mix_review.reference_comparison.v1",
+        "status": "completed",
+        "reference_comparison": comparison,
+    }]
+    saved = deepcopy(context)
+
+    brief = build_session_intelligence(context, reference_comparison=comparison)
+
+    assert brief["audio_evidence"] == []
+    assert brief["mixdown_coach"] is None
+    assert brief["realtime_mix_comparison"] is None
+    assert context == saved
+
+
+@pytest.mark.parametrize("rms", ["missing", None, True, float("nan"), float("inf"), -60.0])
+def test_session_intelligence_withholds_legacy_uploaded_metrics_without_qualified_rms(rms) -> None:
+    metrics = {"rms_dbfs": rms, "true_peak_dbtp": -0.1, "integrated_lufs": -8.0}
+    if rms == "missing":
+        metrics.pop("rms_dbfs")
+    context = _context()
+    context["measurements"] = [{"kind": "mix_review", "metrics": metrics}]
+
+    brief = build_session_intelligence(context)
+
+    assert brief["audio_evidence"] == []
+
+
+def test_session_intelligence_keeps_uploaded_comparison_when_both_renders_clear_floor() -> None:
+    comparison = {
+        "comparison_basis": "uploaded whole-file comparison",
+        "dynamics": {"mix": {"rms_dbfs": -59.9}, "reference": {"rms_dbfs": -40.0}},
+        "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
+    }
+    context = _context()
+    context["measurements"] = [{
+        "schema": "kenn.mix_review.reference_comparison.v1",
+        "status": "completed",
+        "reference_comparison": comparison,
+    }]
+
+    brief = build_session_intelligence(context)
+
+    assert brief["audio_evidence"][0]["largest_difference"] == {"center_hz": 300.0, "delta_db": 5.0}
+    assert brief["mixdown_coach"]["status"] == "ready"
+
+
+def test_ordinary_review_comparison_requires_its_own_upload_to_clear_floor() -> None:
+    comparison = {
+        "comparison_basis": "uploaded whole-file comparison",
+        "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
+        "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
+    }
+    context = _context()
+    context["measurements"] = [{
+        "kind": "mix_review",
+        "schema": "kenn.mix_review.local_review.v1",
+        "metrics": {"rms_dbfs": -60.0, "peak_dbfs": -0.1},
+        "reference_comparison": comparison,
+    }]
+
+    brief = build_session_intelligence(context)
+
+    assert brief["audio_evidence"] == []
+    assert brief["mixdown_coach"] is None
+
+
+def test_legacy_local_review_schema_without_kind_still_qualifies_its_metrics() -> None:
+    context = _context()
+    context["measurements"] = [{
+        "schema": "kenn.mix_review.local_review.v1",
+        "metrics": {"rms_dbfs": None, "peak_dbfs": -0.1, "integrated_lufs": -8.0},
+    }]
+
+    brief = build_session_intelligence(context)
+
+    assert brief["audio_evidence"] == []
+
+
+def test_session_intelligence_preserves_realtime_comparison_abstention_semantics() -> None:
+    comparison = {
+        "schema": "kenn.realtime_mix_comparison.v1",
+        "comparison_available": False,
+        "comparisons": [],
+        "pink_noise_shape": None,
+        "limitations": ["Live RMS is missing or quiet; comparison is withheld."],
+    }
+
+    brief = build_session_intelligence(_context(), reference_comparison=comparison)
+
+    assert brief["realtime_mix_comparison"] == comparison
+    assert {item["kind"] for item in brief["audio_evidence"]} == {"plugin_feature_frame"}
 
 
 def test_retrieval_provenance_cache_keeps_only_source_labels_and_classes() -> None:

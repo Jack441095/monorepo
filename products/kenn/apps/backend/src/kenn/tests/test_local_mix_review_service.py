@@ -318,7 +318,10 @@ def test_legacy_active_review_keeps_signal_fields_on_read(tmp_path):
         "status": "completed",
         "metrics": {"rms_dbfs": -12.0, "peak_dbfs": -1.0},
         "findings": [{"type": "headroom"}],
-        "reference_comparison": {"reference_match_score": {"points": 2.0}},
+        "reference_comparison": {
+            "reference_match_score": {"points": 2.0},
+            "dynamics": {"mix": {"rms_dbfs": -12.0}, "reference": {"rms_dbfs": -13.0}},
+        },
         "grade": {"points": 80.0},
     }
     (tmp_path / "reviews.json").write_text(json.dumps({active["review_id"]: active}), encoding="utf-8")
@@ -328,6 +331,196 @@ def test_legacy_active_review_keeps_signal_fields_on_read(tmp_path):
     assert fetched["metrics"] == active["metrics"]
     assert fetched["findings"] == active["findings"]
     assert fetched["reference_comparison"] == active["reference_comparison"]
+
+
+def test_active_legacy_ordinary_review_with_quiet_reference_keeps_mix_grade_only(tmp_path):
+    ordinary = {
+        "schema": "kenn.mix_review.local_review.v1",
+        "review_id": "review-active-quiet-reference",
+        "status": "completed",
+        "metrics": {"rms_dbfs": -12.0, "integrated_lufs": -14.0},
+        "findings": [{"type": "mix_own_finding"}],
+        "reference": {"filename": "quiet.wav", "sha256": "c" * 64},
+        "reference_comparison": {
+            "reference_match_score": {"points": 12.0, "points_available": 30.0},
+            "recommendations": ["stale recommendation"],
+        },
+        "grade": {
+            "points": 40.0,
+            "points_available": 60.0,
+            "full_marks": 100.0,
+            "parts": [
+                {"part": "technical_health", "points": 25.0, "points_available": 30.0},
+                {"part": "reference_match", "points": "stale", "points_available": None},
+            ],
+            "ungraded": [],
+        },
+    }
+    (tmp_path / "reviews.json").write_text(json.dumps({ordinary["review_id"]: ordinary}), encoding="utf-8")
+
+    fetched = LocalMixReviewService(tmp_path).mix_review_status(ordinary["review_id"])["review"]
+
+    assert fetched["metrics"] == ordinary["metrics"]
+    assert fetched["findings"] == ordinary["findings"]
+    assert fetched["reference"] == ordinary["reference"]
+    assert "reference_comparison" not in fetched
+    assert fetched["grade"]["points"] == 25.0
+    assert fetched["grade"]["points_available"] == 30.0
+    assert [part["part"] for part in fetched["grade"]["parts"]] == ["technical_health"]
+    assert "reference comparison" in fetched["limitations"].lower()
+
+
+def test_legacy_standalone_quiet_reference_receipt_is_sanitized_on_read(tmp_path):
+    legacy = {
+        "schema": "kenn.mix_review.reference_comparison.v1",
+        "review_id": "reference-legacy-quiet",
+        "status": "completed",
+        "source_mix": {"filename": "mix.wav", "sha256": "a" * 64},
+        "source_reference": {"filename": "quiet.wav", "sha256": "b" * 64},
+        "reference_comparison": {
+            "reference_match_score": {"points": 12.0, "points_available": 30.0},
+            "dynamics": {"mix": {"rms_dbfs": -12.0}, "reference": {"rms_dbfs": -80.0}},
+            "recommendations": ["stale EQ"],
+            "eq8_preset_adv_base64": "stale-preset",
+            "pink_noise_reference": {"deviation_db": 8.0},
+        },
+        "metrics": {"rms_dbfs": -12.0},
+        "evidence": {"facts": [{"name": "rms_dbfs", "value": -12.0}]},
+        "findings": [{"type": "stale finding"}],
+        "flags": [{"label": "stale flag"}],
+        "action_plan": [{"focus": "stale action"}],
+        "technical_rating": "stale rating",
+        "grade": {
+            "points": 43.0,
+            "points_available": 60.0,
+            "full_marks": 100.0,
+            "parts": [
+                {"part": "technical_health", "points": 28.0, "points_available": 30.0},
+                {"part": "reference_match", "points": 15.0, "points_available": 30.0},
+            ],
+            "ungraded": [],
+        },
+        "limitations": ["Old comparison limitation."],
+    }
+    index_path = tmp_path / "reviews.json"
+    index_path.write_text(json.dumps({legacy["review_id"]: legacy}), encoding="utf-8")
+    service = LocalMixReviewService(tmp_path)
+
+    fetched = service.mix_review_status(legacy["review_id"])["review"]
+    listed = service.list_reviews()[0]
+    exported = json.loads(service.report_json_bytes(legacy["review_id"]))
+    html_export = service.report_html(legacy["review_id"]).decode("utf-8")
+
+    for result in (fetched, listed, exported):
+        assert result["source_mix"] == legacy["source_mix"]
+        assert result["source_reference"] == legacy["source_reference"]
+        assert "reference_comparison" not in result
+        assert not {"metrics", "evidence", "findings", "flags", "action_plan", "technical_rating"} & result.keys()
+        assert result["grade"]["points"] == 28.0
+        assert result["grade"]["points_available"] == 30.0
+        assert [part["part"] for part in result["grade"]["parts"]] == ["technical_health"]
+        assert any("both be finite numeric values" in item for item in result["limitations"])
+    assert "stale-preset" not in html_export and "stale EQ" not in html_export
+    assert json.loads(index_path.read_text(encoding="utf-8"))[legacy["review_id"]] == legacy
+
+
+def test_legacy_standalone_quiet_mix_drops_grade_when_mix_provenance_is_unqualified(tmp_path):
+    legacy = {
+        "schema": "kenn.mix_review.reference_comparison.v1",
+        "review_id": "reference-legacy-quiet-mix",
+        "status": "completed",
+        "source_mix": {"filename": "quiet.wav", "sha256": "a" * 64},
+        "source_reference": {"filename": "ref.wav", "sha256": "b" * 64},
+        "reference_comparison": {
+            "reference_match_score": {"points": 10.0, "points_available": 30.0},
+            "dynamics": {"mix": {"rms_dbfs": -80.0}, "reference": {"rms_dbfs": -10.0}},
+            "eq8_preset_adv_base64": "stale-preset",
+        },
+        "grade": {"points": 70.0, "points_available": 100.0},
+    }
+    (tmp_path / "reviews.json").write_text(json.dumps({legacy["review_id"]: legacy}), encoding="utf-8")
+
+    fetched = LocalMixReviewService(tmp_path).mix_review_status(legacy["review_id"])["review"]
+
+    assert fetched["grade"]["points"] == fetched["grade"]["points_available"] == 0.0
+    assert fetched["grade"]["parts"] == []
+    assert "reference_comparison" not in fetched
+    assert fetched["source_mix"] == legacy["source_mix"]
+
+
+def test_legacy_standalone_missing_reference_rms_keeps_only_proven_mix_grade(tmp_path):
+    legacy = {
+        "schema": "kenn.mix_review.reference_comparison.v1",
+        "review_id": "reference-legacy-missing-rms",
+        "status": "completed",
+        "source_mix": {"filename": "mix.wav", "sha256": "a" * 64},
+        "source_reference": {"filename": "ref.wav", "sha256": "b" * 64},
+        "mix_metrics": {"rms_dbfs": -12.0, "integrated_lufs": -14.0},
+        "reference_comparison": {"recommendations": ["stale EQ"]},
+        "grade": {
+            "points": 50.0,
+            "points_available": 60.0,
+            "full_marks": 100.0,
+            "parts": [
+                {"part": "technical_health", "points": 25.0, "points_available": 30.0},
+                {"part": "reference_match", "points": 25.0, "points_available": 30.0},
+            ],
+            "ungraded": [],
+        },
+    }
+    (tmp_path / "reviews.json").write_text(json.dumps({legacy["review_id"]: legacy}), encoding="utf-8")
+
+    fetched = LocalMixReviewService(tmp_path).mix_review_status(legacy["review_id"])["review"]
+
+    assert fetched["mix_metrics"] == legacy["mix_metrics"]
+    assert fetched["grade"]["points"] == 25.0
+    assert fetched["grade"]["points_available"] == 30.0
+    assert "reference_comparison" not in fetched
+
+
+def test_new_standalone_active_mix_quiet_reference_keeps_only_qualified_mix_grade(tmp_path):
+    active_mix = _wav_bytes(amplitude=0.2, frequency_hz=100)
+    quiet_reference = _wav_bytes(amplitude=0.0005, frequency_hz=3000)
+    request = _multipart_upload([
+        ("mix", "mix.wav", active_mix),
+        ("reference", "quiet-reference.wav", quiet_reference),
+    ])
+
+    result = LocalMixReviewService(tmp_path).handle_multipart_reference(*request)
+    review = result["review"]
+
+    assert review["source_mix"]["sha256"] == hashlib.sha256(active_mix).hexdigest()
+    assert review["source_reference"]["sha256"] == hashlib.sha256(quiet_reference).hexdigest()
+    assert review["mix_metrics"]["rms_dbfs"] > -60.0
+    assert "reference_comparison" not in review
+    assert all(part["part"] != "reference_match" for part in review["grade"]["parts"])
+    assert any("reference comparison measurements" in item for item in review["limitations"])
+
+
+def test_active_standalone_reference_comparison_survives_read_gate(tmp_path, monkeypatch):
+    def matching(*_args, **_kwargs):
+        return {
+            "ok": True,
+            "dynamics": {
+                "mix": {"rms_dbfs": -12.0},
+                "reference": {"rms_dbfs": -13.0},
+            },
+            "reference_match_score": {"points": 20.0, "points_available": 30.0, "note": "matched"},
+            "eq8_preset_adv_base64": "active-preset",
+        }
+
+    monkeypatch.setattr(mix_review._matching_engine(), "compare_mix_to_reference", matching)
+    active = _wav_bytes(amplitude=0.2, frequency_hz=100)
+    reference = _wav_bytes(amplitude=0.2, frequency_hz=3000)
+    request = _multipart_upload([("mix", "mix.wav", active), ("reference", "ref.wav", reference)])
+    service = LocalMixReviewService(tmp_path)
+
+    result = service.handle_multipart_reference(*request)
+    fetched = service.mix_review_status(result["review_id"])["review"]
+
+    assert fetched["reference_comparison"]["eq8_preset_adv_base64"] == "active-preset"
+    assert fetched["grade"]["points"] == result["review"]["grade"]["points"]
+    assert fetched["source_mix"] == result["review"]["source_mix"]
 
 
 def test_active_mix_with_quiet_reference_keeps_comparison_limitation(tmp_path):

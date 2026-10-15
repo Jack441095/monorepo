@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from kenn.core.mixdown_coach import build_mixdown_coach
 from scripts.evaluate_mixdown_coach import CASES, evaluate_case
 
@@ -7,6 +9,7 @@ from scripts.evaluate_mixdown_coach import CASES, evaluate_case
 def test_reference_coach_prioritises_level_matching_then_low_mid_listening() -> None:
     coach = build_mixdown_coach({
         "reference_comparison": {
+            "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
             "lufs_delta_db": 2.4,
             "comparison_basis": "40-band LTAS normalised around 1 kHz.",
             "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
@@ -29,7 +32,10 @@ def test_reference_coach_prioritises_level_matching_then_low_mid_listening() -> 
 
 
 def test_reference_coach_abstains_without_measured_tonal_difference() -> None:
-    coach = build_mixdown_coach({"reference_comparison": {"largest_ltas_difference": {"center_hz": 300, "delta_db": 0.4}}})
+    coach = build_mixdown_coach({"reference_comparison": {
+        "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
+        "largest_ltas_difference": {"center_hz": 300, "delta_db": 0.4},
+    }})
 
     assert coach["status"] == "abstain"
     assert coach["listening_checks"] == []
@@ -38,6 +44,7 @@ def test_reference_coach_abstains_without_measured_tonal_difference() -> None:
 def test_reference_coach_surfaces_pink_noise_shape_as_advisory() -> None:
     coach = build_mixdown_coach({
         "reference_comparison": {
+            "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
             "pink_noise_reference": {
                 "status": "complete",
                 "curve": "-3 dB per octave pink-noise-style spectral baseline",
@@ -61,5 +68,38 @@ def test_reference_coach_surfaces_pink_noise_shape_as_advisory() -> None:
 def test_sealed_mixdown_coach_evaluation_cases_pass() -> None:
     rows = [evaluate_case(case) for case in CASES]
 
-    assert len(rows) == 5
+    assert len(rows) == 6
     assert all(row["passed"] for row in rows)
+
+
+@pytest.mark.parametrize("quiet_side", ["mix", "reference"])
+def test_reference_coach_withholds_quiet_source_comparison(quiet_side) -> None:
+    comparison = {
+        "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
+        "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
+        "pink_noise_reference": {
+            "largest_deviation": {"center_hz": 300.0, "deviation_db": 5.0},
+        },
+        "lufs_delta_db": 2.0,
+    }
+    comparison["dynamics"][quiet_side]["rms_dbfs"] = -60.0
+
+    coach = build_mixdown_coach({"reference_comparison": comparison})
+
+    assert coach["status"] == "abstain"
+    assert coach["listening_checks"] == []
+    assert "RMS" in coach["reason"] and "-60 dBFS" in coach["reason"]
+    assert coach["live_target_inference_allowed"] is False
+
+
+@pytest.mark.parametrize("comparison", [
+    {"largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0}},
+    {"dynamics": {"mix": {"rms_dbfs": -15.0}}},
+    {"dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": float("nan")}}},
+])
+def test_reference_coach_abstains_without_two_qualified_source_rms_values(comparison) -> None:
+    coach = build_mixdown_coach({"reference_comparison": comparison})
+
+    assert coach["status"] == "abstain"
+    assert coach["listening_checks"] == []
+    assert "RMS is missing, invalid" in coach["reason"]

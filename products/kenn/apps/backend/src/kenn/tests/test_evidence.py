@@ -11,6 +11,7 @@ from kenn.core.evidence import (
     from_plugin_context,
     live_context_has_activity,
     uploaded_metrics_have_activity,
+    reference_comparison_has_activity,
     plugin_context_for_advice,
     from_realtime_mix_comparison,
     from_stem_masking_context,
@@ -238,7 +239,7 @@ def test_reference_ltas_measurement_is_rendered_as_a_listening_target() -> None:
     packet = from_mix_review_context({
         "schema": "kenn_mix_review_handoff.v1",
         "metrics": {"rms_dbfs": -18.0},
-        "reference_comparison": {
+        "reference_comparison": {"dynamics": {"mix": {"rms_dbfs": -18.0}, "reference": {"rms_dbfs": -20.0}},
             "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
             "lufs_delta_db": 0.2,
         },
@@ -254,7 +255,7 @@ def test_pink_noise_measurement_is_rendered_as_bounded_shape_evidence() -> None:
     packet = from_mix_review_context({
         "schema": "kenn_mix_review_handoff.v1",
         "metrics": {"rms_dbfs": -18.0},
-        "reference_comparison": {
+        "reference_comparison": {"dynamics": {"mix": {"rms_dbfs": -18.0}, "reference": {"rms_dbfs": -20.0}},
             "pink_noise_reference": {
                 "curve": "-3 dB per octave pink-noise-style spectral baseline",
                 "largest_deviation": {"center_hz": 296.0, "deviation_db": 5.1},
@@ -317,7 +318,7 @@ def test_realtime_mix_comparison_becomes_direct_answer_evidence() -> None:
     comparison = build_realtime_mix_comparison(
         {
             "metrics": {"peak_dbfs": -6.0, "rms_dbfs": -20.0},
-            "reference_comparison": {
+            "reference_comparison": {"dynamics": {"mix": {"rms_dbfs": -18.0}, "reference": {"rms_dbfs": -20.0}},
                 "pink_noise_reference": {
                     "largest_deviation": {"center_hz": 300.0, "deviation_db": 4.0},
                 },
@@ -471,7 +472,7 @@ def test_uploaded_evidence_withholds_quiet_meters_and_nested_signal_facts(rms, a
             "stem_masking": {"lowest_visibility": 0.1, "lowest_visibility_stem": "Bass"},
             "low_end_stems": [{"name": "Bass"}],
         },
-        "reference_comparison": {
+        "reference_comparison": {"dynamics": {"mix": {"rms_dbfs": -18.0}, "reference": {"rms_dbfs": -20.0}},
             "largest_ltas_difference": {"center_hz": 315.0, "delta_db": 5.0},
             "pink_noise_reference": {"curve": "pink baseline", "largest_deviation": {"center_hz": 315.0, "deviation_db": 5.0}},
             "lufs_delta_db": 4.0,
@@ -495,3 +496,36 @@ def test_uploaded_evidence_withholds_quiet_meters_and_nested_signal_facts(rms, a
         assert any("at/below -60 dBFS" in item for item in packet.limitations)
         assert relevant_observations("peak and pink reference bass masking", [packet]) == []
     assert context == saved
+
+
+@pytest.mark.parametrize("side", ["mix", "reference"])
+@pytest.mark.parametrize("rms", [None, True, "-18", float("nan"), float("inf"), 10**1000, -60.0, -80.0, -59.9])
+def test_reference_facts_require_activity_in_both_uploaded_sources(side, rms):
+    # Active own meters cannot qualify an older comparison with quiet or missing reference provenance.
+    comparison = {
+        "dynamics": {"mix": {"rms_dbfs": -18.0}, "reference": {"rms_dbfs": -20.0}},
+        "largest_ltas_difference": {"center_hz": 315.0, "delta_db": 5.0},
+        "pink_noise_reference": {"largest_deviation": {"center_hz": 80.0, "deviation_db": 6.0}},
+        "lufs_delta_db": 4.0,
+    }
+    comparison["dynamics"][side]["rms_dbfs"] = rms
+    before = deepcopy(comparison)
+    packet = from_mix_review_context({
+        "schema": "kenn_mix_review_handoff.v1",
+        "metrics": {"rms_dbfs": -18.0, "peak_dbfs": -0.1},
+        "reference_comparison": comparison,
+    })
+    active = rms == -59.9
+    assert reference_comparison_has_activity(comparison) is active
+    names = {fact.name for fact in packet.facts}
+    assert {"rms_dbfs", "peak_dbfs"} <= names
+    assert ("reference_largest_ltas_delta_db" in names) is active
+    assert ("pink_noise_largest_deviation_db" in names) is active
+    if not active:
+        assert any("Mix and reference RMS" in item for item in packet.limitations)
+    assert comparison == before
+
+
+@pytest.mark.parametrize("comparison", [None, {}, {"dynamics": None}, {"dynamics": {"mix": {"rms_dbfs": -18.0}}}])
+def test_legacy_comparison_without_both_source_readings_cannot_qualify(comparison):
+    assert not reference_comparison_has_activity(comparison)

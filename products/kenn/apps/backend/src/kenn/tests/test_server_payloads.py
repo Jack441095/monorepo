@@ -25,7 +25,7 @@ def _handoff():
         "ableton_repair_templates": [{"device_chain": "EQ Eight", "move": "Cached EQ repair"}],
         "revision_steps": [{"action": "Cached revision move"}],
         "reference": {"title": "Cached reference analysis"},
-        "reference_comparison": {"eq_bands": [{"freq": 100.0, "gain": -2.0}]},
+        "reference_comparison": {"dynamics": {"mix": {"rms_dbfs": -18.0}, "reference": {"rms_dbfs": -20.0}},"eq_bands": [{"freq": 100.0, "gain": -2.0}]},
         "mix_style": {"genre": {"genre_name": "House", "confidence": 0.9}},
         "leave_alone": ["Cached stereo judgment"],
         "previous_version": {"title": "Cached previous analysis"},
@@ -103,3 +103,19 @@ def test_active_uploaded_handoff_keeps_freeform_summary_when_context_lines_are_a
     context = _handoff()
     del context["context_lines"]
     assert "Cached signal summary" in server_payloads.mix_review_context_turn(context)["content"]
+
+
+@pytest.mark.parametrize("side", ["mix", "reference"])
+@pytest.mark.parametrize("rms", [None, True, float("nan"), -60.0, -80.0])
+def test_active_mix_with_unqualified_comparison_keeps_only_measured_own_history(side, rms):
+    # Cached whole-review prose may include reference advice even when the own-source metrics qualify.
+    context = _handoff()
+    context["reference_comparison"]["dynamics"][side]["rms_dbfs"] = rms
+    before = deepcopy(context)
+    content = server_payloads.mix_review_context_turn(context)["content"]
+    assert "Mix and reference RMS" in content
+    assert '"rms_dbfs": -18.0' in content
+    assert "Warm club mix" in content and "Keep the vocal forward" in content
+    assert "Cached" not in content
+    assert "Excellent" not in content
+    assert context == before

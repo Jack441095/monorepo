@@ -18,7 +18,13 @@ from typing import Any, Iterable
 
 from kenn.core.audiogen_artifacts import safe_artifact_metadata
 from kenn.core.audio_classification import AudioClassificationError, normalize as normalize_audio_classification
-from kenn.core.evidence import plugin_context_for_advice
+from kenn.core.evidence import (
+    REFERENCE_SIGNAL_LIMITATION,
+    UPLOADED_SIGNAL_LIMITATION,
+    plugin_context_for_advice,
+    reference_comparison_has_activity,
+    uploaded_metrics_have_activity,
+)
 from kenn.core.track_classifier import classify_track_context
 
 
@@ -142,13 +148,38 @@ def _live_track(track: dict[str, Any]) -> dict[str, Any]:
 
 
 def _safe_mix_review(receipt: dict[str, Any]) -> dict[str, Any]:
+    """Project a receipt into canonical context while requalifying each uploaded source."""
     allowed = ("schema", "status", "analysis_version", "input_context", "metrics", "findings", "action_plan", "limitations")
     result = {key: receipt[key] for key in allowed if key in receipt}
+    for key in ("review_id", "created_at"):
+        if key in receipt:
+            result[key] = _text(receipt[key], 128)
+    for key in ("source", "reference", "source_mix", "source_reference"):
+        source = receipt.get(key)
+        if isinstance(source, dict):
+            result[key] = {field: _text(source[field], 256) for field in ("filename", "sha256") if field in source}
+    standalone = receipt.get("schema") == "kenn.mix_review.reference_comparison.v1"
+    own_activity = uploaded_metrics_have_activity(receipt.get("metrics"))
+    limitations: list[str] = []
+    if standalone or not own_activity:
+        # Legacy receipts can carry old findings even when no activity-qualified
+        # whole-file measurement exists; source metadata remains useful on its own.
+        result.update({"metrics": {}, "findings": [], "action_plan": []})
+        if not standalone:
+            limitations.append(UPLOADED_SIGNAL_LIMITATION)
     comparison = receipt.get("reference_comparison")
-    if isinstance(comparison, dict):
+    comparison_active = reference_comparison_has_activity(comparison)
+    if isinstance(comparison, dict) and comparison_active and (standalone or own_activity):
+        dynamics = comparison["dynamics"]
         safe: dict[str, Any] = {
             "comparison_basis": _text(comparison.get("comparison_basis"), 512),
             "lufs_delta_db": comparison.get("lufs_delta_db"),
+            # Requalification downstream needs each source's RMS, not a verdict
+            # whose original measurements were discarded during projection.
+            "dynamics": {
+                source: {"rms_dbfs": dynamics[source]["rms_dbfs"]}
+                for source in ("mix", "reference")
+            },
         }
         for key in ("largest_spectral_difference", "largest_ltas_difference"):
             item = comparison.get(key)
@@ -175,6 +206,14 @@ def _safe_mix_review(receipt: dict[str, Any]) -> dict[str, Any]:
             if safe_pink:
                 safe["pink_noise_reference"] = safe_pink
         result["reference_comparison"] = safe
+    elif isinstance(comparison, dict) or standalone:
+        # Missing source activity cannot support cached spectral deltas or repairs.
+        limitations.append(REFERENCE_SIGNAL_LIMITATION)
+    if limitations:
+        existing = result.get("limitations")
+        existing = existing if isinstance(existing, list) else [existing] if isinstance(existing, str) else []
+        result["limitations"] = list(dict.fromkeys(_text(item) for item in [*existing, *limitations] if _text(item)))
+        result["signal_limitation"] = " ".join(limitations)
     return result
 
 
@@ -566,7 +605,10 @@ def build_session_context(
     for receipt in list(mix_review_receipts)[:MAX_JOBS]:
         if not isinstance(receipt, dict):
             continue
-        context["measurements"].append({"kind": "mix_review", **_safe_mix_review(receipt)})
+        measurement = {"kind": "mix_review", **_safe_mix_review(receipt)}
+        context["measurements"].append(measurement)
+        if isinstance(measurement.get("signal_limitation"), str):
+            context["limitations"].append(measurement["signal_limitation"])
         context["sources"].append(_source_envelope("mix_review", receipt, status=_text(receipt.get("status"), 64) or "observed"))
 
     for job in list(audiogen_jobs)[:MAX_JOBS]:

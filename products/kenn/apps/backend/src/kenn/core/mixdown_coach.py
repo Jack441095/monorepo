@@ -4,6 +4,8 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from kenn.core.evidence import UPLOADED_ACTIVITY_FLOOR_DBFS, reference_comparison_has_activity
+
 
 SCHEMA = "kenn.mixdown_coach.v1"
 MAX_LISTENING_CHECKS = 5
@@ -106,6 +108,17 @@ def build_mixdown_coach(review: dict[str, Any] | None) -> dict[str, Any]:
             "schema": SCHEMA, "status": "abstain", "listening_checks": [],
             "reason": "No uploaded-reference LTAS comparison is available.",
             "limitations": ["A whole-mix review cannot be inferred from Live structure or a genre label."],
+            "live_target_inference_allowed": False,
+        }
+    if not reference_comparison_has_activity(comparison):
+        reason = (
+            "RMS is missing, invalid or at/below "
+            f"{UPLOADED_ACTIVITY_FLOOR_DBFS:g} dBFS on one or both supplied renders; listening guidance is withheld."
+        )
+        return {
+            "schema": SCHEMA, "status": "abstain", "listening_checks": [],
+            "reason": reason,
+            "limitations": [reason, "A quiet comparison is not evidence that the supplied renders sound alike."],
             "live_target_inference_allowed": False,
         }
 

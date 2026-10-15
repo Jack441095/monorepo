@@ -1922,3 +1922,50 @@ def test_uploaded_review_and_chat_withhold_quiet_signal_over_http(running_server
     assert bool(evidence["facts"]) is active
     if not active:
         assert any("at/below -60 dBFS" in item for item in evidence["limitations"])
+
+
+@pytest.mark.parametrize("reference_rms,available", [(None, False), (-60.0, False), (-59.9, True)])
+def test_saved_reference_status_export_and_preset_requalify_both_sources_over_http(
+    running_server, monkeypatch, tmp_path, reference_rms, available,
+):
+    # Old metadata could otherwise serve an EQ preset after its reference stopped qualifying.
+    import base64
+    import kenn.server as server_module
+    from kenn.core.local_mix_review_service import LocalMixReviewService
+
+    receipt = {
+        "schema": "kenn.mix_review.reference_comparison.v1",
+        "status": "completed", "review_id": "reference-legacy-http",
+        "source_mix": {"filename": "mix.wav", "sha256": "a" * 64},
+        "source_reference": {"filename": "ref.wav", "sha256": "b" * 64},
+        "reference_comparison": {
+            "dynamics": {"mix": {"rms_dbfs": -18.0}, "reference": {"rms_dbfs": reference_rms}},
+            "largest_ltas_difference": {"center_hz": 315.0, "delta_db": 5.0},
+            "eq8_preset_adv_base64": base64.b64encode(b"test-preset").decode(),
+        },
+        "grade": {"points": 90.0, "points_available": 100.0},
+    }
+    index = tmp_path / "reviews.json"
+    index.write_text(json.dumps({receipt["review_id"]: receipt}), encoding="utf-8")
+    monkeypatch.setattr(server_module, "mix_review", LocalMixReviewService(tmp_path))
+    for endpoint in (
+        "/api/mix-review-status?id=reference-legacy-http",
+        "/api/mix-review-report/reference-legacy-http.json",
+    ):
+        with urllib.request.urlopen(running_server + endpoint, timeout=10) as response:
+            result = json.loads(response.read())
+        review = result.get("review", result)
+        assert ("reference_comparison" in review) is available
+        assert review["source_reference"] == receipt["source_reference"]
+        if not available:
+            assert review["grade"]["points_available"] == 0.0
+            assert "Mix and reference RMS" in str(review["limitations"])
+    preset_url = running_server + "/api/mix-review/reference-preset/reference-legacy-http.adv"
+    if available:
+        with urllib.request.urlopen(preset_url, timeout=10) as response:
+            assert response.read() == b"test-preset"
+    else:
+        with pytest.raises(urllib.error.HTTPError) as error:
+            urllib.request.urlopen(preset_url, timeout=10)
+        assert error.value.code == 404
+    assert json.loads(index.read_text(encoding="utf-8"))[receipt["review_id"]] == receipt

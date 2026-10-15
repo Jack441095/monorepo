@@ -15,7 +15,11 @@ from typing import Any, Iterable
 
 from kenn.core.arrangement_analysis import analyze_arrangement_context
 from kenn.core.audio_classification import AudioClassificationError, normalize as normalize_audio_classification
-from kenn.core.evidence import live_context_has_activity
+from kenn.core.evidence import (
+    live_context_has_activity,
+    reference_comparison_has_activity,
+    uploaded_metrics_have_activity,
+)
 from kenn.core.session_context import MAX_CONTEXT_AGE_SECONDS, validate_session_context
 
 
@@ -199,14 +203,21 @@ def _audio_evidence(context: dict[str, Any], reference_comparison: Any) -> list[
         if not isinstance(measurement, dict):
             continue
         kind = _text(measurement.get("kind"), 64)
+        schema = measurement.get("schema")
+        standalone_reference_receipt = schema == "kenn.mix_review.reference_comparison.v1"
+        ordinary_review = schema == "kenn.mix_review.local_review.v1" or (kind == "mix_review" and not standalone_reference_receipt)
+        uploaded_measurement = schema in {
+            "kenn.mix_review.local_review.v1", "kenn.mix_review.reference_comparison.v1",
+        } or kind == "mix_review"
         metrics = measurement.get("metrics") if isinstance(measurement.get("metrics"), dict) else {}
         if kind == "plugin_feature_frame" and not live_context_has_activity(metrics):
             # Older stored contexts can predate the ingress gate; neither their levels nor pink shape may ground advice.
             continue
+        uploaded_metrics_qualified = not uploaded_measurement or uploaded_metrics_have_activity(metrics)
         numeric_metrics = {
             _text(key, 96): number
             for key, value in list(metrics.items())[:32]
-            if (number := _number(value)) is not None
+            if uploaded_metrics_qualified and (number := _number(value)) is not None
         }
         if kind and numeric_metrics:
             evidence.append({
@@ -216,7 +227,11 @@ def _audio_evidence(context: dict[str, Any], reference_comparison: Any) -> list[
                 "limitations": ["Measurements describe their captured audio scope, not an unobserved Live cause."],
             })
         trusted_comparison = measurement.get("reference_comparison")
-        if isinstance(trusted_comparison, dict):
+        comparison_qualified = (
+            reference_comparison_has_activity(trusted_comparison)
+            and (not ordinary_review or uploaded_metrics_have_activity(metrics))
+        )
+        if isinstance(trusted_comparison, dict) and comparison_qualified:
             largest = trusted_comparison.get("largest_ltas_difference")
             if isinstance(largest, dict):
                 frequency = _number(largest.get("center_hz"))
@@ -239,7 +254,11 @@ def _audio_evidence(context: dict[str, Any], reference_comparison: Any) -> list[
             pink = pink_noise_evidence(measurement)
             if pink is not None:
                 evidence.append(pink)
-    if isinstance(reference_comparison, dict):
+    if (
+        isinstance(reference_comparison, dict)
+        and reference_comparison.get("schema") != "kenn.realtime_mix_comparison.v1"
+        and reference_comparison_has_activity(reference_comparison)
+    ):
         largest = reference_comparison.get("largest_ltas_difference")
         if isinstance(largest, dict):
             frequency = _number(largest.get("center_hz"))
@@ -276,7 +295,7 @@ def _mixdown_coach_from_context(context: dict[str, Any]) -> dict[str, Any] | Non
         if measurement.get("status") != "completed":
             continue
         comparison = measurement.get("reference_comparison")
-        if not isinstance(comparison, dict):
+        if not isinstance(comparison, dict) or not reference_comparison_has_activity(comparison):
             continue
         from kenn.core.mixdown_coach import build_mixdown_coach
         return build_mixdown_coach({"reference_comparison": comparison})
@@ -466,6 +485,10 @@ def build_session_intelligence(
         if isinstance(context_comparison, dict)
         else None
     )
+    # This result field is reserved for the realtime schema; bare uploaded
+    # comparisons must qualify both sources before contributing evidence.
+    if isinstance(effective_comparison, dict) and effective_comparison.get("schema") != "kenn.realtime_mix_comparison.v1":
+        effective_comparison = effective_comparison if reference_comparison_has_activity(effective_comparison) else None
     observed_at = context.get("observed_at") if isinstance(context, dict) else None
     now = time.time()
     fresh = validation["ok"] is True

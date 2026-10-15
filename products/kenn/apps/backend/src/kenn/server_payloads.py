@@ -15,7 +15,12 @@ from __future__ import annotations
 import json
 
 from kenn.core.audiogen_artifacts import safe_artifact_metadata
-from kenn.core.evidence import UPLOADED_SIGNAL_LIMITATION, uploaded_metrics_have_activity
+from kenn.core.evidence import (
+    REFERENCE_SIGNAL_LIMITATION,
+    UPLOADED_SIGNAL_LIMITATION,
+    reference_comparison_has_activity,
+    uploaded_metrics_have_activity,
+)
 
 
 def safe_error_payload(status: int, payload: dict, error_id: str) -> dict:
@@ -139,6 +144,18 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
         mix_goal_label = str(context.get("mix_goal_label") or session_context.get("mix_goal_label") or "").strip()
         session_goal = str(context.get("session_goal") or session_context.get("session_goal") or "").strip()
         metrics = context.get("metrics") if isinstance(context.get("metrics"), dict) else {}
+        comparison = context.get("reference_comparison")
+        if uploaded_metrics_have_activity(metrics) and isinstance(comparison, dict) and not reference_comparison_has_activity(comparison):
+            # Cached prose can mix valid own-source observations with obsolete
+            # reference advice. Rebuild from measured fields rather than guessing
+            # which sentences depended on the unqualified reference.
+            lines = [f"Mix Review Lab context for {title}.", REFERENCE_SIGNAL_LIMITATION]
+            if mix_goal_label:
+                lines.append(f"Selected mix target: {mix_goal_label[:160]}")
+            if session_goal:
+                lines.append(f"Session goal: {session_goal[:300]}")
+            lines.append("Structured metrics: " + json.dumps(metrics, ensure_ascii=False))
+            return {"role": "user", "content": "\n".join(lines)}
         if not uploaded_metrics_have_activity(metrics):
             # Older handoffs can carry cached prose and repairs alongside quiet
             # metrics. Rebuild from identity and explicit intent so none of those

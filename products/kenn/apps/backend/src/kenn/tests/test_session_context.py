@@ -6,6 +6,7 @@ from copy import deepcopy
 import pytest
 
 from kenn.core.session_context import build_session_context, validate_session_context
+from kenn.core.evidence import REFERENCE_SIGNAL_LIMITATION, UPLOADED_SIGNAL_LIMITATION
 
 
 def _snapshot() -> dict:
@@ -285,3 +286,98 @@ def test_session_context_validator_handles_wrong_collection_types_and_nan_time()
     assert any("tracks must be a list" in error for error in result["errors"])
     assert any("scenes must be a list" in error for error in result["errors"])
     assert any("Unix timestamp" in error for error in result["errors"])
+
+
+def _uploaded_receipt(*, standalone=False):
+    return {
+        "schema": "kenn.mix_review.reference_comparison.v1" if standalone else "kenn.mix_review.local_review.v1",
+        "status": "completed", "analysis_version": "fixture-v1", "review_id": "mix-a",
+        "source_mix": {"filename": "mix.wav", "sha256": "abc", "cached_signal": "discard"},
+        "source_reference": {"filename": "reference.wav", "sha256": "def"},
+        "reference": {"filename": "reference.wav", "sha256": "def"},
+        "input_context": {"channel_layout": "stereo", "sample_rate_hz": 48000},
+        "metrics": {"rms_dbfs": -18.0, "peak_dbfs": -1.0},
+        "findings": [{"detail": "Old peak finding"}], "action_plan": [{"action": "Old gain move"}],
+        "limitations": ["Whole-file scope."],
+        "reference_comparison": {
+            "dynamics": {"mix": {"rms_dbfs": -18.0, "crest_db": 8.0}, "reference": {"rms_dbfs": -14.0}},
+            "comparison_basis": "Uploaded pair around 1 kHz.", "lufs_delta_db": -4.0,
+            "largest_ltas_difference": {"center_hz": 200.0, "delta_db": 3.0},
+            "pink_noise_reference": {"curve": "pink", "largest_deviation": {"center_hz": 200.0, "deviation_db": 4.0}},
+            "recommendations": ["Old EQ move"],
+        },
+    }
+
+
+@pytest.mark.parametrize("rms", [None, "-18", True, False, math.nan, math.inf, -math.inf, 10**400, -100.0, -60.0])
+def test_canonical_uploaded_receipt_rejects_quiet_or_invalid_own_measurements(rms):
+    # Canonical ingestion must requalify old receipts even when status publication was bypassed.
+    receipt = _uploaded_receipt()
+    receipt["metrics"]["rms_dbfs"] = rms
+    before = deepcopy(receipt)
+    context = build_session_context(snapshot=_snapshot(), mix_review_receipts=[receipt])
+    measurement = context["measurements"][0]
+
+    assert measurement["metrics"] == {}
+    assert measurement["findings"] == measurement["action_plan"] == []
+    assert "reference_comparison" not in measurement
+    assert UPLOADED_SIGNAL_LIMITATION in measurement["limitations"]
+    assert measurement["input_context"] == receipt["input_context"]
+    assert measurement["source_mix"] == {"filename": "mix.wav", "sha256": "abc"}
+    assert measurement["review_id"] == "mix-a"
+    assert measurement["reference"] == receipt["reference"]
+    assert validate_session_context(context)["ok"] is True
+    assert receipt == before
+
+
+@pytest.mark.parametrize("source", ["mix", "reference"])
+@pytest.mark.parametrize("rms", [None, "-18", True, math.nan, math.inf, -math.inf, 10**400, -100.0, -60.0])
+def test_canonical_standalone_comparison_requires_activity_from_both_sources(source, rms):
+    receipt = _uploaded_receipt(standalone=True)
+    receipt["reference_comparison"]["dynamics"][source]["rms_dbfs"] = rms
+    before = deepcopy(receipt)
+    context = build_session_context(snapshot=_snapshot(), mix_review_receipts=[receipt])
+    measurement = context["measurements"][0]
+
+    assert measurement["metrics"] == {}
+    assert measurement["findings"] == measurement["action_plan"] == []
+    assert "reference_comparison" not in measurement
+    assert REFERENCE_SIGNAL_LIMITATION in measurement["limitations"]
+    assert measurement["source_reference"] == {"filename": "reference.wav", "sha256": "def"}
+    assert receipt == before
+
+
+@pytest.mark.parametrize("dynamics", [None, {}, {"mix": {"rms_dbfs": -18.0}}, {"reference": {"rms_dbfs": -18.0}}])
+def test_canonical_standalone_comparison_withholds_legacy_deltas_without_pair_rms(dynamics):
+    receipt = _uploaded_receipt(standalone=True)
+    receipt["reference_comparison"]["dynamics"] = dynamics
+    measurement = build_session_context(snapshot=_snapshot(), mix_review_receipts=[receipt])["measurements"][0]
+    assert "reference_comparison" not in measurement
+    assert REFERENCE_SIGNAL_LIMITATION in measurement["limitations"]
+
+
+def test_canonical_active_upload_keeps_own_findings_when_reference_is_quiet():
+    receipt = _uploaded_receipt()
+    receipt["reference_comparison"]["dynamics"]["reference"]["rms_dbfs"] = -60.0
+    measurement = build_session_context(snapshot=_snapshot(), mix_review_receipts=[receipt])["measurements"][0]
+    assert measurement["metrics"] == receipt["metrics"]
+    assert measurement["findings"] == receipt["findings"]
+    assert measurement["action_plan"] == receipt["action_plan"]
+    assert "reference_comparison" not in measurement
+    assert REFERENCE_SIGNAL_LIMITATION in measurement["limitations"]
+
+
+@pytest.mark.parametrize("standalone", [False, True])
+def test_canonical_active_comparison_keeps_bounded_pair_rms_for_downstream_requalification(standalone):
+    receipt = _uploaded_receipt(standalone=standalone)
+    receipt["reference_comparison"]["dynamics"]["mix"]["rms_dbfs"] = -59.9
+    before = deepcopy(receipt)
+    measurement = build_session_context(snapshot=_snapshot(), mix_review_receipts=[receipt])["measurements"][0]
+    comparison = measurement["reference_comparison"]
+    assert comparison["dynamics"] == {"mix": {"rms_dbfs": -59.9}, "reference": {"rms_dbfs": -14.0}}
+    assert comparison["largest_ltas_difference"] == {"center_hz": 200.0, "delta_db": 3.0}
+    assert comparison["pink_noise_reference"]["largest_deviation"]["deviation_db"] == 4.0
+    assert "recommendations" not in comparison
+    assert receipt == before
+    comparison["dynamics"]["mix"]["rms_dbfs"] = -100.0
+    assert receipt == before

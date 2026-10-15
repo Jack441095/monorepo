@@ -160,6 +160,10 @@ class FakeKennHTTP:
                         "metrics": {"rms_dbfs": -18.0},  # dBFS, active uploaded render.
                         "reference_comparison": {
                             "comparison_basis": "Each LTAS is normalised around 1 kHz.",
+                            "dynamics": {
+                                "mix": {"rms_dbfs": -18.0},
+                                "reference": {"rms_dbfs": -19.0},
+                            },
                             "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
                             "pink_noise_reference": {
                                 "curve": "-3 dB per octave pink-noise-style spectral baseline",
@@ -1745,6 +1749,34 @@ def test_mcp_reference_review_includes_bounded_mixdown_coach() -> None:
     pink = next(item for item in payload["recommendations"] if "pink-noise" in item["title"])
     assert "5.1 dB above" in pink["description"]
     assert coach["live_target_inference_allowed"] is False
+
+
+def test_mcp_quiet_reference_review_withholds_comparison_guidance() -> None:
+    class QuietReferenceKennHTTP(FakeKennHTTP):
+        def get(self, path: str, query: dict | None = None) -> dict:
+            response = super().get(path, query)
+            if path == "/api/mix-review-status" and (query or {}).get("id") == "reference-review":
+                comparison = response["review"]["reference_comparison"]
+                comparison["dynamics"]["reference"]["rms_dbfs"] = -60.0
+            return response
+
+    client = QuietReferenceKennHTTP()
+    facade = KennMCPFacade(client)
+
+    intelligence_response = _call(
+        facade, 29, "kenn_session_intelligence",
+        {"session_id": "quiet-reference-session", "mix_review_id": "reference-review"},
+    )
+    intelligence = json.loads(intelligence_response["result"]["content"][0]["text"])
+    assert not {item["kind"] for item in intelligence["audio_evidence"]} & {
+        "uploaded_reference_ltas", "pink_noise_shape",
+    }
+    assert intelligence["mixdown_coach"] is None
+
+    coach_response = _call(facade, 30, "mix_review_recommendations", {"review_id": "reference-review"})
+    coach_payload = json.loads(coach_response["result"]["content"][0]["text"])
+    assert coach_payload["mixdown_coach"]["status"] == "abstain"
+    assert coach_payload["mixdown_coach"]["listening_checks"] == []
 
 
 def test_mcp_ask_audio_engineering_question_is_grounded_and_read_only() -> None:

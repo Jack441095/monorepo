@@ -19,22 +19,42 @@ SCHEMA = "kenn.mixdown_coach_evaluation.v1"
 CASES: tuple[dict[str, Any], ...] = (
     {
         "id": "low_mid_with_level_delta", "category": "low_mid",
-        "review": {"reference_comparison": {"lufs_delta_db": 2.0, "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0}}},
+        "review": {"reference_comparison": {
+            "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
+            "lufs_delta_db": 2.0, "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
+        }},
         "expect": {"status": "ready", "first_kind": "level_match", "contains": "low-mid masking"},
     },
     {
         "id": "sub_balance", "category": "low_end",
-        "review": {"reference_comparison": {"largest_ltas_difference": {"center_hz": 60.0, "delta_db": -3.0}}},
+        "review": {"reference_comparison": {
+            "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
+            "largest_ltas_difference": {"center_hz": 60.0, "delta_db": -3.0},
+        }},
         "expect": {"status": "ready", "contains": "kick/bass relationship"},
     },
     {
         "id": "high_end_balance", "category": "high_end",
-        "review": {"reference_comparison": {"largest_ltas_difference": {"center_hz": 9000.0, "delta_db": 2.5}}},
+        "review": {"reference_comparison": {
+            "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
+            "largest_ltas_difference": {"center_hz": 9000.0, "delta_db": 2.5},
+        }},
         "expect": {"status": "ready", "contains": "hats, cymbals"},
     },
     {
         "id": "weak_difference_abstains", "category": "abstention",
-        "review": {"reference_comparison": {"largest_ltas_difference": {"center_hz": 300.0, "delta_db": 0.5}}},
+        "review": {"reference_comparison": {
+            "dynamics": {"mix": {"rms_dbfs": -15.0}, "reference": {"rms_dbfs": -16.0}},
+            "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 0.5},
+        }},
+        "expect": {"status": "abstain"},
+    },
+    {
+        "id": "quiet_source_abstains", "category": "abstention",
+        "review": {"reference_comparison": {
+            "dynamics": {"mix": {"rms_dbfs": -60.0}, "reference": {"rms_dbfs": -16.0}},
+            "largest_ltas_difference": {"center_hz": 300.0, "delta_db": 5.0},
+        }},
         "expect": {"status": "abstain"},
     },
     {

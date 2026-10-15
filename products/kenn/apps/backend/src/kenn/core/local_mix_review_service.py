@@ -18,6 +18,7 @@ import hashlib
 import html
 import importlib.util
 import json
+import math
 import os
 from pathlib import Path
 import tempfile
@@ -26,8 +27,10 @@ import uuid
 from typing import Any
 
 from kenn.core.evidence import (
+    REFERENCE_SIGNAL_LIMITATION,
     UPLOADED_ACTIVITY_FLOOR_DBFS,
     UPLOADED_SIGNAL_LIMITATION,
+    reference_comparison_has_activity,
     uploaded_metrics_have_activity,
 )
 from kenn.core.grade import grade_session
@@ -117,8 +120,12 @@ def _safe_flag(finding: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def _finite(value: Any) -> float | None:
-    number = _number(value)
-    return number if number is not None and number == number and abs(number) != float("inf") else None
+    try:
+        number = _number(value)
+        return number if number is not None and math.isfinite(number) else None
+    except OverflowError:
+        # An unrepresentable legacy number cannot safely contribute to a score or comparison.
+        return None
 
 
 def _grade_from_report(
@@ -210,11 +217,42 @@ def _review_from_report(
 def _published_review(review: dict[str, Any]) -> dict[str, Any]:
     """Return a publication-safe copy of a stored review, including legacy receipts."""
     published = copy.deepcopy(review)
-    if published.get("schema") != "kenn.mix_review.local_review.v1":
-        # Standalone reference-comparison receipts have their own two-source significance gate.
+    schema = published.get("schema")
+    if schema == "kenn.mix_review.reference_comparison.v1":
+        comparison = published.get("reference_comparison")
+        if reference_comparison_has_activity(comparison):
+            return published
+        dynamics = comparison.get("dynamics") if isinstance(comparison, dict) else {}
+        if isinstance(dynamics, dict) and isinstance(dynamics.get("mix"), dict):
+            mix_active = uploaded_metrics_have_activity(dynamics["mix"])
+        else:
+            mix_active = uploaded_metrics_have_activity(published.get("mix_metrics"))
+        published.pop("reference_comparison", None)
+        grade = published.get("grade") if isinstance(published.get("grade"), dict) else {}
+        published["grade"] = _grade_without_reference_match(
+            grade, retain_mix_grade=mix_active,
+        )
+        for key in (
+            "metrics", "evidence", "findings", "flags", "action_plan", "technical_rating",
+            "qualified_fault_families", "not_evaluated_fault_families", "analysis_evidence",
+        ):
+            published.pop(key, None)
+        if not uploaded_metrics_have_activity(published.get("mix_metrics")):
+            # A comparison's RMS can qualify the mix without exposing an unqualified metric bundle.
+            published.pop("mix_metrics", None)
+        _append_reference_limitation(published)
+        return published
+    if schema != "kenn.mix_review.local_review.v1":
+        # Other registry records have different source and significance contracts.
         return published
     metrics = published.get("metrics") if isinstance(published.get("metrics"), dict) else {}
     if uploaded_metrics_have_activity(metrics):
+        comparison = published.get("reference_comparison")
+        if isinstance(comparison, dict) and not reference_comparison_has_activity(comparison):
+            published.pop("reference_comparison", None)
+            grade = published.get("grade") if isinstance(published.get("grade"), dict) else {}
+            published["grade"] = _grade_without_reference_match(grade, retain_mix_grade=True)
+            _append_reference_limitation(published)
         return published
 
     original_metrics = review.get("metrics") if isinstance(review.get("metrics"), dict) else {}
@@ -249,6 +287,64 @@ def _published_review(review: dict[str, Any]) -> dict[str, Any]:
         limitations = f"{limitations} {UPLOADED_SIGNAL_LIMITATION}".strip()
     published["limitations"] = limitations
     return published
+
+
+def _grade_without_reference_match(grade: dict[str, Any], *, retain_mix_grade: bool) -> dict[str, Any]:
+    """Remove only the paired score when saved parts let us recompute the remaining grade exactly."""
+    ungraded = grade.get("ungraded") if isinstance(grade.get("ungraded"), list) else []
+    prior_reason = next((
+        _text(item.get("reason"), 512)
+        for item in ungraded
+        if isinstance(item, dict) and item.get("part") == "reference_match" and item.get("reason")
+    ), REFERENCE_SIGNAL_LIMITATION)
+    parts = grade.get("parts")
+    if not retain_mix_grade or not isinstance(parts, list):
+        # Without qualified mix RMS and explicit parts, the old aggregate cannot be separated safely.
+        return {
+            "points": 0.0,
+            "points_available": 0.0,
+            "full_marks": grade.get("full_marks", 100.0),
+            "meaning": "0.0 of 0 points available; reference comparison withheld.",
+            "parts": [],
+            "ungraded": [{"part": "reference_match", "reason": prior_reason}],
+        }
+    safe_parts = []
+    for part in parts:
+        if not isinstance(part, dict) or not isinstance(part.get("part"), str):
+            # A malformed own-grade part prevents an exact aggregate from being rebuilt.
+            return _grade_without_reference_match({}, retain_mix_grade=False)
+        if part["part"] == "reference_match":
+            continue
+        points_value = _finite(part.get("points"))
+        available_value = _finite(part.get("points_available"))
+        if points_value is None or available_value is None:
+            # Keep only scores whose saved components can be added without guessing.
+            return _grade_without_reference_match({}, retain_mix_grade=False)
+        safe_parts.append(copy.deepcopy(part))
+    full_marks = _finite(grade.get("full_marks"))
+    if full_marks is None:
+        # E2 grades use a fixed 100-point total, so an old missing field has a known default.
+        full_marks = 100.0
+    points = round(sum(float(part["points"]) for part in safe_parts), 1)
+    available = sum(float(part["points_available"]) for part in safe_parts)
+    ungraded = [copy.deepcopy(item) for item in ungraded if isinstance(item, dict) and item.get("part") != "reference_match"]
+    ungraded.append({"part": "reference_match", "reason": prior_reason})
+    meaning = f"{points:.1f} of {available:.0f} points available, out of a possible {full_marks:.0f}; reference comparison withheld."
+    return {**grade, "points": points, "points_available": available, "meaning": meaning, "parts": safe_parts, "ungraded": ungraded}
+
+
+def _append_reference_limitation(review: dict[str, Any]) -> None:
+    limitations = review.get("limitations")
+    if isinstance(limitations, list):
+        values = list(limitations)
+        if REFERENCE_SIGNAL_LIMITATION not in values:
+            values.append(REFERENCE_SIGNAL_LIMITATION)
+        review["limitations"] = values
+    else:
+        text = limitations if isinstance(limitations, str) else ""
+        if REFERENCE_SIGNAL_LIMITATION not in text:
+            text = f"{text} {REFERENCE_SIGNAL_LIMITATION}".strip()
+        review["limitations"] = text
 
 
 def _number(value: Any) -> float | None:
@@ -445,7 +541,7 @@ def compare_reference_audio(
                 "eq8_preset_adv_base64": matching_result.get("eq8_preset_adv_base64"),
             })
 
-    return {
+    result = {
         "schema": "kenn.mix_review.reference_comparison.v1",
         "ok": bool(mix_report.get("ok")) and bool(reference_report.get("ok")),
         "analysis_version": _text(mix_report.get("analysis_version"), 128),
@@ -462,6 +558,10 @@ def compare_reference_audio(
             "The comparison cannot identify the source, arrangement, or processing responsible for a difference.",
         ],
     }
+    if not comparison_is_significant and uploaded_metrics_have_activity(mix_report.get("metrics")):
+        # Retain only the independently qualified mix readings; quiet-source RMS stays private.
+        result["mix_metrics"] = dict(mix_report.get("metrics") or {})
+    return result
 
 
 class LocalMixReviewService:
@@ -676,6 +776,7 @@ class LocalMixReviewService:
             "storage": "metadata_only",
             "audio_retained": False,
         }
+        review = _published_review(review)
         with self._lock:
             self._reviews[review_id] = review
             self._prune_reviews()

@@ -25,6 +25,7 @@ LIVE_ACTIVITY_FLOOR_DBFS = -80.0
 # the optional matching engine. Uploaded reports use mean channel RMS, not its mono sum.
 UPLOADED_ACTIVITY_FLOOR_DBFS = -60.0
 UPLOADED_SIGNAL_LIMITATION = "RMS is missing, invalid or at/below -60 dBFS; signal measurements, grading and recommendations are withheld."
+REFERENCE_SIGNAL_LIMITATION = "Mix and reference RMS must both be finite numeric values above -60 dBFS; reference comparison measurements and recommendations are withheld."
 
 
 @dataclass(frozen=True)
@@ -92,6 +93,18 @@ def uploaded_metrics_have_activity(metrics: dict[str, Any] | None) -> bool:
         # An unrepresentable integer cannot qualify the source for publication.
         return False
     return value is not None and math.isfinite(value) and value > UPLOADED_ACTIVITY_FLOOR_DBFS
+
+
+def reference_comparison_has_activity(comparison: dict[str, Any] | None) -> bool:
+    """Qualify both uploaded sources from the matcher's downmixed RMS provenance."""
+    if not isinstance(comparison, dict):
+        # A score or cached recommendation alone cannot establish either source's activity.
+        return False
+    dynamics = comparison.get("dynamics")
+    if not isinstance(dynamics, dict):
+        # Older receipts without per-source RMS must abstain until they are reanalysed.
+        return False
+    return all(uploaded_metrics_have_activity(dynamics.get(source)) for source in ("mix", "reference"))
 
 
 def plugin_context_for_advice(context: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -276,7 +289,7 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
             if names:
                 facts.append(EvidenceFact("low_end_measured_stems", ", ".join(names), "", "mix_review_upload"))
     comparison = context.get("reference_comparison")
-    if isinstance(comparison, dict):
+    if reference_comparison_has_activity(comparison):
         largest = comparison.get("largest_spectral_difference")
         if isinstance(largest, dict):
             band = largest.get("band")
@@ -319,6 +332,7 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
             "Measurements apply to the uploaded render reviewed by Mix Review, not to unuploaded revisions.",
             "A stereo render cannot prove individual track, routing, plug-in, or automation causes.",
             "Optional stem masking and transient comparisons apply only to the supplied stems/renders; they prioritise tests but do not establish an audible cause on their own.",
+            *((REFERENCE_SIGNAL_LIMITATION,) if isinstance(comparison, dict) and not reference_comparison_has_activity(comparison) else ()),
         ),
     )
 
