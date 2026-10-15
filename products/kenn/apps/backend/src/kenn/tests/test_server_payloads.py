@@ -5,7 +5,7 @@ from copy import deepcopy
 import pytest
 
 from kenn import server_payloads
-from kenn.core.evidence import UPLOADED_SIGNAL_LIMITATION
+from kenn.core.evidence import TRANSIENT_SIGNAL_LIMITATION, UPLOADED_SIGNAL_LIMITATION
 
 
 def _handoff():
@@ -33,6 +33,19 @@ def _handoff():
         "version_advice": {"summary": "Cached revision advice"},
         "revision_impact": {"summary": "Cached impact"},
         "next_revision_plan": {"focus": "Cached plan", "steps": [{"action": "Cached step"}]},
+    }
+
+
+def _transient_summary():
+    return {
+        "score": 0.0,
+        "matched_event_count": 1,
+        "profile": "uncompressed",
+        "activity": {
+            "schema": "kenn.transient_preservation.activity.v1",
+            "pre_rms_dbfs": -18.0,
+            "post_rms_dbfs": -18.5,
+        },
     }
 
 
@@ -119,3 +132,75 @@ def test_active_mix_with_unqualified_comparison_keeps_only_measured_own_history(
     assert "Cached" not in content
     assert "Excellent" not in content
     assert context == before
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda value: value.update(activity={"schema": "wrong", "pre_rms_dbfs": -18.0, "post_rms_dbfs": -18.0}),
+    lambda value: value["activity"].update(pre_rms_dbfs=-60.0),
+    lambda value: value["activity"].update(post_rms_dbfs=float("nan")),
+    lambda value: value.update(matched_event_count=0),
+    lambda value: value.update(score=1.1),
+    lambda value: value.update(profile="x" * 161),
+])
+def test_unqualified_transient_summary_rebuilds_cached_handoff_but_keeps_qualified_reference(mutate):
+    context = _handoff()
+    summary = _transient_summary()
+    mutate(summary)
+    summary["cached_claim"] = "must never be serialized"
+    context["analysis_evidence"] = {"transient_preservation": summary}
+    context["metrics"]["transient_preservation_score"] = 0.0
+    before = deepcopy(context)
+
+    content = server_payloads.mix_review_context_turn(context)["content"]
+
+    assert TRANSIENT_SIGNAL_LIMITATION in content
+    assert "Structured metrics:" in content and '"rms_dbfs": -18.0' in content
+    assert "Qualified reference comparison:" in content and '"reference": {"rms_dbfs": -20.0}' in content
+    assert "transient_preservation_score" not in content
+    assert "must never be serialized" not in content
+    assert "Cached" not in content and "Excellent" not in content
+    assert "Warm club mix" in content and "Keep the vocal forward" in content
+    assert context == before
+
+
+def test_qualified_zero_transient_score_and_exact_provenance_survive_history():
+    context = _handoff()
+    summary = _transient_summary()
+    summary["cached_claim"] = "must be stripped"
+    context["analysis_evidence"] = {"transient_preservation": summary}
+    context["metrics"]["transient_preservation_score"] = 0.91
+    context["metrics"]["matched_event_count"] = 99
+
+    content = server_payloads.mix_review_context_turn(context)["content"]
+
+    assert "Cached signal context" in content
+    assert TRANSIENT_SIGNAL_LIMITATION not in content
+    assert '"score": 0.0' in content
+    assert '"pre_rms_dbfs": -18.0' in content and '"post_rms_dbfs": -18.5' in content
+    assert "must be stripped" not in content
+    assert "transient preservation score" not in content
+    assert "matched event count=99" not in content
+
+
+def test_legacy_transient_prose_without_activity_proof_is_rebuilt():
+    context = _handoff()
+    context["context_lines"] = ["Transient preservation score: 0.91; punch retained."]
+
+    content = server_payloads.mix_review_context_turn(context)["content"]
+
+    assert TRANSIENT_SIGNAL_LIMITATION in content
+    assert "Transient preservation score" not in content
+    assert "Cached peak warning" not in content
+    assert '"rms_dbfs": -18.0' in content
+
+
+def test_invalid_transient_section_type_is_rebuilt_without_cached_claims():
+    context = _handoff()
+    context["analysis_evidence"] = {"transient_preservation": "score 0.91, preserved"}
+
+    content = server_payloads.mix_review_context_turn(context)["content"]
+
+    assert TRANSIENT_SIGNAL_LIMITATION in content
+    assert "score 0.91" not in content
+    assert "Cached peak warning" not in content
+    assert '"rms_dbfs": -18.0' in content

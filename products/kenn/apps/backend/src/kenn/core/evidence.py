@@ -27,6 +27,7 @@ LIVE_ACTIVITY_FLOOR_DBFS = -80.0
 UPLOADED_ACTIVITY_FLOOR_DBFS = -60.0
 UPLOADED_SIGNAL_LIMITATION = "RMS is missing, invalid or at/below -60 dBFS; signal measurements, grading and recommendations are withheld."
 REFERENCE_SIGNAL_LIMITATION = "Mix and reference RMS must both be finite numeric values above -60 dBFS; reference comparison measurements and recommendations are withheld."
+TRANSIENT_SIGNAL_LIMITATION = "Transient comparison lacks qualifying pre/post activity or valid matched-event evidence; score, profile and event count are withheld. Pre/post RMS must be finite and above -60 dBFS."
 
 
 @dataclass(frozen=True)
@@ -46,6 +47,7 @@ class EvidencePacket:
     limitations: tuple[str, ...]
     observed_at_epoch: float | None = None
     stem_masking_provenance: dict[str, Any] | None = None
+    transient_preservation_provenance: dict[str, Any] | None = None
 
     def payload(self) -> dict[str, Any]:
         payload = {
@@ -59,6 +61,9 @@ class EvidencePacket:
         if self.source == "stem_masking_analysis" and self.stem_masking_provenance is not None:
             # History must retain the source counts needed to requalify cached masking facts.
             payload["stem_masking_provenance"] = deepcopy(self.stem_masking_provenance)
+        if self.source == "mix_review_upload" and self.transient_preservation_provenance is not None:
+            # Replay must requalify the pre/post captures instead of trusting cached score facts.
+            payload["transient_preservation_provenance"] = deepcopy(self.transient_preservation_provenance)
         if self.source in {"plugin_bus_snapshot", "realtime_mix_comparison"}:
             age = self.captured_at_age_seconds
             if self.observed_at_epoch is not None:
@@ -98,6 +103,52 @@ def uploaded_metrics_have_activity(metrics: dict[str, Any] | None) -> bool:
         # An unrepresentable integer cannot qualify the source for publication.
         return False
     return value is not None and math.isfinite(value) and value > UPLOADED_ACTIVITY_FLOOR_DBFS
+
+
+def transient_preservation_has_activity(summary: dict[str, Any] | None) -> bool:
+    """Qualify both full-file renders and the bounded result fields for a transient comparison."""
+    if not isinstance(summary, dict):
+        # A score without its two source readings cannot establish what was compared.
+        return False
+    activity = summary.get("activity")
+    if not isinstance(activity, dict) or activity.get("schema") != "kenn.transient_preservation.activity.v1":
+        # Older cached scores lack pre/post RMS provenance and must abstain on replay.
+        return False
+    if not all(uploaded_metrics_have_activity({"rms_dbfs": activity.get(key)}) for key in ("pre_rms_dbfs", "post_rms_dbfs")):
+        # An active post-render cannot qualify a quiet or unmeasured pre-render.
+        return False
+    score = summary.get("score")
+    try:
+        score_value = float(score) if isinstance(score, (int, float)) and not isinstance(score, bool) else None
+    except OverflowError:
+        # An unrepresentable score cannot describe a bounded ratio.
+        return False
+    count = summary.get("matched_event_count")
+    profile = summary.get("profile")
+    # Cap the profile at 160 characters so replay retains a label, not cached critique prose.
+    return (
+        score_value is not None and math.isfinite(score_value) and 0.0 <= score_value <= 1.0
+        and isinstance(count, int) and not isinstance(count, bool) and count > 0
+        and isinstance(profile, str) and bool(profile.strip()) and len(profile.strip()) <= 160
+    )
+
+
+def _qualified_transient_preservation(summary: Any) -> dict[str, Any] | None:
+    """Return a normalized score and its exact source activity proof, or abstain."""
+    if not transient_preservation_has_activity(summary):
+        # Keep malformed or inactive comparisons out of both facts and replay provenance.
+        return None
+    activity = summary["activity"]
+    return {
+        "score": float(summary["score"]),
+        "matched_event_count": summary["matched_event_count"],
+        "profile": summary["profile"].strip(),
+        "activity": {
+            "schema": "kenn.transient_preservation.activity.v1",
+            "pre_rms_dbfs": float(activity["pre_rms_dbfs"]),
+            "post_rms_dbfs": float(activity["post_rms_dbfs"]),
+        },
+    }
 
 
 def reference_comparison_has_activity(comparison: dict[str, Any] | None) -> bool:
@@ -249,12 +300,18 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
             limitations=(UPLOADED_SIGNAL_LIMITATION,),
         )
     facts: list[EvidenceFact] = []
+    transient_provenance: dict[str, Any] | None = None
+    limitations: list[str] = []
     # These are calculated assessments/labels, not measurements.  They can
     # remain available in the Mix Review narrative, but must not gain the
     # stronger "measured" status simply because they happen to be numeric.
     derived_metric_names = {"technical_score", "quality_score", "confidence_score", "rating_score"}
+    transient_metric_names = {
+        "transient_preservation", "transient_preservation_score", "transient_preservation_profile",
+        "transient_preservation_matched_event_count", "matched_event_count",
+    }
     for name, value in metrics.items():
-        if str(name).lower() in derived_metric_names:
+        if str(name).lower() in derived_metric_names | transient_metric_names:
             continue
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             continue
@@ -272,13 +329,16 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
     analysis = context.get("analysis_evidence")
     if isinstance(analysis, dict):
         transient = analysis.get("transient_preservation")
-        if isinstance(transient, dict):
-            score = transient.get("score")
-            if isinstance(score, (int, float)) and not isinstance(score, bool):
-                facts.append(EvidenceFact("transient_preservation_score", float(score), "ratio", "mix_review_upload"))
-            profile = transient.get("profile")
-            if isinstance(profile, str) and profile.strip():
-                facts.append(EvidenceFact("transient_preservation_profile", profile.strip(), "", "mix_review_upload"))
+        if "transient_preservation" in analysis:
+            transient_provenance = _qualified_transient_preservation(transient)
+            if transient_provenance is None:
+                limitations.append(TRANSIENT_SIGNAL_LIMITATION)
+            else:
+                facts.extend([
+                    EvidenceFact("transient_preservation_score", transient_provenance["score"], "ratio", "mix_review_upload"),
+                    EvidenceFact("transient_preservation_profile", transient_provenance["profile"], "", "mix_review_upload"),
+                    EvidenceFact("transient_preservation_matched_event_count", transient_provenance["matched_event_count"], "events", "mix_review_upload"),
+                ])
         masking = analysis.get("stem_masking")
         if isinstance(masking, dict):
             visibility = masking.get("lowest_visibility")
@@ -293,6 +353,8 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
             names = [name for name in names if name]
             if names:
                 facts.append(EvidenceFact("low_end_measured_stems", ", ".join(names), "", "mix_review_upload"))
+    if transient_provenance is None and any(str(name).lower() in transient_metric_names for name in metrics):
+        limitations.append(TRANSIENT_SIGNAL_LIMITATION)
     comparison = context.get("reference_comparison")
     if reference_comparison_has_activity(comparison):
         largest = comparison.get("largest_spectral_difference")
@@ -337,8 +399,10 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
             "Measurements apply to the uploaded render reviewed by Mix Review, not to unuploaded revisions.",
             "A stereo render cannot prove individual track, routing, plug-in, or automation causes.",
             "Optional stem masking and transient comparisons apply only to the supplied stems/renders; they prioritise tests but do not establish an audible cause on their own.",
+            *limitations,
             *((REFERENCE_SIGNAL_LIMITATION,) if isinstance(comparison, dict) and not reference_comparison_has_activity(comparison) else ()),
         ),
+        transient_preservation_provenance=transient_provenance,
     )
 
 
@@ -684,6 +748,8 @@ def packets_from_history(history: list | None) -> list[EvidencePacket]:
         raw_facts = raw.get("facts")
         if not source or not isinstance(raw_facts, list):
             continue
+        facts: list[EvidenceFact] = []
+        stale_names: set[str] = set()
         if source == "stem_masking_analysis":
             # Old scalar facts cannot bypass the current source-activity contract on replay.
             provenance = raw.get("stem_masking_provenance")
@@ -696,22 +762,47 @@ def packets_from_history(history: list | None) -> list[EvidencePacket]:
             if packet is not None:
                 packets.append(packet)
             continue
-        facts: list[EvidenceFact] = []
+        if source == "mix_review_upload":
+            # Rebuild this derived result only from its captured source RMS values.
+            raw_transient = raw.get("transient_preservation_provenance")
+            transient_provenance = _qualified_transient_preservation(raw_transient)
+            stale_names = {
+                "transient_preservation_score", "transient_preservation_profile",
+                "transient_preservation_matched_event_count", "transient_preservation", "matched_event_count",
+            }
+            had_transient = transient_provenance is not None or "transient_preservation_provenance" in raw or any(
+                isinstance(item, dict) and item.get("name") in stale_names for item in raw_facts
+            )
+            limitations = [str(value) for value in raw.get("limitations") or []]
+            if had_transient and transient_provenance is None:
+                limitations.append(TRANSIENT_SIGNAL_LIMITATION)
+            if transient_provenance is not None:
+                facts.extend([
+                    EvidenceFact("transient_preservation_score", transient_provenance["score"], "ratio", source),
+                    EvidenceFact("transient_preservation_profile", transient_provenance["profile"], "", source),
+                    EvidenceFact("transient_preservation_matched_event_count", transient_provenance["matched_event_count"], "events", source),
+                ])
+        else:
+            transient_provenance = None
+            limitations = [str(value) for value in raw.get("limitations") or []]
         for item in raw_facts:
             if not isinstance(item, dict) or not isinstance(item.get("name"), str):
+                continue
+            if source == "mix_review_upload" and item["name"] in stale_names:
                 continue
             value = item.get("value")
             if isinstance(value, (str, int, float, bool)):
                 facts.append(EvidenceFact(item["name"], value, str(item.get("unit") or ""), source, str(item.get("confidence") or "measured")))
-        if facts:
+        if facts or (source == "mix_review_upload" and limitations):
             age = raw.get("captured_at_age_seconds")
             observed_at = raw.get("observed_at_epoch")
             packets.append(EvidencePacket(
                 source,
                 float(age) if isinstance(age, (int, float)) else None,
                 tuple(facts),
-                tuple(str(v) for v in raw.get("limitations") or []),
+                tuple(limitations),
                 float(observed_at) if isinstance(observed_at, (int, float)) else None,
+                transient_preservation_provenance=transient_provenance,
             ))
     return packets
 

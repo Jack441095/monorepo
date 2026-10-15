@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeou
 from datetime import datetime, timezone
 import json
 import logging
+import math
 import threading
 import wave
 from pathlib import Path
@@ -393,7 +394,11 @@ def _attach_transient_preservation(
     against unrelated audio (e.g. a reference track). Never raises.
     """
     if not pre_master_bytes:
+        # A single uploaded render cannot establish pre/post preservation.
         return
+    # An attempted but unqualified comparison must remain distinguishable from
+    # no comparison, so downstream readers can discard cached transient prose.
+    report["transient_preservation"] = {}
     try:
         from audio_analysis.analysis_core.transient_groove import transient_preservation
         from audio_analysis.utils.audio_io_api import decode_audio_bytes, read_wav_mono
@@ -403,11 +408,30 @@ def _attach_transient_preservation(
         pre_data = read_wav_mono(pre_decoded["wav_bytes"])
         post_data = read_wav_mono(post_decoded["wav_bytes"])
         sample_rate = int(post_data.get("analysis_sample_rate") or post_data["sample_rate"])
-        report["transient_preservation"] = transient_preservation(
+        pre_rate = int(pre_data.get("analysis_sample_rate") or pre_data["sample_rate"])
+        if pre_rate != sample_rate:
+            # Onset timestamps cannot be paired using a rate from the other render.
+            return
+        activity = {"schema": "kenn.transient_preservation.activity.v1"}
+        for name, decoded in (("pre_rms_dbfs", pre_data), ("post_rms_dbfs", post_data)):
+            raw_rms = decoded.get("true_rms")
+            if isinstance(raw_rms, bool) or not isinstance(raw_rms, (int, float)) or not math.isfinite(raw_rms) or raw_rms <= 0:
+                # Silence or missing raw RMS cannot establish either source's activity.
+                return
+            # read_wav_mono already measures full-file raw mono RMS before its
+            # preview decimation; transient_preservation peak-normalizes later.
+            activity[name] = 20.0 * math.log10(raw_rms)
+        report["transient_preservation"] = {"activity": activity}
+        if activity["pre_rms_dbfs"] <= -60.0 or activity["post_rms_dbfs"] <= -60.0:
+            # Match the uploaded-source -60 dBFS floor before peak normalization
+            # can turn a tiny signal into apparently useful transient events.
+            return
+        report["transient_preservation"].update(transient_preservation(
             pre_data["samples"], post_data["samples"], sample_rate
-        )
+        ))
     except Exception:
-        logger.warning("Transient-preservation comparison failed; omitted from report.", exc_info=True)
+        # Keep the attempted-comparison marker so cached prose can be withheld.
+        logger.warning("Transient-preservation comparison failed; measurements withheld.", exc_info=True)
 
 
 def _run_analysis(

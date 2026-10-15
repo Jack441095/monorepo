@@ -2,6 +2,44 @@
 
 from __future__ import annotations
 
+import math
+
+
+def _transient_preservation_evidence(transient: dict) -> dict:
+    """Project qualified pre/post measurements, or retain an abstention marker."""
+    activity = transient.get("activity")
+    if not isinstance(activity, dict) or activity.get("schema") != "kenn.transient_preservation.activity.v1":
+        # Older results do not establish activity before peak normalization.
+        return {}
+    levels = {}
+    for name in ("pre_rms_dbfs", "post_rms_dbfs"):
+        value = activity.get(name)
+        try:
+            value = float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+        except OverflowError:
+            # Unrepresentable values cannot qualify a source for publication.
+            return {}
+        if value is None or not math.isfinite(value) or value <= -60.0:
+            # Both original renders must exceed the uploaded-source -60 dBFS floor.
+            return {}
+        levels[name] = value
+    count = transient.get("matched_event_count")
+    score = transient.get("preservation_score")
+    profile = transient.get("profile")
+    try:
+        score = float(score) if isinstance(score, (int, float)) and not isinstance(score, bool) else None
+    except OverflowError:
+        # An overflowing scalar is not a bounded preservation score.
+        return {}
+    if not isinstance(count, int) or isinstance(count, bool) or count <= 0 or score is None or not math.isfinite(score) or not 0.0 <= score <= 1.0 or not isinstance(profile, str) or not profile.strip():
+        # No matched events or malformed summaries cannot support a transient claim.
+        return {}
+    # 160 characters retain the short profile label without copying cached prose.
+    return {
+        "score": score, "matched_event_count": count, "profile": profile.strip()[:160],
+        "activity": {"schema": "kenn.transient_preservation.activity.v1", **levels},
+    }
+
 
 def _measured_analysis_evidence(report: dict) -> dict:
     """Select compact *measurements* from optional deeper analyses.
@@ -12,14 +50,10 @@ def _measured_analysis_evidence(report: dict) -> dict:
     """
     evidence: dict = {}
     transient = report.get("transient_preservation")
-    if isinstance(transient, dict):
-        score = transient.get("preservation_score")
-        if isinstance(score, (int, float)) and not isinstance(score, bool):
-            evidence["transient_preservation"] = {
-                "score": float(score),
-                "matched_event_count": transient.get("matched_event_count"),
-                "profile": str(transient.get("profile") or ""),
-            }
+    if "transient_preservation" in report:
+        # Keep an empty section for invalid/legacy results: its presence tells
+        # KENN that cached prose may contain an unqualified comparison claim.
+        evidence["transient_preservation"] = _transient_preservation_evidence(transient) if isinstance(transient, dict) else {}
     masking = report.get("stem_masking")
     if isinstance(masking, dict) and masking.get("ok") and isinstance(masking.get("stems"), list):
         candidates = [
@@ -109,6 +143,10 @@ def kenn_handoff(report: dict) -> dict:
         "technical_score": metrics.get("technical_score"),
         "technical_rating": metrics.get("technical_rating", ""),
         "peak_dbfs": metrics.get("peak_dbfs"),
+        # analyze_wav derives the legacy estimate from decoded true_rms (or
+        # sample-square RMS), not peak. KENN's source gate reads the canonical
+        # key; an explicit canonical value must retain precedence even if quiet.
+        "rms_dbfs": metrics.get("rms_dbfs", metrics.get("rms_dbfs_estimate")),
         "rms_dbfs_estimate": metrics.get("rms_dbfs_estimate"),
         "crest_factor_db": metrics.get("crest_factor_db"),
         "integrated_lufs": metrics.get("integrated_lufs"),

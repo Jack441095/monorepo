@@ -6,7 +6,6 @@ Covers:
 
 from __future__ import annotations
 
-
 from audio_analysis.integration.handoff import kenn_handoff
 
 
@@ -90,7 +89,9 @@ class TestKennHandoff:
 
     def test_handoff_preserves_optional_measured_stem_and_transient_summaries(self):
         report = _make_report({
-            "transient_preservation": {"preservation_score": 0.42, "matched_event_count": 18, "profile": "Smearing"},
+            "transient_preservation": {"preservation_score": 0.42, "matched_event_count": 18, "profile": "Smearing", "activity": {
+                "schema": "kenn.transient_preservation.activity.v1", "pre_rms_dbfs": -18.0, "post_rms_dbfs": -14.0,
+            }},
             "stem_masking": {"ok": True, "stems": [
                 {"name": "Kick", "overall_visibility": 0.81},
                 {"name": "Bass", "overall_visibility": 0.31},

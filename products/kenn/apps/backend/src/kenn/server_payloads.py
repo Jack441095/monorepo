@@ -17,8 +17,10 @@ import json
 from kenn.core.audiogen_artifacts import safe_artifact_metadata
 from kenn.core.evidence import (
     REFERENCE_SIGNAL_LIMITATION,
+    TRANSIENT_SIGNAL_LIMITATION,
     UPLOADED_SIGNAL_LIMITATION,
     reference_comparison_has_activity,
+    transient_preservation_has_activity,
     uploaded_metrics_have_activity,
 )
 
@@ -133,6 +135,15 @@ def _format_genre_classification(mix_style: object) -> str:
     return f"{name}-leaning ({confidence * 100:.0f}% confidence, source: {evidence_id})"
 
 
+def _handoff_metrics_without_transient_claims(metrics: dict) -> dict:
+    """Keep own-upload metrics while dropping cached transient-comparison scalars."""
+    return {
+        key: value for key, value in metrics.items()
+        if "transient_preservation" not in str(key).lower()
+        and "matched_event_count" not in str(key).lower()
+    }
+
+
 def mix_review_context_turn(context: dict | None) -> dict | None:
     """Build uploaded-review history, withholding signal claims unless whole-file RMS qualifies."""
     if not isinstance(context, dict):
@@ -145,6 +156,76 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
         session_goal = str(context.get("session_goal") or session_context.get("session_goal") or "").strip()
         metrics = context.get("metrics") if isinstance(context.get("metrics"), dict) else {}
         comparison = context.get("reference_comparison")
+        analysis_evidence = context.get("analysis_evidence") if isinstance(context.get("analysis_evidence"), dict) else {}
+        transient_summary = analysis_evidence.get("transient_preservation")
+        if transient_summary is None:
+            # Early handoffs may place the optional section beside analysis_evidence.
+            transient_summary = context.get("transient_preservation")
+        transient_present = (
+            "transient_preservation" in analysis_evidence
+            or "transient_preservation" in context
+        )
+        transient_active = transient_preservation_has_activity(transient_summary)
+
+        def validated_transient_summary() -> dict | None:
+            if not transient_active:
+                # Only serialize the fixed provenance fields accepted by the shared validator.
+                return None
+            activity = transient_summary["activity"]
+            return {
+                "score": float(transient_summary["score"]),
+                "matched_event_count": transient_summary["matched_event_count"],
+                "profile": transient_summary["profile"].strip(),
+                "activity": {
+                    "schema": "kenn.transient_preservation.activity.v1",
+                    "pre_rms_dbfs": float(activity["pre_rms_dbfs"]),
+                    "post_rms_dbfs": float(activity["post_rms_dbfs"]),
+                },
+            }
+
+        cached_text = json.dumps(
+            {key: context.get(key) for key in (
+                "context", "context_lines", "flags", "priority_actions", "judgment",
+                "revision_steps", "next_revision_plan", "metrics", "technical_metrics",
+                "analysis_evidence", "summary", "section_highlights", "ableton_repair_templates",
+                "reference", "reference_comparison", "mix_style", "leave_alone", "version_comparison",
+                "version_advice", "revision_impact",
+            )},
+            ensure_ascii=False,
+            default=str,
+        ).lower()
+        legacy_transient_claim = any(
+            marker in cached_text
+            for marker in (
+                "transient_preservation", "transient preservation", "transient-preservation",
+                "transient score", "transient profile", "matched_event_count",
+            )
+        )
+        legacy_transient_claim = legacy_transient_claim or any(
+            key in context for key in (
+                "transient_preservation_score", "transient_preservation_profile",
+                "transient_preservation_matched_event_count",
+            )
+        )
+        transient_unqualified = (transient_present and not transient_active) or (
+            not transient_present and legacy_transient_claim
+        )
+
+        if uploaded_metrics_have_activity(metrics) and transient_unqualified:
+            # Cached handoff prose cannot identify which claims used an unqualified pre/post render.
+            lines = [f"Mix Review Lab context for {title}.", TRANSIENT_SIGNAL_LIMITATION]
+            if mix_goal_label:
+                lines.append(f"Selected mix target: {mix_goal_label[:160]}")
+            if session_goal:
+                lines.append(f"Session goal: {session_goal[:300]}")
+            safe_metrics = _handoff_metrics_without_transient_claims(metrics)
+            lines.append("Structured metrics: " + json.dumps(safe_metrics, ensure_ascii=False))
+            if isinstance(comparison, dict) and reference_comparison_has_activity(comparison):
+                lines.append("Qualified reference comparison: " + json.dumps(comparison, ensure_ascii=False))
+            elif isinstance(comparison, dict):
+                lines.append(REFERENCE_SIGNAL_LIMITATION)
+            return {"role": "user", "content": "\n".join(lines)}
+
         if uploaded_metrics_have_activity(metrics) and isinstance(comparison, dict) and not reference_comparison_has_activity(comparison):
             # Cached prose can mix valid own-source observations with obsolete
             # reference advice. Rebuild from measured fields rather than guessing
@@ -154,7 +235,11 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
                 lines.append(f"Selected mix target: {mix_goal_label[:160]}")
             if session_goal:
                 lines.append(f"Session goal: {session_goal[:300]}")
-            lines.append("Structured metrics: " + json.dumps(metrics, ensure_ascii=False))
+            safe_metrics = _handoff_metrics_without_transient_claims(metrics)
+            lines.append("Structured metrics: " + json.dumps(safe_metrics, ensure_ascii=False))
+            safe_transient = validated_transient_summary()
+            if safe_transient is not None:
+                lines.append("Qualified transient-preservation summary: " + json.dumps(safe_transient, ensure_ascii=False))
             return {"role": "user", "content": "\n".join(lines)}
         if not uploaded_metrics_have_activity(metrics):
             # Older handoffs can carry cached prose and repairs alongside quiet
@@ -178,14 +263,18 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
         if session_goal:
             lines.append(f"Session goal: {session_goal[:300]}")
         if metrics:
+            safe_metrics = _handoff_metrics_without_transient_claims(metrics)
             lines.append(
                 "Structured metrics: "
                 + ", ".join(
                     f"{key.replace('_', ' ')}={value}"
-                    for key, value in metrics.items()
+                    for key, value in safe_metrics.items()
                     if value not in {None, ""}
                 )
             )
+        safe_transient = validated_transient_summary()
+        if safe_transient is not None:
+            lines.append("Qualified transient-preservation summary: " + json.dumps(safe_transient, ensure_ascii=False))
         flags = context.get("flags") if isinstance(context.get("flags"), list) else []
         if flags:
             lines.append(

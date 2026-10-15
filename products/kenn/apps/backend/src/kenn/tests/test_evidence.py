@@ -7,12 +7,14 @@ import pytest
 
 from kenn.core.evidence import (
     MARKER,
+    TRANSIENT_SIGNAL_LIMITATION,
     from_ableton_session,
     from_audio_classification_context,
     from_mix_review_context,
     from_plugin_context,
     live_context_has_activity,
     uploaded_metrics_have_activity,
+    transient_preservation_has_activity,
     reference_comparison_has_activity,
     plugin_context_for_advice,
     from_realtime_mix_comparison,
@@ -22,6 +24,19 @@ from kenn.core.evidence import (
     packets_from_history,
 )
 from kenn.core.realtime_mix_comparison import build_realtime_mix_comparison
+
+
+def _transient_summary(*, pre_rms=-18.0, post_rms=-20.0, score=0.0, count=1, profile="clean"):
+    return {
+        "score": score,
+        "matched_event_count": count,
+        "profile": profile,
+        "activity": {
+            "schema": "kenn.transient_preservation.activity.v1",
+            "pre_rms_dbfs": pre_rms,
+            "post_rms_dbfs": post_rms,
+        },
+    }
 
 
 def _masking_context():
@@ -666,7 +681,7 @@ def test_uploaded_evidence_withholds_quiet_meters_and_nested_signal_facts(rms, a
         "schema": "kenn_mix_review_handoff.v1",
         "metrics": {"rms_dbfs": rms, "peak_dbfs": -0.1, "stereo_correlation": -0.9},
         "analysis_evidence": {
-            "transient_preservation": {"score": 0.9, "profile": "compressed"},
+            "transient_preservation": _transient_summary(score=0.9, profile="compressed"),
             "stem_masking": {"lowest_visibility": 0.1, "lowest_visibility_stem": "Bass"},
             "low_end_stems": [{"name": "Bass"}],
         },
@@ -694,6 +709,106 @@ def test_uploaded_evidence_withholds_quiet_meters_and_nested_signal_facts(rms, a
         assert any("at/below -60 dBFS" in item for item in packet.limitations)
         assert relevant_observations("peak and pink reference bass masking", [packet]) == []
     assert context == saved
+
+
+@pytest.mark.parametrize("summary", [
+    None,
+    {"score": 0.5, "matched_event_count": 1, "profile": "clean"},
+    {**_transient_summary(), "activity": {"schema": "wrong", "pre_rms_dbfs": -18.0, "post_rms_dbfs": -20.0}},
+    _transient_summary(pre_rms=-60.0),
+    _transient_summary(post_rms=-60.1),
+    _transient_summary(pre_rms=None),
+    _transient_summary(post_rms=True),
+    _transient_summary(pre_rms=float("nan")),
+    _transient_summary(post_rms=float("inf")),
+    _transient_summary(pre_rms=10**1000),
+    _transient_summary(score=True),
+    _transient_summary(score=float("nan")),
+    _transient_summary(score=float("inf")),
+    _transient_summary(score=-0.01),
+    _transient_summary(score=1.01),
+    _transient_summary(score=10**1000),
+    _transient_summary(count=True),
+    _transient_summary(count=0),
+    _transient_summary(count=-1),
+    _transient_summary(count=1.5),
+    _transient_summary(profile="  "),
+    _transient_summary(profile="x" * 161),
+])
+def test_transient_facts_require_active_pre_post_renders_and_bounded_result(summary):
+    context = {
+        "schema": "kenn_mix_review_handoff.v1",
+        "metrics": {"rms_dbfs": -18.0, "peak_dbfs": -0.1},
+        "analysis_evidence": {"transient_preservation": summary},
+    }
+
+    packet = from_mix_review_context(context)
+
+    assert packet is not None
+    assert not any(fact.name.startswith("transient_preservation_") for fact in packet.facts)
+    assert packet.transient_preservation_provenance is None
+    assert TRANSIENT_SIGNAL_LIMITATION in packet.limitations
+
+
+def test_transient_facts_preserve_valid_zero_score_and_requalify_history():
+    context = {
+        "schema": "kenn_mix_review_handoff.v1",
+        "metrics": {"rms_dbfs": -18.0, "peak_dbfs": -0.1},
+        "analysis_evidence": {"transient_preservation": _transient_summary()},
+    }
+    saved = deepcopy(context)
+
+    packet = from_mix_review_context(context)
+    assert packet is not None
+    assert transient_preservation_has_activity(context["analysis_evidence"]["transient_preservation"])
+    values = {fact.name: fact.value for fact in packet.facts}
+    assert values["transient_preservation_score"] == 0.0
+    assert values["transient_preservation_matched_event_count"] == 1
+    assert context == saved
+
+    (recovered,) = packets_from_history([history_turn(packet)])
+    recovered_values = {fact.name: fact.value for fact in recovered.facts}
+    assert recovered_values["transient_preservation_score"] == 0.0
+    assert recovered_values["transient_preservation_profile"] == "clean"
+    assert recovered_values["transient_preservation_matched_event_count"] == 1
+    assert recovered.transient_preservation_provenance == packet.transient_preservation_provenance
+
+
+def test_history_drops_cached_transient_scalars_without_activity_provenance():
+    raw = {
+        "schema": "kenn.evidence.v1",
+        "source": "mix_review_upload",
+        "facts": [
+            {"name": "peak_dbfs", "value": -0.1, "unit": "dB", "confidence": "measured"},
+            {"name": "transient_preservation_score", "value": 0.99, "unit": "ratio"},
+            {"name": "transient_preservation_profile", "value": "compressed"},
+            {"name": "transient_preservation_matched_event_count", "value": 12, "unit": "events"},
+        ],
+        "limitations": [],
+    }
+
+    (packet,) = packets_from_history([{"role": "user", "content": MARKER + json.dumps(raw)}])
+
+    assert {fact.name for fact in packet.facts} == {"peak_dbfs"}
+    assert packet.transient_preservation_provenance is None
+    assert TRANSIENT_SIGNAL_LIMITATION in packet.limitations
+    assert relevant_observations("Was punch lost?", [packet]) == []
+
+
+def test_unqualified_transient_metrics_cannot_enter_upload_evidence():
+    packet = from_mix_review_context({
+        "schema": "kenn_mix_review_handoff.v1",
+        "metrics": {
+            "rms_dbfs": -18.0,
+            "transient_preservation_score": 0.99,
+            "transient_preservation_profile": "compressed",
+            "matched_event_count": 12,
+        },
+    })
+
+    assert packet is not None
+    assert {fact.name for fact in packet.facts} == {"rms_dbfs"}
+    assert TRANSIENT_SIGNAL_LIMITATION in packet.limitations
 
 
 @pytest.mark.parametrize("side", ["mix", "reference"])
