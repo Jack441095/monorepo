@@ -290,3 +290,96 @@ def test_actual_legacy_masking_critique_is_withheld_without_activity():
     assert "jointly active real preview frames" in content
     assert "getting buried" not in content
     assert "carving space" not in content
+
+
+def _low_end_stem(name="Bass", share=0.0):
+    return {
+        "name": name, "low_end_share": share,
+        "activity": {
+            "schema": "kenn.low_end_stem.activity.v1", "active_floor_dbfs": -60.0,
+            "source_rms_dbfs": -18.0, "window_rms_dbfs": -19.0,
+            "sample_rate": 44100.0, "analysis_sample_count": 8192,
+            "frame_size_samples": 4096, "window_start_sample": 2048,
+        },
+    }
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda item: item.pop("activity"),
+    lambda item: item["activity"].update(source_rms_dbfs=-60.0),
+    lambda item: item["activity"].update(window_rms_dbfs=-60.0),
+    lambda item: item["activity"].update(window_rms_dbfs=float("nan")),
+    lambda item: item["activity"].update(window_start_sample=0),
+    lambda item: item.update(low_end_share=True),
+])
+def test_invalid_low_end_stem_rebuilds_cache_but_preserves_independent_evidence(mutate):
+    # Enclosing upload activity cannot qualify a quiet stem or its normalized window.
+    context = _handoff()
+    invalid = _low_end_stem("Quiet", 0.9)
+    mutate(invalid)
+    context["analysis_evidence"] = {
+        "low_end_stems": [invalid, _low_end_stem()],
+        "stem_masking": _erb_summary(), "transient_preservation": _transient_summary(),
+    }
+    context["metrics"]["low_end_measured_stems"] = "Invented stem"
+    before = deepcopy(context)
+    content = server_payloads.mix_review_context_turn(context)["content"]
+    assert "Cached" not in content
+    assert "Invented stem" not in content
+    assert '"name": "Quiet"' not in content
+    assert '"low_end_share": 0.0' in content
+    assert "Qualified low-end stem previews" in content
+    assert "Qualified ERB" in content
+    assert "Qualified transient" in content
+    assert "Qualified reference" in content
+    assert context == before
+
+
+def test_valid_low_end_zero_is_bounded_and_survives_unqualified_reference():
+    context = _handoff()
+    item = _low_end_stem()
+    item["repair"] = "Unsupported EQ carving"
+    context["analysis_evidence"] = {"low_end_stems": [item]}
+    context["reference_comparison"] = {}
+    content = server_payloads.mix_review_context_turn(context)["content"]
+    assert '"low_end_share": 0.0' in content
+    assert "Qualified low-end stem previews" in content
+    assert "Unsupported EQ carving" not in content
+    assert "Cached" not in content
+
+
+@pytest.mark.parametrize("legacy", [
+    "Measured low-end spectrum summaries were supplied for: Bass.",
+    "'Kick' and 'Bass' both carry substantial low-end energy (0.8 and 0.7 share "
+    "of their own spectrum) — likely candidates for low-end EQ carving or sidechain ducking.",
+])
+def test_historical_low_end_prose_cannot_restore_unqualified_stem_rankings(legacy):
+    context = _handoff()
+    context["context_lines"] = [legacy]
+    content = server_payloads.mix_review_context_turn(context)["content"]
+    assert legacy not in content
+    assert "Qualified low-end" not in content
+    assert "Qualified reference" in content
+
+
+def test_valid_low_end_provenance_cannot_restore_historical_overlap_repair():
+    # Active independent windows still cannot establish shared-time masking or a repair.
+    context = _handoff()
+    context["analysis_evidence"] = {"low_end_stems": [_low_end_stem()]}
+    context["context_lines"] = ["Bass and Kick both carry substantial low-end; try sidechain ducking."]
+    context["metrics"]["low_end_share"] = 0.23
+    content = server_payloads.mix_review_context_turn(context)["content"]
+    assert "sidechain ducking" not in content
+    assert "both carry substantial" not in content
+    assert '"low_end_share": 0.23' in content
+    assert '"low_end_share": 0.0' in content
+    assert "Qualified reference" in content
+
+
+def test_whole_mix_low_end_share_does_not_invent_an_optional_stem_failure():
+    context = _handoff()
+    context["metrics"]["low_end_share"] = 0.23
+    content = server_payloads.mix_review_context_turn(context)["content"]
+    assert "low end share=0.23" in content
+    assert "Low-end stem previews lack" not in content
+    assert "Cached" in content

@@ -478,8 +478,10 @@ def test_stem_spectrum_comparison_identifies_low_end_dominant_stem() -> None:
     assert ranked[0]["name"] == "bass"
 
 
-def test_stem_spectrum_comparison_flags_low_end_overlap() -> None:
+def test_stem_spectrum_comparison_keeps_low_end_shares_without_repair_claims() -> None:
     kick = {"name": "kick", "samples": _sine(70.0, 1.0, amp=0.6), "sample_rate": SR}
     bass = {"name": "bass", "samples": _sine(90.0, 1.0, amp=0.6), "sample_rate": SR}
     result = stem_solo.stem_spectrum_comparison([kick, bass])
-    assert result["low_end_summary"]["overlap_warning"] is not None
+    # Within-stem fractions do not establish simultaneous masking or a repair.
+    assert len(result["low_end_summary"]["ranked"]) == 2
+    assert result["low_end_summary"]["overlap_warning"] is None

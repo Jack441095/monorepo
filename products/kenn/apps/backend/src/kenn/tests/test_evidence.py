@@ -10,6 +10,10 @@ from kenn.core.evidence import (
     TRANSIENT_SIGNAL_LIMITATION,
     STEM_MASKING_SIGNAL_LIMITATION,
     ERB_PREVIEW_LIMITATION,
+    LOW_END_SIGNAL_LIMITATION,
+    LOW_END_PREVIEW_LIMITATION,
+    qualified_low_end_stems,
+    low_end_stems_have_activity,
     qualified_stem_masking_summary,
     stem_masking_has_activity,
     from_ableton_session,
@@ -938,3 +942,124 @@ def test_erb_visibility_isolates_unpaired_quiet_preview_sources():
     assert qualified_stem_masking_summary(summary) == summary
     summary["lowest_visibility_stem"] = "Quiet"
     assert qualified_stem_masking_summary(summary) is None
+
+def _low_end_preview(name="Bass", share=0.0):
+    return {"name": name, "low_end_share": share, "activity": {
+        "schema": "kenn.low_end_stem.activity.v1", "active_floor_dbfs": -60.0,
+        "source_rms_dbfs": -18.0, "window_rms_dbfs": -20.0,
+        "sample_rate": 44100.0, "analysis_sample_count": 65536,
+        "frame_size_samples": 4096, "window_start_sample": 30720,
+    }}
+
+
+@pytest.mark.parametrize("path,value", [
+    (("activity",), None), (("activity", "schema"), "legacy"),
+    (("activity", "active_floor_dbfs"), -80.0),
+    (("activity", "source_rms_dbfs"), -60.0), (("activity", "window_rms_dbfs"), -60.0),
+    (("activity", "source_rms_dbfs"), None), (("activity", "window_rms_dbfs"), True),
+    (("activity", "source_rms_dbfs"), "-18"), (("activity", "window_rms_dbfs"), float("nan")),
+    (("activity", "source_rms_dbfs"), float("inf")), (("activity", "window_rms_dbfs"), 10**1000),
+    (("activity", "sample_rate"), True), (("activity", "sample_rate"), 0),
+    (("activity", "sample_rate"), float("nan")), (("activity", "sample_rate"), 10**1000),
+    (("activity", "analysis_sample_count"), 255), (("activity", "analysis_sample_count"), True),
+    (("activity", "analysis_sample_count"), 2**53),
+    (("activity", "frame_size_samples"), 2048), (("activity", "frame_size_samples"), True),
+    (("activity", "window_start_sample"), 0), (("activity", "window_start_sample"), True),
+    (("low_end_share",), True), (("low_end_share",), -0.1), (("low_end_share",), 1.1),
+    (("low_end_share",), float("nan")), (("low_end_share",), 10**1000),
+    (("name",), ""), (("name",), " Bass"), (("name",), "x" * 97),
+])
+def test_low_end_preview_requires_source_and_exact_fft_window_activity(path, value):
+    # An active render used to promote silent-window normalized ratios and cached stem names.
+    item = _low_end_preview()
+    target = item
+    for part in path[:-1]:
+        target = target[part]
+    target[path[-1]] = value
+    assert qualified_low_end_stems([item]) == []
+    assert not low_end_stems_have_activity([item])
+    packet = from_mix_review_context({"schema": "kenn_mix_review_handoff.v1", "metrics": {"rms_dbfs": -18.0}, "analysis_evidence": {"low_end_stems": [item], "transient_preservation": _transient_summary()}})
+    assert packet is not None
+    assert "low_end_measured_stems" not in {fact.name for fact in packet.facts}
+    assert "transient_preservation_score" in {fact.name for fact in packet.facts}
+    assert LOW_END_SIGNAL_LIMITATION in packet.limitations
+    raw = packet.payload()
+    raw["low_end_stems_provenance"] = [item]
+    raw["facts"].append({"name": "low_end_measured_stems", "value": "Unqualified"})
+    recovered, = packets_from_history([{"content": MARKER + json.dumps(raw)}])
+    assert "low_end_measured_stems" not in {fact.name for fact in recovered.facts}
+    assert LOW_END_SIGNAL_LIMITATION in recovered.limitations
+
+
+def test_low_end_zero_share_retains_source_proof_and_rebuilds_cached_names():
+    # Zero is a measured own-spectrum result, while replayed name facts are never authoritative.
+    item = _low_end_preview()
+    packet = from_mix_review_context({"schema": "kenn_mix_review_handoff.v1", "metrics": {"rms_dbfs": -18.0}, "analysis_evidence": {"low_end_stems": [item]}})
+    assert packet is not None and packet.low_end_stems_provenance == [item]
+    raw = packet.payload()
+    raw["facts"].append({"name": "low_end_measured_stems", "value": "Unqualified"})
+    raw["limitations"] = []
+    recovered, = packets_from_history([{"content": MARKER + json.dumps(raw)}])
+    assert [fact.value for fact in recovered.facts if fact.name == "low_end_measured_stems"] == ["Bass"]
+    assert LOW_END_PREVIEW_LIMITATION in packet.limitations
+    assert LOW_END_PREVIEW_LIMITATION in recovered.limitations
+    assert "centered FFT-window" in " ".join(relevant_observations("bass", [recovered]))
+    raw["low_end_stems_provenance"][0]["activity"]["window_rms_dbfs"] = -100.0
+    assert packet.low_end_stems_provenance == [item]
+
+
+@pytest.mark.parametrize("count,size,start", [(256,256,0),(511,256,127),(512,512,0),(1023,512,255),(1024,1024,0),(2048,2048,0),(4096,4096,0),(8193,4096,2048)])
+def test_low_end_preview_accepts_existing_centered_fft_geometry(count, size, start):
+    item = _low_end_preview()
+    item["activity"].update(analysis_sample_count=count, frame_size_samples=size, window_start_sample=start)
+    assert qualified_low_end_stems([item]) == [item]
+
+
+def test_low_end_preview_isolates_valid_stem_and_rejects_duplicate_identities():
+    valid, quiet = _low_end_preview(), _low_end_preview("Quiet", .9)
+    quiet["activity"]["window_rms_dbfs"] = -100.0
+    assert qualified_low_end_stems([valid, quiet]) == [valid]
+    assert not low_end_stems_have_activity([valid, quiet])
+    assert qualified_low_end_stems([valid, deepcopy(valid)]) == []
+    assert qualified_low_end_stems([valid, quiet, _low_end_preview("Third")]) == []
+
+
+def test_low_end_legacy_names_and_metric_aliases_cannot_bypass_activity():
+    aliases = {"low_end_measured_stems": "Bass", "low_end_overlap": .9}
+    packet = from_mix_review_context({"schema": "kenn_mix_review_handoff.v1", "metrics": {"rms_dbfs": -18.0, **aliases}, "analysis_evidence": {"low_end_stems": [{"name": "Bass", "low_end_share": .9}]}})
+    assert packet is not None and {fact.name for fact in packet.facts} == {"rms_dbfs"}
+    raw = {"schema": "kenn.evidence.v1", "source": "mix_review_upload", "facts": [{"name": name, "value": value} for name, value in aliases.items()] + [{"name": "peak_dbfs", "value": -1.0}]}
+    recovered, = packets_from_history([{"content": MARKER + json.dumps(raw)}])
+    assert {fact.name for fact in recovered.facts} == {"peak_dbfs"}
+    assert LOW_END_SIGNAL_LIMITATION in recovered.limitations
+
+
+def test_whole_mix_low_end_share_survives_unqualified_stem_preview_and_replay():
+    # Whole-mix low_end_share is an independent render metric, not a legacy stem alias.
+    packet = from_mix_review_context({
+        "schema": "kenn_mix_review_handoff.v1",
+        "metrics": {"rms_dbfs": -18.0, "low_end_share": 0.42},
+        "analysis_evidence": {"low_end_stems": [{"name": "Unqualified", "low_end_share": .99}]},
+    })
+    assert packet is not None
+    assert {fact.name: fact.value for fact in packet.facts} == {"rms_dbfs": -18.0, "low_end_share": 0.42}
+    assert LOW_END_SIGNAL_LIMITATION in packet.limitations
+    recovered, = packets_from_history([history_turn(packet)])
+    assert {fact.name: fact.value for fact in recovered.facts} == {"rms_dbfs": -18.0, "low_end_share": 0.42}
+    assert LOW_END_SIGNAL_LIMITATION in recovered.limitations
+
+
+def test_upload_without_optional_low_end_analysis_stays_absent_across_two_history_hops():
+    # Replaying an ordinary upload must not manufacture an empty attempted-analysis marker.
+    packet = from_mix_review_context({
+        "schema": "kenn_mix_review_handoff.v1",
+        "metrics": {"rms_dbfs": -18.0, "low_end_share": 0.42},
+    })
+    assert packet is not None
+    original = packet.payload()
+    for _ in range(2):
+        packet, = packets_from_history([history_turn(packet)])
+        assert packet.low_end_stems_provenance is None
+        assert "low_end_stems_provenance" not in packet.payload()
+        assert LOW_END_SIGNAL_LIMITATION not in packet.limitations
+        assert packet.payload() == original

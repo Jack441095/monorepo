@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import html
 
+from audio_analysis.integration.handoff import qualified_low_end_stems
+
 
 def _escape(value: object) -> str:
     return html.escape(str(value if value is not None else ""), quote=True)
@@ -119,30 +121,31 @@ def _mix_style_html(style: dict | None) -> str:
 
 
 def _stem_solo_html(stem_solo: dict | None, stem_masking: dict | None) -> str:
-    """Stage 10 stem-solo/masking — low-end overlap ranking + carving suggestions."""
+    """Render qualified own-spectrum previews without cached overlap or repair claims."""
     if not stem_solo and not stem_masking:
+        # Optional stem analyses add no section to an ordinary mix review.
         return ""
     parts = []
-    low_end = (stem_solo or {}).get("low_end_summary") or {}
-    overlap_warning = low_end.get("overlap_warning", "")
-    if overlap_warning:
-        parts.append(f"<p>{_escape(overlap_warning)}</p>")
-    ranked = low_end.get("ranked") or []
-    if ranked:
+    low_end = stem_solo.get("low_end_summary") if isinstance(stem_solo, dict) else None
+    ranked = low_end.get("ranked") if isinstance(low_end, dict) else None
+    ranked = ranked if isinstance(ranked, list) else []
+    names = [item.get("name") for item in ranked if isinstance(item, dict)]
+    measured = [entry for item in ranked if isinstance(item, dict) and names.count(item.get("name")) == 1
+                for entry in qualified_low_end_stems([item])]
+    if measured:
+        parts.append("<p>Sub+bass share of each stem's own centered spectrum preview; "
+                     "these ratios do not compare mix levels or establish simultaneous masking.</p>")
         rows = "".join(
-            f"<li>{_escape(item.get('name', ''))}: "
-            f"{_escape(item.get('low_end_share', ''))}</li>"
-            for item in ranked
+            f"<li>{_escape(item['name'])}: {_escape(item['low_end_share'])}</li>"
+            for item in measured
         )
         parts.append(f"<ul>{rows}</ul>")
-    suggestions = ((stem_masking or {}).get("erb_details") or {}).get("carving_suggestions") or []
-    if suggestions:
-        rows = "".join(
-            f"<li>Carve {_escape(item.get('masker', ''))} to make room for "
-            f"{_escape(item.get('masked', ''))} around {_escape(item.get('frequency_hz', ''))} Hz</li>"
-            for item in suggestions
-        )
-        parts.append(f"<ul>{rows}</ul>")
+    if stem_solo is not None and (not measured or len(measured) != len(ranked)):
+        # Legacy/quiet entries cannot reappear through a saved report's cached ranking.
+        parts.append("<p>Unqualified stem previews withheld: raw source and centered-window "
+                     "RMS must both exceed -60 dBFS.</p>")
+    # Relative spectra cannot validate the old cached carving/clarity predictions,
+    # even when activity qualifies a preview; omit those repair claims entirely.
     return "<section><h2>Stem Solo &amp; Masking</h2>" + "".join(parts) + "</section>"
 
 

@@ -155,6 +155,100 @@ def stem_masking_evidence(masking: object) -> dict:
     return min(checked, key=lambda item: item["lowest_visibility"])
 
 
+def _low_end_rms_has_activity(value: object) -> bool:
+    """Qualify finite raw RMS above the existing -60 dBFS upload floor."""
+    try:
+        value = float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+    except OverflowError:
+        # Unrepresentable levels cannot qualify a normalized spectrum for publication.
+        return False
+    return value is not None and math.isfinite(value) and value > -60.0
+
+
+def qualified_low_end_stems(summary: object) -> list[dict[str, object]]:
+    """Copy up to two source-qualified spectrum previews, omitting invalid identities."""
+    if not isinstance(summary, list) or not 1 <= len(summary) <= 2:
+        # Empty/legacy sections retain an abstention without inventing a measured stem.
+        return []
+    names = [item.get("name") for item in summary if isinstance(item, dict)]
+    qualified = []
+    for item in summary:
+        if not isinstance(item, dict):
+            # Malformed entries do not erase independently qualified stems.
+            continue
+        name, activity = item.get("name"), item.get("activity")
+        if (
+            not isinstance(name, str) or not name.strip() or name != name.strip()
+            or len(name) > 96 or names.count(name) != 1
+        ):
+            # Exact unique identities prevent an invalid alias becoming a measured ranking.
+            continue
+        if (
+            not isinstance(activity, dict) or activity.get("schema") != "kenn.low_end_stem.activity.v1"
+            or activity.get("active_floor_dbfs") != -60.0
+        ):
+            # Normalized ratios from older reports lack raw source/window activity proof.
+            continue
+        if not all(_low_end_rms_has_activity(activity.get(key)) for key in ("source_rms_dbfs", "window_rms_dbfs")):
+            # An active full file cannot qualify silence in the actual centered FFT window.
+            continue
+        count, size, start = (activity.get(key) for key in ("analysis_sample_count", "frame_size_samples", "window_start_sample"))
+        if not isinstance(count, int) or isinstance(count, bool) or not 256 <= count <= 2**53 - 1:
+            # 256 samples is the existing FFT minimum; JSON transports integers exactly up to 2**53-1.
+            continue
+        expected_size = 1 << (min(4096, count).bit_length() - 1)
+        if (
+            not isinstance(size, int) or isinstance(size, bool) or size != expected_size
+            or not isinstance(start, int) or isinstance(start, bool) or start != (count - size) // 2
+        ):
+            # Geometry must describe the existing centered power-of-two FFT, not another active region.
+            continue
+        rate, share = activity.get("sample_rate"), item.get("low_end_share")
+        try:
+            rate = float(rate) if isinstance(rate, (int, float)) and not isinstance(rate, bool) else None
+            share = float(share) if isinstance(share, (int, float)) and not isinstance(share, bool) else None
+        except OverflowError:
+            # Unrepresentable scalars cannot qualify a rate or bounded own-spectrum share.
+            continue
+        if (
+            rate is None or not math.isfinite(rate) or rate <= 0
+            or share is None or not math.isfinite(share) or not 0 <= share <= 1
+        ):
+            # A valid zero share is retained; no low-band energy is different from missing audio.
+            continue
+        qualified.append({
+            "name": name, "low_end_share": share,
+            "activity": {
+                "schema": "kenn.low_end_stem.activity.v1", "active_floor_dbfs": -60.0,
+                "source_rms_dbfs": float(activity["source_rms_dbfs"]),
+                "window_rms_dbfs": float(activity["window_rms_dbfs"]),
+                "sample_rate": rate, "analysis_sample_count": count,
+                "frame_size_samples": size, "window_start_sample": start,
+            },
+        })
+    return qualified
+
+
+def low_end_stems_evidence(stem_solo: object) -> list[dict]:
+    """Select two qualified own-spectrum previews without promoting quiet or duplicate identities."""
+    low_end = stem_solo.get("low_end_summary") if isinstance(stem_solo, dict) else None
+    ranked = low_end.get("ranked") if isinstance(low_end, dict) else None
+    if not isinstance(ranked, list):
+        # Legacy/malformed sections retain an empty sentinel for cached-prose qualification.
+        return []
+    names = [item.get("name") for item in ranked if isinstance(item, dict)]
+    measured = []
+    for item in ranked:
+        if not isinstance(item, dict) or names.count(item.get("name")) != 1:
+            # An ambiguous name cannot acquire measured status through an unrelated valid entry.
+            continue
+        measured.extend(qualified_low_end_stems([item]))
+        if len(measured) == 2:
+            # The chat handoff needs two named previews; rendering can qualify each remaining row.
+            break
+    return measured
+
+
 def _measured_analysis_evidence(report: dict) -> dict:
     """Select compact *measurements* from optional deeper analyses.
 
@@ -171,18 +265,9 @@ def _measured_analysis_evidence(report: dict) -> dict:
     if "stem_masking" in report:
         # Invalid legacy sections still mark cached prose as unqualified.
         evidence["stem_masking"] = stem_masking_evidence(report.get("stem_masking"))
-    stem_solo = report.get("stem_solo")
-    if isinstance(stem_solo, dict):
-        low_end = stem_solo.get("low_end_summary")
-        ranked = low_end.get("ranked") if isinstance(low_end, dict) else None
-        if isinstance(ranked, list):
-            measured = [
-                {"name": str(item.get("name") or "stem"), "low_end_share": float(item["low_end_share"])}
-                for item in ranked[:2]
-                if isinstance(item, dict) and isinstance(item.get("low_end_share"), (int, float))
-            ]
-            if measured:
-                evidence["low_end_stems"] = measured
+    if "stem_solo" in report:
+        # Presence survives abstention so cached low-end prose is requalified by KENN.
+        evidence["low_end_stems"] = low_end_stems_evidence(report.get("stem_solo"))
     return evidence
 
 

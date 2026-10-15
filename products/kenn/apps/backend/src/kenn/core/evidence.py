@@ -27,6 +27,8 @@ LIVE_ACTIVITY_FLOOR_DBFS = -80.0
 UPLOADED_ACTIVITY_FLOOR_DBFS = -60.0
 UPLOADED_SIGNAL_LIMITATION = "RMS is missing, invalid or at/below -60 dBFS; signal measurements, grading and recommendations are withheld."
 REFERENCE_SIGNAL_LIMITATION = "Mix and reference RMS must both be finite numeric values above -60 dBFS; reference comparison measurements and recommendations are withheld."
+LOW_END_SIGNAL_LIMITATION = "Low-end stem previews lack qualifying raw source or centered-window activity; unqualified stem names and shares are withheld. Both RMS readings must exceed -60 dBFS."
+LOW_END_PREVIEW_LIMITATION = "Low-end shares describe each stem's own centered FFT-window spectrum, not relative stem levels, simultaneous audible masking or a whole-song ranking."
 ERB_PREVIEW_LIMITATION = "ERB visibility is a relative-spectrum proxy for jointly active preview frames, not calibrated audible masking severity or a whole-song assessment."
 STEM_MASKING_SIGNAL_LIMITATION = "ERB stem visibility lacks qualifying jointly active real preview frames; visibility and stem claims are withheld. Preview frames must exceed -60 dBFS RMS. Name-based fallback profiles are not measurements."
 TRANSIENT_SIGNAL_LIMITATION = "Transient comparison lacks qualifying pre/post activity or valid matched-event evidence; score, profile and event count are withheld. Pre/post RMS must be finite and above -60 dBFS."
@@ -51,6 +53,7 @@ class EvidencePacket:
     stem_masking_provenance: dict[str, Any] | None = None
     transient_preservation_provenance: dict[str, Any] | None = None
     erb_masking_provenance: dict[str, Any] | None = None
+    low_end_stems_provenance: list[dict[str, Any]] | None = None
 
     def payload(self) -> dict[str, Any]:
         payload = {
@@ -70,6 +73,9 @@ class EvidencePacket:
         if self.source == "mix_review_upload" and self.erb_masking_provenance is not None:
             # Replay requalifies real preview sources instead of trusting cached visibility.
             payload["erb_masking_provenance"] = deepcopy(self.erb_masking_provenance)
+        if self.source == "mix_review_upload" and self.low_end_stems_provenance is not None:
+            # Replayed names must remain tied to the actual source and centered FFT window.
+            payload["low_end_stems_provenance"] = deepcopy(self.low_end_stems_provenance)
         if self.source in {"plugin_bus_snapshot", "realtime_mix_comparison"}:
             age = self.captured_at_age_seconds
             if self.observed_at_epoch is not None:
@@ -253,6 +259,76 @@ def stem_masking_has_activity(summary: dict[str, Any] | None) -> bool:
     return qualified_stem_masking_summary(summary) is not None
 
 
+def qualified_low_end_stems(summary: Any) -> list[dict[str, Any]]:
+    """Copy up to two source-qualified spectrum previews, omitting invalid identities."""
+    if not isinstance(summary, list) or not 1 <= len(summary) <= 2:
+        # Empty/legacy sections retain an abstention without inventing a measured stem.
+        return []
+    names = [item.get("name") for item in summary if isinstance(item, dict)]
+    qualified = []
+    for item in summary:
+        if not isinstance(item, dict):
+            # Malformed entries do not erase independently qualified stems.
+            continue
+        name, activity = item.get("name"), item.get("activity")
+        if (
+            not isinstance(name, str) or not name.strip() or name != name.strip()
+            or len(name) > 96 or names.count(name) != 1
+        ):
+            # Exact unique identities prevent an invalid alias becoming a measured ranking.
+            continue
+        if (
+            not isinstance(activity, dict) or activity.get("schema") != "kenn.low_end_stem.activity.v1"
+            or activity.get("active_floor_dbfs") != -60.0
+        ):
+            # Normalized ratios from older reports lack raw source/window activity proof.
+            continue
+        if not all(uploaded_metrics_have_activity({"rms_dbfs": activity.get(key)}) for key in ("source_rms_dbfs", "window_rms_dbfs")):
+            # An active full file cannot qualify silence in the actual centered FFT window.
+            continue
+        count, size, start = (activity.get(key) for key in ("analysis_sample_count", "frame_size_samples", "window_start_sample"))
+        if not isinstance(count, int) or isinstance(count, bool) or not 256 <= count <= 2**53 - 1:
+            # 256 samples is the existing FFT minimum; JSON transports integers exactly up to 2**53-1.
+            continue
+        expected_size = 1 << (min(4096, count).bit_length() - 1)
+        if (
+            not isinstance(size, int) or isinstance(size, bool) or size != expected_size
+            or not isinstance(start, int) or isinstance(start, bool) or start != (count - size) // 2
+        ):
+            # Geometry must describe the existing centered power-of-two FFT, not another active region.
+            continue
+        rate, share = activity.get("sample_rate"), item.get("low_end_share")
+        try:
+            rate = float(rate) if isinstance(rate, (int, float)) and not isinstance(rate, bool) else None
+            share = float(share) if isinstance(share, (int, float)) and not isinstance(share, bool) else None
+        except OverflowError:
+            # Unrepresentable scalars cannot qualify a rate or bounded own-spectrum share.
+            continue
+        if (
+            rate is None or not math.isfinite(rate) or rate <= 0
+            or share is None or not math.isfinite(share) or not 0 <= share <= 1
+        ):
+            # A valid zero share is retained; no low-band energy is different from missing audio.
+            continue
+        qualified.append({
+            "name": name, "low_end_share": share,
+            "activity": {
+                "schema": "kenn.low_end_stem.activity.v1", "active_floor_dbfs": -60.0,
+                "source_rms_dbfs": float(activity["source_rms_dbfs"]),
+                "window_rms_dbfs": float(activity["window_rms_dbfs"]),
+                "sample_rate": rate, "analysis_sample_count": count,
+                "frame_size_samples": size, "window_start_sample": start,
+            },
+        })
+    return qualified
+
+
+def low_end_stems_have_activity(summary: Any) -> bool:
+    """Return whether every entry in a nonempty bounded preview list qualifies."""
+    qualified = qualified_low_end_stems(summary)
+    return bool(qualified) and len(qualified) == len(summary)
+
+
 def reference_comparison_has_activity(comparison: dict[str, Any] | None) -> bool:
     """Qualify both uploaded sources from the matcher's downmixed RMS provenance."""
     if not isinstance(comparison, dict):
@@ -404,6 +480,7 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
     facts: list[EvidenceFact] = []
     transient_provenance: dict[str, Any] | None = None
     erb_provenance: dict[str, Any] | None = None
+    low_end_provenance: list[dict[str, Any]] | None = None
     limitations: list[str] = []
     # These are calculated assessments/labels, not measurements.  They can
     # remain available in the Mix Review narrative, but must not gain the
@@ -414,8 +491,9 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
         "transient_preservation_matched_event_count", "matched_event_count",
     }
     erb_metric_names = {"stem_masking", "stem_masking_lowest_visibility", "stem_masking_lowest_visibility_stem", "lowest_visibility", "overall_visibility", "lowest_visibility_stem", "stem_count"}
+    low_end_metric_names = {"low_end_stems", "low_end_measured_stems", "low_end_summary", "low_end_overlap", "low_end_overlap_warning"}
     for name, value in metrics.items():
-        if str(name).lower() in derived_metric_names | transient_metric_names | erb_metric_names:
+        if str(name).lower() in derived_metric_names | transient_metric_names | erb_metric_names | low_end_metric_names:
             continue
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             continue
@@ -453,16 +531,20 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
                     EvidenceFact("stem_masking_lowest_visibility", erb_provenance["lowest_visibility"], "ratio", "mix_review_upload"),
                     EvidenceFact("stem_masking_lowest_visibility_stem", erb_provenance["lowest_visibility_stem"], "", "mix_review_upload"),
                 ])
-        low_end = analysis.get("low_end_stems")
-        if isinstance(low_end, list):
-            names = [str(item.get("name") or "").strip() for item in low_end if isinstance(item, dict)]
-            names = [name for name in names if name]
-            if names:
-                facts.append(EvidenceFact("low_end_measured_stems", ", ".join(names), "", "mix_review_upload"))
+        if "low_end_stems" in analysis:
+            low_end = analysis.get("low_end_stems")
+            low_end_provenance = qualified_low_end_stems(low_end)
+            if not low_end_stems_have_activity(low_end):
+                limitations.append(LOW_END_SIGNAL_LIMITATION)
+            if low_end_provenance:
+                limitations.append(LOW_END_PREVIEW_LIMITATION)
+                facts.append(EvidenceFact("low_end_measured_stems", ", ".join(item["name"] for item in low_end_provenance), "", "mix_review_upload"))
     if transient_provenance is None and any(str(name).lower() in transient_metric_names for name in metrics):
         limitations.append(TRANSIENT_SIGNAL_LIMITATION)
     if erb_provenance is None and any(str(name).lower() in erb_metric_names for name in metrics):
         limitations.append(STEM_MASKING_SIGNAL_LIMITATION)
+    if not low_end_provenance and any(str(name).lower() in low_end_metric_names for name in metrics):
+        limitations.append(LOW_END_SIGNAL_LIMITATION)
     comparison = context.get("reference_comparison")
     if reference_comparison_has_activity(comparison):
         largest = comparison.get("largest_spectral_difference")
@@ -512,6 +594,7 @@ def from_mix_review_context(context: dict[str, Any] | None) -> EvidencePacket | 
         ),
         transient_preservation_provenance=transient_provenance,
         erb_masking_provenance=erb_provenance,
+        low_end_stems_provenance=low_end_provenance,
     )
 
 
@@ -905,9 +988,23 @@ def packets_from_history(history: list | None) -> list[EvidencePacket]:
                     EvidenceFact("stem_masking_lowest_visibility", erb_provenance["lowest_visibility"], "ratio", source),
                     EvidenceFact("stem_masking_lowest_visibility_stem", erb_provenance["lowest_visibility_stem"], "", source),
                 ])
+            raw_low_end = raw.get("low_end_stems_provenance")
+            low_end_names = {"low_end_stems", "low_end_measured_stems", "low_end_summary", "low_end_overlap", "low_end_overlap_warning"}
+            had_low_end = "low_end_stems_provenance" in raw or any(isinstance(item, dict) and str(item.get("name")).lower() in low_end_names for item in raw_facts)
+            # Absence stays absent across repeated history hops; an empty sentinel means attempted analysis.
+            low_end_provenance = qualified_low_end_stems(raw_low_end) if had_low_end else None
+            stale_names.update(low_end_names)
+            if had_low_end and not low_end_stems_have_activity(raw_low_end):
+                limitations.append(LOW_END_SIGNAL_LIMITATION)
+            if low_end_provenance:
+                if LOW_END_PREVIEW_LIMITATION not in limitations:
+                    # A stripped receipt cannot expand a short own-spectrum preview into a song assessment.
+                    limitations.append(LOW_END_PREVIEW_LIMITATION)
+                facts.append(EvidenceFact("low_end_measured_stems", ", ".join(item["name"] for item in low_end_provenance), "", source))
         else:
             transient_provenance = None
             erb_provenance = None
+            low_end_provenance = None
             limitations = [str(value) for value in raw.get("limitations") or []]
         for item in raw_facts:
             if not isinstance(item, dict) or not isinstance(item.get("name"), str):
@@ -928,6 +1025,7 @@ def packets_from_history(history: list | None) -> list[EvidencePacket]:
                 float(observed_at) if isinstance(observed_at, (int, float)) else None,
                 transient_preservation_provenance=transient_provenance,
                 erb_masking_provenance=erb_provenance,
+                low_end_stems_provenance=low_end_provenance,
             ))
     return packets
 
@@ -1084,7 +1182,7 @@ def relevant_observations(query: str, packets: list[EvidencePacket]) -> list[str
             if isinstance(visibility, (int, float)) and isinstance(stem, str):
                 observations.append(f"Measured across jointly active stem preview frames: lowest relative ERB preview visibility was {visibility:.2f} for '{stem}'. This relative-spectrum proxy prioritises a listening check; it does not measure calibrated audible masking severity or the whole song.")
             if isinstance(names, str) and names:
-                observations.append(f"Measured low-end spectrum summaries were supplied for: {names}. These identify analysed stems, not which one should dominate creatively.")
+                observations.append(f"Activity-qualified centered FFT-window low-end previews were supplied for: {names}. Own-spectrum shares cannot establish relative stem levels, simultaneous audible masking or a whole-song ranking.")
         if packet.source == "stem_masking_analysis" and (wants_masking or wants_low_end):
             candidate_count = values.get("masking_candidate_count")
             highest_fraction = values.get("masking_highest_competing_frame_fraction")

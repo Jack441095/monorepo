@@ -18,6 +18,10 @@ from kenn.core.audiogen_artifacts import safe_artifact_metadata
 from kenn.core.evidence import (
     REFERENCE_SIGNAL_LIMITATION,
     ERB_PREVIEW_LIMITATION,
+    LOW_END_PREVIEW_LIMITATION,
+    LOW_END_SIGNAL_LIMITATION,
+    qualified_low_end_stems,
+    low_end_stems_have_activity,
     STEM_MASKING_SIGNAL_LIMITATION,
     qualified_stem_masking_summary,
     TRANSIENT_SIGNAL_LIMITATION,
@@ -146,6 +150,7 @@ def _handoff_metrics_without_optional_claims(metrics: dict) -> dict:
         and "matched_event_count" not in str(key).lower()
         and "stem_masking" not in str(key).lower()
         and "visibility" not in str(key).lower()
+        and str(key).lower() not in {"low_end_stems", "low_end_measured_stems", "low_end_summary", "low_end_overlap", "low_end_overlap_warning"}
     }
 
 
@@ -174,6 +179,9 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
         erb_summary = analysis_evidence.get("stem_masking", context.get("stem_masking"))
         erb_present = "stem_masking" in analysis_evidence or "stem_masking" in context
         safe_erb = qualified_stem_masking_summary(erb_summary)
+        low_end_summary = analysis_evidence.get("low_end_stems", context.get("low_end_stems"))
+        low_end_present = "low_end_stems" in analysis_evidence or "low_end_stems" in context
+        safe_low_end = qualified_low_end_stems(low_end_summary)
 
         def validated_transient_summary() -> dict | None:
             if not transient_active:
@@ -227,8 +235,21 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
             )
         ) or any("stem_masking" in str(key).lower() for key in context)
         erb_unqualified = (erb_present and safe_erb is None) or (not erb_present and legacy_erb_claim)
+        legacy_low_end_claim = any(
+            marker in cached_text for marker in (
+                '"low_end_stems"', '"low_end_measured_stems"', '"low_end_summary"', '"low_end_overlap"', '"low_end_overlap_warning"',
+                '"stem_solo"', "both carry substantial low-end", "share of their own spectrum",
+                "low-end spectrum summaries", "low-end stem ranking",
+            )
+        ) or any(str(key).lower() in {"low_end_stems", "low_end_measured_stems", "low_end_summary", "low_end_overlap", "low_end_overlap_warning", "stem_solo"} for key in context)
+        unsupported_low_end_repair = any(marker in cached_text for marker in (
+            "both carry substantial low-end", "low-end eq carving",
+        ))
+        low_end_unqualified = (
+            low_end_present and not low_end_stems_have_activity(low_end_summary)
+        ) or (not low_end_present and legacy_low_end_claim)
         reference_unqualified = isinstance(comparison, dict) and not reference_comparison_has_activity(comparison)
-        if uploaded_metrics_have_activity(metrics) and (transient_unqualified or erb_unqualified or reference_unqualified):
+        if uploaded_metrics_have_activity(metrics) and (transient_unqualified or erb_unqualified or low_end_unqualified or unsupported_low_end_repair or reference_unqualified):
             # Cached prose mixes optional analyses, so rebuild once and preserve
             # each independently qualified section rather than trusting sentences.
             lines = [f"Mix Review Lab context for {title}."]
@@ -236,6 +257,8 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
                 lines.append(TRANSIENT_SIGNAL_LIMITATION)
             if erb_unqualified:
                 lines.append(STEM_MASKING_SIGNAL_LIMITATION)
+            if low_end_unqualified:
+                lines.append(LOW_END_SIGNAL_LIMITATION)
             if reference_unqualified:
                 lines.append(REFERENCE_SIGNAL_LIMITATION)
             if mix_goal_label:
@@ -251,6 +274,9 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
             if safe_erb is not None:
                 lines.append("Qualified ERB stem-masking summary: " + json.dumps(safe_erb, ensure_ascii=False))
                 lines.append(ERB_PREVIEW_LIMITATION)
+            if safe_low_end:
+                lines.append("Qualified low-end stem previews: " + json.dumps(safe_low_end, ensure_ascii=False))
+                lines.append(LOW_END_PREVIEW_LIMITATION)
             return {"role": "user", "content": "\n".join(lines)}
         if not uploaded_metrics_have_activity(metrics):
             # Older handoffs can carry cached prose and repairs alongside quiet
@@ -289,6 +315,9 @@ def mix_review_context_turn(context: dict | None) -> dict | None:
         if safe_erb is not None:
             lines.append("Qualified ERB stem-masking summary: " + json.dumps(safe_erb, ensure_ascii=False))
             lines.append(ERB_PREVIEW_LIMITATION)
+        if safe_low_end:
+            lines.append("Qualified low-end stem previews: " + json.dumps(safe_low_end, ensure_ascii=False))
+            lines.append(LOW_END_PREVIEW_LIMITATION)
         flags = context.get("flags") if isinstance(context.get("flags"), list) else []
         if flags:
             lines.append(

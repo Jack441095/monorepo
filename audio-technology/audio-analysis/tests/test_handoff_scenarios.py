@@ -13,6 +13,15 @@ import pytest
 from audio_analysis.integration.handoff import kenn_handoff
 
 
+def _low_end_preview(name="Bass", share=0.0):
+    return {"name": name, "low_end_share": share, "activity": {
+        "schema": "kenn.low_end_stem.activity.v1", "active_floor_dbfs": -60.0,
+        "source_rms_dbfs": -18.0, "window_rms_dbfs": -20.0,
+        "sample_rate": 44100.0, "analysis_sample_count": 65536,
+        "frame_size_samples": 4096, "window_start_sample": 30720,
+    }}
+
+
 def _erb_report():
     return {"ok": True, "stems": [{"name": "Kick", "overall_visibility": 0.81}, {"name": "Bass", "overall_visibility": 0.0}],
             "activity": {"schema": "kenn.erb_masking.activity.v1", "active_floor_dbfs": -60.0, "frame_size_samples": 4096,
@@ -105,7 +114,7 @@ class TestKennHandoff:
             }},
             "stem_masking": _erb_report(),
             "stem_solo": {"low_end_summary": {"ranked": [
-                {"name": "Kick", "low_end_share": 0.44}, {"name": "Bass", "low_end_share": 0.39},
+                _low_end_preview("Kick", 0.44), _low_end_preview("Bass", 0.39),
             ]}},
         })
         evidence = kenn_handoff(report)["analysis_evidence"]
@@ -222,3 +231,23 @@ def test_erb_handoff_drops_legacy_name_based_visibility():
     masking = _erb_report()
     masking.pop("activity")
     assert kenn_handoff(_make_report({"stem_masking": masking}))["analysis_evidence"]["stem_masking"] == {}
+
+
+def test_low_end_handoff_preserves_zero_and_omits_quiet_entries_before_top_two():
+    # A quiet normalized spectrum must not displace a measured zero-share stem.
+    quiet = _low_end_preview("Quiet", .99)
+    quiet["activity"]["window_rms_dbfs"] = -100.0
+    ranked = [quiet, _low_end_preview("Bass", .5), _low_end_preview("Guitar", 0.0), _low_end_preview("Fourth", .1)]
+    result = kenn_handoff(_make_report({"stem_solo": {"low_end_summary": {"ranked": ranked}}}))
+    measured = result["analysis_evidence"]["low_end_stems"]
+    assert [item["name"] for item in measured] == ["Bass", "Guitar"]
+    assert measured[1]["low_end_share"] == 0.0
+    measured[0]["activity"]["source_rms_dbfs"] = -100.0
+    assert ranked[1]["activity"]["source_rms_dbfs"] == -18.0
+
+
+@pytest.mark.parametrize("ranked", [None, [], [{"name": "Bass", "low_end_share": .99}], [_low_end_preview(), _low_end_preview()]])
+def test_low_end_handoff_preserves_abstention_sentinel_for_legacy_or_duplicate_names(ranked):
+    # Empty sections tell cached-prose consumers that a low-end claim was attempted.
+    result = kenn_handoff(_make_report({"stem_solo": {"low_end_summary": {"ranked": ranked}}}))
+    assert result["analysis_evidence"]["low_end_stems"] == []

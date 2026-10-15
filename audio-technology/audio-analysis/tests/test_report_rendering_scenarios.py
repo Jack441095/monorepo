@@ -118,8 +118,8 @@ class TestReportHTML:
         html = report_html({})
         assert "Mix Style" not in html
 
-    def test_stem_solo_renders_low_end_and_carving(self):
-        """Stage 10 stem-solo/masking section renders when stem data is present."""
+    def test_stem_solo_withholds_legacy_rankings_and_carving(self):
+        """Saved rankings without raw activity proof cannot publish overlap or repair claims."""
         html = report_html({
             "stem_solo": {
                 "low_end_summary": {
@@ -137,8 +137,9 @@ class TestReportHTML:
             },
         })
         assert "Stem Solo &amp; Masking" in html or "Stem Solo" in html
-        assert "both carry substantial low-end energy" in html
-        assert "vocal" in html and "keys" in html
+        assert "both carry substantial low-end energy" not in html
+        assert "vocal" not in html and "keys" not in html
+        assert "Unqualified stem previews withheld" in html
 
     def test_stem_solo_absent_when_missing(self):
         html = report_html({})
