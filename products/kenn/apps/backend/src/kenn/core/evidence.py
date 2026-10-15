@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import json
+import math
 import re
 import time
 from typing import Any
@@ -18,6 +19,8 @@ from typing import Any
 
 MARKER = "KENN_EVIDENCE_PACKET_V1:"
 MAX_PLUGIN_CONTEXT_AGE_SECONDS = 15.0
+# Match the existing per-insert analysis floor; this is activity in dBFS, not a mix-quality target.
+LIVE_ACTIVITY_FLOOR_DBFS = -80.0
 
 
 @dataclass(frozen=True)
@@ -64,6 +67,12 @@ def from_plugin_context(context: dict[str, Any] | None) -> EvidencePacket | None
     """Convert the validated plug-in snapshot into explicit bus evidence."""
     if not isinstance(context, dict) or context.get("schema") != "kenn.live_mix_context.v1":
         return None
+    rms = context.get("rms_dbfs")
+    try:
+        rms_value = float(rms) if not isinstance(rms, bool) and isinstance(rms, (int, float)) else None
+    except OverflowError:
+        rms_value = None  # An unrepresentable integer cannot establish the activity floor.
+    has_activity = rms_value is not None and math.isfinite(rms_value) and rms_value > LIVE_ACTIVITY_FLOOR_DBFS
     fields = (
         ("peak_dbfs", "dBFS"), ("rms_dbfs", "dBFS"), ("crest_db", "dB"),
         ("transient_ratio", "ratio"), ("clipped_samples", "samples"),
@@ -74,12 +83,15 @@ def from_plugin_context(context: dict[str, Any] | None) -> EvidencePacket | None
     )
     facts: list[EvidenceFact] = []
     for name, unit in fields:
+        if not has_activity and name not in {"sample_rate", "analysed_samples", "audio_age_seconds"}:
+            # Capture provenance survives abstention; audio measurements cannot ground advice below the floor.
+            continue
         value = context.get(name)
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             continue
         facts.append(EvidenceFact(name, float(value), unit, "plugin_bus_snapshot"))
     pink_noise = context.get("pink_noise_reference")
-    if isinstance(pink_noise, dict):
+    if has_activity and isinstance(pink_noise, dict):
         pink_largest = pink_noise.get("largest_deviation")
         if isinstance(pink_largest, dict):
             frequency = pink_largest.get("center_hz")
@@ -115,7 +127,7 @@ def from_plugin_context(context: dict[str, Any] | None) -> EvidencePacket | None
             facts.append(EvidenceFact("realtime_window_seconds", float(window_seconds), "seconds", "plugin_bus_snapshot"))
         if isinstance(status, str) and status.strip():
             facts.append(EvidenceFact("realtime_window_status", status.strip(), "", "plugin_bus_snapshot"))
-        shape = live_window.get("pink_noise_shape")
+        shape = live_window.get("pink_noise_shape") if has_activity else None
         largest_median = shape.get("largest_median_deviation") if isinstance(shape, dict) else None
         if isinstance(largest_median, dict):
             frequency = largest_median.get("center_hz")
@@ -137,6 +149,8 @@ def from_plugin_context(context: dict[str, Any] | None) -> EvidencePacket | None
             "Low/mid/high values are broad relative energy estimates; the fixed realtime bands are not a calibrated spectrum, and are not LUFS or true-peak measurement.",
             "The pink-noise-style comparison is a broad shape reference and cannot identify a track, cause, or automatic EQ move.",
             "A snapshot cannot establish the audible cause of a mix symptom by itself.",
+            *(("RMS is missing, non-finite, or at/below -80 dBFS; signal-derived measurements are withheld until an audible passage is measured.",)
+              if not has_activity else ()),
         ),
         observed_at_epoch=(time.time() - age_value) if age_value is not None else None,
     )

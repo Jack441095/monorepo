@@ -386,33 +386,37 @@ def review_from_handoff(payload: dict[str, Any]) -> dict[str, Any]:
         return checked
     metrics = checked["metrics"]
     observations: list[dict[str, str]] = []
-    if metrics["peak_dbfs"] > -0.3:
-        observations.append({"severity": "warning", "title": "Very little peak headroom", "detail": "Peak level is within 0.3 dBFS of full scale; review limiting and export headroom."})
-    if metrics.get("clipped_samples", 0.0) > 0:
-        observations.append({"severity": "warning", "title": "Recent samples reached digital full scale", "detail": f"{int(metrics['clipped_samples'])} sample(s) in the most recent analysis block reached 0 dBFS. Check source gain and limiter behaviour."})
-    if metrics["stereo_correlation"] < 0.0:
-        observations.append({"severity": "warning", "title": "Potential mono-compatibility risk", "detail": "Correlation is negative in the last analysed buffer; audition the mix in mono before making a correction."})
-    if metrics["stereo_width"] > 0.75:
-        observations.append({"severity": "info", "title": "Wide side energy", "detail": "Side energy is high. This is stylistic, so compare against a reference and mono playback."})
-    band_values = [metrics.get(key) for key in ("low_energy", "mid_energy", "high_energy")]
-    if all(isinstance(value, (int, float)) for value in band_values):
-        observations.append({
-            "severity": "info",
-            "title": "Realtime tonal snapshot available",
-            "detail": "Low, mid and high band energy are available for a guided check. These are broad relative energy estimates, not a calibrated EQ curve or full-resolution pink-noise measurement.",
-        })
-    pink_reference = checked.get("pink_noise_reference")
-    largest = pink_reference.get("largest_deviation") if isinstance(pink_reference, dict) and pink_reference.get("status") == "complete" else None
-    if isinstance(largest, dict):
-        frequency = largest.get("center_hz")
-        deviation = largest.get("deviation_db")
-        if isinstance(frequency, (int, float)) and isinstance(deviation, (int, float)):
-            direction = "above" if deviation > 0 else "below"
+    if metrics["rms_dbfs"] <= -80.0:
+        # Reuse the live-analysis -80 dBFS activity floor before ratios or spectra can become advice.
+        observations.append({"severity": "info", "title": "Insufficient signal", "detail": "The input is near silence. Play an audible passage before judging tone, dynamics or stereo image; signal-derived observations are withheld."})
+    else:
+        if metrics["peak_dbfs"] > -0.3:
+            observations.append({"severity": "warning", "title": "Very little peak headroom", "detail": "Peak level is within 0.3 dBFS of full scale; review limiting and export headroom."})
+        if metrics.get("clipped_samples", 0.0) > 0:
+            observations.append({"severity": "warning", "title": "Recent samples reached digital full scale", "detail": f"{int(metrics['clipped_samples'])} sample(s) in the most recent analysis block reached 0 dBFS. Check source gain and limiter behaviour."})
+        if metrics["stereo_correlation"] < 0.0:
+            observations.append({"severity": "warning", "title": "Potential mono-compatibility risk", "detail": "Correlation is negative in the last analysed buffer; audition the mix in mono before making a correction."})
+        if metrics["stereo_width"] > 0.75:
+            observations.append({"severity": "info", "title": "Wide side energy", "detail": "Side energy is high. This is stylistic, so compare against a reference and mono playback."})
+        band_values = [metrics.get(key) for key in ("low_energy", "mid_energy", "high_energy")]
+        if all(isinstance(value, (int, float)) for value in band_values):
             observations.append({
                 "severity": "info",
-                "title": "Realtime spectral reference available",
-                "detail": f"The nearest realtime band, centred at {frequency:.0f} Hz, is {abs(deviation):.1f} dB {direction} a measured -3 dB/octave pink-noise-style baseline around the 1 kHz anchor. Use this as a broad listening target; it is not track attribution or an automatic EQ move.",
+                "title": "Realtime tonal snapshot available",
+                "detail": "Low, mid and high band energy are available for a guided check. These are broad relative energy estimates, not a calibrated EQ curve or full-resolution pink-noise measurement.",
             })
+        pink_reference = checked.get("pink_noise_reference")
+        largest = pink_reference.get("largest_deviation") if isinstance(pink_reference, dict) and pink_reference.get("status") == "complete" else None
+        if isinstance(largest, dict):
+            frequency = largest.get("center_hz")
+            deviation = largest.get("deviation_db")
+            if isinstance(frequency, (int, float)) and isinstance(deviation, (int, float)):
+                direction = "above" if deviation > 0 else "below"
+                observations.append({
+                    "severity": "info",
+                    "title": "Realtime spectral reference available",
+                    "detail": f"The nearest realtime band, centred at {frequency:.0f} Hz, is {abs(deviation):.1f} dB {direction} a measured -3 dB/octave pink-noise-style baseline around the 1 kHz anchor. Use this as a broad listening target; it is not track attribution or an automatic EQ move.",
+                })
     if not observations:
         observations.append({"severity": "info", "title": "No immediate bus-level warning", "detail": "Continue with a full Mix Review for loudness, tonal balance, dynamics and reference comparison."})
     return {

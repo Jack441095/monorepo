@@ -249,6 +249,59 @@ def test_handoff_accepts_realtime_band_metrics() -> None:
     assert any(item["title"] == "Realtime tonal snapshot available" for item in review["observations"])
 
 
+@pytest.mark.parametrize("rms_dbfs", [-100.0, -80.0, -79.9])
+def test_review_withholds_signal_observations_until_input_clears_activity_floor(rms_dbfs):
+    # Strong ratios and a nonzero spectrum must not bypass the quiet-input gate.
+    review = review_from_handoff(_payload(
+        rms_dbfs=rms_dbfs, peak_dbfs=-0.1, clipped_samples=3,
+        stereo_correlation=-0.9, stereo_width=0.9,
+        spectrum_schema="realtime_spectrum.v1", spectrum_bands=_spectrum(),
+    ))
+
+    assert review["ok"] and review["schema"] == "kenn.plugin_review.v1"
+    assert review["automix"]["available"] is False
+    assert "not a calibrated LUFS" in review["limitations"]
+    titles = {item["title"] for item in review["observations"]}
+    if rms_dbfs <= -80.0:
+        assert titles == {"Insufficient signal"}
+        assert "withheld" in review["observations"][0]["detail"]
+    else:
+        assert titles == {
+            "Very little peak headroom", "Recent samples reached digital full scale",
+            "Potential mono-compatibility risk", "Wide side energy",
+            "Realtime tonal snapshot available", "Realtime spectral reference available",
+        }
+
+
+def test_quiet_ingest_preserves_source_identity_and_activity_while_gating_review(monkeypatch):
+    # The raw transport still needs RMS and clocks so bound analysis can decide when audio resumes.
+    monkeypatch.setattr(plugin_handoff, "_live_contexts", {})
+    result = ingest_live_context(_payload(
+        conversation_id="quiet-owner", host_track_name="Quiet Bass", rms_dbfs=-80.0,
+        measurement_window=_window(), spectrum_schema="realtime_spectrum.v1", spectrum_bands=_spectrum(),
+    ), session_id="quiet-insert")
+
+    assert result["ok"]
+    context = live_context_summary("quiet-insert")
+    assert context["conversation_id"] == "quiet-owner"
+    assert context["host_track_name"] == "Quiet Bass"
+    assert context["rms_dbfs"] == -80.0
+    assert context["measurement_window"]["source_generation"] == 1
+    assert context["freshness"]["current_for_diagnosis"]
+    assert [item["title"] for item in result["observations"]] == ["Insufficient signal"]
+
+    from kenn.core.chat_context import plugin_live_context_turn
+    from kenn.core.evidence import packets_from_history, relevant_observations
+
+    # The same cached frame feeds chat, whose evidence must not reintroduce the withheld signal details.
+    turn = plugin_live_context_turn("quiet-insert")
+    packets = packets_from_history([turn])
+    assert len(packets) == 1
+    assert "measurement_window_end_sample" in {fact.name for fact in packets[0].facts}
+    assert not {fact.name for fact in packets[0].facts} & {"peak_dbfs", "rms_dbfs", "low_energy", "stereo_correlation"}
+    assert not relevant_observations("Check the stereo image and tonal balance", packets)
+
+
 def test_handoff_rejects_raw_audio_and_nonfinite_metrics() -> None:
     assert validate_handoff(_payload(raw_audio=[0.0]))["ok"] is False
     assert validate_handoff(_payload(low_energy=float("nan")))["ok"] is False

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from kenn.core.evidence import (
     from_ableton_session,
     from_audio_classification_context,
@@ -147,6 +149,84 @@ def test_plugin_evidence_preserves_realtime_band_energy_as_limited_measurement()
     assert packet is not None
     assert {fact.name for fact in packet.facts} >= {"low_energy", "mid_energy", "high_energy"}
     assert any("not a calibrated spectrum" in item for item in packet.limitations)
+
+
+@pytest.mark.parametrize("rms_dbfs", [-100.0, -80.0, None, True, float("nan"), float("inf"), 10 ** 1000])
+def test_quiet_or_unqualified_plugin_context_keeps_provenance_but_withholds_signal_facts(rms_dbfs) -> None:
+    # Quiet or unqualified RMS used to expose even misleading stereo and pink-reference facts to chat.
+    context = {
+        "schema": "kenn.live_mix_context.v1",
+        "age_seconds": 1.0,
+        "peak_dbfs": -0.1,
+        "rms_dbfs": rms_dbfs,
+        "crest_db": 79.9,
+        "transient_ratio": 2.0,
+        "clipped_samples": 8,
+        "stereo_correlation": -0.9,
+        "stereo_width": 0.9,
+        "low_energy": 0.04,
+        "mid_energy": 0.01,
+        "high_energy": 0.002,
+        "sample_rate": 48000,
+        "analysed_samples": 96000,
+        "audio_age_seconds": 0.12,
+        "pink_noise_reference": {
+            "curve": "pink baseline",
+            "largest_deviation": {"center_hz": 315.0, "deviation_db": 5.0},
+        },
+        "measurement_window": {
+            "start_sample": 4800, "end_sample": 9600, "duration_seconds": 0.1,
+            "source_generation": 3, "dropped_samples": 0, "invalid_samples": 0,
+        },
+        "live_window": {
+            "sample_count": 4, "window_seconds": 24.0, "status": "stable",
+            "pink_noise_shape": {"largest_median_deviation": {"center_hz": 315.0, "median_deviation_db": 4.8}},
+        },
+    }
+
+    packet = from_plugin_context(context)
+
+    assert packet is not None
+    names = {fact.name for fact in packet.facts}
+    assert names >= {
+        "sample_rate", "analysed_samples", "audio_age_seconds",
+        "measurement_window_end_sample", "measurement_window_source_generation",
+        "measurement_window_dropped_samples", "realtime_window_sample_count", "realtime_window_status",
+    }
+    assert not names & {
+        "peak_dbfs", "rms_dbfs", "crest_db", "transient_ratio", "clipped_samples",
+        "stereo_correlation", "stereo_width", "low_energy", "mid_energy", "high_energy",
+        "realtime_pink_noise_largest_deviation_frequency_hz", "realtime_pink_noise_largest_deviation_db",
+        "realtime_pink_noise_reference_curve", "realtime_pink_noise_median_deviation_frequency_hz",
+        "realtime_pink_noise_median_deviation_db",
+    }
+    assert packet.payload()["freshness"]["current_for_diagnosis"] is True
+    assert any("signal-derived measurements are withheld" in item for item in packet.limitations)
+
+
+def test_plugin_context_just_above_activity_floor_keeps_signal_facts_and_pink_details() -> None:
+    packet = from_plugin_context({
+        "schema": "kenn.live_mix_context.v1",
+        "age_seconds": 1.0,
+        "rms_dbfs": -79.9,
+        "peak_dbfs": -0.1,
+        "low_energy": 0.04,
+        "pink_noise_reference": {
+            "curve": "pink baseline",
+            "largest_deviation": {"center_hz": 315.0, "deviation_db": 5.0},
+        },
+        "live_window": {
+            "pink_noise_shape": {"largest_median_deviation": {"center_hz": 315.0, "median_deviation_db": 4.8}},
+        },
+    })
+
+    assert packet is not None
+    names = {fact.name for fact in packet.facts}
+    assert names >= {
+        "rms_dbfs", "peak_dbfs", "low_energy", "realtime_pink_noise_largest_deviation_db",
+        "realtime_pink_noise_median_deviation_db",
+    }
+    assert not any("signal-derived measurements are withheld" in item for item in packet.limitations)
 
 
 def test_reference_ltas_measurement_is_rendered_as_a_listening_target() -> None:
