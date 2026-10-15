@@ -18,8 +18,16 @@ struct KENNStreamingMeterSnapshot
     // Ready silence has zero energy and no finite logarithmic reading. Warm-up
     // remains separate so callers cannot confuse missing history with silence.
     std::optional<double> momentaryLUFS, shortTermLUFS, integratedLUFS, truePeakDBTP;
+    // The greatest 400 ms energy measured on the internal 10 ms grid in the
+    // preceding 100 ms ending at endSample, with its own window end position.
+    // Keep it separate from momentaryMeanSquare, which ends at endSample: a
+    // maximum is evidence about an earlier window, not the current loudness.
+    double momentaryMaximumMeanSquare = 0.0;
+    int64_t momentaryMaximumEndSample = 0;
+    bool momentaryMaximumReady = false;
+    std::optional<double> momentaryMaximumLUFS;
     static constexpr double interpolationDelaySamples = 5.875; // (48 FIR taps - 1) / (2 * 4x).
-    // The continuous loudness window covers [endSample - samplesPerBin, endSample].
+    // Momentary and short-term windows end at endSample and span 400 ms and 3 s.
     // Causal polyphase FIR upsampling delays output by interpolationDelaySamples
     // input frames, so the 100 ms peak scan corresponds to this exact input interval.
     double peakIntervalStartSample = 0.0;
@@ -52,10 +60,12 @@ public:
     bool prepare(double rate) noexcept
     {
         samplesPerBin = 0;
+        samplesPerMeasurement = 0;
         reset();
         if (rate != 44100.0 && rate != 48000.0 && rate != 96000.0)
             return false; // No qualified coefficients/grid: publish absence, not an approximation.
         samplesPerBin = static_cast<int>(rate / 10.0); // Frames in one exact 100 ms bin.
+        samplesPerMeasurement = static_cast<int>(rate / 100.0); // Exact 10 ms hops at every qualified rate.
         // BS.1770-5 Annex 1, Tables 1/2: the supplied coefficients are for
         // 48 kHz. Map their analogue prototype through the bilinear transform
         // at the requested rate, retaining the specified 48 kHz response.
@@ -76,9 +86,13 @@ public:
         for (auto& stage : highPass) stage.reset();
         for (auto& channel : peakHistory) channel.fill(0.0);
         bins.fill(0.0);
+        momentaryBins.fill(0.0);
         gatedCount.fill(0); gatedEnergy.fill(0.0);
         absoluteGatedBlocks = 0; absoluteGatedEnergy = 0.0;
         binFrames = binCursor = completedBins = peakCursor = 0;
+        measurementFrames = measurementCursor = completedMeasurements = 0;
+        measurementEnergy = intervalMaximumEnergy = 0.0;
+        intervalMaximumEndSample = 0;
         frames = 0; binEnergy = binPeak = 0.0; latest = {};
     }
 
@@ -93,10 +107,11 @@ public:
             return false; // Keep bad audio out of recursive filters and rolling energy.
         }
         const std::array<double, 2> input { left, right };
+        double frameEnergy = 0.0;
         for (size_t channel = 0; channel < 2; ++channel)
         {
             const auto weighted = highPass[channel].filter(shelf[channel].filter(input[channel]));
-            binEnergy += weighted * weighted; // L/R each have unit BS.1770 channel weight; never mono-sum.
+            frameEnergy += weighted * weighted; // L/R each have unit BS.1770 channel weight; never mono-sum.
             auto& history = peakHistory[channel];
             history[peakCursor] = history[peakCursor + peakTaps] = input[channel];
             // Duplicate the 12-frame ring so all four phase dot products have
@@ -111,22 +126,52 @@ public:
         }
         peakCursor = (peakCursor + 1) % peakTaps;
         ++frames;
+        binEnergy += frameEnergy;
+        measurementEnergy += frameEnergy;
+        if (++measurementFrames == samplesPerMeasurement)
+        {
+            momentaryBins[measurementCursor] = measurementEnergy / samplesPerMeasurement;
+            measurementCursor = (measurementCursor + 1) % momentaryMeasurements;
+            completedMeasurements = std::min(completedMeasurements + 1, momentaryMeasurements);
+            if (completedMeasurements == momentaryMeasurements)
+            {
+                // At most 5 ms of a 400 ms tone falls between observations:
+                // the ideal timing loss is <=0.055 LU, inside the 0.1 LU test
+                // margin. Re-summing 40 bins avoids loud-to-quiet cancellation.
+                double energy = 0.0;
+                for (const auto bin : momentaryBins) energy += bin;
+                energy /= momentaryMeasurements;
+                // The first observation also marks ready digital silence:
+                // zero energy still has a measured position after warm-up.
+                if (intervalMaximumEndSample == 0 || energy > intervalMaximumEnergy)
+                {
+                    intervalMaximumEnergy = energy;
+                    intervalMaximumEndSample = frames;
+                }
+            }
+            measurementFrames = 0;
+            measurementEnergy = 0.0;
+        }
         if (++binFrames != samplesPerBin) return false; // Preserve the partial bin across host callbacks.
         bins[binCursor] = binEnergy / samplesPerBin;
         binCursor = (binCursor + 1) % shortTermBins;
         completedBins = std::min(completedBins + 1, shortTermBins);
         latest = {};
         latest.endSample = frames;
-        latest.momentaryReady = completedBins >= momentaryBins;
+        latest.momentaryMaximumReady = intervalMaximumEndSample != 0;
+        latest.momentaryMaximumMeanSquare = intervalMaximumEnergy;
+        latest.momentaryMaximumEndSample = intervalMaximumEndSample;
+        latest.momentaryMaximumLUFS = loudness(intervalMaximumEnergy);
+        latest.momentaryReady = completedBins >= momentaryWindowBins;
         latest.shortTermReady = completedBins == shortTermBins;
         // Re-sum a bounded 30-value ring instead of repeatedly subtracting a
         // loud expired bin. Subtractive cancellation leaves false energy in a
         // later quiet/DC window; this costs only 340 additions/second/insert.
         if (latest.momentaryReady)
         {
-            for (size_t age = 0; age < momentaryBins; ++age)
+            for (size_t age = 0; age < momentaryWindowBins; ++age)
                 latest.momentaryMeanSquare += bins[(binCursor + shortTermBins - 1 - age) % shortTermBins];
-            latest.momentaryMeanSquare /= momentaryBins;
+            latest.momentaryMeanSquare /= momentaryWindowBins;
             latest.momentaryLUFS = loudness(latest.momentaryMeanSquare);
             // BS.1770-5 gating blocks are 400 ms long and overlap by 75%, which is exactly one momentary window
             // every 100 ms bin, so each completed window is one gating block.
@@ -148,6 +193,8 @@ public:
         latest.peakIntervalEndSample = static_cast<double>(frames) - KENNStreamingMeterSnapshot::interpolationDelaySamples;
         latest.peakIntervalStartSample = latest.peakIntervalEndSample - static_cast<double>(samplesPerBin);
         binFrames = 0; binEnergy = binPeak = 0.0;
+        intervalMaximumEnergy = 0.0;
+        intervalMaximumEndSample = 0;
         return true;
     }
 
@@ -216,8 +263,9 @@ private:
         if (energy <= 0.0) return {}; // Exact silence has no finite LUFS; do not invent a meter floor.
         return -0.691 + 10.0 * std::log10(energy); // BS.1770 Annex 1 calibration offset, dB.
     }
-    static constexpr size_t momentaryBins = 4, shortTermBins = 30; // 400 ms and 3 s, ungated (Tech 3341 §2.2).
-    // 0.05 LU buckets from the -70 LUFS absolute gate up to +10 LUFS: 1600 buckets, about 19 KB per meter.
+    static constexpr size_t momentaryWindowBins = 4, shortTermBins = 30; // 400 ms and 3 s, ungated (Tech 3341 §2.2).
+    static constexpr size_t momentaryMeasurements = 40; // 400 ms / 10 ms; independent of snapshots and integrated gating.
+    // 0.05 LU buckets from -70 LUFS to +10 LUFS: 1600 count/energy pairs, 25 KiB per meter.
     static constexpr double absoluteGateLUFS = -70.0, bucketWidthLU = 0.05;
     static constexpr size_t gateBuckets = 1600;
     static constexpr size_t peakTaps = 12; // 48 FIR coefficients, split into four interpolation phases.
@@ -237,11 +285,16 @@ private:
     std::array<Biquad, 2> shelf, highPass;
     std::array<std::array<double, peakTaps * 2>, 2> peakHistory {};
     std::array<double, shortTermBins> bins {};
+    std::array<double, momentaryMeasurements> momentaryBins {};
     std::array<int64_t, gateBuckets> gatedCount {};
     std::array<double, gateBuckets> gatedEnergy {};
     int64_t absoluteGatedBlocks = 0;
     double absoluteGatedEnergy = 0.0;
     int samplesPerBin = 0, binFrames = 0;
+    int samplesPerMeasurement = 0, measurementFrames = 0;
+    size_t measurementCursor = 0, completedMeasurements = 0;
+    double measurementEnergy = 0.0, intervalMaximumEnergy = 0.0;
+    int64_t intervalMaximumEndSample = 0;
     size_t binCursor = 0, completedBins = 0, peakCursor = 0;
     int64_t frames = 0;
     double binEnergy = 0.0, binPeak = 0.0;

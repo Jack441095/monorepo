@@ -41,7 +41,7 @@ static void feed(KENNStreamingMeter& meter, int frames, double rate, double hz, 
     }
 }
 
-static void feedWorker(KENNContinuousAnalysis& worker, double seconds, int64_t& hostSample, double rate = 48000.0)
+static void feedWorker(KENNContinuousAnalysis& worker, double seconds, int64_t& hostSample, double rate = 48000.0, double gain = 0.1)
 {
     const auto total = static_cast<int>(std::round(seconds * rate));
     constexpr int block = 128; // Host frames per callback; partial final callbacks remain valid.
@@ -50,7 +50,7 @@ static void feedWorker(KENNContinuousAnalysis& worker, double seconds, int64_t& 
         juce::AudioBuffer<float> audio(2, std::min(block, total - first));
         for (int sample = 0; sample < audio.getNumSamples(); ++sample)
         {
-            const auto value = static_cast<float>(0.1 * std::sin(2.0 * juce::MathConstants<double>::pi * 997.0 * static_cast<double>(hostSample + sample) / rate));
+            const auto value = static_cast<float>(gain * std::sin(2.0 * juce::MathConstants<double>::pi * 997.0 * static_cast<double>(hostSample + sample) / rate));
             audio.setSample(0, sample, value); audio.setSample(1, sample, -value);
         }
         watchAllocations = true;
@@ -138,33 +138,42 @@ static void verifyWorkerRetirement()
             "Worker candidate warms from its first complete host-aligned window");
     require(frame.streamingMeter.endSample % 4800 == 0, "Worker candidate bins remain aligned to existing publications");
     worker.invalidate();
-    require(!worker.snapshot().streamingMeter.shortTermReady, "Source invalidation retires candidate readiness before draining");
+    require(!worker.snapshot().streamingMeter.shortTermReady && !worker.snapshot().streamingMeter.momentaryMaximumReady,
+            "Source invalidation retires candidate readiness before draining");
     for (const auto& recent : worker.recentSnapshots())
-        require(!recent.streamingMeter.shortTermReady, "Source invalidation retires candidate readings in paired history too");
+        require(!recent.streamingMeter.shortTermReady && !recent.streamingMeter.momentaryMaximumReady,
+                "Source invalidation retires candidate readings in paired history too");
     feedWorker(worker, 0.5, host);
-    require(worker.snapshot().streamingMeter.momentaryReady && !worker.snapshot().streamingMeter.shortTermReady,
+    require(worker.snapshot().streamingMeter.momentaryReady && worker.snapshot().streamingMeter.momentaryMaximumReady
+                && !worker.snapshot().streamingMeter.shortTermReady,
             "A source change needs fresh 400 ms/3-second history");
     feedWorker(worker, 3.0, host);
     host = 0;
     feedWorker(worker, 0.1, host);
-    require(!worker.snapshot().streamingMeter.momentaryReady, "Seeking retires weighting, energy and FIR history together");
+    require(!worker.snapshot().streamingMeter.momentaryReady && !worker.snapshot().streamingMeter.momentaryMaximumReady,
+            "Seeking retires weighting, energy and FIR history together");
     feedWorker(worker, 3.0, host);
     juce::AudioBuffer<float> oversized(2, 20000); oversized.clear(); // Exceeds the 16,384-frame capture queue.
     worker.push(oversized, true, { host, true }); host += oversized.getNumSamples();
-    require(!worker.snapshot().streamingMeter.shortTermReady, "A dropped callback immediately retires long-window candidate evidence");
+    require(!worker.snapshot().streamingMeter.shortTermReady && !worker.snapshot().streamingMeter.momentaryMaximumReady,
+            "A dropped callback immediately retires long-window candidate evidence");
     feedWorker(worker, 0.5, host);
-    require(worker.snapshot().streamingMeter.momentaryReady && !worker.snapshot().streamingMeter.shortTermReady,
+    require(worker.snapshot().streamingMeter.momentaryReady && worker.snapshot().streamingMeter.momentaryMaximumReady
+                && !worker.snapshot().streamingMeter.shortTermReady,
             "Queue overflow recovers without bridging old loudness into the new passage");
     juce::AudioBuffer<float> invalid(2, 128); invalid.clear(); invalid.setSample(1, 0, std::numeric_limits<float>::quiet_NaN());
     worker.push(invalid, true, { host, true }); worker.drainPending(); host += invalid.getNumSamples();
-    require(!worker.snapshot().streamingMeter.momentaryReady, "Invalid worker audio cannot retain a prior loudness window");
+    require(!worker.snapshot().streamingMeter.momentaryReady && !worker.snapshot().streamingMeter.momentaryMaximumReady,
+            "Invalid worker audio cannot retain a prior loudness window");
     worker.prepare(48000.0, false);
     host = 0; feedWorker(worker, 3.1, host);
-    require(worker.snapshot().valid && !worker.snapshot().streamingMeter.truePeakReady,
+    require(worker.snapshot().valid && !worker.snapshot().streamingMeter.truePeakReady
+                && !worker.snapshot().streamingMeter.momentaryMaximumReady,
             "Production-default worker preparation leaves the candidate disabled");
     worker.prepare(32000.0, false, true);
     host = 0; feedWorker(worker, 0.5, host, 32000.0);
-    require(worker.snapshot().valid && !worker.snapshot().streamingMeter.truePeakReady,
+    require(worker.snapshot().valid && !worker.snapshot().streamingMeter.truePeakReady
+                && !worker.snapshot().streamingMeter.momentaryMaximumReady,
             "Unqualified rates retain existing analysis while candidate fields remain absent");
     require(allocations == 0, "Enabling the candidate adds no C++ heap allocation to callback or worker processing");
 }
@@ -206,6 +215,109 @@ static void requireNear(double actual, double expected, double tolerance, const 
         std::cerr << "  got " << actual << ", wanted " << expected << " +/- " << tolerance << '\n';
 }
 
+static void verifyMomentaryMeasurementTiming()
+{
+    for (const double rate : { 44100.0, 48000.0, 96000.0 })
+    {
+        const auto bin = static_cast<int>(rate / 10.0); // Frames in the unchanged 100 ms snapshot interval.
+        const auto hop = static_cast<int>(rate / 100.0); // Frames in one 10 ms internal observation.
+        const auto label = std::to_string(static_cast<int>(rate)) + " Hz: ";
+        double worstArbitraryMiss = 0.0;
+        // The EBU's 20 ms offsets all land on a 10 ms grid. These one-frame and
+        // half-hop offsets catch a fix that only happens to fit those fixtures.
+        for (const auto offset : { 1, static_cast<int>(0.007 * rate) + 1,
+                                  static_cast<int>(0.045 * rate) + 1, static_cast<int>(0.095 * rate) + 1 })
+        {
+            Signal signal(static_cast<size_t>(offset), 0.0f);
+            appendTone(signal, rate, -23.0, 0.4);
+            appendSilence(signal, rate, 0.5);
+            const auto snapshots = run(signal, rate);
+            require(snapshots.size() == signal.size() / static_cast<size_t>(bin),
+                    "Finer momentary observations preserve exactly ten snapshots per second");
+            double highest = -200.0; // LUFS sentinel; absent maximum evidence must fail calibration.
+            int64_t highestEndSample = 0;
+            for (size_t index = 0; index < snapshots.size(); ++index)
+            {
+                const auto& snapshot = snapshots[index];
+                require(snapshot.endSample == static_cast<int64_t>(index + 1) * bin,
+                        "Snapshot positions remain on the original 100 ms grid");
+                if (snapshot.momentaryMaximumReady)
+                {
+                    require(snapshot.momentaryMaximumEndSample > snapshot.endSample - bin
+                                && snapshot.momentaryMaximumEndSample <= snapshot.endSample
+                                && snapshot.momentaryMaximumEndSample % hop == 0,
+                            "A maximum names its actual 10 ms window end inside the completed snapshot interval");
+                    if (snapshot.momentaryMaximumLUFS && *snapshot.momentaryMaximumLUFS > highest)
+                    {
+                        highest = *snapshot.momentaryMaximumLUFS;
+                        highestEndSample = snapshot.momentaryMaximumEndSample;
+                    }
+                }
+            }
+            requireNear(highest, -23.0, 0.1, label + "arbitrary sample offsets preserve the 400 ms tone maximum within 0.1 LU");
+            worstArbitraryMiss = std::max(worstArbitraryMiss, std::abs(highest + 23.0));
+            require(std::abs(highestEndSample - (offset + 4 * bin)) <= hop,
+                    "The maximum's measured position follows the tone end within one 10 ms hop");
+            if (offset == static_cast<int>(0.045 * rate) + 1)
+            {
+                const auto& snapshot = snapshots[4]; // 500 ms: the tone ended about 55 ms earlier.
+                require(snapshot.momentaryMaximumLUFS && snapshot.momentaryLUFS
+                            && *snapshot.momentaryMaximumLUFS > *snapshot.momentaryLUFS + 0.2,
+                        "Sub-hop maximum remains separate from the lower point-in-time 400 ms reading");
+            }
+        }
+        std::cout << label << "Arbitrary sample-offset maxima: worst error " << worstArbitraryMiss << " LU\n";
+
+        KENNStreamingMeter meter, other;
+        meter.prepare(rate); other.prepare(rate);
+        watchAllocations = true;
+        feed(meter, 4 * bin + 4 * hop + hop / 2, rate, 1000.0, 0.1);
+        meter.reset(); // Discard a maximum and a partial 10 ms energy bin together.
+        for (int sample = 0; sample < 4 * bin - 1; ++sample) meter.push(0.0f, 0.0f);
+        watchAllocations = false;
+        require(!meter.snapshot().momentaryMaximumReady && meter.snapshot().momentaryMaximumEndSample == 0,
+                "Reset inside a finer hop retires pending maxima and requires a full fresh 400 ms window");
+        meter.push(0.0f, 0.0f);
+        const auto silence = meter.snapshot();
+        require(silence.momentaryMaximumReady && silence.momentaryMaximumMeanSquare == 0.0
+                    && !silence.momentaryMaximumLUFS && silence.momentaryMaximumEndSample == 4 * bin,
+                "Fresh silence has a ready zero-energy maximum and no loud history from before reset");
+        require(!other.snapshot().momentaryMaximumReady && other.snapshot().momentaryMaximumEndSample == 0,
+                "A second instance cannot inherit finer-hop history or maximum positions");
+        feed(other, 4 * bin, rate, 1000.0, 0.01);
+        const auto independent = other.snapshot();
+        meter.push(std::numeric_limits<float>::quiet_NaN(), 0.0f);
+        require(!meter.snapshot().momentaryMaximumReady && meter.snapshot().momentaryMaximumEndSample == 0,
+                "Non-finite audio retires the maximum and its position together");
+        requireNear(other.snapshot().momentaryMaximumMeanSquare, independent.momentaryMaximumMeanSquare, 0.0,
+                    "Retiring one instance preserves another active instance's exact maximum energy");
+        require(other.snapshot().momentaryMaximumReady
+                    && other.snapshot().momentaryMaximumEndSample == independent.momentaryMaximumEndSample,
+                "Retiring one instance preserves another active instance's maximum and position");
+        for (int sample = 0; sample < 4 * bin; ++sample) meter.push(0.0f, 0.0f);
+        require(meter.snapshot().momentaryMaximumReady && meter.snapshot().momentaryMaximumMeanSquare == 0.0
+                    && meter.snapshot().momentaryMaximumEndSample == 4 * bin,
+                "Non-finite recovery starts the maximum position and full 400 ms history again");
+        require(allocations == 0, "Finer-hop measurement and reset use fixed storage without C++ heap allocation");
+
+        KENNContinuousAnalysis worker;
+        worker.prepare(rate, false, true);
+        int64_t host = 0;
+        feedWorker(worker, 0.045, host, rate, 0.0);
+        // A short remaining tone ends near 445 ms. Drain at 500 ms so the
+        // worker must preserve the earlier maximum while publishing current M.
+        feedWorker(worker, 0.4, host, rate);
+        feedWorker(worker, 0.055, host, rate, 0.0);
+        const auto snapshot = worker.snapshot();
+        require(snapshot.valid && snapshot.streamingMeter.momentaryMaximumReady
+                    && snapshot.streamingMeter.endSample % bin == 0
+                    && snapshot.streamingMeter.momentaryMaximumEndSample < snapshot.streamingMeter.endSample
+                    && snapshot.streamingMeter.momentaryMaximumLUFS && snapshot.streamingMeter.momentaryLUFS
+                    && *snapshot.streamingMeter.momentaryMaximumLUFS > *snapshot.streamingMeter.momentaryLUFS + 0.2,
+                "ContinuousAnalysis preserves finer-hop maxima on its existing 100 ms snapshots");
+    }
+}
+
 static void verifyTech3341Loudness()
 {
     constexpr double tolerance = 0.1; // LU, the tolerance every loudness row in Table 1 uses.
@@ -242,11 +354,8 @@ static void verifyTech3341Loudness()
             requireNear(highest, -23.0, tolerance, label + "Tech 3341 case 10 maximum short-term is -23 LUFS at every start offset");
         }
 
-        // Case 13: a 400 ms tone at -23 starting i * 20 ms into the file; the highest M must be -23. This one we do
-        // not meet. The meter reports every 100 ms, so a tone that starts off that grid never fills a whole window:
-        // at 40 ms or 60 ms off it covers 360 of 400 ms, which reads 0.46 LU low. Only the offsets on the grid pass.
-        // We pin the size of the miss so nobody claims EBU-mode momentary from this meter; closing it needs a
-        // shorter hop than 100 ms.
+        // Case 13: off-grid 400 ms tones used to lose up to 40 ms of energy between 100 ms snapshots.
+        // Every start offset must meet the same 0.1 LU tolerance; on-grid cases alone hide the timing defect.
         double worstMiss = 0.0;
         for (int i = 0; i < 20; ++i)
         {
@@ -256,12 +365,12 @@ static void verifyTech3341Loudness()
             appendSilence(thirteen, rate, 1.0);
             double highest = -200.0;
             for (const auto& s : run(thirteen, rate))
-                if (s.momentaryLUFS) highest = std::max(highest, *s.momentaryLUFS);
-            if (i % 5 == 0)
-                requireNear(highest, -23.0, tolerance, label + "Tech 3341 case 13 maximum momentary is -23 LUFS when the tone starts on the 100 ms grid");
+                if (s.momentaryMaximumLUFS) highest = std::max(highest, *s.momentaryMaximumLUFS);
+            requireNear(highest, -23.0, tolerance, label + "Tech 3341 case 13 maximum momentary is -23 LUFS at every start offset");
             worstMiss = std::max(worstMiss, std::abs(highest + 23.0));
         }
-        requireNear(worstMiss, 0.46, 0.05, label + "Tech 3341 case 13 off-grid starts read about 0.46 LU low, the cost of the 100 ms hop");
+        require(worstMiss <= tolerance, (label + "Generated case 13 maxima all stay within 0.1 LU").c_str());
+        std::cout << label << "Generated case 13: 20 start offsets; worst error " << worstMiss << " LU\n";
 
         // Tech 3341 (Nov 2023), Table 1 p. 8 and the clarification on p. 9:
         // https://tech.ebu.ch/docs/tech/tech3341.pdf
@@ -287,7 +396,7 @@ static void verifyTech3341Loudness()
             {
                 // A snapshot ending exactly at a segment boundary still describes the preceding segment.
                 const auto segment = static_cast<size_t>((snapshot.endSample - 1) / segmentFrames);
-                const auto reading = momentary ? snapshot.momentaryLUFS : snapshot.shortTermLUFS;
+                const auto reading = momentary ? snapshot.momentaryMaximumLUFS : snapshot.shortTermLUFS;
                 if (reading && segment < maxima.size()) maxima[segment] = std::max(maxima[segment], *reading);
             }
             double worstLiveMiss = 0.0;
@@ -300,23 +409,12 @@ static void verifyTech3341Loudness()
                 if (std::abs(miss) > tolerance) ++outsideTolerance;
                 const auto behavior = label + "Tech 3341 case " + (momentary ? "14" : "11")
                                     + " successive maximum " + std::to_string(i);
-                if (!momentary || i % 5 == 0)
-                    requireNear(maxima[i], expected, tolerance, behavior + " is within 0.1 LU");
-                else
-                {
-                    // Case 14 fails the same off-grid starts as case 13. Pin the measured window loss openly;
-                    // this is a regression for a known limitation, not a passing EBU conformance assertion.
-                    const auto offsetMs = static_cast<double>((i % 5) * 20); // Milliseconds within a 100 ms hop.
-                    const auto coveredMs = 400.0 - std::min(offsetMs, 100.0 - offsetMs);
-                    const auto expectedLoss = -10.0 * std::log10(coveredMs / 400.0); // LU from missing window energy.
-                    requireNear(miss, expectedLoss, 0.05, behavior + " documents the known off-grid under-read in LU");
-                }
+                requireNear(maxima[i], expected, tolerance, behavior + " is within 0.1 LU");
             }
             if (momentary)
             {
-                require(outsideTolerance == 16, "Known case 14 conformance gap affects sixteen off-grid maxima per rate");
-                requireNear(worstLiveMiss, 0.46, 0.05, label + "Known case 14 worst under-read remains about 0.46 LU");
-                std::cout << label << "KNOWN CONFORMANCE GAP: case 14 has " << outsideTolerance
+                require(outsideTolerance == 0, "Generated case 14 maxima all stay within 0.1 LU");
+                std::cout << label << "Generated case 14: " << outsideTolerance
                           << "/20 maxima outside 0.1 LU; worst error " << worstLiveMiss << " LU\n";
             }
             else
@@ -599,7 +697,7 @@ int main(int argc, char** argv)
             profile(repeats); return 0;
         }
         if (argc != 1) throw std::runtime_error("Use --trace RATE FLOAT32_STEREO or --profile REPEATS"); // Refuse ignored/mislabelled options.
-        verifyMeter(); verifyWorkerRetirement(); verifyTech3341Loudness(); verifyIntegratedGating(); verifyTech3341TruePeak();
+        verifyMeter(); verifyWorkerRetirement(); verifyMomentaryMeasurementTiming(); verifyTech3341Loudness(); verifyIntegratedGating(); verifyTech3341TruePeak();
         std::cout << checks << " streaming meter checks, " << failures << " failures\n";
         return failures == 0 ? 0 : 1;
     }
