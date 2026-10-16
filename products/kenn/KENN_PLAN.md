@@ -76,6 +76,12 @@ The [14 October reuse screen](docs/research/audio_analysis_reuse_2026-10-14.md)
 records the current loudness/interpolation shortlist and later analysis options.
 It is a source review; comparative benchmarks and any adoption remain open.
 
+The [15 October open-source deep research](docs/research/KENN_OPEN_SOURCE_DEEP_RESEARCH_2026-10-15.md)
+extends this check across the brain, voice, retrieval, Live-integration, teaching and grading
+surfaces with per-candidate licences (code and weights), M3 fit estimates and first steps. Like
+the 14 October screen, it is a source review: it approves nothing, adds no dependency, and every
+candidate stays behind this check and owner approval.
+
 ### Product direction
 
 The owner's end goal is one assistant that is specialised in music production and
@@ -1162,6 +1168,12 @@ by setup. Local runtime engineering remains paused; C1/C2/C3 remain unticked.
 
 Needs the route/context audit; fixes may land in small slices while that audit continues.
 
+Runtime baseline note (15 Oct research): the recorded latency baseline ran Ollama 0.34.4 on the
+llama.cpp runner; since v0.40.0 supported models run on the MLX runner by default on Apple
+Silicon, and a tag can resolve to two runner packages. Until a same-prompt re-measure on the
+current stable line exists, earlier latency figures describe a runtime combination no longer
+installed. Pin the runner name alongside the digest in C2 receipts.
+
 Decisions, 13 Oct, made under my delegation ("go with the best way of doing it, your choice"). These settle
 what to do; they do not supply owner grades, and each still runs only when its own gate is met.
 
@@ -1178,6 +1190,10 @@ what to do; they do not supply owner grades, and each still runs only when its o
   gate open now; owner-graded correctness is. Reopen only if the C1 receipts or a later bench show late answers
   again, and then on the same explicitly pinned checkpoint as the selected Ollama control,
   with held-out quality unchanged. Compare a change of model separately from a change of runtime.
+- **Speculative-decoding history (15 Oct research note):** the MLX engine has used Qwen3.5's MTP
+  head automatically since v0.32.6 (2026-08-04), with a memory-growth fix in v0.34.2; v0.40.0
+  changed routing, not availability. The parked decision above is unchanged: runtime changes
+  compare separately from model changes, on the same explicitly pinned checkpoint.
 - **Reference-numbers and precedence-effect notes: held, then done together.** The 11 Oct check found the reference
   figures already indexed and the misses to be retrieval, and any rebuild makes the next bench incomparable with
   v7 while its grading is pending. After I grade v7, write both notes from cited sources, check each figure
@@ -1290,6 +1306,11 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
   hardware. Any MLX comparison must explicitly use the selected control's checkpoint
   lineage, rather than the engine's default model. Require unchanged safety and a held-out
   quality comparison for each latency change.
+  - [ ] Record the runner, not only the digest, in every C2 receipt, and unload eval models after
+    each call: evals run beside a KENN session must set `keep_alive: 0` on the Ollama provider and
+    be checked with `ollama ps`. Serial eval runs alone do not prevent two models staying
+    resident for their keep-alive window. (Research: KENN_OPEN_SOURCE_DEEP_RESEARCH_2026-10-15.md
+    §2.2, §2.9; lane 02 KQ3, lane 06 KQ1.)
   - [x] Reviewed the pinned Ollama runtime, existing cache/attention behavior,
     conditional source costs, fixed-model backend options and Jev/Kev fit against
     the five-question diagnostic. This establishes research findings, not an
@@ -1461,6 +1482,11 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
   actions; only explicit Apply produces an execution receipt. Include the UI delivery path.
+  - [ ] Query-rewriting trial (15 Oct research): resolve the follow-up against session context,
+    rewrite the retrieval query before the existing hybrid search (Rewrite-Retrieve-Read,
+    arXiv 2305.14283), and measure recall on the device-purpose fixtures the RRF receipt showed
+    weakest (0.616 pre-fusion). Routing stays unchanged; one local call per follow-up.
+    (Research: lane 06 KQ5.)
   - First model run, 3 Oct: six scripted conversations, 30 turns, 24 reached the model and 12 were accepted (11 guard
     rejections, 1 timeout); accepted answers took 13 to 58 s. Corrections and short follow-ups often lose the thread,
     clarify replies forget the conversation, and a question about an analysis that never ran got an accepted answer
@@ -2185,6 +2211,11 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   enabled/state/automation metadata, chooser labels and display-unit parity. Treat
   the 78 stock entries as a baseline; separately inventory Packs, presets, Max for
   Live and plug-ins, recording unsupported or manual-only controls explicitly.
+  - [ ] Qualify the Remote Script surfaces AbletonOSC does not expose — browser load/preview,
+    rack-chain traversal, take lanes, grouped undo steps — through the vendored bridge as a
+    capability probe with an explicit refusal path; one write authority stays. Read-verified only
+    today; Live 12.4.3 field reports show warp-marker writes and warped-looped arrangement
+    resizes no-op, so do not promise them. (Research: lane 01 Q5.)
 - [x] **L1a: Audit whole-software Live 12 coverage.** Completed 2 October 2026:
   chat, planner, HTTP, MCP, frontend, native plug-in, desktop, backend and bundled
   Remote Script reviewed against installed Live 12.4.6 and official references.
@@ -2231,6 +2262,10 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   requires the existing comparison/time/schema/agreement gates and human review;
   include ambiguity, missing ranges, wrong units and stale identities. A large
   synthetic corpus or high schema validity alone does not qualify action accuracy.
+  - [ ] Before the next shadow comparison, send one required-schema planner-shaped request
+    through both Ollama runners (llamacpp and MLX) on the installed line and compare `format`
+    acceptance; record the runner per shadow trace. Keep `tool_choice` out of the design —
+    it is unsupported on the OpenAI-compatible surface. (Research: lane 06 KQ3.)
 - [ ] **L5: Confirm transport reliability across surfaces.** Fresh preconditions,
   ordered/duplicate/missing OSC replies, reconnect, idempotency, per-set serialization,
   ambiguous timeout outcomes, restart and identity-bound Undo. Use the A2 route map
@@ -2262,6 +2297,7 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
     - **Save-panel follow-up, later 15 Oct:** a supervised UI check navigated the native Save panel to a fresh private empty directory and read back its full URL plus `kenn-analysis.wav`, then cancelled both dialogs; transport/record stayed stopped and no file was created. This maps controls, not a qualified helper save/render. Python/Swift request validation now agrees on ASCII 6/2/2 range bounds, positive start/nonzero length and Unicode title controls; native toggle readback rejects fractions/NaN, and WAV checks require ownership/single-link plus the existing eight-minute limit. **254 scoped backend tests** and Swift checks pass; native/Python mutations were detected. [Follow-up evidence](docs/evidence/KENN_OFFLINE_SCAN_HELPER_2026-10-15.md#save-panel-and-validation-follow-up-later-15-october). Before promotion, AX enumeration must fail closed on read failure/truncation and completion must share a stable WAV/descriptor identity. Candidate remains disabled/unwired. Battery 13% then 11%, discharging: no mains timing gate closed. Both workflows for published checkpoint `5e57d6ef` failed before steps started; current annotations confirm failed account payments/spending limits. Manual sharing sync completed with exact product-tree equality; no CI pass is claimed.
     - **AX/completion safety checkpoint, 16 Oct:** failed, malformed, changed, over-budget or late AX reads now reject the actual export caller before any press. Complete trees share a 2048-node budget; optional absence is distinct from messaging failure. WAV validation and descriptor inspection now carry one device/inode/size/mode/nanosecond-mtime/ctime identity and reject replacement, rewrites and link races. Swift checks, **254 scoped FakeLive/backend tests** and **eight native mutation checks** pass; parallel review covered the caller and identity boundaries. [Completion evidence](docs/evidence/KENN_OFFLINE_SCAN_COMPLETION_2026-10-16.md). These are fixture-qualified prerequisites, not real render completion: the helper still cannot press Export or operate Save, remains disabled/unwired and returns no writer-closed publication receipt. A supervised probe of the disposable demo copy passed the stricter AX preflight, rejected the existing MP3 setting and cancelled its owned Export dialog with no cleanup error; independent readback confirmed stopped playback/recording and an empty job directory. No render or Save action ran. AC power was available (10%, 15% then 19%, charging), but no timing benchmark ran. Current baseline core/sharing annotations still confirm the billing/spending-limit block.
     - **Destination/structural checkpoint, later 16 Oct:** added an unwired read-only native Save-destination verifier and an uncached OSC arrangement-structure reader. The verifier requires the exact enabled native controls, fixed filename, typed canonical directory URL and stable owned directory, with cancellation/output/metadata rechecks. The reader requires two complete matching observations with strict replies and track/clip/label budgets; OSC has no request nonce/set epoch, so this does not prove full-source freshness, atomicity, export range or tails. **352 scoped FakeLive/backend tests**, Swift helper checks, **four Python and seven native mutation checks** pass; independent parallel review found no blocker in this disabled scope. A supervised inspection found no verified keystroke-free folder-navigation action; both dialogs were cancelled, playback/recording stayed stopped and no render ran. [Destination/bounds evidence](docs/evidence/KENN_OFFLINE_SCAN_DESTINATION_BOUNDS_2026-10-16.md). No runtime/HTTP/frontend integration or export/Save authority was added. Candidate stays disabled; navigation, panel ownership, overwrite exclusion, full-source identity/range/tails and actual render/cancel/writer-closure qualification remain open. AC power was available (22%, charging), but no timing workload ran. Baseline CI annotations still confirm the billing/spending-limit block.
+    - **Cancellation checkpoint, 16 Oct:** the helper's post-menu cancellation path left the newly opened Export dialog visible; a fixture on the real `LiveExportAccessibility.run()` reproduced it. Each helper instance now takes one request, binds the original main window and baseline window set, accepts exactly one new top-level Export dialog with a unique native Cancel control (two-second grace after a cancel), and cleanup revalidates process, windows and Cancel before pressing once and reading disappearance back. Re-run: 7 Swift check groups (40 caller lifecycle scenarios) and 33 `test_macos_live_export.py` tests pass on FakeLive; no Live UI action ran. Still disabled and unwired; no render cancellation or writer closure is claimed. [Evidence](docs/evidence/KENN_OFFLINE_SCAN_CANCELLATION_2026-10-16.md).
     - Still open: qualify job-only save destination, overwrite refusal, actual render progress/completion/cancellation and Live writer closure; establish independently fresh full-arrangement identity/range and tail policy. Then wire visible export/analysis/cancel/failure states and prove the complete button-to-report flow. Cached snapshots and an explicitly injected confirmed range do not prove automatic whole-track discovery. Battery power (16%, discharging) left mains qualification open. GitHub CLI eventually reconnected: the predecessor's core and sharing jobs still could not start because of account payments/spending limits; no CI pass is claimed.
 - [ ] **Stage 2/3 guarded parameter control: implementation reviewed, 12 Oct.** This is the branch
   `codex/kenn-stage2-stage3-integration`, reviewed through `945b4373`. It adds inspect → proposal → explicit
@@ -2388,6 +2424,12 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   Owner listening review is required for usefulness claims. Existing artifact/import
   code is a starting point, not a completed creation gate.
 - [ ] **B4: Optional integrations.** Audio-to-MIDI, reference suggestions, AudioGen, SLO and offline AutoMix remain separate typed artifact providers with unavailable states. Audio generation needs explicit opt-in and license/provider review; no silent network provider, filesystem rename or automatic session modification. Reference A/B should use authorized files, corresponding sections and matched playback loudness; identify analysed regions and normalization separately. For later provider trials, investigate local whisper.cpp push-to-talk or Basic Pitch ONNX on bounded instrument clips, one at a time. Speech becomes inspectable text through the existing policy; MIDI keeps preview/target/Apply/Undo. Pin code and weight licences separately and qualify offline operation and resource use.
+- Research pointer, 15 Oct (licence-first): Basic Pitch ONNX (Apache-2.0, 230,444-byte file),
+  whisper.cpp with large-v3-turbo weights (MIT), beat_this small (MIT; replace or isolate its
+  inference-time `soxr` call, LGPL-2.1-or-later), MSST + KimberleyJSN mel-band + ZFTurbo
+  BS-RoFormer separation checkpoints (MIT per first-party statements, MUSDB18-HQ chain-of-title
+  to clear), ACE-Step v1/v1.5 generation (Apache-2.0 / MIT, opt-in only). Each remains a
+  candidate: this check and owner approval still gate any addition.
 - [ ] **E1: Real-time analysis.** Chat and mix review should read Live's channel state (levels, dynamics, spectrum, stereo width, correlation, transit time, peak) as 100 ms windows. Each window carries its sample positions, capture age, source generation and drop count. We only use the 100 ms windows the insert-analysis work already measures. If the queue overflows we drop measurements; we never make playback wait.
   - [x] The insert-analysis queue and the 100 ms window contract already exist. Check that chat and mix review actually get those windows, and that nothing on the path can write to Live. Done 14 Oct: both now carry the window position, drop counts and audio age (see the audit note below), and the backend path is advisory only.
   - [ ] Tests: synthetic signals, queue overflow and recovery, allocations in the audio callback, pass-through, instance isolation, and average/p99/max timings across sample rates, buffer sizes and 1/8/32/64 instances. Connect two native inserts through separate insert IDs and owner-scoped bindings, and check the kick/bass spectra match through FakeLive HTTP.
@@ -2406,6 +2448,15 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     Done 14 Oct for the C++ candidate, in `test_streaming_meter_main.cpp` (808 checks at the time, 0 failures, at 44.1, 48 and 96 kHz). The Tech 3341 table was read from the EBU PDF this time, so the true-peak tolerance is confirmed as +0.2/-0.4 dBTP for cases 15-23. The 4x interpolator passes all nine cases: worst readings are -0.316 dB on case 17 and -0.224 dB on case 23, and the case 15-19 numbers match the earlier receipt. Its 28 failures in the 98-tone sweep were against our own stricter -0.2/+0.1 dB margin, not the standard. So 4x meets the EBU minimum and 8x only buys that margin at 31-47% of a core; my call, with a recommendation to keep 4x for the live meter. Loudness cases 1, 2, 9, 10 and 12 pass. Case 13 does not: the meter reports on a 100 ms grid, so a 400 ms tone starting off the grid reads up to 0.46 LU low against a 0.1 LU tolerance. The test pins that gap; it needs a shorter hop before we call the momentary reading EBU mode. Update 14 Oct (later): the C++ meter now computes gated integrated loudness (absolute -70 LUFS gate, relative -10 LU gate, a fixed 1600-bucket histogram so memory does not grow with programme length) and passes Tech 3341 cases 1-5 at all three rates, 881 checks, 0 failures; breaking the relative gate makes cases 3-5 fail, so the tests do bite. Not covered: cases 6-8 (5.0 channel and the two authentic programmes), 11 and 14, LRA, the 5.0 channel case, and the EBU's own wav files (signals are generated from the table, and cases 20-23 use our reading of 'continuous in phase'). The candidate is still disabled; enabling it needs the CPU timing run on mains power.
     15 Oct temporal follow-up: generated continuous-stream Tech 3341 case 11 passes all twenty successive maxima at 44.1/48/96 kHz (worst 0.069 LU). Case 14 exposes sixteen off-grid maxima per rate outside 0.1 LU, worst 0.454 LU, from the same 100 ms hop limitation as case 13. The test names and prints that gap and pins its window-energy loss; green regression checks do not imply conformance. StreamingMeter now has 1,013 checks, zero regression failures; disabling the new temporal-maxima accumulation causes 126 failures. Scoped ContinuousAnalysis, RealtimeThreadSafety and StreamingMeter CTest targets passed 3/3. Cases 6–8, native LRA, authentic vectors and mains contention timings remain open; the candidate stays disabled. [Evidence](docs/evidence/KENN_MIX_REVIEW_OFFLINE_BENCHMARK_2026-10-15.md).
     Later 15 Oct timing correction: the standing reuse review retained KENN's C++ weighting and bounded storage. A 40-bin, 10 ms momentary ring now retains each 100 ms interval's maximum with its actual sample position, while current M/S, integrated gating and HTTP cadence retain their contracts. Generated cases 13/14 now have no misses at any supported rate, worst 0.006994 LU; arbitrary sample offsets reach 0.050146 LU. The native target passes 1,304 checks; restoring 100 ms observations causes 114 failures, including the original sixteen case-14 misses per rate. All 33 generated current-window/reference comparisons pass. Meter storage grows by 408 bytes and snapshots by 40 bytes; added worker cost remains unqualified because mains/quiet-machine conditions were unavailable. Full temporal/transient coverage, cases 6–8, native LRA, authentic vectors, peak promotion and shared-worker/publisher/model/host qualification remain open. [Timing evidence](docs/evidence/KENN_STREAMING_MOMENTARY_TIMING_2026-10-15.md).
+  - [ ] Conformance material, 15 Oct: the "download URL unverified" note is resolved — EBU Tech
+    3341-2023 names its minimum-requirement test signals at http://tech.ebu.ch/loudness,
+    synthesised at 48 kHz; ITU Report BS.2217-2 (10/2016) is a free 29-file expected-value table
+    at ±0.1 LKFS; EBU Tech 3342-2023 V4 is the current LRA document. Confirm the EBU file terms
+    before downloading or redistributing; the page returned HTTP 403 during the research pass.
+  - [ ] Comparator, 15 Oct: libebur128 (MIT, quiet since v1.2.6) stays test-side only.
+    sz_meters (MIT, C++, BS.1770-4 gating + inter-sample true peak + AES17 metrics) is the
+    second comparator to benchmark against the existing 8x accuracy reference before any
+    live-path consideration. No dependency is added by this note.
   - [x] Declared-target part (30): loudness within tolerance and true-peak ceiling against the cited list or my stated target.
     Done 14 Oct in [declared_target.py](apps/backend/src/kenn/core/declared_target.py): loudness 20 and ceiling 10, 1 LU tolerance with the full loss at 6 LU, a peak 1 dB over the ceiling loses the whole ceiling part. Targets: Spotify (-14 LUFS, -1 dBTP, -2 dBTP if louder; read on Spotify's own page) and AES TD1008 music (-16 LUFS, from a secondary summary, so the AES PDF still needs opening; it gives no true-peak figure, so the ceiling there is our -1 dBTP default). YouTube, Apple Music and Tidal are left out until someone reads their own pages. Tolerances are placeholders for E9. Not yet wired into chat or the plug-in.
   - [x] Rework the technical-health part (30) so every deduction names its source, and drop the letter grade from the report.
@@ -2442,6 +2493,11 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
 - [ ] **E4: Explain and teach.** Chat and mix-review answers explain the music and the audio (why the grade is what it is, what a number means, what to listen for), so the producer learns rather than just clicks Apply.
   - [ ] Reuse the existing grounded conversation patterns. Citations, evidence and refusals must work from chat, the browser chat and the first model call.
   - [ ] Test that every number in an explanation comes from the grade's own measurements or a cited source, so the grounding gate has nothing to reject and the model never guesses a figure.
+  - [ ] Two E4 aids from the 15 Oct research: MixAssist dialogues (Zenodo 15571750 / 15848443,
+    both cc-by-4.0) for phrasing structure — name the measurement, give the range, say what to
+    listen for — using the Zenodo copies only, never the unlicensed HuggingFace copies; and
+    AudioCommons timbral_models (Apache-2.0) as an offline descriptor pilot, kept out of the
+    grade until an E9 listening check passes.
 - [ ] **E5: Gate the whole flow.** Qualify the full path: real-time analysis, grounded grade, actionable suggestion, explanation, with exact Apply/Undo and human grading.
   - [ ] Follow the 15 s gate path in docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md. Script and rehearse the whole sequence before anyone makes a release claim.
   - [ ] I grade a held-out set of mix questions blind (grade, suggestion and explanation scored separately) alongside the gate figures. Land the synonym fix before the v5 bench.
@@ -2459,6 +2515,12 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   - [ ] Define the curriculum: session objectives, before and after grades, lesson notes, and gaps found from suggestions that failed.
   - [ ] Add a simple session: the producer picks a topic and gets an objective, a starting grade and a suggested path.
   - [ ] Check that one-off questions don't corrupt curriculum state, and that curriculum state never blocks a one-off question.
+  - [ ] Curriculum material, 15 Oct: no open mixing curriculum exists to reuse — author lesson
+    content in-house. Utilities are clean: fsrs (MIT) scheduler; music21 (BSD-3, keep bundled
+    corpus files out unless checked); partitura (Apache-2.0); tonal (MIT); VexFlow (MIT). The six
+    MED CC BY songs are the only clean external listening set. Competitive note: 0–100-with-
+    reasoning grades now ship elsewhere; the differentiator is in-session, source-labelled,
+    teaching-first grading. (Research: lane 04 §3, §5, §8; lane 05 §3.)
 - [ ] **E9: Is the grade reliable?** Check the grade; don't assume it.
   - [ ] Build a held-out set of mixes judged by independent human reviewers. The grade counts as correct when it agrees with them.
   - [ ] Regression test: a test file with known level, dynamics, spectrum and correlation must always get the same grade.
@@ -2876,6 +2938,7 @@ different hardware, routes or fixtures into a single passing figure.
 | Listening | At least 80% reviewer agreement on useful findings and at least 90% applied-fix remeasurement success on the consented qualified corpus; two reviewers. No unsupported musical-quality claims. |
 | Mix grade and education | Grade the current mix or a change out of 100 against the producer's own reference, an explicit target, and published conventions; reasoning shown. A grade below a helpful threshold triggers a short list of specific, actionable suggestions, each bound to a Live target or marked informational. Owner listening review required before usefulness claims. |
 | Real-time analysis | 100 ms analysis windows with sample positions, capture age, source generation and drop counts. Oversampling variants (4x and 8x) must preserve the same causal peak bins across silence, right-channel DC, bin-edge impulses and noise; reset/gap retirement and full transient/temporal conformance qualified. |
+| Meter conformance material | Generated Tech 3341/3342 cases remain the gate; the EBU 48 kHz signal set (http://tech.ebu.ch/loudness) and the ITU BS.2217-2 expected-value table (±0.1 LKFS) are the external oracles once file terms are checked. Test-only; never redistributed. |
 | Suggestion validity | Each suggestion names a live target, offers an Apply/Undo path, or is explicitly marked informational; the grade changes if an applied suggestion is re-measured. |
 | Grade defensibility | Same inputs produce the same grade; the target set, conventions and reference files are declared and versioned; unsupported measurements, sources and claims are rejected, not graded around. |
 
