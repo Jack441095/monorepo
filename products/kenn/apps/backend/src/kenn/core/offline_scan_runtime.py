@@ -26,6 +26,7 @@ FAKE_ARRANGEMENT_FINGERPRINT = "fake-live-arrangement-v1"
 
 _lock = Lock()
 _service: OfflineScanService | None = None
+_recovered = False
 
 
 def _fake_live_selected() -> bool:
@@ -66,7 +67,7 @@ def _fake_fingerprint() -> str:
 
 def get_offline_scan_service() -> OfflineScanService | None:
     """Return the shared FakeLive scan service, or None when Live is real."""
-    global _service
+    global _service, _recovered
     if not _fake_live_selected():
         # Real Live has no qualified exporter yet; None keeps every caller on the
         # "no qualified offline export candidate" refusal.
@@ -75,22 +76,33 @@ def get_offline_scan_service() -> OfflineScanService | None:
         if _service is None:
             runtime_dir = os.getenv(
                 "KENN_OFFLINE_SCAN_RUNTIME_DIR",
-                str(Path(tempfile.gettempdir()) / "nite-kenn-offline-scan"),
+                # Fake-only name: recovery below assumes no writer can survive, which would
+                # be false for a future real exporter sharing this directory.
+                str(Path(tempfile.gettempdir()) / "nite-kenn-offline-scan-fake"),
             )
             service = OfflineScanService(
                 runtime_dir, exporter=fake_tone_exporter, read_source_fingerprint=_fake_fingerprint,
             )
-            # A previous backend that died mid-scan left its job directory behind.
-            # The fake exporter writes in-process, so with that process gone no
-            # writer can still hold the WAV and absence is provable here. A real
-            # exporter must supply its own Live-side readback instead.
-            service.recover_abandoned(writer_is_absent=lambda request: True)
             _service = service
+        if not _recovered:
+            try:
+                # A previous backend that died mid-scan left its job directory behind.
+                # The fake exporter writes in-process, so with that process gone no
+                # writer can still hold the WAV and absence is provable here. A real
+                # exporter must supply its own Live-side readback instead.
+                _service.recover_abandoned(writer_is_absent=lambda request: True)
+                _recovered = True
+            except RuntimeError:
+                # Another backend sharing this directory holds the scan lease, so it owns
+                # a live job and we must not touch its WAV. Serve requests now and retry
+                # recovery on the next call instead of failing every route until restart.
+                pass
         return _service
 
 
 def reset_offline_scan_service() -> None:
     """Drop the cached service so the next call rebuilds it from the environment."""
-    global _service
+    global _service, _recovered
     with _lock:
         _service = None
+        _recovered = False

@@ -1,7 +1,7 @@
 """Confirm one experimental export without creating another Live write authority.
 
 The job module owns audio and reports; LiveActionService owns permission and
-confirmation. No default runtime installs this candidate or exposes it over HTTP.
+confirmation. Only the FakeLive runtime (core/offline_scan_runtime.py) installs an exporter; real Live gets none.
 """
 
 from __future__ import annotations

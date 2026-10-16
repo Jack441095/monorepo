@@ -6,6 +6,7 @@ registered in only one server fails here. No Live UI action runs anywhere in thi
 from __future__ import annotations
 
 from collections import defaultdict, deque
+import fcntl
 import json
 import os
 import subprocess
@@ -179,6 +180,23 @@ def test_real_live_gets_no_exporter_and_every_route_says_so(post, monkeypatch):
     assert status == 409 and "No qualified offline export candidate" in body["error"]
     status, body = post("/api/ableton/offline-scan/status", {"session_id": OWNER, "job_id": "scan-" + "0" * 32})
     assert status == 409 and "No qualified offline export candidate" in body["error"]
+    # Start and cancel must refuse too; a route that forgot the None check would raise a 500 instead.
+    proposal = {"confirmation_token": "x"}
+    status, body = post("/api/ableton/offline-scan/start",
+                        {"session_id": OWNER, "proposal": proposal, "confirm_token": "x", "idempotency_key": "k"})
+    assert status == 409 and "No qualified offline export candidate" in body["error"]
+    status, body = post("/api/ableton/offline-scan/cancel", {"session_id": OWNER, "job_id": "scan-" + "0" * 32})
+    assert status == 409 and "No qualified offline export candidate" in body["error"]
+
+
+def test_a_proposal_edited_after_confirmation_does_not_start_a_job(post, tmp_path):
+    # The token confirms the preview the owner saw; swapping the render length afterwards must not ride on it.
+    proposal = _propose(post)
+    edited = json.loads(json.dumps(proposal))
+    edited["export_request"]["render_length"] = "2.0.0"
+    status, body = _start(post, edited)
+    assert status == 409, body
+    assert not list((tmp_path / "scan-runtime").glob("scan-*"))
 
 
 def test_closed_experimental_gate_blocks_proposals(post, monkeypatch):
@@ -215,3 +233,20 @@ def test_a_scan_killed_mid_export_is_disposed_when_the_runtime_restarts(tmp_path
     receipt = service.status(OWNER, job_id)
     assert receipt["state"] == "cancelled" and receipt["audio_deleted"] is True
     assert not list(runtime.rglob("kenn-analysis.wav"))
+
+
+def test_a_busy_lease_at_startup_does_not_take_the_routes_down(tmp_path):
+    # Two backends sharing one runtime directory: the second must still serve requests while the first
+    # owns a job, and must finish recovery once the lease is free. Before this the RuntimeError from
+    # the busy lease escaped get_offline_scan_service() and every route returned 500 until restart.
+    runtime = tmp_path / "scan-runtime"
+    runtime.mkdir()
+    holder = os.open(runtime / ".scan.lock", os.O_CREAT | os.O_RDWR, 0o600)
+    fcntl.flock(holder, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    try:
+        assert offline_scan_runtime.get_offline_scan_service() is not None
+        assert offline_scan_runtime._recovered is False
+    finally:
+        os.close(holder)  # Closing the descriptor drops the flock.
+    assert offline_scan_runtime.get_offline_scan_service() is not None
+    assert offline_scan_runtime._recovered is True
