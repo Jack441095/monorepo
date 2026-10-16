@@ -1315,11 +1315,14 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     and every resident model's name, digest and `runner` from `/api/ps`) plus `ollama_keep_alive`; the
     `after_run` sample is the `ollama ps` check. The runner exists only while a model is resident, so a
     `keep_alive 0` run reports an empty `after_run.loaded` ("not observed"), and a keep-warm run is
-    the way to see its runner. HTTP runs record `null` because the companion's Ollama is not ours. Setting
-    the unload: `KENN_OLLAMA_KEEP_ALIVE=0` for the chat harness and `measure_model_phases.py` (string `"0"`
-    checked against the local 0.40.4: the model is not left in `ollama ps`), and `run_deliberative_ollama.py`
-    now defaults to `--keep-alive 0` (was a fixed `10m`), so its `latency_ms` is cold-start unless a warm run
-    is asked for. Not run against MLX: no model here currently resolves to that runner.
+    the way to see its runner. HTTP runs record `null` because the companion's Ollama is not ours.
+    `ollama_keep_alive` is the value KENN is configured to send, not proof the server honoured it: the
+    OpenAI-compatible `/chat/completions` path ignores `keep_alive`, so `KENN_OLLAMA_KEEP_ALIVE=0` only
+    unloads where KENN calls a native endpoint, and the `after_run` sample is the check. Scope: this tick
+    covers `measure_chat_latency.py` and `run_deliberative_ollama.py`, which now defaults to `--keep-alive 0`
+    (was a fixed `10m`; the value is recorded in its output), so its `latency_ms` is cold-start unless a
+    warm run is asked for. `measure_model_phases.py` still records only the configured `keep_alive` and has
+    no runner field, so it is not covered. Not run against MLX: no model here currently resolves to that runner.
   - [x] Reviewed the pinned Ollama runtime, existing cache/attention behavior,
     conditional source costs, fixed-model backend options and Jev/Kev fit against
     the five-question diagnostic. This establishes research findings, not an

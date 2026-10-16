@@ -152,6 +152,9 @@ def main() -> int:
         "benchmark_id": benchmark.get("benchmark_id", "unknown"),
         "model_provider": "ollama",
         "model_id": str(args.model)[:128],
+        # Recorded because "0" makes every latency_ms a cold start and "10m" a warm one; the numbers
+        # cannot be compared across runs without it.
+        "keep_alive": args.keep_alive,
         "predictions": predictions,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

@@ -97,6 +97,9 @@ def test_an_unreachable_ollama_is_recorded_as_an_error_and_never_raised(tool, mo
 def test_a_remote_base_url_is_refused_without_a_request(tool, monkeypatch):
     monkeypatch.setenv("KENN_LLM_PROVIDER", "ollama")
     monkeypatch.setenv("KENN_LLM_BASE_URL", "http://example.invalid:11434/v1")
+    # If validation ever stopped short of the opener this would be a network call to a remote host.
+    monkeypatch.setattr("kenn.core.ollama_deliberative.open_loopback_ollama",
+                        lambda *a, **k: pytest.fail("a remote URL must not be requested"))
     assert "loopback" in tool._ollama_runtime()["error"]
 
 
@@ -129,7 +132,8 @@ def test_measure_samples_runtime_before_and_after_and_records_the_keep_alive(too
     assert runtime["before_run"]["loaded"][0]["runner"] == "mlx"
     assert runtime["after_run"]["loaded"] == []
     assert runtime["after_run"]["digests"] == {"qwen3:1.7b-q4_K_M": DIGEST}
-    assert report["provenance"]["ollama_keep_alive"]
+    # Configured value (default 30m), not proof the server honoured it; after_run above is that proof.
+    assert report["provenance"]["ollama_keep_alive"] == tool._ollama_keep_alive()
 
 
 def test_an_http_run_does_not_claim_this_process_s_ollama(tool, monkeypatch):

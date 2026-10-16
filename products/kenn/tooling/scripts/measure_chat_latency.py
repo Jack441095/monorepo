@@ -314,6 +314,11 @@ def _response_cache_enabled() -> bool:
 
 
 def _ollama_keep_alive() -> str:
+    """The keep_alive KENN is configured to send, not what the server honoured.
+
+    The OpenAI-compatible /chat/completions path ignores keep_alive, so only the after_run `ollama ps`
+    sample says whether a model stayed resident.
+    """
     from kenn.llm.llm_rewrite import KEEP_ALIVE_DURATION
 
     return KEEP_ALIVE_DURATION
@@ -328,10 +333,10 @@ def _ollama_runtime(timeout: float = 2.0) -> dict | None:
     from kenn.core.ollama_deliberative import open_loopback_ollama, validate_ollama_base_url
     from kenn.llm.llm_rewrite import _native_ollama_base, config
 
-    cfg = config()
-    if cfg["provider"] != "ollama" or not cfg["enabled"]:
-        return None
     try:
+        cfg = config()
+        if cfg["provider"] != "ollama" or not cfg["enabled"]:
+            return None
         # Same loopback-only rule the planner uses; a remote base URL gets an error entry, not a probe.
         base = validate_ollama_base_url(_native_ollama_base(cfg["base_url"] or "http://127.0.0.1:11434"))
 
