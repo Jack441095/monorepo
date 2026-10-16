@@ -1,3 +1,4 @@
+import ApplicationServices
 import Darwin
 import Foundation
 
@@ -25,6 +26,7 @@ struct LiveExportHelperTests {
     }
 
     private static func run() throws {
+        try axReadsRejectFailuresAndTruncation()
         let root = URL(fileURLWithPath: canonicalPath(FileManager.default.temporaryDirectory.path)!).appendingPathComponent("kenn-export-test-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
         defer { try? FileManager.default.removeItem(at: root) } // Tests remove only their exclusive generated fixture directory.
@@ -33,6 +35,7 @@ struct LiveExportHelperTests {
         }
         let original = request()
         try original.validate()
+        try incompletePreflightNeverPressesExport(original)
         for name in ["manifest.json", "receipt.json", "cancel.requested"] {
             try Data("{}".utf8).write(to: root.appendingPathComponent(name))
         }
@@ -104,13 +107,7 @@ struct LiveExportHelperTests {
         profile.removeValue(forKey: "Base.RenderLengthBox.RenderLength.Bars")
         try rejects({ try LiveExportProfile.validate(values: profile, request: original) }, "An inaccessible range control was accepted")
 
-        for mask in 0..<16 {
-            let evidence = ExportCompletionEvidence(observedExportProgress: mask & 1 != 0, exportDialogsGone: mask & 2 != 0, validWAV: mask & 4 != 0, liveHasNoOpenOutputDescriptor: mask & 8 != 0)
-            try expect(evidence.permitsPublication == (mask == 15), "Incomplete export evidence allowed publication")
-        }
-        try expect(!ExportCompletionEvidence(observedExportProgress: true, exportDialogsGone: true, validWAV: true, liveHasNoOpenOutputDescriptor: nil).permitsPublication, "Permission failure was treated as writer closure")
-        try expect(liveHasNoOpenOutputDescriptor(pid: Int32.max, outputPath: original.output_path) == nil, "A missing writer process was treated as proven closed")
-
+        try wavAndDescriptorEvidenceShareOneGeneration(output: output, root: root)
         let valid = wav()
         try valid.write(to: output)
         try ExportWAV.validate(output.path)
@@ -118,10 +115,11 @@ struct LiveExportHelperTests {
         try FileManager.default.linkItem(at: output, to: alias)
         try rejects({ try ExportWAV.validate(output.path) }, "A hard-linked WAV was accepted as exclusively owned")
         try FileManager.default.removeItem(at: alias)
+        let identity = try ExportWAV.validate(output.path)
         let handle = try FileHandle(forWritingTo: output)
-        try expect(liveHasNoOpenOutputDescriptor(pid: getpid(), outputPath: output.path) == false, "An open writer descriptor was missed")
+        try expect(inspectLiveOutputDescriptors(pid: getpid(), outputPath: output.path, expected: identity)?.hasNoOpenDescriptor == false, "An open writer descriptor was missed")
         try handle.close()
-        try expect(liveHasNoOpenOutputDescriptor(pid: getpid(), outputPath: output.path) == true, "The closed self-process descriptor could not be verified")
+        try expect(inspectLiveOutputDescriptors(pid: getpid(), outputPath: output.path, expected: identity)?.hasNoOpenDescriptor == true, "The closed self-process descriptor could not be verified")
         try Data(valid.dropLast()).write(to: output)
         try rejects({ try ExportWAV.validate(output.path) }, "A partial file was treated as a completed WAV")
         try wav(sampleRate: 44_100).write(to: output)
@@ -145,6 +143,224 @@ struct LiveExportHelperTests {
         try oversized.close()
         try rejects({ try ExportWAV.validate(output.path) }, "An over-limit sparse file was accepted")
         print("PASS: request ownership, double export gate, receipt identity, all completion gates, PCM validation and real descriptor closure")
+    }
+
+    private static func incompletePreflightNeverPressesExport(_ request: LiveExportRequest) throws {
+        let window = AXUIElementCreateApplication(Int32.max)
+        let menuBar = AXUIElementCreateApplication(Int32.max - 1)
+        let file = AXUIElementCreateApplication(Int32.max - 2)
+        let menu = AXUIElementCreateApplication(Int32.max - 3)
+        let export = AXUIElementCreateApplication(Int32.max - 4)
+        for failure in ["none", "windows", "dialogs", "children", "role", "overflow", "malformed", "deadline"] {
+            var windowCounts = 0
+            var presses = 0
+            func children(_ node: AXUIElement) -> [AXUIElement] {
+                if CFEqual(node, menuBar) { return [file] }
+                if CFEqual(node, file) { return [menu] }
+                if CFEqual(node, menu) { return [export] }
+                return [] // All other fixture nodes are leaves; no native AX read is needed.
+            }
+            let environment = LiveExportEnvironment(trusted: { true }, isLive: { _ in true }, reader: { deadline in
+                ExportAXReader(deadline: failure == "deadline" ? .distantPast : deadline, copyValue: { node, key in
+                    if key == kAXMenuBarAttribute { return (.success, menuBar) }
+                    if key == kAXTitleAttribute {
+                        if CFEqual(node, window) { return (.success, request.expected_window_title as CFString) }
+                        if CFEqual(node, file) { return (.success, "File" as CFString) }
+                        if CFEqual(node, export) { return (.success, "Export Audio/Video…" as CFString) }
+                    }
+                    if key == kAXRoleAttribute { return failure == "role" ? (.cannotComplete, nil) : (.success, kAXWindowRole as CFString) }
+                    if key == kAXSubroleAttribute { return (.success, kAXStandardWindowSubrole as CFString) }
+                    return (.noValue, nil) // Optional titles/identifiers are explicitly absent in this fixture.
+                }, countValues: { node, key in
+                    if key == kAXWindowsAttribute {
+                        windowCounts += 1
+                        if failure == "windows" || (failure == "dialogs" && windowCounts > 2) { return (.cannotComplete, 0) }
+                        return (.success, 1)
+                    }
+                    if CFEqual(node, window) {
+                        if failure == "children" { return (.cannotComplete, 0) }
+                        if failure == "overflow" { return (.success, ExportAXReader.maximumNodes + 1) }
+                    }
+                    return (.success, children(node).count)
+                }, copyValues: { node, key, _ in
+                    if key == kAXWindowsAttribute {
+                        return (.success, failure == "malformed" ? [NSNumber(value: 1)] as CFArray : [window] as CFArray)
+                    }
+                    return (.success, children(node) as CFArray)
+                })
+            }, press: { _ in
+                presses += 1
+                return .failure // Positive control reaches the action seam but never opens a real dialog.
+            })
+            let receipt = LiveExportAccessibility(request, environment: environment).run(supervised: true, enabled: true)
+            if failure == "none" {
+                try expect(presses == 1 && receipt.error_code == "export_menu_rejected", "The action spy never reached a valid menu preflight")
+            } else {
+                // Caller coverage matters: a rejecting reader must stop the actual AXPress path.
+                try expect(presses == 0 && receipt.status == "unavailable", "Incomplete preflight pressed Export: \(failure)")
+            }
+            try expect(!receipt.writer_closed && !receipt.owned_dialog, "A preflight failure claimed an owned dialog or closed writer")
+        }
+        print("PASS: actual export orchestration performs zero presses after incomplete preflight")
+    }
+
+    private static func wavAndDescriptorEvidenceShareOneGeneration(output: URL, root: URL) throws {
+        try wav().write(to: output)
+        let first = try ExportWAV.validate(output.path)
+        let replacement = root.appendingPathComponent("replacement.wav")
+        try wav().write(to: replacement)
+        guard rename(replacement.path, output.path) == 0 else { throw TestFailure(description: "Fixture replacement failed") }
+        // The previous path-only descriptor scan accepted B using validation of A.
+        try expect(inspectLiveOutputDescriptors(pid: getpid(), outputPath: output.path, expected: first) == nil, "A replaced WAV reused another file's validation evidence")
+        let second = try ExportWAV.validate(output.path)
+        for mask in 0..<16 {
+            let evidence = ExportCompletionEvidence(observedExportProgress: mask & 1 != 0, exportDialogsGone: mask & 2 != 0,
+                validWAV: mask & 4 != 0 ? second : nil,
+                writer: ExportDescriptorEvidence(identity: second, hasNoOpenDescriptor: mask & 8 != 0))
+            try expect(evidence.permitsPublication == (mask == 15), "Incomplete export evidence allowed publication")
+        }
+        try expect(!ExportCompletionEvidence(observedExportProgress: true, exportDialogsGone: true, validWAV: second, writer: nil).permitsPublication, "Unknown inspection was treated as writer closure")
+        try expect(!ExportCompletionEvidence(observedExportProgress: true, exportDialogsGone: true, validWAV: first,
+            writer: ExportDescriptorEvidence(identity: second, hasNoOpenDescriptor: true)).permitsPublication, "Completion combined two different WAV generations")
+        try expect(inspectLiveOutputDescriptors(pid: Int32.max, outputPath: output.path, expected: second) == nil, "A missing process was treated as proven closed")
+        try expect(inspectLiveOutputDescriptors(pid: getpid(), outputPath: output.path, expected: second, inspect: { _, _ in nil }) == nil, "A failed descriptor inspection was treated as closed")
+
+        let writer = try FileHandle(forWritingTo: output)
+        try writer.seek(toOffset: 44) // Change PCM only, keeping format and file length valid.
+        try writer.write(contentsOf: Data([1, 0, 0, 0, 0, 0]))
+        try writer.close()
+        // Pin an explicitly different mtime so this boundary never relies on waiting for a clock tick.
+        var times = [timespec(tv_sec: 0, tv_nsec: Int(UTIME_OMIT)), timespec(tv_sec: second.modifiedSeconds - 1, tv_nsec: second.modifiedNanoseconds)]
+        guard utimensat(AT_FDCWD, output.path, &times, AT_SYMLINK_NOFOLLOW) == 0 else { throw TestFailure(description: "Fixture timestamp update failed") }
+        try expect(inspectLiveOutputDescriptors(pid: getpid(), outputPath: output.path, expected: second) == nil, "A same-size in-place WAV rewrite reused stale validation")
+        times[1] = timespec(tv_sec: second.modifiedSeconds, tv_nsec: second.modifiedNanoseconds)
+        guard utimensat(AT_FDCWD, output.path, &times, AT_SYMLINK_NOFOLLOW) == 0 else { throw TestFailure(description: "Fixture timestamp restore failed") }
+        let restored = ExportFileIdentity.at(output.path)!
+        try expect(restored.modifiedSeconds == second.modifiedSeconds && restored.modifiedNanoseconds == second.modifiedNanoseconds, "Fixture did not restore mtime")
+        try expect(inspectLiveOutputDescriptors(pid: getpid(), outputPath: output.path, expected: second) == nil, "Restored mtime hid the WAV's changed ctime")
+
+        let beforeScan = try ExportWAV.validate(output.path)
+        let raced = inspectLiveOutputDescriptors(pid: getpid(), outputPath: output.path, expected: beforeScan, inspect: { _, _ in
+            do {
+                try wav().write(to: replacement)
+                guard rename(replacement.path, output.path) == 0 else { return nil } // A failed fixture mutation cannot prove closure.
+            } catch { return nil } // Failed fixture I/O must fail the assertion rather than report success.
+            return true
+        })
+        try expect(raced == nil, "A WAV replaced during descriptor inspection was accepted")
+        let beforeLink = try ExportWAV.validate(output.path)
+        try FileManager.default.linkItem(at: output, to: replacement)
+        try expect(inspectLiveOutputDescriptors(pid: getpid(), outputPath: output.path, expected: beforeLink) == nil, "A new hard link preserved completion evidence")
+        try FileManager.default.removeItem(at: replacement)
+        let beforeRemoval = try ExportWAV.validate(output.path)
+        try FileManager.default.removeItem(at: output)
+        try expect(inspectLiveOutputDescriptors(pid: getpid(), outputPath: output.path, expected: beforeRemoval) == nil, "A missing WAV retained completion evidence")
+        try FileManager.default.createSymbolicLink(at: output, withDestinationURL: URL(fileURLWithPath: "/dev/null"))
+        try expect(inspectLiveOutputDescriptors(pid: getpid(), outputPath: output.path, expected: beforeRemoval) == nil, "A symbolic-link replacement retained completion evidence")
+        try FileManager.default.removeItem(at: output)
+
+        for replacePath in [true, false] {
+            try wav().write(to: output)
+            var mutated = false
+            // Inject only the read boundary; the production parser still opens, parses and restats real fixture files.
+            try rejects({ _ = try ExportWAV.validate(output.path, readBytes: { file, count in
+                let bytes = try file.read(upToCount: count) ?? Data()
+                if !mutated {
+                    mutated = true
+                    if replacePath {
+                        try wav().write(to: replacement)
+                        guard rename(replacement.path, output.path) == 0 else { throw TestFailure(description: "Fixture rename during parse failed") }
+                    } else {
+                        let changed = try FileHandle(forWritingTo: output)
+                        try changed.seek(toOffset: 44)
+                        try changed.write(contentsOf: Data([2, 0, 0, 0, 0, 0]))
+                        try changed.close()
+                    }
+                }
+                return bytes
+            }) }, "A WAV changed during header parsing was validated")
+        }
+        print("PASS: WAV generation binding, replacement/rewrite/link races, parser rechecks and completion identity")
+    }
+
+    private static func axReadsRejectFailuresAndTruncation() throws {
+        let root = AXUIElementCreateApplication(Int32.max)
+        let child = AXUIElementCreateApplication(Int32.max - 1)
+        let hidden = AXUIElementCreateApplication(Int32.max - 2)
+        for error in [AXError.cannotComplete, .invalidUIElement, .failure, .notImplemented, .illegalArgument] {
+            let failed = ExportAXReader(deadline: .distantFuture,
+                copyValue: { _, _ in (error, nil) }, countValues: { _, _ in (error, 0) })
+            // Failed reads used to look like no windows or children, permitting an unsafe Export action.
+            try rejects({ _ = try failed.elements(root, kAXWindowsAttribute) }, "A failed AX window read was treated as an empty list")
+            try rejects({ _ = try failed.elements(root, kAXChildrenAttribute, allowAbsent: true) }, "A failed AX child read was treated as a leaf")
+            try rejects({ _ = try failed.value(root, kAXIdentifierAttribute) }, "A failed optional AX read was treated as absence")
+        }
+        for absent in [AXError.noValue, .attributeUnsupported] {
+            let reader = ExportAXReader(deadline: .distantFuture,
+                copyValue: { _, _ in (absent, nil) }, countValues: { _, _ in (absent, 0) })
+            let optional = try reader.value(root, kAXIdentifierAttribute)
+            let leaf = try reader.elements(root, kAXChildrenAttribute, allowAbsent: true)
+            try expect(optional == nil && leaf.isEmpty, "Explicit optional absence did not produce an empty leaf")
+            try rejects({ _ = try reader.value(root, kAXRoleAttribute, required: true) }, "A required role was allowed to disappear")
+            try rejects({ _ = try reader.elements(root, kAXWindowsAttribute) }, "Missing required AXWindows was treated as empty")
+        }
+        let nilValue = ExportAXReader(deadline: .distantFuture, copyValue: { _, _ in (.success, nil) })
+        try rejects({ _ = try nilValue.value(root, kAXValueAttribute) }, "A successful but nil AX result was accepted")
+        let wrongText = ExportAXReader(deadline: .distantFuture, copyValue: { _, _ in (.success, NSNumber(value: 1)) })
+        try rejects({ _ = try wrongText.string(root, kAXTitleAttribute) }, "A malformed title became missing text")
+
+        var copied = false
+        let oversized = ExportAXReader(deadline: .distantFuture,
+            countValues: { _, _ in (.success, ExportAXReader.maximumNodes + 1) },
+            copyValues: { _, _, _ in copied = true; return (.success, [child] as CFArray) })
+        try rejects({ _ = try oversized.elements(root, kAXChildrenAttribute) }, "An over-limit AX array was accepted")
+        try expect(!copied, "An oversized AX array was allocated before checking its count")
+        for bad in [nil, NSNumber(value: 1), [NSNumber(value: 1)] as CFArray, [child, hidden] as CFArray] as [CFTypeRef?] {
+            let malformed = ExportAXReader(deadline: .distantFuture,
+                countValues: { _, _ in (.success, 1) }, copyValues: { _, _, maximum in
+                    copied = maximum == 2 // Count plus one observes growth instead of silently truncating it.
+                    return (.success, bad)
+                })
+            try rejects({ _ = try malformed.elements(root, kAXChildrenAttribute) }, "A malformed or growing AX array was accepted")
+            try expect(copied, "The AX copy did not request one bounded growth-detection slot")
+        }
+        var countCalls = 0
+        let changing = ExportAXReader(deadline: .distantFuture, countValues: { _, _ in
+            countCalls += 1
+            return (.success, countCalls == 1 ? 1 : 2)
+        }, copyValues: { _, _, _ in (.success, [child] as CFArray) })
+        try rejects({ _ = try changing.elements(root, kAXWindowsAttribute) }, "An AX list changed during enumeration without rejection")
+        let failedCopy = ExportAXReader(deadline: .distantFuture,
+            countValues: { _, _ in (.success, 1) }, copyValues: { _, _, _ in (.cannotComplete, nil) })
+        try rejects({ _ = try failedCopy.elements(root, kAXWindowsAttribute) }, "A failed bounded AX copy was accepted")
+
+        var hasHiddenChild = true
+        let tree = ExportAXReader(deadline: .distantFuture, countValues: { node, _ in
+            (.success, CFEqual(node, root) || (CFEqual(node, child) && hasHiddenChild) ? 1 : 0)
+        }, copyValues: { node, _, _ in (.success, [CFEqual(node, root) ? child : hidden] as CFArray) })
+        // The old prefix traversal hid a third node that could contain another dialog or duplicate control.
+        try rejects({ _ = try tree.nodes(roots: [root], limit: 2) }, "An overflowing AX tree was silently truncated")
+        hasHiddenChild = false
+        let complete = try tree.nodes(roots: [root], limit: 2)
+        try expect(complete.count == 2, "An exactly bounded complete tree was rejected")
+        try rejects({ _ = try tree.nodes(roots: [root, child, hidden], limit: 2) }, "Multiple roots bypassed the shared tree budget")
+
+        let start = Date(timeIntervalSince1970: 1)
+        var clock = start
+        let late = ExportAXReader(deadline: start.addingTimeInterval(1), now: { clock }, copyValue: { _, _ in
+            clock = start.addingTimeInterval(2)
+            return (.success, "late" as CFString)
+        }, countValues: { _, _ in
+            clock = start.addingTimeInterval(2)
+            return (.success, 0)
+        })
+        try rejects({ _ = try late.value(root, kAXTitleAttribute) }, "An AX value returned after the deadline was accepted")
+        clock = start
+        try rejects({ _ = try late.elements(root, kAXWindowsAttribute) }, "An AX count returned after the deadline was accepted")
+        let healthy = ExportAXReader(deadline: .distantFuture, countValues: { _, _ in (.success, 0) })
+        let empty = try healthy.nodes(roots: [root])
+        try expect(empty.count == 1, "Another reader's timeout contaminated a fresh tree")
+        print("PASS: AX failure/absence separation, bounded arrays and complete trees, deadlines and reader isolation")
     }
 
     private static func wav(sampleRate: UInt32 = 48_000, channels: UInt16 = 2, frames: UInt32 = 1) -> Data {

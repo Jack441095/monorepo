@@ -157,15 +157,54 @@ enum LiveExportProfile {
     }
 }
 
-/// Completion needs independent writer evidence; a disappearing dialog alone is insufficient.
+/// Metadata for one owned WAV generation; timestamps also reject same-inode, same-size rewrites.
+struct ExportFileIdentity: Equatable {
+    let device: dev_t
+    let inode: ino_t
+    let size: off_t
+    let mode: mode_t
+    let modifiedSeconds: time_t
+    let modifiedNanoseconds: Int
+    let changedSeconds: time_t
+    let changedNanoseconds: Int
+
+    init?(_ info: stat) {
+        guard info.st_mode & S_IFMT == S_IFREG, info.st_uid == getuid(), info.st_nlink == 1, info.st_size >= 0 else {
+            // Links, foreign ownership and nonregular files cannot identify a job-owned render.
+            return nil
+        }
+        device = info.st_dev
+        inode = info.st_ino
+        size = info.st_size
+        mode = info.st_mode
+        modifiedSeconds = info.st_mtimespec.tv_sec
+        modifiedNanoseconds = info.st_mtimespec.tv_nsec
+        changedSeconds = info.st_ctimespec.tv_sec
+        changedNanoseconds = info.st_ctimespec.tv_nsec
+    }
+
+    static func at(_ path: String) -> Self? {
+        var info = stat()
+        guard lstat(path, &info) == 0 else { return nil } // Missing/inaccessible paths leave the generation unknown.
+        return Self(info)
+    }
+}
+
+struct ExportDescriptorEvidence {
+    let identity: ExportFileIdentity
+    let hasNoOpenDescriptor: Bool
+}
+
+/// Completion binds parser and descriptor evidence to the same unchanged file generation.
 struct ExportCompletionEvidence {
     let observedExportProgress: Bool
     let exportDialogsGone: Bool
-    let validWAV: Bool
-    let liveHasNoOpenOutputDescriptor: Bool?
+    let validWAV: ExportFileIdentity?
+    let writer: ExportDescriptorEvidence?
 
     var permitsPublication: Bool {
-        observedExportProgress && exportDialogsGone && validWAV && liveHasNoOpenOutputDescriptor == true
+        guard let identity = validWAV, let writer else { return false } // Partial or inaccessible evidence cannot qualify completion.
+        return observedExportProgress && exportDialogsGone && writer.identity == identity && writer.hasNoOpenDescriptor
     }
 }
 
@@ -174,11 +213,9 @@ enum ExportWAV {
     static let maximumBytes: UInt64 = 150 * 1_024 * 1_024 // 150 MiB matches the existing offline upload ceiling.
     static let maximumFrames: UInt64 = 48_000 * 8 * 60 // Eight minutes at 48 kHz matches offline analysis.
 
-    static func validate(_ path: String) throws {
-        var info = stat()
-        guard lstat(path, &info) == 0, info.st_mode & S_IFMT == S_IFREG,
-              info.st_uid == getuid(), info.st_nlink == 1,
-              info.st_size >= 44, UInt64(info.st_size) <= maximumBytes else {
+    @discardableResult
+    static func validate(_ path: String, readBytes: (FileHandle, Int) throws -> Data = { try $0.read(upToCount: $1) ?? Data() }) throws -> ExportFileIdentity {
+        guard let identity = ExportFileIdentity.at(path), identity.size >= 44, UInt64(identity.size) <= maximumBytes else {
             throw ExportProblem.invalid("The completed WAV must be an owned, single-link regular file within the 150 MiB limit.")
         }
         let descriptor = open(path, O_RDONLY | O_NOFOLLOW)
@@ -186,30 +223,29 @@ enum ExportWAV {
         let file = FileHandle(fileDescriptor: descriptor, closeOnDealloc: true)
         defer { try? file.close() } // Validation owns only its read handle, never Live's writer.
         var opened = stat()
-        guard fstat(descriptor, &opened) == 0, opened.st_dev == info.st_dev, opened.st_ino == info.st_ino,
-              opened.st_size == info.st_size, opened.st_uid == getuid(), opened.st_nlink == 1 else {
+        guard fstat(descriptor, &opened) == 0, ExportFileIdentity(opened) == identity else {
             throw ExportProblem.invalid("The WAV identity changed during validation.")
         }
         func read(_ count: Int) throws -> Data {
-            let bytes = try file.read(upToCount: count) ?? Data()
+            let bytes = try readBytes(file, count)
             guard bytes.count == count else { throw ExportProblem.invalid("The WAV is truncated.") }
             return bytes
         }
         let header = try read(12)
         guard String(data: header.prefix(4), encoding: .ascii) == "RIFF",
               String(data: header.suffix(4), encoding: .ascii) == "WAVE",
-              UInt64(u32(header, 4)) + 8 == UInt64(info.st_size) else {
+              UInt64(u32(header, 4)) + 8 == UInt64(identity.size) else {
             throw ExportProblem.invalid("A finalized RIFF/WAVE header is required; RF64 is not qualified.")
         }
         var validFormat = false
         var dataBytes: UInt64 = 0
         var offset: UInt64 = 12 // RIFF's identifier, length and WAVE identifier occupy 12 bytes.
-        while offset + 8 <= UInt64(info.st_size) {
+        while offset + 8 <= UInt64(identity.size) {
             try file.seek(toOffset: offset)
             let chunk = try read(8)
             let length = UInt64(u32(chunk, 4))
             let payload = offset + 8
-            guard payload + length <= UInt64(info.st_size) else { throw ExportProblem.invalid("The WAV chunk extends beyond the file.") }
+            guard payload + length <= UInt64(identity.size) else { throw ExportProblem.invalid("The WAV chunk extends beyond the file.") }
             let name = String(data: chunk.prefix(4), encoding: .ascii)
             if name == "fmt " {
                 guard !validFormat, length == 16 else { throw ExportProblem.invalid("Only one 16-byte PCM format chunk is qualified.") }
@@ -226,9 +262,15 @@ enum ExportWAV {
             }
             offset = payload + length + length % 2 // RIFF chunks use even-byte padding.
         }
-        guard validFormat, dataBytes > 0, offset == UInt64(info.st_size) else {
+        guard validFormat, dataBytes > 0, offset == UInt64(identity.size) else {
             throw ExportProblem.invalid("The WAV has incomplete format, audio or trailing chunk data.")
         }
+        var finished = stat()
+        guard fstat(descriptor, &finished) == 0, ExportFileIdentity(finished) == identity,
+              ExportFileIdentity.at(path) == identity else {
+            throw ExportProblem.invalid("The WAV changed while its headers were being validated.")
+        }
+        return identity
     }
 
     private static func u16(_ data: Data, _ offset: Int) -> UInt16 {
@@ -245,26 +287,49 @@ func canonicalPath(_ path: String) -> String? {
     return String(cString: resolved)
 }
 
-/// Returns nil when macOS refuses inspection; lack of access never proves a writer closed.
-func liveHasNoOpenOutputDescriptor(pid: Int32, outputPath: String) -> Bool? {
-    var output = stat()
-    guard lstat(outputPath, &output) == 0, output.st_mode & S_IFMT == S_IFREG else { return nil }
+/// Rechecks the validated generation around inspection; nil never proves the writer closed.
+func inspectLiveOutputDescriptors(pid: Int32, outputPath: String, expected: ExportFileIdentity,
+                                  inspect: (Int32, ExportFileIdentity) -> Bool? = processHasNoOpenOutputDescriptor) -> ExportDescriptorEvidence? {
+    guard pid > 0, ExportFileIdentity.at(outputPath) == expected else { return nil } // Validation of A must not qualify a later B.
+    guard let closed = inspect(pid, expected), ExportFileIdentity.at(outputPath) == expected else {
+        // A failed snapshot or a concurrent rewrite leaves the writer/file association unproven.
+        return nil
+    }
+    return ExportDescriptorEvidence(identity: expected, hasNoOpenDescriptor: closed)
+}
+
+private func processHasNoOpenOutputDescriptor(pid: Int32, expected: ExportFileIdentity) -> Bool? {
     let entrySize = MemoryLayout<proc_fdinfo>.stride
     let needed = proc_pidinfo(pid, PROC_PIDLISTFDS, 0, nil, 0)
-    guard needed > 0, needed <= 16_384 * entrySize else { return nil } // Bound the process snapshot to 16384 descriptors.
+    guard needed > 0, needed <= 16_384 * entrySize, Int(needed) % entrySize == 0 else {
+        return nil // Failed, malformed or over-16384-descriptor snapshots cannot prove closure.
+    }
     var entries = [proc_fdinfo](repeating: proc_fdinfo(), count: Int(needed) / entrySize + 32)
-    let capacity = entries.count * entrySize // Headroom detects descriptor growth without an unbounded retry loop.
+    let capacity = entries.count * entrySize // 32 entries of headroom detect growth without an unbounded retry loop.
     let actual = entries.withUnsafeMutableBytes { proc_pidinfo(pid, PROC_PIDLISTFDS, 0, $0.baseAddress, Int32(capacity)) }
-    guard actual > 0, actual < capacity, Int(actual) % entrySize == 0 else { return nil }
+    guard actual > 0, actual < capacity, actual <= 16_384 * entrySize, Int(actual) % entrySize == 0 else {
+        return nil // Filled or partial buffers are incomplete even when every returned entry looks unrelated.
+    }
     for entry in entries.prefix(Int(actual) / entrySize) where entry.proc_fdtype == PROX_FDTYPE_VNODE {
         var vnode = vnode_fdinfowithpath()
         let bytes = proc_pidfdinfo(pid, entry.proc_fd, PROC_PIDFDVNODEPATHINFO, &vnode, Int32(MemoryLayout.size(ofValue: vnode)))
         guard bytes == MemoryLayout.size(ofValue: vnode) else { return nil } // A racing or inaccessible descriptor leaves closure unproven.
         // Device/inode identity also catches macOS's /var versus /private/var aliases and hard links.
         let identity = vnode.pvip.vip_vi.vi_stat
-        if identity.vst_dev == output.st_dev && identity.vst_ino == output.st_ino { return false }
+        if identity.vst_dev == expected.device && identity.vst_ino == expected.inode { return false }
     }
     return true
+}
+
+/// Keeps process checks, reads and presses injectable together; the executable always uses native defaults.
+struct LiveExportEnvironment {
+    var trusted: () -> Bool = AXIsProcessTrusted
+    var isLive: (Int32) -> Bool = { pid in
+        guard let running = NSRunningApplication(processIdentifier: pid) else { return false } // A missing process has no export authority.
+        return running.bundleIdentifier == "com.ableton.live" && !running.isTerminated
+    }
+    var reader: (Date) -> ExportAXReader = { ExportAXReader(deadline: $0) }
+    var press: (AXUIElement) -> AXError = { AXUIElementPerformAction($0, kAXPressAction as CFString) }
 }
 
 /// Restricts AX actions to a verified Ableton process and the one dialog this invocation opens.
@@ -274,9 +339,11 @@ final class LiveExportAccessibility {
     private var openedDialog: AXUIElement?
     private var ownedCancel: AXUIElement?
     private let deadline: Date
+    private let environment: LiveExportEnvironment
 
-    init(_ request: LiveExportRequest) {
+    init(_ request: LiveExportRequest, environment: LiveExportEnvironment = LiveExportEnvironment()) {
         self.request = request
+        self.environment = environment
         app = AXUIElementCreateApplication(request.live_pid)
         deadline = Date().addingTimeInterval(Double(request.timeout_seconds))
         AXUIElementSetMessagingTimeout(app, 2) // Two seconds bounds an unresponsive Live AX request.
@@ -289,7 +356,7 @@ final class LiveExportAccessibility {
             guard request.action == "inspect" || (supervised && enabled) else {
                 throw ExportProblem.unavailable("experimental_export_disabled", "Export requires KENN_EXPERIMENTAL_LIVE_EXPORT=1 and --supervised-test; production export is disabled.")
             }
-            guard AXIsProcessTrusted() else {
+            guard environment.trusted() else {
                 throw ExportProblem.unavailable("accessibility_not_granted", "Accessibility access is unavailable; this helper does not request or change permissions.")
             }
             try verifyLive()
@@ -298,29 +365,29 @@ final class LiveExportAccessibility {
                 return receipt
             }
             try checkCancellation()
-            guard dialogs().isEmpty else {
+            guard try dialogs().isEmpty else {
                 throw ExportProblem.unavailable("existing_dialog", "Close existing Live dialogs before a supervised export check.")
             }
             let menuBar = try element(app, kAXMenuBarAttribute)
-            let file = try unique(children(menuBar), title: "File")
-            let fileMenus = children(file)
-            let exportItems = fileMenus.flatMap(children).filter { ["Export Audio/Video…", "Export Audio/Video..."].contains(title($0)) }
+            let file = try unique(try children(menuBar), title: "File")
+            let exportItems = try reader.nodes(roots: [file]).filter { try ["Export Audio/Video…", "Export Audio/Video..."].contains(title($0)) }
             guard exportItems.count == 1 else {
                 throw ExportProblem.unavailable("export_menu_unavailable", "The fixed File > Export Audio/Video menu item is missing or ambiguous.")
             }
-            guard AXUIElementPerformAction(exportItems[0], kAXPressAction as CFString) == .success else {
+            try checkCancellation() // Recheck after tree reads; a cancelled or expired request must not open a dialog.
+            guard environment.press(exportItems[0]) == .success else {
                 throw ExportProblem.unavailable("export_menu_rejected", "Live did not accept the export menu action.")
             }
             while Date() < deadline {
                 try checkCancellation()
-                let candidates = dialogs().filter { title($0) == "Export Audio/Video" }
+                let candidates = try dialogs().filter { try title($0) == "Export Audio/Video" }
                 if candidates.count == 1 {
-                    guard windows().contains(where: { CFEqual($0, candidates[0]) }) else {
+                    guard try windows().contains(where: { CFEqual($0, candidates[0]) }) else {
                         throw ExportProblem.unavailable("export_sheet_unqualified", "A sheet-based export dialog has no qualified cancellation readback.")
                     }
                     openedDialog = candidates[0]
-                    let cancel = descendants(candidates[0]).filter {
-                        (attribute($0, kAXIdentifierAttribute) as? String) == "Base.FinalButtonsBox.CancelButton"
+                    let cancel = try descendants(candidates[0]).filter {
+                        try reader.string($0, kAXIdentifierAttribute) == "Base.FinalButtonsBox.CancelButton"
                     }
                     if cancel.count == 1 { ownedCancel = cancel[0] }
                     receipt.owned_dialog = true
@@ -334,9 +401,9 @@ final class LiveExportAccessibility {
             }
             if let dialog = openedDialog {
                 var values: [String: [String]] = [:]
-                for node in [dialog] + descendants(dialog) {
-                    if let identifier = attribute(node, kAXIdentifierAttribute) as? String,
-                       let value = attribute(node, kAXValueAttribute) {
+                for node in try reader.nodes(roots: [dialog]) {
+                    if let identifier = try reader.string(node, kAXIdentifierAttribute),
+                       let value = try reader.value(node, kAXValueAttribute) {
                         values[identifier, default: []].append(LiveExportProfile.settingValue(identifier: identifier, value: value))
                     }
                 }
@@ -358,18 +425,19 @@ final class LiveExportAccessibility {
     }
 
     private func verifyLive() throws {
-        guard let running = NSRunningApplication(processIdentifier: request.live_pid),
-              running.bundleIdentifier == "com.ableton.live",
-              !running.isTerminated else {
+        guard environment.isLive(request.live_pid) else {
             throw ExportProblem.unavailable("live_identity_mismatch", "The requested process is not a running Ableton Live application.")
         }
-        let matches = windows().filter { title($0) == request.expected_window_title }
+        let matches = try windows().filter { try title($0) == request.expected_window_title }
         guard matches.count == 1 else {
             throw ExportProblem.unavailable("window_identity_mismatch", "The exact expected Live window is missing or ambiguous.")
         }
     }
 
     private func checkCancellation() throws {
+        guard Date() < deadline else {
+            throw ExportProblem.unavailable("accessibility_deadline", "The export request deadline expired before an action.")
+        }
         let marker = URL(fileURLWithPath: request.output_path).deletingLastPathComponent().appendingPathComponent("cancel.requested")
         if FileManager.default.fileExists(atPath: marker.path) {
             throw ExportProblem(status: "cancelled", code: "cancel_requested", message: "The job owner requested cancellation.")
@@ -379,14 +447,14 @@ final class LiveExportAccessibility {
     private func cancelOwnedDialog() -> String? {
         guard let dialog = openedDialog else { return nil } // Never dismiss a dialog that predates this helper.
         // Retain only the exact button found before the request deadline, so timeout cleanup does not traverse a fresh UI.
-        guard let cancel = ownedCancel, AXUIElementPerformAction(cancel, kAXPressAction as CFString) == .success else {
+        guard let cancel = ownedCancel, environment.press(cancel) == .success else {
             return "The helper-owned export dialog could not be cancelled through its exact Cancel identifier."
         }
         let cancelDeadline = Date().addingTimeInterval(2) // Two seconds bounds cancellation readback after an expired request.
+        let cleanupReader = environment.reader(cancelDeadline)
         while Date() < cancelDeadline {
-            var current: CFTypeRef?
-            let result = AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &current)
-            if result == .success, let currentWindows = current as? [AXUIElement],
+            // A failed or incomplete read never proves disappearance; retry only within the cleanup budget.
+            if let currentWindows = try? cleanupReader.elements(app, kAXWindowsAttribute),
                !currentWindows.contains(where: { CFEqual($0, dialog) }) {
                 // The qualified export dialog is a top-level AX window. A sheet profile needs separate readback.
                 return nil
@@ -396,42 +464,33 @@ final class LiveExportAccessibility {
         return "The Cancel action was accepted but disappearance of the helper-owned dialog was not verified."
     }
 
-    private func windows() -> [AXUIElement] { attribute(app, kAXWindowsAttribute) as? [AXUIElement] ?? [] }
-    private func dialogs() -> [AXUIElement] {
-        windows().flatMap { [$0] + descendants($0) }.filter { role($0) == kAXSheetRole || (attribute($0, kAXSubroleAttribute) as? String) == kAXDialogSubrole }
-    }
-    private func title(_ node: AXUIElement) -> String { attribute(node, kAXTitleAttribute) as? String ?? "" }
-    private func role(_ node: AXUIElement) -> String { attribute(node, kAXRoleAttribute) as? String ?? "" }
-    private func children(_ node: AXUIElement) -> [AXUIElement] { attribute(node, kAXChildrenAttribute) as? [AXUIElement] ?? [] }
-    private func attribute(_ node: AXUIElement, _ key: String) -> CFTypeRef? {
-        var value: CFTypeRef?
-        guard Date() < deadline else { return nil } // Stop querying an unresponsive AX tree after the request deadline.
-        guard AXUIElementCopyAttributeValue(node, key as CFString, &value) == .success else {
-            // Missing/custom controls remain unknown, so callers reject the action instead of guessing.
-            return nil
+    private var reader: ExportAXReader { environment.reader(deadline) }
+
+    private func windows() throws -> [AXUIElement] { try reader.elements(app, kAXWindowsAttribute) }
+    private func dialogs() throws -> [AXUIElement] {
+        try reader.nodes(roots: windows()).filter { node in
+            let role = try reader.string(node, kAXRoleAttribute, required: true)
+            if role == kAXSheetRole { return true }
+            return try reader.string(node, kAXSubroleAttribute, required: role == kAXWindowRole) == kAXDialogSubrole
         }
-        return value
+    }
+    private func title(_ node: AXUIElement) throws -> String { try reader.string(node, kAXTitleAttribute) ?? "" }
+    private func children(_ node: AXUIElement) throws -> [AXUIElement] {
+        try reader.elements(node, kAXChildrenAttribute, allowAbsent: true)
     }
     private func element(_ node: AXUIElement, _ key: String) throws -> AXUIElement {
-        guard let value = attribute(node, key), CFGetTypeID(value) == AXUIElementGetTypeID() else {
+        guard let value = try reader.value(node, key, required: true), CFGetTypeID(value) == AXUIElementGetTypeID() else {
             throw ExportProblem.unavailable("inaccessible_menu", "Live did not expose the required native menu.")
         }
         return unsafeBitCast(value, to: AXUIElement.self)
     }
     private func unique(_ nodes: [AXUIElement], title expected: String) throws -> AXUIElement {
-        let matches = nodes.filter { title($0) == expected }
+        let matches = try nodes.filter { try title($0) == expected }
         guard matches.count == 1 else { throw ExportProblem.unavailable("ambiguous_menu", "The fixed File menu is missing or ambiguous.") }
         return matches[0]
     }
-    private func descendants(_ root: AXUIElement) -> [AXUIElement] {
-        var queue = children(root)
-        var result: [AXUIElement] = []
-        while !queue.isEmpty, result.count < 2_048 { // At most 2048 nodes prevents pathological AX trees from retaining unbounded memory.
-            let node = queue.removeFirst()
-            result.append(node)
-            if queue.count + result.count < 2_048 { queue.append(contentsOf: children(node).prefix(2_048 - queue.count - result.count)) }
-        }
-        return result
+    private func descendants(_ root: AXUIElement) throws -> [AXUIElement] {
+        Array(try reader.nodes(roots: [root]).dropFirst())
     }
 }
 

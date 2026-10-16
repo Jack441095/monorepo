@@ -5,7 +5,7 @@ script_dir="$(cd "$(dirname "$0")" && pwd)"
 build_dir="$(mktemp -d "${TMPDIR:-/tmp}/kenn-live-export-tests.XXXXXX")"
 trap 'rm -rf "$build_dir"' EXIT
 xcrun swiftc -D KENN_EXPORT_TESTS -parse-as-library \
-  "$script_dir/KENNLiveExportHelper.swift" "$script_dir/KENNLiveExportHelperTests.swift" \
+  "$script_dir/KENNLiveExportHelper.swift" "$script_dir/KENNExportAX.swift" "$script_dir/KENNLiveExportHelperTests.swift" \
   -o "$build_dir/KENNLiveExportHelperTests" \
   -framework AppKit -framework ApplicationServices
 "$build_dir/KENNLiveExportHelperTests"

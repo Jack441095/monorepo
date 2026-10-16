@@ -42,6 +42,20 @@ gate, exact receipt identity, private/exclusive directory ownership, overwrite a
 symlink rejection, finalized PCM validation and an actual fixture file descriptor
 opening/closing in the test process.
 
+The 16 Oct fixtures also exercise the actual export caller with injected native
+boundaries: failed, malformed, over-limit or late UI reads produce zero Export
+presses. A positive control reaches the press spy without operating Live. The AX
+reader distinguishes explicit optional absence from messaging failures, checks
+each array element's CF type, rejects changed counts and applies one 2048-node
+budget across all window roots. Deadline checks run before and after each read.
+
+Eight additional native mutation checks on 16 Oct each failed their regression
+assertion: treating a failed AX read as empty, accepting a malformed AX array,
+truncating an overflowing tree, ignoring a read deadline, combining different WAV
+generations, omitting descriptor identity rechecks, omitting parser identity
+rechecks and ignoring ctime. These were run on temporary source copies. See
+[completion evidence](../../../docs/evidence/KENN_OFFLINE_SCAN_COMPLETION_2026-10-16.md).
+
 Mutation checks on 15 Oct 2026 independently removed the supervised flag gate,
 accepted a nonprivate directory and treated unknown writer inspection as closed.
 Each corresponding Swift regression test failed. Python adapter mutations also
@@ -79,6 +93,14 @@ stopped, and the directory stayed empty. This maps controls for future helper
 work; the helper still cannot press Export or operate the Save panel. No save,
 overwrite refusal, render progress or writer closure was qualified.
 
+On 16 Oct the stricter AX reader repeated the supervised probe against the
+disposable demo copy. It opened the correct Export dialog, rejected the existing
+MP3 setting, cancelled its owned dialog and verified disappearance without a
+cleanup error. Independent readback showed only the main set with playback and
+both recording modes stopped; the private job directory remained empty. This
+qualifies that window's bounded preflight/rejection/cancellation path. It does not
+qualify Save, rendering, full-range discovery or Live writer closure.
+
 ## Request and receipt boundary
 
 Requests use `schema: "kenn.live_export_request.v1"` and these fields:
@@ -113,10 +135,17 @@ The completion checks prepared for a qualified profile require all four facts:
 observed export progress, disappearance of the owned export dialogs, a finalized
 owned, single-link stereo 48 kHz/24-bit PCM RIFF file within 150 MiB and eight
 minutes, and successful native inspection
-showing that Live has no descriptor open for that exact device/inode. File-size
-stability and a missing/permission-denied process inspection do not count. The
-RIFF check reads chunk headers, not the entire audio file. Descriptor inspection
-is bounded to 16384 entries; an incomplete snapshot remains unknown.
+showing that Live has no descriptor open for that exact device/inode. Parser and
+descriptor evidence carry the same file generation: device, inode, size, mode,
+nanosecond mtime and ctime. Ownership and single-link status are required at each
+snapshot. Validation checks the opened descriptor and path before and after
+parsing; descriptor inspection rechecks that identity before and after its scan.
+Replacement, same-size rewrites, restored mtime and link changes invalidate the
+evidence. File-size stability and a missing/permission-denied process inspection
+do not count. The RIFF check reads chunk headers, not the entire audio file.
+Descriptor inspection is bounded to 16384 entries with 32 entries of allocation
+headroom; an incomplete snapshot remains unknown. This metadata contract is
+fixture-qualified, not proof that a real Live export has completed.
 Numeric toggle readback accepts only exact zero or one; fractional or NaN AX
 values cannot be rounded into a qualified Off/On preference.
 
@@ -137,10 +166,11 @@ and export lifecycle/cancellation. Existing preferences must be verified
 rather than silently changed. Writer inspection must also work against the real
 Live process. Until then, the job service must show the unavailable reason and
 retain any uncertain owned file for recovery rather than publish an analysis.
-AX enumeration must also distinguish failed reads and truncated trees from an
-empty result before promotion. The WAV validation and Live descriptor checks
-still need a shared stable file identity across completion; separate path reads
-do not establish that contract.
+The failed/truncated AX-read boundary and shared WAV/descriptor generation now
+have fixture and mutation coverage. The strict AX profile passed one supervised
+preflight/rejection/cancellation check; its node budget and required attributes
+may conservatively reject an unfamiliar window. No real render progress or Live
+writer closure has been qualified, and these checks do not enable the candidate.
 
 The optional Python `MacOSLiveExportHelper` adapter in backend `core/macos_live_export.py`
 accepts a fixed executable path and explicit `enabled` and `supervised_test` flags.
