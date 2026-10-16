@@ -1306,11 +1306,20 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
   hardware. Any MLX comparison must explicitly use the selected control's checkpoint
   lineage, rather than the engine's default model. Require unchanged safety and a held-out
   quality comparison for each latency change.
-  - [ ] Record the runner, not only the digest, in every C2 receipt, and unload eval models after
+  - [x] Record the runner, not only the digest, in every C2 receipt, and unload eval models after
     each call: evals run beside a KENN session must set `keep_alive: 0` on the Ollama provider and
     be checked with `ollama ps`. Serial eval runs alone do not prevent two models staying
     resident for their keep-alive window. (Research: KENN_OPEN_SOURCE_DEEP_RESEARCH_2026-10-15.md
-    §2.2, §2.9; lane 02 KQ3, lane 06 KQ1.)
+    §2.2, §2.9; lane 02 KQ3, lane 06 KQ1.) 16 Oct: `measure_chat_latency.py` provenance now carries
+    `ollama_runtime.before_run` / `after_run` (Ollama version, digest of each model the run resolves to,
+    and every resident model's name, digest and `runner` from `/api/ps`) plus `ollama_keep_alive`; the
+    `after_run` sample is the `ollama ps` check. The runner exists only while a model is resident, so a
+    `keep_alive 0` run reports an empty `after_run.loaded` ("not observed"), and a keep-warm run is
+    the way to see its runner. HTTP runs record `null` because the companion's Ollama is not ours. Setting
+    the unload: `KENN_OLLAMA_KEEP_ALIVE=0` for the chat harness and `measure_model_phases.py` (string `"0"`
+    checked against the local 0.40.4: the model is not left in `ollama ps`), and `run_deliberative_ollama.py`
+    now defaults to `--keep-alive 0` (was a fixed `10m`), so its `latency_ms` is cold-start unless a warm run
+    is asked for. Not run against MLX: no model here currently resolves to that runner.
   - [x] Reviewed the pinned Ollama runtime, existing cache/attention behavior,
     conditional source costs, fixed-model backend options and Jev/Kev fit against
     the five-question diagnostic. This establishes research findings, not an
