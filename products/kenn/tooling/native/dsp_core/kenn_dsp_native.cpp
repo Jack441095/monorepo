@@ -662,6 +662,7 @@ nb::dict stereo_metrics(FloatInput left, FloatInput right)
     double mono_sum_squares = 0.0;
     double side_sum_squares = 0.0;
     std::size_t mono_silence_count = 0;
+    std::size_t frame_silence_count = 0;
     {
         nb::gil_scoped_release release;
         left_summary = summarize_channel(left.data(), left.shape(0));
@@ -676,6 +677,10 @@ nb::dict stereo_metrics(FloatInput left, FloatInput right)
             side_sum_squares += side * side;
             if (std::abs(mid) < kSilenceThreshold)
                 ++mono_silence_count;
+            // A frame is silent only when both channels are. The mono-sum count
+            // alone reads a polarity-flipped file (L = -R) as silent.
+            if (std::abs(left(index)) < kSilenceThreshold && std::abs(right(index)) < kSilenceThreshold)
+                ++frame_silence_count;
         }
     }
 
@@ -686,6 +691,7 @@ nb::dict stereo_metrics(FloatInput left, FloatInput right)
     output["mono_rms"] = std::sqrt(mono_sum_squares / static_cast<double>(left.shape(0)));
     output["side_rms"] = std::sqrt(side_sum_squares / static_cast<double>(left.shape(0)));
     output["mono_silence_percentage"] = 100.0 * static_cast<double>(mono_silence_count) / static_cast<double>(left.shape(0));
+    output["silence_percentage"] = 100.0 * static_cast<double>(frame_silence_count) / static_cast<double>(left.shape(0));
     return output;
 }
 

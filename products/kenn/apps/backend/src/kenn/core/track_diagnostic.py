@@ -167,59 +167,63 @@ def build_tracks_from_live_session(
     return tracks
 
 
-def _decode_pcm_samples(payload: bytes) -> Tuple[List[float], int, float]:
-    """Decode WAV byte payload into mono float samples, sample_rate, and duration."""
+def _decode_pcm_channels(payload: bytes) -> Tuple[List[List[float]], int, float]:
+    """Decode a WAV payload into per-channel float samples, sample_rate and full duration.
+
+    Channels stay separate so level and loudness are measured per channel. The
+    old decoder averaged to mono first, which read a polarity-flipped stereo
+    file at -96 dBFS and put every stereo LUFS 3 dB low (16 Oct 2026).
+    """
     from kenn.core.audio_analysis import _parse_wav
     channels, sampwidth, framerate, data_bytes, audio_format = _parse_wav(payload)
+    if channels < 1 or framerate <= 0:
+        raise ValueError("WAV header has no channels or no sample rate")
 
     total_frames = len(data_bytes) // (channels * sampwidth)
-    duration = total_frames / framerate if framerate > 0 else 0.0
-
-    samples: List[float] = []
-    # Read up to 4,000,000 frames to stay bounded within memory
+    duration = total_frames / framerate
+    # 4,000,000 frames (83 s at 48 kHz) keeps the pure-Python loops and their
+    # float lists bounded; duration still reports the whole file.
     frames_to_read = min(total_frames, 4_000_000)
+    count = frames_to_read * channels
 
     if sampwidth == 2 and audio_format == 1:
-        # 16-bit PCM signed
-        unpack_fmt = f"<{channels}h"
-        frame_size = channels * 2
-        for f in range(frames_to_read):
-            offset = f * frame_size
-            vals = struct.unpack_from(unpack_fmt, data_bytes, offset)
-            mono = sum(vals) / (channels * 32768.0)
-            samples.append(mono)
+        values = [v / 32768.0 for v in struct.unpack_from(f"<{count}h", data_bytes)]
     elif sampwidth == 4 and audio_format == 3:
-        # 32-bit float
-        unpack_fmt = f"<{channels}f"
-        frame_size = channels * 4
-        for f in range(frames_to_read):
-            offset = f * frame_size
-            vals = struct.unpack_from(unpack_fmt, data_bytes, offset)
-            mono = sum(vals) / channels
-            samples.append(mono)
+        values = list(struct.unpack_from(f"<{count}f", data_bytes))
+    elif sampwidth == 4 and audio_format == 1:
+        values = [v / 2147483648.0 for v in struct.unpack_from(f"<{count}i", data_bytes)]
     elif sampwidth == 3 and audio_format == 1:
-        # 24-bit PCM signed
-        frame_size = channels * 3
-        for f in range(frames_to_read):
-            offset = f * frame_size
-            mono_acc = 0.0
-            for ch in range(channels):
-                ch_offset = offset + ch * 3
-                raw = data_bytes[ch_offset : ch_offset + 3]
-                # Sign extension for 24-bit
-                raw_int = int.from_bytes(raw, byteorder="little", signed=True)
-                mono_acc += raw_int / 8388608.0
-            samples.append(mono_acc / channels)
+        values = [
+            int.from_bytes(data_bytes[offset : offset + 3], byteorder="little", signed=True) / 8388608.0
+            for offset in range(0, count * 3, 3)
+        ]
+    elif sampwidth == 1 and audio_format == 1:
+        # 8-bit WAV is unsigned with its midpoint at 128.
+        values = [(v - 128) / 128.0 for v in data_bytes[:count]]
     else:
-        # Fallback approximation for other bit depths
-        step = max(1, len(data_bytes) // (frames_to_read * channels))
-        for i in range(0, len(data_bytes), step * channels):
-            val = (data_bytes[i] - 128) / 128.0
-            samples.append(val)
-            if len(samples) >= frames_to_read:
-                break
+        # The old fallback read any other layout as 8-bit bytes and measured
+        # nonsense; refusing is the truthful answer for a diagnostic.
+        raise ValueError(f"unsupported WAV sample format ({sampwidth * 8}-bit, format tag {audio_format})")
 
-    return samples, framerate, duration
+    return [values[ch::channels] for ch in range(channels)], framerate, duration
+
+
+def _analysis_signal(channels: List[List[float]]) -> List[float]:
+    """Return the single signal the waveform, spectrogram and spectral features read.
+
+    That is the mono sum, unless the channels hold audio that cancels in the
+    sum (L = -R), where the side signal is used so the display is not blank.
+    """
+    if len(channels) == 1:
+        return channels[0]
+    count = len(channels)
+    mono = [sum(frame) / count for frame in zip(*channels)]
+    mono_peak = max((abs(v) for v in mono), default=0.0)
+    channel_peak = max((abs(v) for ch in channels for v in ch), default=0.0)
+    # -60 dB below the louder channel: the sum is gone but the channels are not.
+    if channel_peak > 0.0 and mono_peak < channel_peak * 0.001 and count == 2:
+        return [(left - right) * 0.5 for left, right in zip(channels[0], channels[1])]
+    return mono
 
 
 def compute_waveform_envelope(samples: List[float], points: int = WAVEFORM_POINTS) -> Tuple[List[float], List[float]]:
@@ -535,6 +539,7 @@ def detect_weak_areas(
 def _extract_dsp_features_with_open_source_tools(
     samples: List[float],
     sample_rate: int,
+    channels: Optional[List[List[float]]] = None,
 ) -> Dict[str, Any]:
     """Extract clinical acoustic features using librosa, pyloudnorm, and scipy."""
     result: Dict[str, Any] = {
@@ -548,11 +553,12 @@ def _extract_dsp_features_with_open_source_tools(
 
         audio_np = np.array(samples, dtype=np.float32)
 
-        # 1. ITU-R BS.1770 LUFS via pyloudnorm
+        # 1. ITU-R BS.1770 LUFS via pyloudnorm, on the real channels: BS.1770
+        # sums channel powers, so a downmix reads stereo 3 dB low.
         try:
             import pyloudnorm as pyln
             meter = pyln.Meter(sample_rate)
-            lufs = meter.integrated_loudness(audio_np)
+            lufs = meter.integrated_loudness(np.array(channels, dtype=np.float32).T if channels else audio_np)
             if not math.isnan(lufs) and not math.isinf(lufs):
                 result["lufs_integrated"] = round(float(lufs), 2)
         except Exception:
@@ -604,7 +610,7 @@ def analyze_track_diagnostic(
     track_index = int(track_info.get("track_index", 0)) if track_info else 0
 
     try:
-        samples, sample_rate, duration = _decode_pcm_samples(payload)
+        channels, sample_rate, duration = _decode_pcm_channels(payload)
     except Exception as exc:
         logger.error("Track diagnostic audio decode error: %s", exc)
         return {
@@ -614,6 +620,7 @@ def analyze_track_diagnostic(
             "track_index": track_index,
         }
 
+    samples = _analysis_signal(channels)
     if not samples:
         return {
             "ok": False,
@@ -623,8 +630,10 @@ def analyze_track_diagnostic(
         }
 
     # Signal measurements
-    peak_val = max((abs(s) for s in samples), default=0.0)
-    rms_val = math.sqrt(sum(s * s for s in samples) / len(samples))
+    # Peak is the loudest channel and RMS the mean of channel RMS, matching
+    # analyze_wav, so the two routes agree on the same file.
+    peak_val = max((abs(v) for ch in channels for v in ch), default=0.0)
+    rms_val = sum(math.sqrt(sum(v * v for v in ch) / len(ch)) for ch in channels) / len(channels)
     peak_dbfs = _db(peak_val)
     rms_dbfs = _db(rms_val)
     crest_factor = round(peak_dbfs - rms_dbfs, 2)
@@ -636,7 +645,7 @@ def analyze_track_diagnostic(
     spectrogram_matrix = compute_spectrogram_matrix(samples, sample_rate, time_slices=SPECTROGRAM_TIME_SLICES)
 
     # Open-source DSP extraction (librosa, pyloudnorm, scipy)
-    dsp_extra = _extract_dsp_features_with_open_source_tools(samples, sample_rate)
+    dsp_extra = _extract_dsp_features_with_open_source_tools(samples, sample_rate, channels)
 
     # Weak areas detection
     weak_areas = detect_weak_areas(

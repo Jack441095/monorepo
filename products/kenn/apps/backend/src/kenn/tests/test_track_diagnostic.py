@@ -44,6 +44,31 @@ def _make_synth_wav(
     return buf.getvalue()
 
 
+def _stereo_wav(left: list[float], right: list[float], sample_rate: int = 48000) -> bytes:
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as wf:
+        wf.setnchannels(2)
+        wf.setsampwidth(2)
+        wf.setframerate(sample_rate)
+        wf.writeframes(b"".join(
+            struct.pack("<hh", int(l * 32767.0), int(r * 32767.0)) for l, r in zip(left, right)
+        ))
+    return buf.getvalue()
+
+
+def test_stereo_level_and_loudness_are_measured_per_channel():
+    # Until 16 Oct 2026 the scan averaged to mono first: L = -R read -96 dBFS,
+    # and every stereo LUFS came out 3 dB below the mix-review figure.
+    tone = [0.1 * math.sin(2.0 * math.pi * 1000.0 * i / 48000.0) for i in range(48000 * 2)]
+    flipped = analyze_track_diagnostic(_stereo_wav(tone, [-v for v in tone]))["metrics"]
+    assert abs(flipped["peak_dbfs"] + 20.0) < 0.1
+    assert any(abs(p["frequency_hz"] - 1000.0) < 30.0 for p in flipped["resonant_peaks"])
+    centred = analyze_track_diagnostic(_stereo_wav(tone, tone))["metrics"]
+    if centred["lufs_integrated"] is not None:  # pyloudnorm is optional
+        # A -20 dBFS 1 kHz sine on both channels is -20 LUFS (BS.1770 sums channel power).
+        assert abs(centred["lufs_integrated"] + 20.0) < 0.2
+
+
 def test_compute_waveform_envelope():
     samples = [0.1 * math.sin(i * 0.1) for i in range(1000)]
     peaks, rms_list = compute_waveform_envelope(samples, points=50)

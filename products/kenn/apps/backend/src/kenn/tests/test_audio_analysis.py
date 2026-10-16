@@ -139,6 +139,23 @@ def test_stereo_phase_cancellation_is_evidence_not_a_subjective_claim() -> None:
     assert "cannot" not in finding["explanation"].lower()
 
 
+def test_a_polarity_flipped_stereo_file_is_not_reported_as_silent() -> None:
+    # Until 16 Oct 2026 silence was counted on the mono sum, so L = -R read as
+    # 100% silent and the spectrum abstained on a full-level file.
+    left = sine(1.0, 1000.0, 48000)
+    report = analyze_wav(wav([left, [-value for value in left]]), filename="flipped.wav")
+    assert report["metrics"]["silence_percentage"] < 10.0
+    assert report["analysis_status"] == "complete"
+    assert report["spectral"]["signal"] == "side"
+    assert abs(report["spectral"]["dominant_peaks"][0]["frequency_hz"] - 1000.0) < 48000 / 16384
+
+
+def test_ordinary_stereo_spectrum_is_measured_on_the_mono_sum() -> None:
+    tone = sine(1.0, 500.0, 48000)
+    report = analyze_wav(wav([tone, tone]), filename="centred.wav")
+    assert report["spectral"]["signal"] == "mono_sum"
+
+
 def test_silence_and_short_audio_abstain_from_spectral_interpretation() -> None:
     silent = analyze_wav(wav([[0.0] * 48000]), filename="silence.wav")
     assert silent["analysis_status"] == "abstained"

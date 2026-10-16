@@ -635,6 +635,19 @@ def test_reference_comparison_is_measured_in_memory_without_retaining_audio() ->
     assert result["grade"]["points"] == round(sum(p["points"] for p in result["grade"]["parts"]), 1)
 
 
+def test_bands_empty_in_both_files_are_not_reported_as_the_largest_difference() -> None:
+    # Until 16 Oct 2026 two identical sines 3 dB apart reported a -64.8 dB gap
+    # at 15 kHz, where both files hold only rounding noise, and an EQ boost for it.
+    result = compare_reference_audio(
+        _wav_bytes(amplitude=0.14, frequency_hz=1000, sample_rate=48000), "mix.wav",
+        _wav_bytes(amplitude=0.2, frequency_hz=1000, sample_rate=48000), "reference.wav",
+    )
+    comparison = result["reference_comparison"]
+    assert all(abs(row["delta_db"]) < 6.0 for row in comparison["ltas_40_band_deltas"])
+    assert abs(comparison["largest_spectral_difference"]["delta_db"] + 3.1) < 0.2
+    assert comparison["eq_bands"] == []
+
+
 def test_reference_comparison_is_persisted_as_metadata_only_receipt(tmp_path) -> None:
     boundary = "kenn-boundary"
     body = (

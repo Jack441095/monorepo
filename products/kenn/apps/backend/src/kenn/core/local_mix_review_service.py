@@ -44,6 +44,14 @@ _ENGINE_PATH = _SERVICE_ROOT / "core" / "local_engine.py"
 _MASKING_PATH = _SERVICE_ROOT / "core" / "masking_analysis.py"
 _MATCHING_PATH = _SERVICE_ROOT / "core" / "reference_matching.py"
 _MAX_TEXT = 512
+# Below these floors a band holds only window leakage and float rounding, so a
+# "difference" there is noise: two identical 1 kHz sines 3 dB apart reported a
+# -64.8 dB gap at 15 kHz (-217 vs -152 dB) and an EQ boost to chase it (16 Oct
+# 2026). -80 dB relative to the 1 kHz-normalised LTAS is far under anything
+# audible beside the anchor band; -100 dBFS sits under the 16-bit noise floor
+# (about -98 dBFS). Both are judgement calls, not standards.
+_LTAS_FLOOR_RELATIVE_DB = -80.0
+_BAND_FLOOR_DBFS = -100.0
 MAX_REVIEWS = 500
 
 
@@ -363,6 +371,13 @@ def _ltas_comparison(mix_spectral: dict[str, Any], reference_spectral: dict[str,
         center_hz = _number(mix.get("center_hz"))
         if mix_level is None or reference_level is None or center_hz is None:
             continue
+        if mix_level <= _LTAS_FLOOR_RELATIVE_DB and reference_level <= _LTAS_FLOOR_RELATIVE_DB:
+            # Empty in both files; there is nothing to match.
+            continue
+        # One side empty is a real gap, but its size is "everything the other
+        # side has", so we measure from the floor rather than from rounding noise.
+        mix_level = max(mix_level, _LTAS_FLOOR_RELATIVE_DB)
+        reference_level = max(reference_level, _LTAS_FLOOR_RELATIVE_DB)
         deltas.append({
             "index": index,
             "center_hz": round(center_hz, 2),
@@ -470,6 +485,11 @@ def compare_reference_audio(
         mix_level, reference_level = _number(mix_bands.get(band)), _number(reference_bands.get(band))
         if mix_level is None or reference_level is None:
             continue
+        if mix_level <= _BAND_FLOOR_DBFS and reference_level <= _BAND_FLOOR_DBFS:
+            # Empty in both files, as in _ltas_comparison.
+            continue
+        mix_level = max(mix_level, _BAND_FLOOR_DBFS)
+        reference_level = max(reference_level, _BAND_FLOOR_DBFS)
         band_deltas.append({
             "band": band,
             "mix_dbfs": round(mix_level, 2),

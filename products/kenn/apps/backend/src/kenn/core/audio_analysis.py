@@ -592,7 +592,14 @@ def analyze_wav(
                 if clipped and not in_run:
                     clip_runs += 1
                 in_run = clipped
-        silence_percentage = 100.0 * sum(1 for value in mono if abs(value) < SILENCE_THRESHOLD) / max(1, len(mono))
+        # A frame is silent only when every channel is below -60 dBFS. Counting
+        # on the mono sum read a polarity-flipped stereo file (L = -R) as 100%
+        # silent and skipped its spectrum (found 16 Oct 2026).
+        silent_frames = sum(
+            1 for frame in zip(*channels) if all(abs(value) < SILENCE_THRESHOLD for value in frame)
+        )
+        silence_percentage = 100.0 * silent_frames / max(1, len(channels[0]))
+        mono_silence_percentage = 100.0 * sum(1 for value in mono if abs(value) < SILENCE_THRESHOLD) / max(1, len(mono))
         dc_offsets = [sum(channel) / len(channel) for channel in channels]
     elif channel_count == 1:
         summary = native_channel_metrics
@@ -603,6 +610,7 @@ def analyze_wav(
         clip_count = int(summary["clipped_sample_count"])
         clip_runs = int(summary["clipped_run_count"])
         silence_percentage = float(summary["silence_percentage"])
+        mono_silence_percentage = silence_percentage
         dc_offsets = [float(summary["dc_offset"])]
     else:
         left_summary = native_channel_metrics["left"]
@@ -613,7 +621,17 @@ def analyze_wav(
         rms = sum(rms_values) / len(rms_values)
         clip_count = int(left_summary["clipped_sample_count"]) + int(right_summary["clipped_sample_count"])
         clip_runs = int(left_summary["clipped_run_count"]) + int(right_summary["clipped_run_count"])
-        silence_percentage = float(native_channel_metrics["mono_silence_percentage"])
+        mono_silence_percentage = float(native_channel_metrics["mono_silence_percentage"])
+        if "silence_percentage" in native_channel_metrics:
+            silence_percentage = float(native_channel_metrics["silence_percentage"])
+        else:
+            # Extensions built before 16 Oct 2026 return only the mono-sum count,
+            # which reads L = -R as silent, so we recount frames here. np.abs
+            # takes the native float32 arrays and the Python decoder's lists alike.
+            import numpy as np
+
+            quiet = (np.abs(channels[0]) < SILENCE_THRESHOLD) & (np.abs(channels[1]) < SILENCE_THRESHOLD)
+            silence_percentage = 100.0 * float(np.count_nonzero(quiet)) / max(1, len(channels[0]))
         dc_offsets = [float(left_summary["dc_offset"]), float(right_summary["dc_offset"])]
     metrics: dict[str, Any] = {
         "duration_seconds": round(duration, 6),
@@ -662,6 +680,19 @@ def analyze_wav(
     elif silence_percentage >= 99.9:
         spectral_abstention_reason = "audio is effectively silent"
 
+    # When the channels carry audio but their sum cancels, the mono spectrum is
+    # only rounding noise. We measure the side signal instead and say so, so
+    # the peaks still describe what is in the file.
+    spectral_signal = "mono_sum"
+    spectral_samples = mono
+    if channel_count == 2 and not spectral_abstention_reason and mono_silence_percentage >= 99.9:
+        spectral_signal = "side"
+        left, right = channels
+        if getattr(channels, "native", False):
+            spectral_samples = (left - right) * np.float32(0.5)
+        else:
+            spectral_samples = [(left[index] - right[index]) * 0.5 for index in range(len(left))]
+
     findings: list[dict[str, Any]] = []
     spectral: dict[str, Any] | None = None
     if spectral_abstention_reason:
@@ -673,8 +704,9 @@ def analyze_wav(
     else:
         spectral = {
             "status": "complete",
+            "signal": spectral_signal,
             **_spectral_measurement(
-                mono, sample_rate, fft_size,
+                spectral_samples, sample_rate, fft_size,
                 include_ltas=include_ltas or include_pink_noise_reference,
             ),
         }
