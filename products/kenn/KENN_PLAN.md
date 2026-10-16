@@ -1496,6 +1496,11 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     arXiv 2305.14283), and measure recall on the device-purpose fixtures the RRF receipt showed
     weakest (0.616 pre-fusion). Routing stays unchanged; one local call per follow-up.
     (Research: lane 06 KQ5.)
+    16 Oct trial, BM25-only (this checkout's index has no embeddings, so the hybrid baseline could not run):
+    standalone rewrite recall@4 0.307 → 0.367 on the 150-case holdout fixture and 0.227 → 0.227 on the 225-case one;
+    as a follow-up resolver it scored 0.307 against production's 0.280 on one fixture and 0.191 against 0.227 on the
+    other, about 1.5 s per call. No adoption case; box stays open for a rerun on a hybrid index with
+    `tooling/scripts/trial_query_rewrite.py`. [Evidence](docs/evidence/KENN_QUERY_REWRITE_TRIAL_2026-10-16.md).
   - First model run, 3 Oct: six scripted conversations, 30 turns, 24 reached the model and 12 were accepted (11 guard
     rejections, 1 timeout); accepted answers took 13 to 58 s. Corrections and short follow-ups often lose the thread,
     clarify replies forget the conversation, and a question about an analysis that never ran got an accepted answer
