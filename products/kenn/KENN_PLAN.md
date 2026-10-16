@@ -1249,8 +1249,10 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     Sinoid Fold curves and describes the pre-12.1 Soft Clip toggle. Chorus-Ensemble gets Ensemble and Amount wrong and
     lacks the Delay Time and Taps controls; Limiter lacks Maximize, Auto release and the True Peak mode; Erosion still
     points at the removed Sine mode; both Meld notes describe one shared matrix and miss the Chord oscillator, and the
-    Drift half invents a waveform morph. Revised drafts of all six are in the same folder for my review. Auto
-    Pan-Tremolo and Delay match the manual. The other 69 are not yet checked.
+    Drift half invents a waveform morph; Phaser-Flanger lacks Doubler and names a Poles control that does not exist;
+    both Roar notes use wrong curve names and put Drive on Stage 1. Revised drafts of eight notes (one Roar draft
+    covers both) are in the same folder for my review. Auto Pan-Tremolo, Delay and LFO match the manual. The other 65
+    are not yet checked.
 - [ ] **Audio calculators**, merged to main 14 Oct (branch `draft/audio-calculators-rebased`): note lengths at a tempo (straight,
   dotted, triplet, as ms and LFO Hz), buffer latency, frequency to note and back, dB to gain factor. The figures go in
   as tool readings, so the gate accepts them. [Draft receipt](docs/evidence/KENN_AUDIO_CALCULATORS_DRAFT_2026-10-13.md),
