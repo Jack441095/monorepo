@@ -34,7 +34,7 @@ from kenn.routes.chat_routes import (
     handle_delete_episode,
     handle_clear_memory,
 )
-from kenn.routes.daw_routes import handle_confirmation_revoke, handle_live_command, handle_parameter_inspection, handle_parameter_proposal, handle_session_card, handle_osc_undo
+from kenn.routes.daw_routes import handle_confirmation_revoke, handle_live_command, handle_parameter_inspection, handle_parameter_proposal, handle_session_card, handle_osc_undo, handle_offline_scan_proposal, handle_offline_scan_start, handle_offline_scan_status, handle_offline_scan_cancel
 from kenn.routes.mix_review_routes import (
     handle_mix_review_status,
     handle_mix_review_report_json,
@@ -251,6 +251,30 @@ def parameter_inspection(payload: dict):
 @app.post("/api/ableton/parameter/proposal")
 async def parameter_proposal_endpoint(payload: dict[str, Any]):
     status, result = handle_parameter_proposal(payload)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/ableton/offline-scan/proposal")
+async def offline_scan_proposal_endpoint(payload: dict[str, Any]):
+    status, result = handle_offline_scan_proposal(payload)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/ableton/offline-scan/start")
+async def offline_scan_start_endpoint(payload: dict[str, Any]):
+    status, result = handle_offline_scan_start(payload)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/ableton/offline-scan/status")
+async def offline_scan_status_endpoint(payload: dict[str, Any]):
+    status, result = handle_offline_scan_status(payload)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/ableton/offline-scan/cancel")
+async def offline_scan_cancel_endpoint(payload: dict[str, Any]):
+    status, result = handle_offline_scan_cancel(payload)
     return JSONResponse(status_code=status, content=result)
 
 

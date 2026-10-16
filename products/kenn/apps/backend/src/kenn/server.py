@@ -1942,6 +1942,10 @@ class Handler(BaseHTTPRequestHandler):
             "/api/ableton/parameter/inspect",
             "/api/ableton/parameter/proposal",
             "/api/ableton/confirmation/revoke",
+            "/api/ableton/offline-scan/proposal",
+            "/api/ableton/offline-scan/start",
+            "/api/ableton/offline-scan/status",
+            "/api/ableton/offline-scan/cancel",
             "/api/ableton/midi-clip/proposal",
             "/api/ableton/midi-clip/update-proposal",
             "/api/ableton/clip-duplication/proposal",
@@ -2349,6 +2353,30 @@ class Handler(BaseHTTPRequestHandler):
             from kenn.routes.daw_routes import handle_parameter_proposal
 
             status, result = handle_parameter_proposal(payload)
+            self.send_json(status, result)
+            return
+        if parsed.path == "/api/ableton/offline-scan/proposal":
+            from kenn.routes.daw_routes import handle_offline_scan_proposal
+
+            status, result = handle_offline_scan_proposal(payload)
+            self.send_json(status, result)
+            return
+        if parsed.path == "/api/ableton/offline-scan/start":
+            from kenn.routes.daw_routes import handle_offline_scan_start
+
+            status, result = handle_offline_scan_start(payload)
+            self.send_json(status, result)
+            return
+        if parsed.path == "/api/ableton/offline-scan/status":
+            from kenn.routes.daw_routes import handle_offline_scan_status
+
+            status, result = handle_offline_scan_status(payload)
+            self.send_json(status, result)
+            return
+        if parsed.path == "/api/ableton/offline-scan/cancel":
+            from kenn.routes.daw_routes import handle_offline_scan_cancel
+
+            status, result = handle_offline_scan_cancel(payload)
             self.send_json(status, result)
             return
         if parsed.path == "/api/ableton/midi-clip/proposal":

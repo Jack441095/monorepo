@@ -101,6 +101,75 @@ def handle_parameter_proposal(payload: dict[str, Any]) -> tuple[int, dict[str, A
     return (200 if result.get("ok") else 409), result
 
 
+def _offline_scan_session(payload: Any, allowed: set[str]) -> str | None:
+    """Return the exact owner session when the payload carries only the allowed keys."""
+    if not isinstance(payload, dict) or set(payload) != allowed:
+        return None
+    session_id = payload["session_id"]
+    if not isinstance(session_id, str) or not session_id or session_id != session_id.strip() or len(session_id) > 128:
+        return None
+    return session_id
+
+
+def handle_offline_scan_proposal(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Bind a producer-confirmed range to a single-use confirmation; nothing is exported yet."""
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.core.offline_scan_runtime import get_offline_scan_service
+
+    session_id = _offline_scan_session(payload, {"session_id", "source", "export_request"})
+    if session_id is None or not isinstance(payload["source"], dict) or not isinstance(payload["export_request"], dict):
+        return 400, {"ok": False, "error": "Supply exactly session_id, source and export_request."}
+    result = LiveActionService(offline_scans=get_offline_scan_service()).propose_offline_scan(
+        source=payload["source"], export_request=payload["export_request"], session_id=session_id,
+    )
+    if result.get("ok"):
+        result.update({"changed": False, "status": "confirmation_required"})
+    return (200 if result.get("ok") else 409), result
+
+
+def handle_offline_scan_start(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Consume the confirmation and start the job; the 202 receipt is polled through status."""
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.core.offline_scan_runtime import get_offline_scan_service
+
+    session_id = _offline_scan_session(payload, {"session_id", "proposal", "confirm_token", "idempotency_key"})
+    if (
+        session_id is None or not isinstance(payload["proposal"], dict)
+        or not isinstance(payload["confirm_token"], str) or len(payload["confirm_token"]) > 512
+    ):
+        return 400, {"ok": False, "error": "Supply exactly session_id, proposal, confirm_token and idempotency_key."}
+    result = LiveActionService(offline_scans=get_offline_scan_service()).execute_offline_scan(
+        payload["proposal"], confirm_token=payload["confirm_token"], session_id=session_id,
+        idempotency_key=payload["idempotency_key"],
+    )
+    return (202 if result.get("ok") else 409), result
+
+
+def _offline_scan_job_call(payload: dict[str, Any], method: str) -> tuple[int, dict[str, Any]]:
+    from kenn.core.offline_scan_runtime import get_offline_scan_service
+
+    session_id = _offline_scan_session(payload, {"session_id", "job_id"})
+    if session_id is None or not isinstance(payload["job_id"], str) or len(payload["job_id"]) > 128:
+        return 400, {"ok": False, "error": "Supply exactly session_id and job_id."}
+    service = get_offline_scan_service()
+    if service is None:
+        # Nothing can have been started without a service, so there is no job to read or cancel.
+        return 409, {"ok": False, "error": "No qualified offline export candidate is configured."}
+    result = getattr(service, method)(session_id, payload["job_id"])
+    # The service answers a missing, invalid and foreign job identically, so 404 leaks nothing about ownership.
+    return (200 if result.get("ok") else 404), result
+
+
+def handle_offline_scan_status(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Return this owner's job receipt, including the retained report once completed."""
+    return _offline_scan_job_call(payload, "status")
+
+
+def handle_offline_scan_cancel(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Request cancellation of this owner's job; the receipt shows when disposal finished."""
+    return _offline_scan_job_call(payload, "cancel")
+
+
 def handle_session_card() -> tuple[int, dict[str, Any]]:
     """Return live Ableton session topology from resilient MixingDoctor cache."""
     try:
