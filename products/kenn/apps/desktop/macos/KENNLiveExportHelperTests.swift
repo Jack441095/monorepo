@@ -36,6 +36,7 @@ struct LiveExportHelperTests {
         let original = request()
         try original.validate()
         try incompletePreflightNeverPressesExport(original)
+        try saveDestinationRequiresExactReadOnlyEvidence(request: original, root: root)
         for name in ["manifest.json", "receipt.json", "cancel.requested"] {
             try Data("{}".utf8).write(to: root.appendingPathComponent(name))
         }
@@ -143,6 +144,132 @@ struct LiveExportHelperTests {
         try oversized.close()
         try rejects({ try ExportWAV.validate(output.path) }, "An over-limit sparse file was accepted")
         print("PASS: request ownership, double export gate, receipt identity, all completion gates, PCM validation and real descriptor closure")
+    }
+
+    private static func saveDestinationRequiresExactReadOnlyEvidence(request: LiveExportRequest, root: URL) throws {
+        let job = root.appendingPathComponent("destination")
+        let parked = root.appendingPathComponent("previous-destination")
+        let other = root.appendingPathComponent("other-destination")
+        try FileManager.default.createDirectory(at: other, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
+        defer { try? FileManager.default.removeItem(at: other) } // This verifier test owns only its generated directories.
+        let current = LiveExportRequest(schema: request.schema, action: request.action, live_pid: request.live_pid,
+            expected_window_title: request.expected_window_title, output_path: job.appendingPathComponent("kenn-analysis.wav").path,
+            render_start: request.render_start, render_length: request.render_length, sample_rate: request.sample_rate, timeout_seconds: request.timeout_seconds)
+        let panel = AXUIElementCreateApplication(Int32.max - 20)
+        let identifiers = ["saveAsNameTextField", "where popup", "CancelButton", "OKButton", "ColumnView"]
+        let controls = identifiers.indices.map { AXUIElementCreateApplication(Int32.max - 21 - Int32($0)) }
+        let extra = AXUIElementCreateApplication(Int32.max - 30)
+        let roles = [kAXTextFieldRole, kAXPopUpButtonRole, kAXButtonRole, kAXButtonRole, kAXBrowserRole]
+        let start = Date(timeIntervalSince1970: 1)
+        var healthyReader: ExportAXReader?
+        let failures = ["none", "wrong-directory", "string-url", "remote-url", "query-url", "missing-url", "failed-url",
+                        "wrong-name", "missing-control", "duplicate-control", "duplicate-panel", "wrong-role", "disabled", "malformed-enabled",
+                        "nested-sheet", "failed-role", "truncated-tree", "deadline", "late-url", "target-appeared", "cancel-appeared",
+                        "metadata-appeared", "directory-replaced", "directory-mode"]
+        for failure in failures {
+            try FileManager.default.createDirectory(at: job, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
+            var clock = start
+            var mutated = false
+            var fixtureError: Error?
+            func index(_ node: AXUIElement) -> Int? { controls.firstIndex { CFEqual($0, node) } }
+            func children(_ node: AXUIElement) -> [AXUIElement] {
+                guard CFEqual(node, panel) else { return [] } // The complete fixture tree has one panel and leaf controls.
+                var result = controls
+                if failure == "missing-control" { result.remove(at: 3) }
+                if ["duplicate-control", "duplicate-panel", "nested-sheet"].contains(failure) { result.append(extra) }
+                return result
+            }
+            let reader = ExportAXReader(deadline: failure == "deadline" ? start : start.addingTimeInterval(1), now: { clock }, copyValue: { node, key in
+                if key == kAXRoleAttribute {
+                    if failure == "failed-role" { return (.cannotComplete, nil) }
+                    if CFEqual(node, panel) { return (.success, kAXSheetRole as CFString) }
+                    if CFEqual(node, extra) { return (.success, (failure == "nested-sheet" ? kAXSheetRole : kAXGroupRole) as CFString) }
+                    if let position = index(node) {
+                        return (.success, (failure == "wrong-role" && position == 4 ? kAXGroupRole : roles[position]) as CFString)
+                    }
+                }
+                if key == kAXIdentifierAttribute {
+                    if CFEqual(node, panel) { return (.success, "save-panel" as CFString) }
+                    if CFEqual(node, extra) {
+                        let identifier = failure == "duplicate-panel" ? "save-panel" : (failure == "nested-sheet" ? "nested-sheet" : "OKButton")
+                        return (.success, identifier as CFString)
+                    }
+                    if let position = index(node) { return (.success, identifiers[position] as CFString) }
+                }
+                if key == kAXEnabledAttribute {
+                    if failure == "malformed-enabled" { return (.success, NSNumber(value: 1)) }
+                    return (.success, failure == "disabled" ? kCFBooleanFalse : kCFBooleanTrue)
+                }
+                if key == kAXValueAttribute, let position = index(node) {
+                    if position == 0 { return (.success, (failure == "wrong-name" ? "user-export.wav" : "kenn-analysis.wav") as CFString) }
+                    // The popup's display name is deliberately unrelated; it cannot prove the target directory.
+                    if position == 1 { return (.success, "Unrelated display name" as CFString) }
+                }
+                if key == kAXURLAttribute, CFEqual(node, controls[4]) {
+                    if !mutated {
+                        mutated = true
+                        do {
+                            if failure == "target-appeared" { try Data([1]).write(to: URL(fileURLWithPath: current.output_path)) }
+                            if failure == "cancel-appeared" { try Data().write(to: job.appendingPathComponent("cancel.requested")) }
+                            if failure == "metadata-appeared" { try Data(repeating: 0, count: 65_537).write(to: job.appendingPathComponent("receipt.json")) }
+                            if failure == "directory-mode" { try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: job.path) }
+                            if failure == "directory-replaced" {
+                                try FileManager.default.moveItem(at: job, to: parked)
+                                try FileManager.default.createDirectory(at: job, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
+                            }
+                        } catch {
+                            fixtureError = error
+                            return (.failure, nil) // The assertion below distinguishes a failed mutation from a rejected race.
+                        }
+                    }
+                    if failure == "late-url" { clock = start.addingTimeInterval(2) }
+                    if failure == "missing-url" { return (.noValue, nil) }
+                    if failure == "failed-url" { return (.cannotComplete, nil) }
+                    if failure == "string-url" { return (.success, job.absoluteString as CFString) }
+                    let url: URL
+                    if failure == "wrong-directory" { url = other }
+                    else if failure == "remote-url" { url = URL(string: "https://example.invalid/destination")! }
+                    else if failure == "query-url" { url = URL(string: job.absoluteString + "?other")! }
+                    else { url = job }
+                    return (.success, url as CFURL)
+                }
+                return (.noValue, nil) // This profile has no other required attributes or subroles.
+            }, countValues: { node, _ in
+                (.success, failure == "truncated-tree" && CFEqual(node, panel) ? ExportAXReader.maximumNodes + 1 : children(node).count)
+            }, copyValues: { node, _, _ in (.success, children(node) as CFArray) })
+            if failure == "none" {
+                do { try ExportSaveDestination.validate(panel: panel, request: current, reader: reader) }
+                catch { throw TestFailure(description: "A complete native Save destination fixture was rejected: \(error)") }
+                healthyReader = reader
+            } else {
+                try rejects({ try ExportSaveDestination.validate(panel: panel, request: current, reader: reader) }, "Save destination accepted unqualified evidence: \(failure)")
+            }
+            try expect(fixtureError == nil, "Save destination fixture mutation failed: \(failure): \(String(describing: fixtureError))")
+            try FileManager.default.removeItem(at: job)
+            if FileManager.default.fileExists(atPath: parked.path) { try FileManager.default.removeItem(at: parked) }
+        }
+        // A new job must not inherit another job's valid directory URL, even when its filename matches.
+        let isolated = LiveExportRequest(schema: current.schema, action: current.action, live_pid: current.live_pid,
+            expected_window_title: current.expected_window_title, output_path: other.appendingPathComponent("kenn-analysis.wav").path,
+            render_start: current.render_start, render_length: current.render_length, sample_rate: current.sample_rate, timeout_seconds: current.timeout_seconds)
+        try isolated.validate()
+        try FileManager.default.createDirectory(at: job, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
+        try rejects({ try ExportSaveDestination.validate(panel: panel, request: isolated, reader: healthyReader!) }, "Another job reused the previous Save destination")
+        do { try ExportSaveDestination.validate(panel: panel, request: current, reader: healthyReader!) }
+        catch { throw TestFailure(description: "A fresh destination read inherited another fixture's state: \(error)") }
+        let remaining = try FileManager.default.contentsOfDirectory(atPath: job.path)
+        try expect(remaining.isEmpty, "Read-only destination validation created a file")
+        let cancelled = job.appendingPathComponent("cancel.requested")
+        try Data().write(to: cancelled)
+        var touchedAX = false
+        let unread = ExportAXReader(deadline: .distantFuture, copyValue: { _, _ in
+            touchedAX = true
+            return (.cannotComplete, nil)
+        })
+        try rejects({ try ExportSaveDestination.validate(panel: panel, request: current, reader: unread) }, "A pre-existing cancellation marker was accepted")
+        try expect(!touchedAX, "A cancelled destination read queried the Save panel")
+        try FileManager.default.removeItem(at: job)
+        print("PASS: read-only Save destination profile, URL/directory identity, cancellation, races and isolated validation")
     }
 
     private static func incompletePreflightNeverPressesExport(_ request: LiveExportRequest) throws {

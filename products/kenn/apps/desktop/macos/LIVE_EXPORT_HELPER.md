@@ -101,6 +101,22 @@ both recording modes stopped; the private job directory remained empty. This
 qualifies that window's bounded preflight/rejection/cancellation path. It does not
 qualify Save, rendering, full-range discovery or Live writer closure.
 
+A later 16 Oct supervised inspection did not establish a keystroke-free AX
+action to open Go To Folder: the inspected location popup and Live Navigate menu
+did not provide one. Both dialogs were cancelled and independent readback showed
+playback and both recording modes stopped. Save was never pressed.
+
+`ExportSaveDestination.validate` is a fixture-qualified, read-only prerequisite
+for future Save work. It requires a complete bounded subtree, the exact native
+control roles/identifiers, Boolean enabled states, `kenn-analysis.wav` and a typed
+file URL on `ColumnView` identifying the exact canonical job directory. It
+rechecks output absence, owned metadata, cancellation and directory identity
+around those reads. It neither navigates nor changes values or presses buttons,
+and it is not called by the executable's export path. The caller must separately
+establish newly opened panel ownership; a successful observation grants no later
+Save authority or atomic overwrite guarantee. See
+[destination/bounds evidence](../../../docs/evidence/KENN_OFFLINE_SCAN_DESTINATION_BOUNDS_2026-10-16.md).
+
 ## Request and receipt boundary
 
 Requests use `schema: "kenn.live_export_request.v1"` and these fields:
