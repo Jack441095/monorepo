@@ -3111,8 +3111,11 @@ Decided by me, 5 Oct 2026, after the readiness review:
   answers the cap cut off. The streamed path still logs the bare reason. The chat-test skip match is not yet checked.
   - [x] 13 Oct: an empty stream now reads `generation returned no answer: empty reply` (a dead stream already named
     its exception). [Receipt](docs/evidence/KENN_ANSWER_TAGS_AND_REQUEST_TIMING_2026-10-13.md).
-  - [ ] The chat-test skip match: not found in this tree on 13 Oct; its commit predates the clone's history. Look for
-    it in the Mac checkout's history.
+  - [x] The chat-test skip match: found 16 Oct. It is `b7738223` (in this history, contrary to the 13 Oct note) and
+    `tests/conftest.py` already matches on the module's file name against a named set
+    (`LOCAL_INDEX_TEST_MODULES`), not on a `tests/` path segment, so nothing needed changing. Checked in a detached
+    worktree with no ignored `data/` dir: 8 tests in `test_support_diagnostics.py` and
+    `test_chat_max_for_live_routing.py` skipped with the index reason, and the rest of the selection ran.
 - [x] Stop a template counting as a model answer when the quality check swaps it in after generation. A correctness
   fix; it didn't change any of the last four scores. Merged to main 7 Oct (`draft/honest-answers` 0fd4b7b1): the
   `brain=True` log row now waits for the quality check, and a swap logs `generation:quality gate: <reason>` instead.
