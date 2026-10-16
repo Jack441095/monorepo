@@ -1231,7 +1231,11 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     Kilohearts and Damage.
 - [ ] **Ableton stock devices, the same way** (me, 13 Oct). The 2 Oct L1a audit found a dedicated corpus note for 77 of
   78 stock devices, so this is gaps and accuracy, not rewriting: from Ableton's Live 12 manual, every claim cited.
-  - [ ] Drum Synth, the one device with no note.
+  - [x] Drum Synths, drafted 16 Oct from the Live 12 manual (ch. 32.1, pp.802-809). The manual has no device called
+    "Drum Synth": it documents eight Max for Live instruments (DS Clang, Clap, Cymbal, FM, HH, Kick, Snare, Tom), so the
+    draft is one family note. With me for review in `.runtime/drum-synth-note-2026-10-16/` (outside `Training_Data_Notes`
+    until approved); the check sheet marks the DS HH 12/24 dB slope wording (a PDF spacing glitch), the edition
+    requirement, and two inferences for confirmation in Live 12.
   - [ ] Devices added in Live 12 updates that the 78-device list does not include (Granulator III is one), checked
     against Ableton's release notes.
   - [ ] Check the existing 77 device notes against the Live 12 manual (ranges, control names, version). The notes live
