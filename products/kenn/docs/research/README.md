@@ -46,3 +46,10 @@ This research series analyzes how to make KENN function as an intelligent Ableto
   Design and phasing for opt-in C++/nanobind audio analysis kernels (`KENN_DSP_NATIVE=1`).
 - **[CPP_DSP_RELEASE_QUALIFICATION.md](CPP_DSP_PHASE4_RELEASE_QUALIFICATION.md)**  
   Qualification criteria for native spectral, loudness, masking, and decoder routines.
+
+---
+
+## 4. Open-source capability and licence research (October 2026)
+
+- **[KENN_OPEN_SOURCE_DEEP_RESEARCH_2026-10-15.md](KENN_OPEN_SOURCE_DEEP_RESEARCH_2026-10-15.md)**  
+  *Synthesis of the six-lane open-source pass: ADOPT/WATCH/AVOID capability map, licence tables with verbatim triggers, corrections against the 14–15 October docs, and 13 draft additive plan edits for review.*
