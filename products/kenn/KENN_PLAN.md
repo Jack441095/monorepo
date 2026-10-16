@@ -1238,8 +1238,16 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     requirement, and two inferences for confirmation in Live 12.
   - [ ] Devices added in Live 12 updates that the 78-device list does not include (Granulator III is one), checked
     against Ableton's release notes.
+    First pass 16 Oct against the 12.x release notes (live at 12.4.6): Drum Sampler and Auto Shift (12.1) already have
+    notes; Saturator's 12.1 redesign and Meld's 12.2 Chord oscillator and Scrambler, and Chorus-Ensemble's Time/Tap
+    controls, have none. Granulator III is not in Ableton's release notes or audio-effect manual (Max for Live), so it
+    needs its own source. Details in `.runtime/stock-device-accuracy-2026-10-16/CHECK_SHEET.md`.
   - [ ] Check the existing 77 device notes against the Live 12 manual (ranges, control names, version). The notes live
     only on the Mac, so this waits for it or for the files to be shared.
+    Started 16 Oct on the Mac copy: the 26 Sep "checked against the Live 12 manual" pass used a PDF older than 12.1, so
+    the current online manual is the source to use. Saturator checked: the approved note lacks the Bass Shaper and
+    Sinoid Fold curves and describes the pre-12.1 Soft Clip toggle; a revised draft is in the same folder for my review.
+    The other 76 are not yet checked.
 - [ ] **Audio calculators**, merged to main 14 Oct (branch `draft/audio-calculators-rebased`): note lengths at a tempo (straight,
   dotted, triplet, as ms and LFO Hz), buffer latency, frequency to note and back, dB to gain factor. The figures go in
   as tool readings, so the gate accepts them. [Draft receipt](docs/evidence/KENN_AUDIO_CALCULATORS_DRAFT_2026-10-13.md),
