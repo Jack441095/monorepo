@@ -1244,10 +1244,12 @@ Knowledge work from 13 Oct (each item's evidence is linked where it is done):
     needs its own source. Details in `.runtime/stock-device-accuracy-2026-10-16/CHECK_SHEET.md`.
   - [ ] Check the existing 77 device notes against the Live 12 manual (ranges, control names, version). The notes live
     only on the Mac, so this waits for it or for the files to be shared.
-    Started 16 Oct on the Mac copy: the 26 Sep "checked against the Live 12 manual" pass used a PDF older than 12.1, so
-    the current online manual is the source to use. Saturator checked: the approved note lacks the Bass Shaper and
-    Sinoid Fold curves and describes the pre-12.1 Soft Clip toggle; a revised draft is in the same folder for my review.
-    The other 76 are not yet checked.
+    Started 16 Oct on the Mac copy, against the online manual and the September PDF (both current, 12.4 era).
+    Several notes stamped "checked against the Live 12 manual" on 26 Sep do not match it. Saturator checked: the approved note lacks the Bass Shaper and
+    Sinoid Fold curves and describes the pre-12.1 Soft Clip toggle. Chorus-Ensemble gets Ensemble and Amount wrong and
+    lacks the Delay Time and Taps controls; Limiter lacks Maximize, Auto release and the True Peak mode; Erosion still
+    points at the removed Sine mode. Revised drafts of all four are in the same folder for my review. Auto Pan-Tremolo
+    and Delay match the manual. The other 71 are not yet checked.
 - [ ] **Audio calculators**, merged to main 14 Oct (branch `draft/audio-calculators-rebased`): note lengths at a tempo (straight,
   dotted, triplet, as ms and LFO Hz), buffer latency, frequency to note and back, dB to gain factor. The figures go in
   as tool readings, so the gate accepts them. [Draft receipt](docs/evidence/KENN_AUDIO_CALCULATORS_DRAFT_2026-10-13.md),
