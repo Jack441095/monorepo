@@ -15,6 +15,185 @@ private func rejects(_ body: () throws -> Void, _ reason: String) throws {
     throw TestFailure(description: reason)
 }
 
+/// A complete synthetic Live window transition; no fixture calls native AX or opens a real application.
+private final class ExportCallerFixture {
+    private static var nextPID = Int32.max - 1_000 // Distinct fake identities prevent cross-instance ownership by accident.
+    let request: LiveExportRequest
+    let scenario: String
+    let start = Date(timeIntervalSince1970: 2_000)
+    var clock = Date(timeIntervalSince1970: 2_000)
+    var menuPresses = 0
+    var cancelPresses = 0
+    var otherPresses = 0
+    var visible = false
+    var sleeps = 0
+    var error: Error?
+    private var cleaning = false
+    private var enabledReads = 0
+    private var processReads = 0
+    private var trustReads = 0
+    private var profileRead = false
+    private let nodes: [AXUIElement]
+    private let settings: [(String, String, AXUIElement)]
+    private var main: AXUIElement { nodes[0] }
+    private var dialog: AXUIElement { nodes[1] }
+    private var menuBar: AXUIElement { nodes[2] }
+    private var file: AXUIElement { nodes[3] }
+    private var menu: AXUIElement { nodes[4] }
+    private var export: AXUIElement { nodes[5] }
+    private var cancel: AXUIElement { nodes[6] }
+    private var replacementMain: AXUIElement { nodes[7] }
+    private var foreign: AXUIElement { nodes[8] }
+    private var replacementCancel: AXUIElement { nodes[9] }
+    private var replacementDialog: AXUIElement { nodes[10] }
+    private var marker: URL { URL(fileURLWithPath: request.output_path).deletingLastPathComponent().appendingPathComponent("cancel.requested") }
+    var elapsed: TimeInterval { clock.timeIntervalSince(start) }
+
+    init(request: LiveExportRequest, scenario: String) {
+        self.request = request
+        self.scenario = scenario
+        func node() -> AXUIElement {
+            Self.nextPID -= 1
+            return AXUIElementCreateApplication(Self.nextPID)
+        }
+        nodes = (0..<11).map { _ in node() }
+        var values = LiveExportProfile.fixedSettings
+        for (prefix, position) in [("Base.RenderStartBox.RenderStart", request.render_start), ("Base.RenderLengthBox.RenderLength", request.render_length)] {
+            for (component, number) in zip(["Bars", "Beats", "Subdivisions"], position.split(separator: ".")) {
+                values["\(prefix).\(component)"] = String(Int(number)!)
+            }
+        }
+        settings = values.keys.sorted().map { ($0, values[$0]!, node()) }
+    }
+
+    func removeMarker() {
+        // lstat also finds a dangling cancellation link; following it would leave the next fixture cancelled.
+        var info = stat()
+        do { if lstat(marker.path, &info) == 0 { try FileManager.default.removeItem(at: marker) } }
+        catch { self.error = error } // The test checks fixture I/O separately from production rejection.
+    }
+
+    private func writeMarker(brokenLink: Bool = false) {
+        do {
+            if brokenLink { try FileManager.default.createSymbolicLink(atPath: marker.path, withDestinationPath: marker.path + ".missing") }
+            else { try Data().write(to: marker) }
+        } catch { self.error = error }
+    }
+
+    private func windows() -> [AXUIElement] {
+        if scenario == "duplicate-windows" { return [main, main] }
+        let replaced = (scenario == "replaced-main" && menuPresses > 0) || (scenario == "cleanup-main" && cleaning)
+        var result = [replaced ? replacementMain : main]
+        if scenario == "existing-dialog" { result.append(dialog); return result }
+        let delayed = scenario == "cancel-delayed" && elapsed < 0.3
+        if visible && !delayed {
+            let replacedDialog = (scenario == "cleanup-replaced-dialog" && cleaning) || (scenario == "close-replacement" && cancelPresses > 0)
+            result.append(replacedDialog ? replacementDialog : dialog)
+        }
+        if (scenario == "ambiguous-dialog" && menuPresses > 0) || (scenario == "extra-window" && menuPresses > 0) || (["cleanup-extra-dialog", "cleanup-extra-window"].contains(scenario) && cleaning) {
+            result.append(foreign)
+        }
+        return result
+    }
+
+    private func children(_ node: AXUIElement) -> [AXUIElement] {
+        if CFEqual(node, menuBar) { return [file] }
+        if CFEqual(node, file) { return [menu] }
+        if CFEqual(node, menu) { return [export] }
+        if CFEqual(node, dialog) || CFEqual(node, replacementDialog) {
+            let button = cleaning && scenario == "cleanup-replaced-cancel" ? replacementCancel : cancel
+            return (scenario == "missing-cancel" ? [] : [button]) + settings.map { $0.2 }
+        }
+        return [] // Main, foreign window and all controls are complete leaves in this fixture.
+    }
+
+    private func value(_ node: AXUIElement, _ key: String) -> (AXError, CFTypeRef?) {
+        if key == kAXMenuBarAttribute {
+            if scenario == "broken-marker-before-menu" { writeMarker(brokenLink: true) }
+            return (.success, menuBar)
+        }
+        if key == kAXTitleAttribute {
+            if CFEqual(node, main) || CFEqual(node, replacementMain) { return (.success, request.expected_window_title as CFString) }
+            if CFEqual(node, dialog) || CFEqual(node, replacementDialog) { return (.success, (scenario == "foreign-dialog" ? "Unrelated dialog" : "Export Audio/Video") as CFString) }
+            if CFEqual(node, file) { return (.success, "File" as CFString) }
+            if CFEqual(node, export) { return (.success, "Export Audio/Video…" as CFString) }
+        }
+        if key == kAXRoleAttribute {
+            if CFEqual(node, main), scenario == "main-role" { return (.success, kAXButtonRole as CFString) }
+            if CFEqual(node, main), scenario == "main-role-absent" { return (.noValue, nil) }
+            if [main, replacementMain, dialog, replacementDialog, foreign].contains(where: { CFEqual($0, node) }) { return (.success, kAXWindowRole as CFString) }
+            if CFEqual(node, cancel) || CFEqual(node, replacementCancel) { return (.success, (cleaning && scenario == "cleanup-role" ? kAXTextFieldRole : kAXButtonRole) as CFString) }
+            return (.success, kAXTextFieldRole as CFString)
+        }
+        if key == kAXSubroleAttribute {
+            if CFEqual(node, main), scenario == "main-subrole" { return (.success, kAXDialogSubrole as CFString) }
+            if CFEqual(node, main), scenario == "main-subrole-absent" { return (.noValue, nil) }
+            let isDialog = [dialog, replacementDialog].contains(where: { CFEqual($0, node) }) || (CFEqual(node, foreign) && !["extra-window", "cleanup-extra-window"].contains(scenario))
+            return (.success, (isDialog ? kAXDialogSubrole : kAXStandardWindowSubrole) as CFString)
+        }
+        if key == kAXIdentifierAttribute {
+            if CFEqual(node, cancel) || CFEqual(node, replacementCancel) { return (.success, (cleaning && scenario == "cleanup-identifier" ? "Unrelated.Cancel" : "Base.FinalButtonsBox.CancelButton") as CFString) }
+            if let setting = settings.first(where: { CFEqual($0.2, node) }) { return (.success, setting.0 as CFString) }
+        }
+        if key == kAXEnabledAttribute, CFEqual(node, cancel) || CFEqual(node, replacementCancel) {
+            enabledReads += 1
+            if cleaning && scenario == "cleanup-boolean" { return (.success, NSNumber(value: 1)) }
+            return (.success, cleaning && scenario == "cleanup-disabled" ? kCFBooleanFalse : kCFBooleanTrue)
+        }
+        if key == kAXValueAttribute, let setting = settings.first(where: { CFEqual($0.2, node) }) {
+            if !profileRead {
+                profileRead = true
+                if scenario == "cancel-profile" { writeMarker() }
+                if scenario == "deadline-profile" { clock = start.addingTimeInterval(Double(request.timeout_seconds)) }
+            }
+            return (.success, setting.1 as CFString)
+        }
+        return (.noValue, nil) // Absent optional attributes carry no ownership or control evidence.
+    }
+
+    var environment: LiveExportEnvironment {
+        LiveExportEnvironment(trusted: {
+            self.trustReads += 1
+            return !(self.scenario == "trust-before-menu" && self.trustReads >= 3) && !(self.scenario == "cleanup-trust" && self.cleaning) && !(self.scenario == "cleanup-last-trust" && self.trustReads == 7)
+        }, isLive: { _ in
+            self.processReads += 1
+            return !(self.scenario == "process-before-menu" && self.processReads >= 2) && !(self.scenario == "cleanup-process" && self.cleaning) && !(self.scenario == "cleanup-last-process" && self.processReads == 6)
+        }, reader: { deadline in
+            // Caller and reader share one fake clock. A new cleanup deadline follows successful Cancel acquisition.
+            if self.enabledReads > 0 && deadline != self.start.addingTimeInterval(Double(self.request.timeout_seconds)) { self.cleaning = true }
+            return ExportAXReader(deadline: deadline, now: { self.clock }, copyValue: { self.value($0, $1) }, countValues: { node, key in
+                if key == kAXWindowsAttribute {
+                    if self.scenario == "cancel-late-acquisition", self.menuPresses > 0 {
+                        self.clock = deadline // An AX operation can return only after the shortened acceptance deadline.
+                    }
+                    if (self.scenario == "cleanup-read-failed" && self.cleaning) || (self.scenario == "close-read-failed" && self.cancelPresses > 0) { return (.cannotComplete, 0) }
+                    return (.success, self.windows().count)
+                }
+                return (.success, self.children(node).count)
+            }, copyValues: { node, key, _ in (.success, (key == kAXWindowsAttribute ? self.windows() : self.children(node)) as CFArray) })
+        }, press: { node in
+            if CFEqual(node, self.export) {
+                self.menuPresses += 1
+                self.visible = !["never-appears", "cancel-never-appears", "cancel-late-acquisition"].contains(self.scenario)
+                if ["cancel-never-appears", "cancel-delayed", "cancel-late-acquisition"].contains(self.scenario) { self.writeMarker() }
+                if self.scenario == "deadline-acquisition" { self.clock = self.start.addingTimeInterval(Double(self.request.timeout_seconds)) }
+                return .success
+            }
+            if CFEqual(node, self.cancel) {
+                self.cancelPresses += 1
+                if self.scenario == "cancel-rejected" { return .failure }
+                if !["cancel-stuck", "close-replacement"].contains(self.scenario) { self.visible = false }
+                return .success
+            }
+            self.otherPresses += 1
+            return .failure // Export/Save and every unrelated control are forbidden even in the positive fixture.
+        }, now: { self.clock }, sleep: { seconds in
+            self.sleeps += 1
+            self.clock = self.clock.addingTimeInterval(seconds)
+        })
+    }
+}
+
 @main
 struct LiveExportHelperTests {
     static func main() {
@@ -36,6 +215,8 @@ struct LiveExportHelperTests {
         let original = request()
         try original.validate()
         try incompletePreflightNeverPressesExport(original)
+        try cancellationAfterMenuClosesOnlyTheNewExportDialog(original)
+        try actualCallerOwnsAndCancelsOnlyQualifiedTransitions(original)
         try saveDestinationRequiresExactReadOnlyEvidence(request: original, root: root)
         for name in ["manifest.json", "receipt.json", "cancel.requested"] {
             try Data("{}".utf8).write(to: root.appendingPathComponent(name))
@@ -270,6 +451,122 @@ struct LiveExportHelperTests {
         try expect(!touchedAX, "A cancelled destination read queried the Save panel")
         try FileManager.default.removeItem(at: job)
         print("PASS: read-only Save destination profile, URL/directory identity, cancellation, races and isolated validation")
+    }
+
+    private static func cancellationAfterMenuClosesOnlyTheNewExportDialog(_ request: LiveExportRequest) throws {
+        let main = AXUIElementCreateApplication(Int32.max - 100)
+        let dialog = AXUIElementCreateApplication(Int32.max - 101)
+        let menuBar = AXUIElementCreateApplication(Int32.max - 102)
+        let file = AXUIElementCreateApplication(Int32.max - 103)
+        let menu = AXUIElementCreateApplication(Int32.max - 104)
+        let export = AXUIElementCreateApplication(Int32.max - 105)
+        let cancel = AXUIElementCreateApplication(Int32.max - 106)
+        let marker = URL(fileURLWithPath: request.output_path).deletingLastPathComponent().appendingPathComponent("cancel.requested")
+        var visible = false
+        var cancelPresses = 0
+        var fixtureError: Error?
+        defer { try? FileManager.default.removeItem(at: marker) } // This fixture owns the generated cancellation marker.
+        func children(_ node: AXUIElement) -> [AXUIElement] {
+            if CFEqual(node, menuBar) { return [file] }
+            if CFEqual(node, file) { return [menu] }
+            if CFEqual(node, menu) { return [export] }
+            if CFEqual(node, dialog) { return [cancel] }
+            return [] // All other controls are leaves in this complete fake tree.
+        }
+        let environment = LiveExportEnvironment(trusted: { true }, isLive: { _ in true }, reader: { deadline in
+            ExportAXReader(deadline: deadline, copyValue: { node, key in
+                if key == kAXMenuBarAttribute { return (.success, menuBar) }
+                if key == kAXTitleAttribute {
+                    if CFEqual(node, main) { return (.success, request.expected_window_title as CFString) }
+                    if CFEqual(node, dialog) { return (.success, "Export Audio/Video" as CFString) }
+                    if CFEqual(node, file) { return (.success, "File" as CFString) }
+                    if CFEqual(node, export) { return (.success, "Export Audio/Video…" as CFString) }
+                }
+                if key == kAXRoleAttribute {
+                    return (.success, (CFEqual(node, main) || CFEqual(node, dialog) ? kAXWindowRole : (CFEqual(node, cancel) ? kAXButtonRole : kAXMenuRole)) as CFString)
+                }
+                if key == kAXSubroleAttribute {
+                    return (.success, (CFEqual(node, dialog) ? kAXDialogSubrole : kAXStandardWindowSubrole) as CFString)
+                }
+                if key == kAXIdentifierAttribute, CFEqual(node, cancel) { return (.success, "Base.FinalButtonsBox.CancelButton" as CFString) }
+                if key == kAXEnabledAttribute, CFEqual(node, cancel) { return (.success, kCFBooleanTrue) }
+                return (.noValue, nil) // Optional attributes do not contribute to this ownership fixture.
+            }, countValues: { node, key in
+                (.success, key == kAXWindowsAttribute ? (visible ? 2 : 1) : children(node).count)
+            }, copyValues: { node, key, _ in
+                (.success, (key == kAXWindowsAttribute ? (visible ? [main, dialog] : [main]) : children(node)) as CFArray)
+            })
+        }, press: { node in
+            if CFEqual(node, export) {
+                visible = true
+                do { try Data().write(to: marker) } catch { fixtureError = error }
+                return .success
+            }
+            if CFEqual(node, cancel) { cancelPresses += 1; visible = false; return .success }
+            return .failure // A different action must never be attempted by this fixture.
+        })
+        let receipt = LiveExportAccessibility(request, environment: environment).run(supervised: true, enabled: true)
+        try expect(fixtureError == nil, "The post-menu cancellation fixture could not create its marker")
+        // The old loop checked cancellation before acquiring the dialog and left it open with no cleanup attempt.
+        try expect(cancelPresses == 1 && !visible, "Cancellation after the menu press left the newly opened export dialog visible")
+        try expect(receipt.status == "cancelled" && receipt.owned_dialog && receipt.cleanup_error == nil && !receipt.writer_closed,
+                   "Post-menu cancellation lost its owned-dialog or fail-closed writer evidence")
+    }
+
+    private static func actualCallerOwnsAndCancelsOnlyQualifiedTransitions(_ request: LiveExportRequest) throws {
+        let scenarios = ["healthy", "cancel-profile", "deadline-profile", "never-appears", "cancel-never-appears", "cancel-delayed",
+                         "deadline-acquisition", "existing-dialog", "foreign-dialog", "ambiguous-dialog", "replaced-main", "extra-window",
+                         "duplicate-windows", "process-before-menu", "trust-before-menu", "broken-marker-before-menu", "missing-cancel",
+                         "cleanup-replaced-dialog", "cleanup-process", "cleanup-trust", "cleanup-main", "cleanup-extra-dialog",
+                         "cleanup-replaced-cancel", "cleanup-disabled", "cleanup-role", "cleanup-identifier", "cleanup-boolean",
+                         "cleanup-read-failed", "cancel-rejected", "cancel-stuck", "close-read-failed", "close-replacement",
+                         "main-role", "main-role-absent", "main-subrole", "main-subrole-absent", "cleanup-extra-window",
+                         "cleanup-last-trust", "cleanup-last-process", "cancel-late-acquisition"]
+        for scenario in scenarios {
+            let fixture = ExportCallerFixture(request: request, scenario: scenario)
+            let caller = LiveExportAccessibility(request, environment: fixture.environment)
+            let receipt = caller.run(supervised: true, enabled: true)
+            try expect(fixture.error == nil, "Caller fixture mutation failed: \(scenario): \(String(describing: fixture.error))")
+            try expect(!receipt.writer_closed && receipt.status != "completed" && fixture.otherPresses == 0,
+                       "Caller claimed render completion or attempted an Export/Save action: \(scenario)")
+            let beforeMenu = ["existing-dialog", "duplicate-windows", "process-before-menu", "trust-before-menu", "broken-marker-before-menu", "main-role", "main-role-absent", "main-subrole", "main-subrole-absent"].contains(scenario)
+            let acquired = ["healthy", "cancel-profile", "deadline-profile", "cancel-delayed"].contains(scenario) || scenario.hasPrefix("cleanup-") || scenario.hasPrefix("close-") || ["cancel-rejected", "cancel-stuck"].contains(scenario)
+            let cleanupBlocked = scenario.hasPrefix("cleanup-")
+            try expect(fixture.menuPresses == (beforeMenu ? 0 : 1), "Unexpected export-menu action count: \(scenario)")
+            try expect(receipt.owned_dialog == acquired, "Caller adopted an unqualified dialog or lost its acquired dialog: \(scenario)")
+            try expect(fixture.cancelPresses == (acquired && !cleanupBlocked ? 1 : 0), "Caller pressed a foreign/stale Cancel control or omitted valid cleanup: \(scenario)")
+            if acquired {
+                let cleanupFailed = cleanupBlocked || ["cancel-rejected", "cancel-stuck", "close-read-failed", "close-replacement"].contains(scenario)
+                try expect((receipt.cleanup_error != nil) == cleanupFailed, "Caller cleanup readback was misreported: \(scenario)")
+                if !cleanupFailed { try expect(!fixture.visible, "Successful cleanup left its owned dialog visible: \(scenario)") }
+            }
+            if ["cancel-profile", "cancel-delayed", "broken-marker-before-menu"].contains(scenario) {
+                try expect(receipt.status == "cancelled", "A current cancellation was lost: \(scenario)")
+            }
+            if ["cancel-never-appears", "cancel-late-acquisition"].contains(scenario) {
+                try expect(receipt.error_code == "cancel_acquisition_unresolved" && receipt.status == "cancelled" && fixture.elapsed <= 2.01,
+                           "Cancelled acquisition waited for the full request timeout or hid unresolved dialog state")
+            }
+            if scenario == "never-appears" { try expect(fixture.elapsed <= 10.01, "Acquisition polling exceeded its request acceptance budget") }
+            if scenario == "cancel-stuck" { try expect(fixture.elapsed <= 2.01 && fixture.sleeps <= 41, "Cleanup polling exceeded its two-second acceptance budget") }
+            if scenario == "deadline-profile" { try expect(receipt.error_code == "accessibility_deadline", "A late profile read was accepted") }
+            if scenario == "healthy" {
+                let presses = fixture.menuPresses + fixture.cancelPresses
+                let reused = caller.run(supervised: true, enabled: true)
+                try expect(reused.error_code == "request_already_used" && fixture.menuPresses + fixture.cancelPresses == presses,
+                           "Reusing one caller discarded its prior ownership and performed another UI action")
+            }
+            fixture.removeMarker()
+            try expect(fixture.error == nil, "Caller fixture marker cleanup failed: \(scenario): \(String(describing: fixture.error))")
+        }
+        // A fresh caller after clean cancellation has separate ownership state, rather than a sticky global dialog.
+        for _ in 0..<2 {
+            let fresh = ExportCallerFixture(request: request, scenario: "healthy")
+            let receipt = LiveExportAccessibility(request, environment: fresh.environment).run(supervised: true, enabled: true)
+            try expect(receipt.owned_dialog && receipt.cleanup_error == nil && fresh.cancelPresses == 1 && !fresh.visible,
+                       "A fresh isolated caller inherited another invocation's ownership or failure")
+        }
+        print("PASS: \(scenarios.count) actual caller lifecycle scenarios, bounded cancellation/cleanup, reuse refusal and fresh-instance recovery")
     }
 
     private static func incompletePreflightNeverPressesExport(_ request: LiveExportRequest) throws {

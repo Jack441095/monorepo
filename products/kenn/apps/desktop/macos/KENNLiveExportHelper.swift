@@ -330,6 +330,8 @@ struct LiveExportEnvironment {
     }
     var reader: (Date) -> ExportAXReader = { ExportAXReader(deadline: $0) }
     var press: (AXUIElement) -> AXError = { AXUIElementPerformAction($0, kAXPressAction as CFString) }
+    var now: () -> Date = Date.init
+    var sleep: (TimeInterval) -> Void = { Thread.sleep(forTimeInterval: $0) }
 }
 
 /// Restricts AX actions to a verified Ableton process and the one dialog this invocation opens.
@@ -338,6 +340,9 @@ final class LiveExportAccessibility {
     private let app: AXUIElement
     private var openedDialog: AXUIElement?
     private var ownedCancel: AXUIElement?
+    private var mainWindow: AXUIElement?
+    private var baselineWindows: [AXUIElement] = []
+    private var used = false
     private let deadline: Date
     private let environment: LiveExportEnvironment
 
@@ -345,12 +350,17 @@ final class LiveExportAccessibility {
         self.request = request
         self.environment = environment
         app = AXUIElementCreateApplication(request.live_pid)
-        deadline = Date().addingTimeInterval(Double(request.timeout_seconds))
+        deadline = environment.now().addingTimeInterval(Double(request.timeout_seconds))
         AXUIElementSetMessagingTimeout(app, 2) // Two seconds bounds an unresponsive Live AX request.
     }
 
     func run(supervised: Bool, enabled: Bool) -> LiveExportReceipt {
         var receipt = LiveExportReceipt(request, problem: .unavailable("export_profile_unqualified", "Live's export range, settings and destination AX controls require supervised qualification."))
+        guard !used else {
+            // A second invocation must not replace ownership evidence from an unresolved first dialog.
+            return LiveExportReceipt(request, problem: .unavailable("request_already_used", "Each helper instance accepts only one bounded request."))
+        }
+        used = true
         do {
             try request.validate()
             guard request.action == "inspect" || (supervised && enabled) else {
@@ -359,13 +369,13 @@ final class LiveExportAccessibility {
             guard environment.trusted() else {
                 throw ExportProblem.unavailable("accessibility_not_granted", "Accessibility access is unavailable; this helper does not request or change permissions.")
             }
-            try verifyLive()
+            baselineWindows = try verifyLive(using: reader)
             if request.action == "inspect" {
                 // Inspection never opens a menu or a dialog, even when the experimental gate is enabled.
                 return receipt
             }
             try checkCancellation()
-            guard try dialogs().isEmpty else {
+            guard try dialogs(in: baselineWindows, using: reader).isEmpty else {
                 throw ExportProblem.unavailable("existing_dialog", "Close existing Live dialogs before a supervised export check.")
             }
             let menuBar = try element(app, kAXMenuBarAttribute)
@@ -375,30 +385,56 @@ final class LiveExportAccessibility {
                 throw ExportProblem.unavailable("export_menu_unavailable", "The fixed File > Export Audio/Video menu item is missing or ambiguous.")
             }
             try checkCancellation() // Recheck after tree reads; a cancelled or expired request must not open a dialog.
+            let beforePress = try verifyLive(using: reader)
+            guard sameWindows(beforePress, baselineWindows), try dialogs(in: beforePress, using: reader).isEmpty else {
+                throw ExportProblem.unavailable("window_identity_changed", "Live's windows changed before the export menu action.")
+            }
+            try checkCancellation()
             guard environment.press(exportItems[0]) == .success else {
                 throw ExportProblem.unavailable("export_menu_rejected", "Live did not accept the export menu action.")
             }
-            while Date() < deadline {
-                try checkCancellation()
-                let candidates = try dialogs().filter { try title($0) == "Export Audio/Video" }
-                if candidates.count == 1 {
-                    guard try windows().contains(where: { CFEqual($0, candidates[0]) }) else {
-                        throw ExportProblem.unavailable("export_sheet_unqualified", "A sheet-based export dialog has no qualified cancellation readback.")
+            var acquisitionDeadline = deadline
+            var acquisitionCancelled = false
+            while environment.now() < acquisitionDeadline {
+                // Cancellation after the menu press still needs bounded acquisition of the new dialog for cleanup.
+                if cancellationRequested(), !acquisitionCancelled {
+                    acquisitionCancelled = true
+                    acquisitionDeadline = min(deadline, environment.now().addingTimeInterval(2)) // Two seconds is the post-cancel acquisition grace.
+                }
+                let acquisitionReader = environment.reader(acquisitionDeadline)
+                let current: [AXUIElement]
+                do { current = try verifyLive(using: acquisitionReader) } catch {
+                    // A late AX reply cannot turn a cancelled, still-unidentified dialog into a clean disappearance.
+                    if acquisitionCancelled, environment.now() >= acquisitionDeadline {
+                        throw ExportProblem(status: "cancelled", code: "cancel_acquisition_unresolved", message: "Cancellation stopped bounded dialog acquisition; a delayed or unidentified Live dialog may remain open.")
                     }
-                    openedDialog = candidates[0]
-                    let cancel = try descendants(candidates[0]).filter {
-                        try reader.string($0, kAXIdentifierAttribute) == "Base.FinalButtonsBox.CancelButton"
-                    }
-                    if cancel.count == 1 { ownedCancel = cancel[0] }
+                    throw error
+                }
+                guard baselineWindows.allSatisfy({ original in current.contains(where: { CFEqual($0, original) }) }) else {
+                    throw ExportProblem.unavailable("window_identity_changed", "An original Live window disappeared during export-dialog acquisition.")
+                }
+                let added = current.filter { candidate in !baselineWindows.contains(where: { CFEqual($0, candidate) }) }
+                let currentDialogs = try dialogs(in: current, using: acquisitionReader)
+                if added.count == 1, current.count == baselineWindows.count + 1,
+                   currentDialogs.count == 1, CFEqual(currentDialogs[0], added[0]) {
+                    let cancel = try verifiedCancel(in: added[0], using: acquisitionReader)
+                    openedDialog = added[0]
+                    ownedCancel = cancel
                     receipt.owned_dialog = true
                     break
                 }
-                if candidates.count > 1 { throw ExportProblem.unavailable("ambiguous_export_dialog", "The export dialog cannot be identified uniquely.") }
-                Thread.sleep(forTimeInterval: 0.1) // 100 ms polling stays off the audio callback and bounds cancellation latency.
+                guard added.isEmpty, currentDialogs.isEmpty else {
+                    throw ExportProblem.unavailable("ambiguous_export_dialog", "The observed window transition does not identify one new top-level export dialog.")
+                }
+                environment.sleep(min(0.1, max(0, acquisitionDeadline.timeIntervalSince(environment.now())))) // At most 100 ms per acquisition poll.
             }
             guard openedDialog != nil else {
+                if acquisitionCancelled {
+                    throw ExportProblem(status: "cancelled", code: "cancel_acquisition_unresolved", message: "Cancellation stopped bounded dialog acquisition; a delayed or unidentified Live dialog may remain open.")
+                }
                 throw ExportProblem.unavailable("export_dialog_unavailable", "Live did not expose an identifiable Export Audio/Video AX dialog before the deadline.")
             }
+            try checkCancellation()
             if let dialog = openedDialog {
                 var values: [String: [String]] = [:]
                 for node in try reader.nodes(roots: [dialog]) {
@@ -409,6 +445,7 @@ final class LiveExportAccessibility {
                 }
                 try LiveExportProfile.validate(values: values, request: request)
             }
+            try checkCancellation() // Profile reads must not hide a cancellation or deadline that arrived during inspection.
             // The read-only settings profile cannot qualify the save-panel destination or export lifecycle.
             // Do not press Export based on selected audio, guessed save controls or file-size stability.
             receipt.cleanup_error = cancelOwnedDialog()
@@ -424,51 +461,120 @@ final class LiveExportAccessibility {
         return receipt
     }
 
-    private func verifyLive() throws {
+    private func verifyLive(using reader: ExportAXReader) throws -> [AXUIElement] {
+        guard environment.trusted() else {
+            throw ExportProblem.unavailable("accessibility_not_granted", "Accessibility access is no longer available.")
+        }
         guard environment.isLive(request.live_pid) else {
             throw ExportProblem.unavailable("live_identity_mismatch", "The requested process is not a running Ableton Live application.")
         }
-        let matches = try windows().filter { try title($0) == request.expected_window_title }
+        let current = try reader.elements(app, kAXWindowsAttribute)
+        guard sameWindows(current, current) else {
+            throw ExportProblem.unavailable("window_identity_mismatch", "Live returned duplicate window identities.")
+        }
+        let matches = try current.filter { try reader.string($0, kAXTitleAttribute) == request.expected_window_title }
         guard matches.count == 1 else {
             throw ExportProblem.unavailable("window_identity_mismatch", "The exact expected Live window is missing or ambiguous.")
         }
+        guard try reader.string(matches[0], kAXRoleAttribute, required: true) == kAXWindowRole,
+              try reader.string(matches[0], kAXSubroleAttribute, required: true) == kAXStandardWindowSubrole else {
+            throw ExportProblem.unavailable("window_identity_mismatch", "The exact Live main window must retain its native standard-window role.")
+        }
+        if let expected = mainWindow, !CFEqual(expected, matches[0]) {
+            // A replacement window with the same title is a different session observation.
+            throw ExportProblem.unavailable("window_identity_changed", "The original exact Live window was replaced.")
+        }
+        mainWindow = matches[0]
+        return current
     }
 
     private func checkCancellation() throws {
-        guard Date() < deadline else {
+        guard environment.now() < deadline else {
             throw ExportProblem.unavailable("accessibility_deadline", "The export request deadline expired before an action.")
         }
-        let marker = URL(fileURLWithPath: request.output_path).deletingLastPathComponent().appendingPathComponent("cancel.requested")
-        if FileManager.default.fileExists(atPath: marker.path) {
+        if cancellationRequested() {
             throw ExportProblem(status: "cancelled", code: "cancel_requested", message: "The job owner requested cancellation.")
         }
     }
 
+    private func cancellationRequested() -> Bool {
+        let marker = URL(fileURLWithPath: request.output_path).deletingLastPathComponent().appendingPathComponent("cancel.requested")
+        var info = stat()
+        // A present or unreadable marker cannot authorize another operation, including broken links.
+        return lstat(marker.path, &info) == 0 || errno != ENOENT
+    }
+
     private func cancelOwnedDialog() -> String? {
         guard let dialog = openedDialog else { return nil } // Never dismiss a dialog that predates this helper.
-        // Retain only the exact button found before the request deadline, so timeout cleanup does not traverse a fresh UI.
-        guard let cancel = ownedCancel, environment.press(cancel) == .success else {
-            return "The helper-owned export dialog could not be cancelled through its exact Cancel identifier."
-        }
-        let cancelDeadline = Date().addingTimeInterval(2) // Two seconds bounds cancellation readback after an expired request.
+        // This two-second acceptance budget cannot interrupt an in-flight AX operation; late replies still reject.
+        let cancelDeadline = environment.now().addingTimeInterval(2)
         let cleanupReader = environment.reader(cancelDeadline)
-        while Date() < cancelDeadline {
-            // A failed or incomplete read never proves disappearance; retry only within the cleanup budget.
-            if let currentWindows = try? cleanupReader.elements(app, kAXWindowsAttribute),
-               !currentWindows.contains(where: { CFEqual($0, dialog) }) {
-                // The qualified export dialog is a top-level AX window. A sheet profile needs separate readback.
-                return nil
+        do {
+            var current = try verifyLive(using: cleanupReader)
+            if !current.contains(where: { CFEqual($0, dialog) }) {
+                guard sameWindows(current, baselineWindows), try dialogs(in: current, using: cleanupReader).isEmpty else {
+                    return "The owned dialog disappeared into an unqualified window state."
+                }
+                return nil // Independently observed disappearance needs no retained-button action.
             }
-            Thread.sleep(forTimeInterval: 0.05) // 50 ms checks observe cancellation without spinning.
+            try verifyOwnedWindows(current, dialog: dialog, using: cleanupReader)
+            let cancel = try verifiedCancel(in: dialog, using: cleanupReader)
+            try verifyOwnedWindows(verifyLive(using: cleanupReader), dialog: dialog, using: cleanupReader)
+            guard let original = ownedCancel, CFEqual(cancel, original), environment.trusted(), environment.isLive(request.live_pid), environment.now() < cancelDeadline,
+                  environment.press(cancel) == .success else {
+                return "The helper-owned export dialog could not be cancelled through its unchanged exact Cancel control."
+            }
+            while environment.now() < cancelDeadline {
+                current = try verifyLive(using: cleanupReader)
+                if !current.contains(where: { CFEqual($0, dialog) }) {
+                    guard sameWindows(current, baselineWindows), try dialogs(in: current, using: cleanupReader).isEmpty else {
+                        return "Cancellation exposed an unqualified replacement dialog or window."
+                    }
+                    return nil
+                }
+                try verifyOwnedWindows(current, dialog: dialog, using: cleanupReader)
+                environment.sleep(min(0.05, max(0, cancelDeadline.timeIntervalSince(environment.now())))) // At most 50 ms; never repeat the press.
+            }
+        } catch {
+            // Unknown process/window/control state cannot justify pressing a retained node or claiming disappearance.
+            return "The helper-owned dialog's process, window or Cancel identity could not be revalidated."
         }
         return "The Cancel action was accepted but disappearance of the helper-owned dialog was not verified."
     }
 
+    private func sameWindows(_ first: [AXUIElement], _ second: [AXUIElement]) -> Bool {
+        first.count == second.count && first.allSatisfy { node in second.filter { CFEqual($0, node) }.count == 1 }
+    }
+
+    private func verifyOwnedWindows(_ current: [AXUIElement], dialog: AXUIElement, using reader: ExportAXReader) throws {
+        let currentDialogs = try dialogs(in: current, using: reader)
+        guard sameWindows(current, baselineWindows + [dialog]), currentDialogs.count == 1, CFEqual(currentDialogs[0], dialog) else {
+            throw ExportProblem.unavailable("dialog_identity_changed", "The owned export dialog is no longer the sole new Live window and dialog.")
+        }
+    }
+
+    private func verifiedCancel(in dialog: AXUIElement, using reader: ExportAXReader) throws -> AXUIElement {
+        guard try reader.string(dialog, kAXRoleAttribute, required: true) == kAXWindowRole,
+              try reader.string(dialog, kAXSubroleAttribute, required: true) == kAXDialogSubrole,
+              try reader.string(dialog, kAXTitleAttribute, required: true) == "Export Audio/Video" else {
+            throw ExportProblem.unavailable("export_dialog_unqualified", "The new window does not match the qualified top-level export profile.")
+        }
+        let matches = try reader.nodes(roots: [dialog]).filter {
+            try reader.string($0, kAXIdentifierAttribute) == "Base.FinalButtonsBox.CancelButton"
+        }
+        guard matches.count == 1, try reader.string(matches[0], kAXRoleAttribute, required: true) == kAXButtonRole,
+              let value = try reader.value(matches[0], kAXEnabledAttribute, required: true), CFGetTypeID(value) == CFBooleanGetTypeID(),
+              CFBooleanGetValue(unsafeBitCast(value, to: CFBoolean.self)) else {
+            throw ExportProblem.unavailable("export_cancel_unqualified", "The exact unique Cancel button must have its native role and Boolean enabled state.")
+        }
+        // These complete observations bracket an action; AX provides no atomic read-and-press operation.
+        return matches[0]
+    }
+
     private var reader: ExportAXReader { environment.reader(deadline) }
 
-    private func windows() throws -> [AXUIElement] { try reader.elements(app, kAXWindowsAttribute) }
-    private func dialogs() throws -> [AXUIElement] {
-        try reader.nodes(roots: windows()).filter { node in
+    private func dialogs(in windows: [AXUIElement], using reader: ExportAXReader) throws -> [AXUIElement] {
+        try reader.nodes(roots: windows).filter { node in
             let role = try reader.string(node, kAXRoleAttribute, required: true)
             if role == kAXSheetRole { return true }
             return try reader.string(node, kAXSubroleAttribute, required: role == kAXWindowRole) == kAXDialogSubrole
@@ -488,9 +594,6 @@ final class LiveExportAccessibility {
         let matches = try nodes.filter { try title($0) == expected }
         guard matches.count == 1 else { throw ExportProblem.unavailable("ambiguous_menu", "The fixed File menu is missing or ambiguous.") }
         return matches[0]
-    }
-    private func descendants(_ root: AXUIElement) throws -> [AXUIElement] {
-        Array(try reader.nodes(roots: [root]).dropFirst())
     }
 }
 

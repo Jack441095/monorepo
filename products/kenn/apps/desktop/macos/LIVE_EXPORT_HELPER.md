@@ -43,8 +43,10 @@ symlink rejection, finalized PCM validation and an actual fixture file descripto
 opening/closing in the test process.
 
 The 16 Oct fixtures also exercise the actual export caller with injected native
-boundaries: failed, malformed, over-limit or late UI reads produce zero Export
-presses. A positive control reaches the press spy without operating Live. The AX
+boundaries: failed, malformed, over-limit or late preflight UI reads prevent the
+menu action. Full lifecycle fixtures acquire a synthetic dialog, read its profile
+and verify cancellation and disappearance; every fixture rejects Export/Save
+button actions. No fixture operates Live. The AX
 reader distinguishes explicit optional absence from messaging failures, checks
 each array element's CF type, rejects changed counts and applies one 2048-node
 budget across all window roots. Deadline checks run before and after each read.
@@ -165,10 +167,14 @@ fixture-qualified, not proof that a real Live export has completed.
 Numeric toggle readback accepts only exact zero or one; fractional or NaN AX
 values cannot be rounded into a qualified Off/On preference.
 
-The current cancellation marker is checked before the menu command and while
-waiting for its dialog. Only a newly opened, uniquely identified export dialog's
-exact Cancel button may be pressed. Failure to identify or cancel it is returned
-to the caller; no Escape or generic close action is sent.
+The cancellation path must acquire a newly appearing dialog before reporting
+post-menu cancellation, so an immediate cancellation does not skip cleanup.
+The caller binds the original main AX window and baseline window set, then
+requires exactly one new top-level export dialog. Cleanup rereads the process,
+window set and exact Cancel control's identity, role and Boolean enabled state;
+an unknown or changed state produces a cleanup error instead of a retained-node
+press. No Escape or generic close action is sent. These observations cannot make
+AX's separate read and press operations atomic.
 
 ## Remaining qualification
 
