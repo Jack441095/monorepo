@@ -35,7 +35,7 @@ DEFAULT_BENCHMARK = ROOT / "packages" / "chat" / "evals" / "ableton_deliberative
 def _generate(
     *, base_url: str, model: str, prompt: str, timeout: float,
     max_output_tokens: int, max_plan_steps: int, max_list_items: int,
-    allowed_actions: list[str],
+    allowed_actions: list[str], keep_alive: str,
 ) -> str:
     request = urllib.request.Request(
         base_url.rstrip("/") + "/api/chat",
@@ -53,7 +53,7 @@ def _generate(
                 "num_ctx": 8192,
                 "num_predict": max_output_tokens,
             },
-            "keep_alive": "10m",
+            "keep_alive": keep_alive,
         }, separators=(",", ":")).encode("utf-8"),
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -76,6 +76,11 @@ def main() -> int:
     parser.add_argument("--max-output-tokens", type=int, default=320)
     parser.add_argument("--max-plan-steps", type=int, default=3)
     parser.add_argument("--max-list-items", type=int, default=4)
+    # "0" unloads the model after every call. An eval that leaves its model resident for ten minutes sits beside
+    # whatever KENN session is running, and two resident models skew both timings (15 Oct research, 2.2). The old
+    # fixed "10m" is still available as --keep-alive 10m for a deliberate warm run. With "0" every call's
+    # latency_ms includes a model load, so those numbers are cold-start latencies, not warm ones.
+    parser.add_argument("--keep-alive", default="0", help="Ollama keep_alive for each call (default: unload after each).")
     parser.add_argument("--case-id", action="append", default=[], help="Run only selected case IDs (repeatable).")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -113,6 +118,7 @@ def main() -> int:
                     max_plan_steps=max(1, min(8, args.max_plan_steps)),
                     max_list_items=max(1, min(8, args.max_list_items)),
                     allowed_actions=[str(action) for action in context.get("available_actions") or []],
+                    keep_alive=args.keep_alive,
                 )
                 sketch = complete_deliberative_sketch_contract(
                     parse_deliberative_output(raw)

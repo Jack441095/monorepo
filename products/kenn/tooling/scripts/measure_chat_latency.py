@@ -57,6 +57,7 @@ import os
 import statistics
 import sys
 import time
+import urllib.request
 import uuid
 from collections import Counter
 from datetime import datetime, timezone
@@ -312,6 +313,48 @@ def _response_cache_enabled() -> bool:
     return cache_enabled()
 
 
+def _ollama_keep_alive() -> str:
+    from kenn.llm.llm_rewrite import KEEP_ALIVE_DURATION
+
+    return KEEP_ALIVE_DURATION
+
+
+def _ollama_runtime(timeout: float = 2.0) -> dict | None:
+    """Ask the local Ollama what is serving us right now: version, our models' digests, loaded runners.
+
+    Returns None when the provider is not a local Ollama. Never raises: an unreachable or odd server becomes
+    {"error": ...} so a receipt says "unknown" rather than the run failing or the field quietly reading clean.
+    """
+    from kenn.core.ollama_deliberative import open_loopback_ollama, validate_ollama_base_url
+    from kenn.llm.llm_rewrite import _native_ollama_base, config
+
+    cfg = config()
+    if cfg["provider"] != "ollama" or not cfg["enabled"]:
+        return None
+    try:
+        # Same loopback-only rule the planner uses; a remote base URL gets an error entry, not a probe.
+        base = validate_ollama_base_url(_native_ollama_base(cfg["base_url"] or "http://127.0.0.1:11434"))
+
+        def get(path: str) -> dict:
+            with open_loopback_ollama(urllib.request.Request(base + path), timeout=timeout) as response:
+                return json.load(response)
+
+        wanted = {name for name in _resolved_models().values() if name}
+        tags = {m.get("name"): m.get("digest") for m in get("/api/tags").get("models", [])}
+        return {
+            "version": get("/api/version").get("version"),
+            # Digest by tag for the models this process would call; None means the tag is not installed.
+            "digests": {name: tags.get(name) for name in sorted(wanted)},
+            # `runner` (llamacpp or mlx) only exists while a model is resident, so a run that unloads after each
+            # call (keep_alive 0) can legitimately report an empty list here. That is "not observed", not "none".
+            "loaded": [{"name": m.get("name"), "digest": m.get("digest"), "runner": m.get("runner"),
+                        "expires_at": m.get("expires_at")} for m in get("/api/ps").get("models", [])],
+            "error": None,
+        }
+    except Exception as exc:  # Unreachable, wrong shape or invalid URL: record it and keep measuring.
+        return {"version": None, "digests": {}, "loaded": [], "error": f"{type(exc).__name__}: {exc}"[:200]}
+
+
 def run_provenance(manifest: dict | None = None) -> dict:
     """Identify this checkout; externally measured model, corpus and hardware fields stay unknown."""
     def git(*arguments):
@@ -335,6 +378,7 @@ def run_provenance(manifest: dict | None = None) -> dict:
         # has to come from --build-manifest: the model name says nothing about which weights sit behind it.
         "resolved_models": _resolved_models(),
         "model_digest": None, "resolved_prompt_sha256": None,
+        "ollama_keep_alive": _ollama_keep_alive(),
         "index_version": _index_version() or None, "index_sha256": None, "corpus_sha256": None,
         "hardware": {"architecture": platform.machine(), "processor": None, "memory_bytes": None},
         "cache_settings": {"KENN_LLM_CACHE": os.environ.get("KENN_LLM_CACHE"),
@@ -451,6 +495,11 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
         # Both describe this process, not the companion answering over HTTP.
         provenance["cache_settings"]["response_cache_enabled"] = None
         provenance["resolved_models"] = None
+        provenance["ollama_keep_alive"] = None
+    # Sampled before and after the run: "before" shows any other model already resident (two resident models
+    # skew a timing run), "after" is the `ollama ps` check that an unload-after-call run really unloaded, and is
+    # also when a keep-warm run still has its runner visible. An HTTP run cannot see the companion's Ollama.
+    provenance["ollama_runtime"] = {"before_run": None if endpoint else _ollama_runtime(), "after_run": None}
     rows: list[dict] = []
     for case in cases:
         question = str(case.get("question") or "").strip()
@@ -582,6 +631,8 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             "error": error,
         })
 
+    if not endpoint:
+        provenance["ollama_runtime"]["after_run"] = _ollama_runtime()
     attempted = [r for r in rows if r["attempted"]]
     accepted = [r for r in rows if r["accepted"]]
     abstained = [r for r in attempted if r["abstained"]]
