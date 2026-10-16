@@ -146,7 +146,7 @@ def main() -> int:
             }
     finally:
         retrieval.load_source_feedback_scores = original_feedback
-        # The trial pinned the model for 1 minute per call to avoid 800 reloads; release it now. The plan asks that
+        # The trial pinned the model for 1 minute per call to avoid a reload on each of the 750 calls; release it now. The plan asks that
         # eval runs leave nothing resident beside a KENN session.
         unload = urllib.request.Request(base + "/api/generate", data=json.dumps(
             {"model": args.model, "prompt": "", "keep_alive": "0"}).encode(),

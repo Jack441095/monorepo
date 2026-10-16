@@ -19,9 +19,9 @@ Each fixture case is scored four ways with the same rank rule as `evaluate_retri
 | `followup_rewrite` | same turns, but the model resolves the follow-up against the previous question |
 
 Greedy decoding (temperature 0, seed 0), 64-token cap, thinking off, 1 minute keep-alive per call and an
-explicit unload at the end (`ollama ps` was empty afterwards). Fixtures:
+explicit unload at the end (`ollama ps` was empty afterwards). One of the 750 rewrite calls returned an empty reply and fell back to the unchanged input (`rewrite_fallbacks: 1` in the receipt), which scores as the raw query. Fixtures:
 `device_purpose_sealed_holdout.json` (150 cases scored of 150) and `device_purpose_sealed_qwen8b.json`
-(225 of 228; the same three skips the scorer always reports). Receipt with ids and ranks only:
+(225 of 228; the same three skips the scorer always reports). The `latency_ms` fields in the underlying rows are a constant 0.0 and are not measured. Receipt with ids and ranks only:
 [results](../../tooling/evaluation/results/KENN_QUERY_REWRITE_TRIAL_2026-10-16.json).
 
 ## Results (BM25 only, recall@4)
