@@ -41,6 +41,10 @@ timing and promotion evidence are recorded in
 Mix Review WAV decoding uses the same native float32 decoder by default since
 17 Oct 2026; ``KENN_DSP_MIX_REVIEW_DECODE_NATIVE=0`` (or ``KENN_DSP_NATIVE=0``)
 returns to the Python parser, which also remains the fallback.
+Sample-library BPM and key come from ``key_tempo_features`` (chroma plus a
+tempo estimate) since 17 Oct 2026, replacing librosa. There is no Python
+fallback: with the extension off, the request abstains. Labelled-set accuracy
+is in ``docs/research/CPP_DSP_KEY_TEMPO_RECEIPT.md``.
 The full optimization-pass evidence, including 24-bit testing-assets runs,
 is recorded in ``CPP_DSP_MEGA_OPTIMIZATION_PASS_RECEIPT.md``.
 

@@ -12,6 +12,14 @@ Their history is in Git, and the consolidation record is
 [the planning audit](docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md).
 Update this file rather than starting another roadmap, handoff prompt or progress log.
 
+**Standing rule for every session: DSP and audio analysis are C++ only.** Decoding,
+meters, loudness, spectra, key, tempo, features, and anything else that reads samples
+belong in the native extension (`tooling/native/dsp_core`). Do not write them in Python,
+numpy, scipy or librosa, not even as a prototype or a quick fallback. Python calls the
+extension and turns its numbers into advice. Old Python DSP is moved to C++ and then
+deleted, never extended. This is Jack's call (14 Oct 2026, restated 17 Oct). The
+principle under "Purpose and decisions" lists what still has to move.
+
 The [2 October product and open-source research](docs/research/KENN_PRODUCT_AND_OPEN_SOURCE_RESEARCH_2026-10-02.md)
 feeds C1-C2, L2-L3 and B1-B4 below. Its three experiment protocols are candidate
 methods for local delivery, passage reranking and audio measurements. The thresholds
@@ -43,11 +51,117 @@ Decisions already made:
 - The Mac target is Apple M3 with 16 GB unified memory. Model residency, context and
   concurrency must fit alongside Live. Do not assume both models can stay resident
   without measuring memory pressure and model switching.
-- Python owns dialogue, retrieval, memory, policy and jobs. All DSP is C++ (my call,
-  14 Oct 2026): meters, loudness, true peak, key and tempo, and any new analysis.
-  Python's `loudness_analysis.py` (pyloudnorm, scipy, librosa) is the existing offline
-  path and stays until a C++ replacement passes the same conformance tests; do not
-  write new DSP in Python or numpy. A whole-backend rewrite is outside this plan.
+- Python owns dialogue, retrieval, memory, policy and jobs. All audio analysis and
+  all DSP is C++ (my call, 14 Oct 2026, restated 17 Oct): decoding, meters, loudness,
+  true peak, spectra, masking, key and tempo, features, and any new analysis. Do not
+  write new DSP or analysis in Python, numpy, scipy or librosa, not even as a first
+  draft; Python only calls the native extension and turns its numbers into advice.
+  Existing Python DSP is moved, not extended. Each piece moves when a C++ replacement
+  matches it (or beats it on labelled audio, where there is no reference to match),
+  and a Python copy that nothing needs as a fallback is then deleted.
+  Still in Python on 17 Oct: the librosa feature load in `sample_embeddings.py`,
+  spectral centroid and flatness in `track_diagnostic.py`, AIFF decode for sample
+  BPM/key, and the pyloudnorm/NumPy fallbacks behind the native defaults. Audited
+  17 Oct: `target_curves.py` and `acoustic_calibration.py` do no DSP (arithmetic on
+  measured summaries); in `psychoacoustics.py` only `compute_erb_spectrum` (FFT bins
+  to 40 ERB bands, used by the reference matcher) is DSP, the rest is masking maths
+  on band profiles. A whole-backend rewrite is outside this plan.
+  - [ ] Key/tempo review fixes before merge (adversary review, 17 Oct). Blockers:
+    a WAV declaring a 2 Hz sample rate sends the chroma loop into an endless
+    loop (hop 0) with the GIL released; and held tones get an invented BPM
+    (an 8 s 220 Hz sine reads 112 BPM at strength 0.955, where librosa said
+    none), which is the usual case for pads, drones and one-shots. Should-fix: a
+    stale extension without the function crashes with TypeError; a NaN sample
+    reports a fake "C"; the receipt compared native features against librosa
+    load plus features. Fixed the same day, each with a test:
+    - A sine's onset envelope does carry a real periodic ripple from spectral
+      leakage, but it is tiny (0.19 dB peak). Tempo now needs two onsets
+      rising 4 dB or more, so held tones, chords, pads, noise and one-shots
+      give no BPM, while a click track still reads 120.1.
+    - On the labelled set that leaves 41 loops without a BPM and acc1 goes
+      from 60 to 53/258. Pitch class is unchanged at 142/250.
+    - Rates under 8 kHz are refused, a stale extension abstains, and NaN
+      audio abstains.
+    - Re-review found no blockers. On 210 real one-shots and pads, librosa gave
+      a BPM on 191 and native now gives one on 30. Of the 41 loops that lost
+      their BPM, 34 had been wrong. Two should-fixes followed:
+      - The onset window is 46 ms at 44.1 kHz but 85 ms at 48 kHz, so 6 of
+        120 loops flip between a BPM and None on sample rate alone.
+      - Two kicks 0.5 s apart read 148 BPM, a lag equal to one kick's decay
+        rather than the gap between kicks.
+    - Both fixed the same day. The onset window is now always 46 ms. A
+      candidate tempo lag now needs two onset pairs that far apart, so two
+      kicks, one-shots and chops give no BPM; 0/39 real one-shots and 2/111
+      pads now get one.
+    - Labelled loops after round 2: 54/258 within 4% (from 60 before the gate),
+      52 wrong, 66 with no BPM (50/258, 48 wrong, 78 none after round 3 below).
+    - Known limit: 9 of 60 resampled loops change at 48 kHz (7 before round 3),
+      2 between a BPM and none and 7 between octave picks, where two
+      correlation peaks are nearly equal.
+    - Third review (fresh reviewer, 17 Oct) is not clean.
+      - Blocker: held low tones still get a confident BPM. Below about
+        45 Hz, 30 saws do (an E1 saw reads 112 BPM, 40 Hz reads 120 at
+        strength 0.94), and so do 10 squares (129, 151 and 171 Hz read
+        120.1). The 46 ms window holds under two periods, so the spectrum
+        swings with phase by more than 4 dB, regularly. The held-tone test
+        only uses 220 Hz.
+      - Should-fix: there is no upper rate limit. A 60 MHz header uses about
+        5 GB and reports a key on noise. Abstain above 768 kHz.
+      - Should-fix: the 48 kHz test likely can't tell the old window from
+        the new one.
+      - Should-fix: the stale-extension test bypasses the `getattr` fallback.
+      - Nits: a dead `count == 0` check, comments missing on early returns,
+        receipt times that disagree (9.2, 10.1 and 10.2 s), and a "random
+        chops" line that overclaims.
+    - Blocker and all three should-fixes, nits, receipt and tests completed
+      the same day (17 Oct), awaiting fresh reviewer re-check:
+      - Each band's rise is now measured from the loudest of its previous 4
+        frames (`kOnsetReferenceFrames`), not from the frame before.
+      - Held tones getting a BPM: 61 → 4 of 1020 at 44.1 kHz and 0 at
+        48 kHz. The 4 left are aliased naive squares and a saw at 150–194 Hz,
+        which really do beat. Added a regression test on an 8 s 40 Hz
+        band-limited saw at 44.1 kHz.
+      - Labelled loops: 50/258 within 4% (54 before), 82 octave, 48 wrong,
+        78 with no BPM; held-out half 71/131 pitch classes, 25/129 BPM,
+        31 with no BPM. Pitch class is unchanged at 142/250. 10.5 s (11.0 s
+        on re-run).
+      - A 3-frame reference scored the same (51/47/76). A median threshold
+        did nothing and was dropped.
+      - Real files: 0/39 one-shots, 2/111 pads and 15/150 FX get a BPM (33 FX
+        before).
+      - Rate check: 9/60 loops change between 44.1 and 48 kHz (2 flips,
+        7 octave drifts).
+      - The click track still reads 120.1, and the reviewer's gate probes are
+        unchanged.
+      - Rates above 768 kHz now throw `invalid_argument` in C++ and abstain
+        in `analyze_sample_audio` (tested with a 60 MHz WAV header and
+        768001 Hz direct call).
+      - The stale-extension test now monkeypatches `native_fft._load` to
+        exercise the `getattr` fallback. The sample-rate click-track test is
+        renamed to `test_click_track_tempo_scales_across_sample_rates` with a
+        comment matching what it verifies.
+      - Removed the dead `count == 0` check in `mean_chroma`, explained every
+        early return/continue and the 30 Hz–11 kHz onset band edges, added the
+        `+-0.5 frames` unit to the parabolic clamp, and updated the receipt and
+        comments.
+      - Scalar build (`-DKENN_USE_ACCELERATE=OFF`) compiles cleanly and reads
+        120.1 BPM on the click track at 44.1 and 48 kHz; Accelerate `.so`
+        restored afterwards.
+      - 140 scoped tests pass; full suite is 6404 passed, 48 skipped, 3
+        pre-existing failures (`test_mixing_doctor` x2,
+        `test_fixed_session_grounded_benchmark_qualifies`). Waiting on a fresh
+        adversary review before committing and merging.
+  - [ ] Next: move `track_diagnostic.py` (the audio-upload track diagnostic) to C++.
+    It decodes, measures peak/RMS, builds the waveform envelope and a 64-slice
+    Goertzel spectrogram in pure Python loops, and calls pyloudnorm, librosa
+    (centroid, flatness) and scipy (Welch resonance peaks): 4.6 s on one 200 s
+    stem. Decode, peak/RMS and loudness reuse existing kernels; one new kernel
+    does the rest. The Python decoder stays only for 8-bit and multichannel WAVs.
+    Bug found 17 Oct, fix with the move: silent frames count as perfectly flat,
+    so on that guitar stem (38% silent frames) flatness read 0.376 where the
+    playing frames average 0.0002, and the centroid read 998 Hz instead of
+    1524 Hz. Skip frames 60 dB under the loudest, as key/tempo does.
+  - [ ] Then `compute_erb_spectrum`, and the librosa load in `sample_embeddings.py`.
 - AbletonOSC is the Live transport owner. UI, HTTP, voice and MCP must share the
   same typed policy and execution services, without a second write authority.
 - Preferences require explicit opt-in. Session inference, diagnostic hypotheses
@@ -2529,7 +2643,7 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     15 Oct publication audit follow-up: saved HTML (including the signed-report renderer), raw handoff and session-report builders now share a pure publication projection. Invalid optional source proof clears mixed cached narratives while retaining independent numeric measurements and qualified previews; replay keeps abstention markers. Canonical receipt and intelligence paths requalify normalized optional evidence rather than trusting scalar aliases or an active enclosing mix. Critique payloads and direct templates qualify transient comparisons and describe their matched-event scope without claiming audible damage. [Publication audit evidence](docs/evidence/KENN_REPORT_PUBLICATION_SIGNIFICANCE_2026-10-15.md). E2 and the significance checkbox remain open for offline comparison and producer listening checks.
   - [ ] Benchmark offline: compare the current mix-review code with cheaper variants, pick the reference, and write down why (see docs/research and the reuse comparison receipts).
     15 Oct bounded comparison: the generated 27-fixture, three-rate matrix compares forced Python reference, native decode-only, loudness-only and combined variants with five measured requests each. Every timed request must prove accepted native execution and preserve loudness meters, all findings and abstentions; fallback cannot qualify. Decode-only matches all 27 fixtures. Loudness-only and combined each differ on stepped mono at 44.1 kHz: LRA evidence rounds to 21.54 rather than 21.53 LU. Keep Python/pyloudnorm + SciPy as the agreement reference and native candidates opt-in; no production promotion. Battery-powered request timings are observational. [Comparison, reference decision and temporal meter evidence](docs/evidence/KENN_MIX_REVIEW_OFFLINE_BENCHMARK_2026-10-15.md). The broader benchmark gate remains open for independent accuracy, real-corpus/listening and controlled timing evidence.
-    17 Oct real-file run, at my call: native audio analysis (decode, channel metrics, FFT) is now the default. On 26 of my files from Audio-Assets (ten full mixdowns plus every sample-pack format), output matched Python everywhere but one peak bandwidth (70.312 vs 70.313 Hz). The corpus took 1.6 s instead of 152.7 s, and peak memory was 1.3 GB instead of 4.6 GB. That moves every `analyze_wav` caller: audio upload, AudioGen, Live session advice and the mix-review spectral pass (the main mix-review report runs local_engine and is unchanged). `KENN_DSP_NATIVE=0` rolls back. Adversary review found the first run used a stale 21 Sep extension, and that native said correlation 0.0 where Python says None (one channel silent); the C++ now returns None, and a rebuild from current source gave the same parity in 1.4 s. The AutoMix kernels stay default-off. Later the same day, my 4x/8x call: 8x true peak everywhere offline, and the C++ loudness meter is now the mix-review default after matching pyloudnorm on all 24 measurable corpus files (8.3 s against 38.3 s for the review). On a dense sine sweep scipy's filter under-reads by up to 0.40 dB at 4x and 0.13 dB at 8x, both near 20 kHz. Review also caught the no-scipy fallback reading the sample peak; it now interpolates properly. The plug-in meter is still 4x and disabled. Then mix-review decode went native by default (full report identical bar two float32 roundings, 6.5 s against 8.9 s), and so did stem masking on the Accelerate build (260 real stems identical, 10.0 s against 29.0 s; the scalar build is slower than NumPy, so it stays off there). Review caught a 3-stray-byte file crashing the Python decoder; it now drops the partial frame like native does. Loudness details are in the 17 Oct section of [the loudness receipt](docs/research/CPP_DSP_PHASE4_MIX_REVIEW_LOUDNESS_RECEIPT.md). See the 17 Oct section of [the release qualification](docs/research/CPP_DSP_PHASE4_RELEASE_QUALIFICATION.md).
+    17 Oct real-file run, at my call: native audio analysis (decode, channel metrics, FFT) is now the default. On 26 of my files from Audio-Assets (ten full mixdowns plus every sample-pack format), output matched Python everywhere but one peak bandwidth (70.312 vs 70.313 Hz). The corpus took 1.6 s instead of 152.7 s, and peak memory was 1.3 GB instead of 4.6 GB. That moves every `analyze_wav` caller: audio upload, AudioGen, Live session advice and the mix-review spectral pass (the main mix-review report runs local_engine and is unchanged). `KENN_DSP_NATIVE=0` rolls back. Adversary review found the first run used a stale 21 Sep extension, and that native said correlation 0.0 where Python says None (one channel silent); the C++ now returns None, and a rebuild from current source gave the same parity in 1.4 s. The AutoMix kernels stay default-off. Later the same day, my 4x/8x call: 8x true peak everywhere offline, and the C++ loudness meter is now the mix-review default after matching pyloudnorm on all 24 measurable corpus files (8.3 s against 38.3 s for the review). On a dense sine sweep scipy's filter under-reads by up to 0.40 dB at 4x and 0.13 dB at 8x, both near 20 kHz. Review also caught the no-scipy fallback reading the sample peak; it now interpolates properly. The plug-in meter is still 4x and disabled. Then mix-review decode went native by default (full report identical bar two float32 roundings, 6.5 s against 8.9 s), and so did stem masking on the Accelerate build (260 real stems identical, 10.0 s against 29.0 s; the scalar build is slower than NumPy, so it stays off there). Review caught a 3-stray-byte file crashing the Python decoder; it now drops the partial frame like native does. Sample BPM and key then moved to C++ (`key_tempo_features`), and librosa key/tempo is gone, including the unused `estimate_key_and_tempo`. On 488 labelled sample-pack loops the reported tonic is right on 142/250 against 106 before, because it now comes from a key-profile match instead of the loudest pitch class. BPM was within 4% on 60/258 against 54 (still mostly octave errors); after review it is 54/258 with 52 wrong and 66 left without a BPM, because held tones, pads, noise and one-shots now get no BPM instead of an invented one. It runs in 9.2 s against 44 s; see [the key/tempo receipt](docs/research/CPP_DSP_KEY_TEMPO_RECEIPT.md). Loudness details are in the 17 Oct section of [the loudness receipt](docs/research/CPP_DSP_PHASE4_MIX_REVIEW_LOUDNESS_RECEIPT.md). See the 17 Oct section of [the release qualification](docs/research/CPP_DSP_PHASE4_RELEASE_QUALIFICATION.md).
   - [ ] Build the grading in the existing mix-review module. Grade only against authorized references, declared conventions and the producer's own target, and never invent a number.
   - [x] Check the grade is deterministic for the same inputs, and that it moves when the underlying analysis changes.
     Done 17 Oct in [test_grade_regression.py](apps/backend/src/kenn/tests/test_grade_regression.py), through the full uploaded-reference path. Same inputs give an identical grade after four other comparisons have run. Within the 40 reference-match points, plain gain moves nothing, a brighter mix moves only tonal balance, a wider mix only width, and a pumping mix only dynamics. Outside it, gain also lowers the declared target and technical health (true peak passes the -0.8 dBTP advisory), and pumping raises technical health (peak-to-loudness clears the 6 dB line); both are correct readings and are asserted. Low-end mono correlation and the mid-only spectrum cannot move in these fixtures, so those equalities are regression guards; the unit tests cover low-end mono. Adversary review 17 Oct: no code blockers; the first note overclaimed "only", corrected here. This found a bug: when two bands tied at the ±6 dB gain clamp, the detail line named whichever band came first in the list, so a mix that differed only at 6 kHz was told bass. Ties now go to the larger unclamped energy delta.

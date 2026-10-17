@@ -12,6 +12,7 @@
 
 - Use neutral branch and tag names such as `draft/`, `feature/`, or `fix/`; omit AI tool names. Commit messages are single-line descriptions of the change and its reason, without AI attribution trailers. Stage exact file paths.
 - `KENN_PLAN.md` is the sole roadmap and work queue.
+- DSP and audio analysis are C++ only, in `tooling/native/dsp_core`; never Python, numpy, scipy or librosa (see the standing rule at the top of `KENN_PLAN.md`).
 - Before implementing or extending audio analysis, follow the standing open-source reuse check in `KENN_PLAN.md`.
 - Daily engineering uses `KENN_LIVE_BACKEND=fake`. Real Live writes require Jack's scheduled, supervised disposable session.
 - Remote KENN work uses physical GPU 1 with `CUDA_VISIBLE_DEVICES=1`. Do not restart servers.

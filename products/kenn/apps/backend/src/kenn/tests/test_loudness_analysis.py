@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from kenn.core.loudness_analysis import estimate_key_and_tempo, loudness_range_lu, measure_loudness, true_peak_dbtp
+from kenn.core.loudness_analysis import loudness_range_lu, measure_loudness, true_peak_dbtp
 
 RATE = 48000
 
@@ -45,20 +45,3 @@ def test_loudness_range_uses_gated_percentiles() -> None:
     assert loudness_range_lu([-20.0] * 10) == pytest.approx(0.0)
     assert loudness_range_lu([-30.0] * 5 + [-20.0] * 5) == pytest.approx(10.0, abs=0.01)
     assert loudness_range_lu([-80.0, -90.0]) is None
-
-
-def test_key_and_tempo_estimates_label_themselves_and_report_the_relative_key() -> None:
-    # D minor triad sustained, with a click every 0.5 s (120 BPM).
-    seconds = 12.0
-    t = np.arange(int(seconds * RATE)) / RATE
-    chord = sum(np.sin(2 * math.pi * f * t) for f in (146.83, 174.61, 220.0)) / 6
-    clicks = np.zeros_like(t)
-    for beat in np.arange(0, seconds, 0.5):
-        start = int(beat * RATE)
-        clicks[start:start + 200] = 0.8
-    mono = chord + clicks
-    result = estimate_key_and_tempo(_wav(np.stack([mono, mono], axis=1)))
-    assert {result["key"], result["key_relative"]} == {"D minor", "F major"}
-    assert result["tempo_bpm"] == pytest.approx(120.0, abs=3.0)
-    assert result["key_confidence"] in {"high", "medium", "low"}
-    assert "estimates" in result["method"]

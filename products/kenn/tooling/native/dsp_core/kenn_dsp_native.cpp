@@ -22,6 +22,7 @@
 
 #include "fft_core.hpp"
 #include "automix_bindings.hpp"
+#include "key_tempo_bindings.hpp"
 #include "loudness_bindings.hpp"
 
 namespace nb = nanobind;
@@ -878,4 +879,5 @@ NB_MODULE(_kenn_dsp_native, module)
                "Compute bulk stereo channel statistics and correlation.");
     init_automix_bindings(module);
     init_loudness_bindings(module);
+    init_key_tempo_bindings(module);
 }

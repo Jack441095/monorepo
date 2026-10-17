@@ -215,10 +215,30 @@ def loudness_metrics(channels: list[list[float]] | Any, sample_rate: int) -> dic
     return result
 
 
+def key_tempo_features(samples: Any, sample_rate: int) -> dict[str, Any] | None:
+    """Return native mean chroma (index 0 = C) and a tempo estimate for mono audio; None when unavailable.
+
+    ``tempo_bpm`` is None when the audio has fewer than two clear onsets (a
+    held tone, a pad, noise, a one-shot) or no beat periodicity, which callers
+    should report as an absent BPM, not a zero. Rates outside 8-768 kHz raise ValueError.
+    """
+    module = _load()
+    function = None if module is None else getattr(module, "key_tempo_features", None)
+    if function is None:
+        return None
+    import numpy as np
+
+    values = np.ascontiguousarray(samples, dtype=np.float32)
+    if values.ndim != 1 or values.size == 0:
+        raise ValueError("native key/tempo needs one non-empty mono channel")
+    return dict(function(values, int(sample_rate)))
+
+
 __all__ = [
     "available",
     "channel_metrics",
     "decode_pcm",
+    "key_tempo_features",
     "loudness_metrics",
     "masking_band_energy",
     "spectral_powers",

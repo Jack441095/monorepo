@@ -8,7 +8,7 @@ new dependency here when it is added.
 | Dependency | Licence | Used for | Added |
 |---|---|---|---|
 | pyloudnorm | MIT | ITU-R BS.1770 loudness (LUFS, LRA windows) | 2026-09-23 (E2) |
-| librosa | ISC | Chroma key estimate, beat-tracked tempo | 2026-09-23 (E2) |
+| librosa | ISC | AIFF decode for sample BPM/key, sample embeddings, track diagnostic centroid/flatness (key and tempo themselves are native since 2026-10-17) | 2026-09-23 (E2) |
 | scipy | BSD-3-Clause | 4x oversampled true peak | 2026-09-23 (E2) |
 | numpy | BSD-3-Clause | Numeric arrays | pre-existing |
 | soundfile | BSD-3-Clause | WAV decoding for measurements | pre-existing |

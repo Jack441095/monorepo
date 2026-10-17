@@ -1932,12 +1932,11 @@ def test_mcp_analyze_sample_library_entry_unknown_id_is_honest(tmp_path, monkeyp
     assert "No sample with that id" in payload["error"]
 
 
-def test_mcp_analyze_sample_library_entry_abstains_honestly_without_librosa(tmp_path, monkeypatch) -> None:
+def test_mcp_analyze_sample_library_entry_abstains_honestly_without_the_native_extension(tmp_path, monkeypatch) -> None:
     (tmp_path / "Pack").mkdir()
     (tmp_path / "Pack" / "Kick One.wav").write_bytes(b"RIFF" + b"\x00" * 40)
     monkeypatch.setenv("KENN_SAMPLE_LIBRARY_ROOT", str(tmp_path))
-    import kenn.core.sample_library as sample_library_module
-    monkeypatch.setattr(sample_library_module, "_librosa", None)
+    monkeypatch.setenv("KENN_DSP_NATIVE", "0")
     client = FakeKennHTTP()
     facade = KennMCPFacade(client)
     from kenn.core.sample_library import scan_sample_library
@@ -1946,7 +1945,7 @@ def test_mcp_analyze_sample_library_entry_abstains_honestly_without_librosa(tmp_
     response = _call(facade, 23, "analyze_sample_library_entry", {"sample_id": sample_id})
     payload = json.loads(response["result"]["content"][0]["text"])
     assert payload["ok"] is False
-    assert "not installed" in payload["error"]
+    assert "not built or is disabled" in payload["error"]
     assert str(tmp_path) not in json.dumps(payload)
 
 

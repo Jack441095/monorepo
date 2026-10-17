@@ -33,7 +33,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-try:  # Optional, heavier dependency; abstain honestly when absent.
+from kenn.core import native_fft
+
+try:  # Only for decoding AIFF, which the native decoder does not read.
     import librosa as _librosa
 except ImportError:
     _librosa = None
@@ -42,7 +44,19 @@ except ImportError:
 # so this only bounds one on-demand request, not the whole library.
 MAX_ANALYSIS_SECONDS = 60.0
 MIN_ANALYSIS_SECONDS = 0.5
+# We read at most 64 MiB of a WAV: 60 s of stereo 32-bit float at up to
+# 139 kHz. The native decoder takes the truncated data chunk as it is, so a
+# longer or wider file is analysed on its first part instead of read whole.
+_MAX_WAV_READ_BYTES = 64 * 1024 * 1024
+# The native key/tempo kernel refuses rates under 8 kHz (a header declaring
+# 2 Hz once looped it forever) or above 768 kHz (a 60 MHz header allocated
+# ~5 GB); a real sample is never outside that range, so abstain.
+_MIN_SAMPLE_RATE_HZ = 8000
+_MAX_SAMPLE_RATE_HZ = 768000
 _KEY_NAMES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+# Krumhansl-Kessler key profiles, index 0 = tonic.
+_MAJOR_PROFILE = (6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88)
+_MINOR_PROFILE = (6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17)
 
 AUDIO_EXTENSIONS = frozenset({".wav", ".aif", ".aiff"})
 _IGNORED_NAMES = frozenset({".DS_Store"})
@@ -182,45 +196,99 @@ def analyze_sample_audio(path: Path) -> tuple[dict[str, Any] | None, str | None]
     Returns ``(result, abstain_reason)`` -- exactly one is ``None``. This
     decodes real audio (bounded to ``MAX_ANALYSIS_SECONDS``), unlike the
     filename/folder-only bulk scan above, so it is never called from
-    ``scan_sample_library`` or ``search_samples``. Key detection reports a
-    pitch-class only (chroma-energy peak), not a major/minor mode -- that
-    would need a separate key-profile classifier this module does not have,
-    so it is deliberately not claimed.
+    ``scan_sample_library`` or ``search_samples``. Key detection reports the
+    tonic pitch class only, not a major/minor mode: on labelled loops the
+    profile match confuses relative and parallel keys often enough that the
+    mode is not worth claiming.
     """
-    if _librosa is None:
-        return None, "the optional librosa dependency is not installed"
+    import numpy as np
+
     if not path.is_file():
         return None, "sample file was not found on disk"
-    try:
-        y, sr = _librosa.load(str(path), sr=None, mono=True, duration=MAX_ANALYSIS_SECONDS)
-    except Exception as exc:
-        return None, f"librosa failed to decode this file: {exc}"
-    if y.size == 0 or (sr and y.size < sr * MIN_ANALYSIS_SECONDS):
+    if not native_fft.available():
+        return None, "the native DSP extension is not built or is disabled"
+    decoded = _decode_mono(path)
+    if isinstance(decoded, str):
+        return None, decoded
+    mono, rate = decoded
+    if rate < _MIN_SAMPLE_RATE_HZ:
+        return None, f"the file declares a {rate} Hz sample rate, below the {_MIN_SAMPLE_RATE_HZ} Hz key/tempo minimum"
+    if rate > _MAX_SAMPLE_RATE_HZ:
+        return None, f"the file declares a {rate} Hz sample rate, above the {_MAX_SAMPLE_RATE_HZ} Hz key/tempo maximum"
+    mono = mono[: int(rate * MAX_ANALYSIS_SECONDS)]
+    if mono.size < rate * MIN_ANALYSIS_SECONDS:
         return None, f"audio is shorter than the {MIN_ANALYSIS_SECONDS}s minimum for reliable BPM/key estimation"
+    if not np.isfinite(mono).all():
+        # One NaN in a float WAV poisoned the chroma and came out as a
+        # confident "C" (adversary review, 17 Oct 2026).
+        return None, "the audio contains NaN or infinite samples"
 
-    # BPM and key are estimated independently: a sustained tone has a clear
+    features = native_fft.key_tempo_features(mono, rate)
+    if features is None:
+        # available() is true but the loaded extension predates
+        # key_tempo_features: a stale build, as bit us on 17 Oct.
+        return None, "the native DSP extension is out of date and has no key/tempo analysis"
+    # BPM and key are reported independently: a sustained tone has a clear
     # pitch class but no discoverable beat, and a pure percussion hit is the
     # opposite -- neither missing dimension should suppress the other.
     result: dict[str, Any] = {}
-    try:
-        tempo, _beat_frames = _librosa.beat.beat_track(y=y, sr=sr)
-        tempo_value = float(tempo.item() if hasattr(tempo, "item") else tempo)
-        if tempo_value > 0:
-            result["estimated_bpm"] = round(tempo_value, 1)
-    except Exception:
-        pass  # beat tracking is best-effort; absence of the field is the honest signal
-    try:
-        chroma = _librosa.feature.chroma_cqt(y=y, sr=sr)
-        mean_chroma = chroma.mean(axis=1)
-        if float(mean_chroma.max()) > 0:
-            result["estimated_key_pitch_class"] = _KEY_NAMES[int(mean_chroma.argmax()) % 12]
-    except Exception:
-        pass
+    if features["tempo_bpm"]:
+        result["estimated_bpm"] = round(float(features["tempo_bpm"]), 1)
+    tonic = _profile_tonic(features["chroma"])
+    if tonic is not None:
+        result["estimated_key_pitch_class"] = _KEY_NAMES[tonic]
 
     if not result:
         return None, "neither a stable tempo nor a clear pitch class could be estimated from this audio"
-    result["analysis_seconds"] = round(min(MAX_ANALYSIS_SECONDS, y.size / sr) if sr else 0.0, 1)
+    result["analysis_seconds"] = round(mono.size / rate, 1)
     return result, None
+
+
+def _decode_mono(path: Path) -> tuple[Any, int] | str:
+    """Return ``(mono float32 samples, rate)`` for one file, or the reason it could not be decoded."""
+    import numpy as np
+
+    if path.suffix.lower() == ".wav":
+        with path.open("rb") as handle:
+            payload = handle.read(_MAX_WAV_READ_BYTES)
+        decoded = native_fft.decode_pcm(payload)
+        if decoded is None:
+            # The native decoder reads mono or stereo 16/24/32-bit PCM and
+            # 32-bit float; 8-bit, multichannel, compressed, empty or
+            # malformed files land here, and abstaining is the honest answer.
+            return "this WAV could not be decoded (mono or stereo 16/24/32-bit PCM or float only)"
+        channels = decoded["channels"]
+        mono = channels[0] if len(channels) == 1 else np.mean(np.stack(channels), axis=0, dtype=np.float32)
+        return mono, int(decoded["sample_rate"])
+    if _librosa is None:
+        # AIFF has no native decoder yet, and the app bundle ships without
+        # librosa, so AIFF samples abstain there.
+        return "AIFF decoding needs the optional librosa dependency, which is not installed"
+    try:
+        mono, rate = _librosa.load(str(path), sr=None, mono=True, duration=MAX_ANALYSIS_SECONDS)
+    except Exception as exc:
+        return f"librosa failed to decode this file: {exc}"
+    return np.asarray(mono, dtype=np.float32), int(rate)
+
+
+def _profile_tonic(chroma: list[float]) -> int | None:
+    """Return the tonic pitch class of the best-correlated major or minor key profile, or None for flat chroma."""
+    import numpy as np
+
+    values = np.asarray(chroma, dtype=np.float64)
+    if float(values.max() - values.min()) <= 0.0:
+        # Silence or a perfectly flat spectrum has no correlation to rank.
+        return None
+    # The profile match beat the plain chroma peak on 488 labelled sample-pack
+    # loops, 142/250 tonics right against 100 (17 Oct 2026, the receipt in
+    # docs/research/CPP_DSP_KEY_TEMPO_RECEIPT.md), because the strongest
+    # pitch class in a loop is often the fifth or the third, not the tonic.
+    best = max(
+        (float(np.corrcoef(values, np.roll(profile, tonic))[0, 1]), tonic)
+        for tonic in range(12)
+        for profile in (_MAJOR_PROFILE, _MINOR_PROFILE)
+    )
+    return best[1]
 
 
 __all__ = [
