@@ -24,6 +24,7 @@
 #include "automix_bindings.hpp"
 #include "key_tempo_bindings.hpp"
 #include "loudness_bindings.hpp"
+#include "track_diagnostic_bindings.hpp"
 
 namespace nb = nanobind;
 using FloatInput = nb::ndarray<nb::numpy, const float, nb::ndim<1>, nb::c_contig, nb::device::cpu>;
@@ -880,4 +881,5 @@ NB_MODULE(_kenn_dsp_native, module)
     init_automix_bindings(module);
     init_loudness_bindings(module);
     init_key_tempo_bindings(module);
+    init_track_diagnostic_bindings(module);
 }

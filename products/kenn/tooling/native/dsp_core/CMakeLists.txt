@@ -27,6 +27,7 @@ nanobind_add_module(
   automix_bindings.cpp
   loudness_bindings.cpp
   key_tempo_bindings.cpp
+  track_diagnostic_bindings.cpp
   "${KENN_AUTOMIX_NATIVE_DIR}/eq_kernel.cpp"
   "${KENN_AUTOMIX_NATIVE_DIR}/limiter_kernel.cpp"
   "${KENN_AUTOMIX_NATIVE_DIR}/phase_correlation_kernel.cpp"

@@ -237,3 +237,63 @@ def test_build_tracks_from_live_session():
     assert tracks[3]["matched_file_path"] == "/path/to/guitar.wav"
 
 
+def test_polarity_flipped_stereo_still_shows_a_waveform() -> None:
+    # When L = -R the mono sum cancels to zero, so the display falls back to the
+    # side signal (L - R) / 2 instead of drawing a flat zero line.
+    tone = [0.4 * math.sin(2.0 * math.pi * 440.0 * i / 48000.0) for i in range(48000)]
+    res = analyze_track_diagnostic(_stereo_wav(tone, [-v for v in tone]))
+    assert res["ok"] is True
+    assert max(res["waveform"]["peaks"]) > 0.35
+    assert max(res["waveform"]["rms"]) > 0.2
+
+
+def test_silence_reports_none_for_centroid_and_flatness_instead_of_one() -> None:
+    # Bug fixed 17 Oct 2026: librosa scored silent frames as flatness 1.0 and
+    # centroid 0 Hz, which made silent stems look like white noise and inflated
+    # flatness on stems with rests.
+    silent = [0.0] * 48000
+    res = analyze_track_diagnostic(_stereo_wav(silent, silent))
+    assert res["ok"] is True
+    assert res["metrics"]["spectral_centroid_hz"] is None
+    assert res["metrics"]["spectral_flatness"] is None
+    assert res["metrics"]["lufs_integrated"] is None
+
+
+def test_a_stale_extension_without_track_diagnostic_abstains_cleanly(monkeypatch) -> None:
+    from kenn.core import native_fft
+
+    real_module = native_fft._load()
+
+    class _StaleModule:
+        decode_pcm = staticmethod(real_module.decode_pcm)
+
+    monkeypatch.setattr(native_fft, "_load", lambda: _StaleModule)
+    res = analyze_track_diagnostic(_make_synth_wav([440.0], duration=0.5))
+    assert res["ok"] is False
+    assert "out of date" in res["error"]
+
+
+def test_an_unsupported_wav_format_returns_ok_false_with_a_reason() -> None:
+    # Format tag 2 (ADPCM) with 16-bit samples is refused by both the native
+    # decoder and the Python 8-bit/multichannel fallback.
+    header = struct.pack(
+        "<4sI4s4sIHHIIHH4sI",
+        b"RIFF",
+        36 + 400,
+        b"WAVE",
+        b"fmt ",
+        16,
+        2,  # ADPCM format tag
+        1,
+        44100,
+        88200,
+        2,
+        16,
+        b"data",
+        400,
+    )
+    res = analyze_track_diagnostic(header + b"\x00" * 400)
+    assert res["ok"] is False
+    assert "unsupported WAV sample format" in res["error"]
+
+

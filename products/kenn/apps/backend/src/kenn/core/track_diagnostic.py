@@ -2,7 +2,7 @@
 
 Analyzes individual Ableton Live tracks to produce:
 1. High-resolution waveform envelope (peaks and RMS).
-2. 2D Time-Frequency Spectrogram (STFT energy distribution across 40 bark bands).
+2. 2D Time-Frequency Spectrogram (Goertzel energy distribution across 31 log bands).
 3. Acoustic "Weak Area" detection (sub rumble, mud resonance, harshness, sibilance, dynamics, phase).
 4. Automated Live 12 surgical remediation proposals with direct parameter values.
 """
@@ -14,16 +14,16 @@ import logging
 import math
 import os
 import re
-import sys
 import time
-import uuid
 import xml.etree.ElementTree as ET
 from array import array
 from typing import Any, Dict, List, Optional, Tuple
 
+from kenn.core import native_fft
+
 logger = logging.getLogger("kenn.track_diagnostic")
 
-# Frequency band centers for the 40-band diagnostic spectrogram (20 Hz - 20 kHz)
+# Frequency band centers for the 31-band diagnostic spectrogram (20 Hz - 20 kHz)
 SPECTROGRAM_FREQUENCIES_HZ = [
     20, 25, 31, 40, 50, 63, 80, 100, 125, 160,
     200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
@@ -33,6 +33,9 @@ SPECTROGRAM_FREQUENCIES_HZ = [
 SPECTROGRAM_BAND_COUNT = len(SPECTROGRAM_FREQUENCIES_HZ)
 SPECTROGRAM_TIME_SLICES = 64
 WAVEFORM_POINTS = 300
+# 4,000,000 frames (83 s at 48 kHz) bounds per-file analysis work while
+# duration_seconds still reports the full file length.
+_MAX_ANALYSIS_FRAMES = 4_000_000
 
 
 def _db(value: float, floor: float = -96.0) -> float:
@@ -168,103 +171,94 @@ def build_tracks_from_live_session(
     return tracks
 
 
-def _decode_pcm_channels(payload: bytes) -> Tuple[List[List[float]], int, float]:
-    """Decode a WAV payload into per-channel float samples, sample_rate and full duration.
+def _decode_pcm_channels(payload: bytes) -> Tuple[List[Any], int, float]:
+    """Decode a WAV payload into per-channel float32 samples, sample_rate and full duration.
 
-    Channels stay separate so level and loudness are measured per channel. The
-    old decoder averaged to mono first, which read a polarity-flipped stereo
-    file at -96 dBFS and put every stereo LUFS 3 dB low (16 Oct 2026).
+    Mono and stereo 16/24/32-bit PCM and float WAVs go through the C++
+    decoder (`native_fft.decode_pcm`). The Python parser stays only for 8-bit
+    WAVs and files with more than two channels, which the native decoder
+    refuses.
     """
+    decoded = native_fft.decode_pcm(payload)
+    if decoded is not None:
+        channels = decoded["channels"]
+        framerate = int(decoded["sample_rate"])
+        total_frames = len(channels[0]) if channels else 0
+        duration = total_frames / framerate if framerate > 0 else 0.0
+        return [ch[:_MAX_ANALYSIS_FRAMES] for ch in channels], framerate, duration
+
     from kenn.core.audio_analysis import _parse_wav
-    channels, sampwidth, framerate, data_bytes, audio_format = _parse_wav(payload)
-    if channels < 1 or framerate <= 0:
+    channels_count, sampwidth, framerate, data_bytes, audio_format = _parse_wav(payload)
+    if channels_count < 1 or framerate <= 0:
         raise ValueError("WAV header has no channels or no sample rate")
 
-    total_frames = len(data_bytes) // (channels * sampwidth)
+    total_frames = len(data_bytes) // (channels_count * sampwidth)
     duration = total_frames / framerate
-    # 4,000,000 frames (83 s at 48 kHz) keeps the pure-Python loops and their
-    # float lists bounded; duration still reports the whole file.
-    frames_to_read = min(total_frames, 4_000_000)
-    count = frames_to_read * channels
+    frames_to_read = min(total_frames, _MAX_ANALYSIS_FRAMES)
+    count = frames_to_read * channels_count
+    if count == 0:
+        # Empty data chunk: return empty channels so the caller reports "no playable samples".
+        return [array("f") for _ in range(channels_count)], framerate, duration
 
-    # Samples land in array("d") (8 bytes each), never lists of Python floats (about
-    # 32 bytes each): on a full 4M-frame 16-bit stereo file, decode plus _analysis_signal
-    # peaked at 596 MB with lists and 107 MB with arrays (tracemalloc, 17 Oct 2026).
-    def typed(code: str) -> array:
-        values = array(code)
-        values.frombytes(data_bytes[: count * values.itemsize])
-        if sys.byteorder == "big":
-            values.byteswap()  # WAV is little-endian on disk
-        return values
-
-    if sampwidth == 2 and audio_format == 1:
-        ints, scale = typed("h"), 32768.0
-    elif sampwidth == 4 and audio_format == 3:
-        floats = typed("f")
-        return [array("d", floats[ch::channels]) for ch in range(channels)], framerate, duration
-    elif sampwidth == 4 and audio_format == 1:
-        ints, scale = typed("i"), 2147483648.0
-    elif sampwidth == 3 and audio_format == 1:
-        # No 24-bit array type, so widen each sample to a signed int on the way in.
-        ints = array("i", (
-            int.from_bytes(data_bytes[offset : offset + 3], byteorder="little", signed=True)
-            for offset in range(0, count * 3, 3)
-        ))
-        scale = 8388608.0
-    elif sampwidth == 1 and audio_format == 1:
-        # 8-bit WAV is unsigned with its midpoint at 128.
+    if sampwidth == 1 and audio_format == 1:
+        # 8-bit WAV is unsigned with its midpoint at 128; native_fft.decode_pcm only accepts 16/24/32-bit.
         return [
-            array("d", ((v - 128) / 128.0 for v in data_bytes[ch:count:channels])) for ch in range(channels)
+            array("f", ((v - 128) / 128.0 for v in data_bytes[ch:count:channels_count]))
+            for ch in range(channels_count)
         ], framerate, duration
-    else:
-        # The old fallback read any other layout as 8-bit bytes and measured
-        # nonsense; refusing is the truthful answer for a diagnostic.
-        raise ValueError(f"unsupported WAV sample format ({sampwidth * 8}-bit, format tag {audio_format})")
 
-    return [array("d", (v / scale for v in ints[ch::channels])) for ch in range(channels)], framerate, duration
+    if channels_count > 2:
+        # Multichannel (>2 ch) WAVs are refused by native_fft.decode_pcm; decode
+        # each channel here and pass the (frames, channels) matrix to the C++ kernel.
+        import sys
 
+        def typed(code: str) -> array:
+            values = array(code)
+            values.frombytes(data_bytes[: count * values.itemsize])
+            if sys.byteorder == "big":
+                values.byteswap()
+            return values
 
-def _analysis_signal(channels: List[List[float]]) -> List[float]:
-    """Return the single signal the waveform, spectrogram and spectral features read.
+        if sampwidth == 2 and audio_format == 1:
+            ints, scale = typed("h"), 32768.0
+        elif sampwidth == 4 and audio_format == 3:
+            floats = typed("f")
+            return [floats[ch::channels_count] for ch in range(channels_count)], framerate, duration
+        elif sampwidth == 4 and audio_format == 1:
+            ints, scale = typed("i"), 2147483648.0
+        elif sampwidth == 3 and audio_format == 1:
+            ints = array("i", (
+                int.from_bytes(data_bytes[offset : offset + 3], byteorder="little", signed=True)
+                for offset in range(0, count * 3, 3)
+            ))
+            scale = 8388608.0
+        else:
+            raise ValueError(f"unsupported WAV sample format ({sampwidth * 8}-bit, format tag {audio_format})")
+        return [
+            array("f", (v / scale for v in ints[ch::channels_count]))
+            for ch in range(channels_count)
+        ], framerate, duration
 
-    That is the mono sum, unless the channels hold audio that cancels in the
-    sum (L = -R), where the side signal is used so the display is not blank.
-    """
-    if len(channels) == 1:
-        return channels[0]
-    count = len(channels)
-    mono = array("d", (sum(frame) / count for frame in zip(*channels)))
-    mono_peak = max(max(mono, default=0.0), -min(mono, default=0.0))
-    channel_peak = max(max(max(ch, default=0.0), -min(ch, default=0.0)) for ch in channels)
-    # -60 dB below the louder channel: the sum is gone but the channels are not.
-    if channel_peak > 0.0 and mono_peak < channel_peak * 0.001 and count == 2:
-        return array("d", ((left - right) * 0.5 for left, right in zip(channels[0], channels[1])))
-    return mono
+    raise ValueError(f"unsupported WAV sample format ({sampwidth * 8}-bit, format tag {audio_format})")
 
 
 def compute_waveform_envelope(samples: List[float], points: int = WAVEFORM_POINTS) -> Tuple[List[float], List[float]]:
-    """Compute normalized peak and RMS envelopes across specified number of points."""
-    if not samples:
+    """Compute normalized peak and RMS envelopes across specified number of points via the C++ kernel."""
+    if not samples or points <= 0:
+        # Empty input or non-positive point count returns a zeroed envelope without calling into C++.
+        return [0.0] * max(0, points), [0.0] * max(0, points)
+    features = native_fft.track_diagnostic_features(
+        [samples],
+        44100,
+        SPECTROGRAM_FREQUENCIES_HZ,
+        time_slices=1,
+        waveform_points=points,
+    )
+    if features is None:
+        # Stale or disabled native extension: return zeroed display points rather than running Python DSP.
         return [0.0] * points, [0.0] * points
-
-    peaks: List[float] = []
-    rms_list: List[float] = []
-    chunk_size = max(1, len(samples) // points)
-
-    for i in range(points):
-        start = i * chunk_size
-        end = min(len(samples), start + chunk_size)
-        chunk = samples[start:end]
-        if not chunk:
-            peaks.append(0.0)
-            rms_list.append(0.0)
-            continue
-
-        p = max((abs(v) for v in chunk), default=0.0)
-        r = math.sqrt(sum(v * v for v in chunk) / len(chunk))
-        peaks.append(round(min(1.0, p), 4))
-        rms_list.append(round(min(1.0, r), 4))
-
+    peaks = [round(min(1.0, float(p)), 4) for p in features["waveform_peaks"]]
+    rms_list = [round(min(1.0, float(r)), 4) for r in features["waveform_rms"]]
     return peaks, rms_list
 
 
@@ -273,53 +267,24 @@ def compute_spectrogram_matrix(
     sample_rate: int,
     time_slices: int = SPECTROGRAM_TIME_SLICES,
 ) -> List[List[float]]:
-    """Compute 2D spectrogram matrix (time_slices x 31 log bands) in decibels."""
-    if not samples or sample_rate <= 0:
+    """Compute 2D spectrogram matrix (time_slices x 31 log bands) in decibels via the C++ kernel."""
+    if not samples or sample_rate <= 0 or time_slices <= 0:
+        # Invalid or empty audio returns the -80 dB floor matrix.
+        return [[-80.0] * SPECTROGRAM_BAND_COUNT for _ in range(max(0, time_slices))]
+    features = native_fft.track_diagnostic_features(
+        [samples],
+        sample_rate,
+        SPECTROGRAM_FREQUENCIES_HZ,
+        time_slices=time_slices,
+        waveform_points=1,
+    )
+    if features is None:
+        # Stale or disabled native extension: return the -80 dB floor matrix.
         return [[-80.0] * SPECTROGRAM_BAND_COUNT for _ in range(time_slices)]
-
-    matrix: List[List[float]] = []
-    slice_len = max(512, len(samples) // time_slices)
-    nyquist = sample_rate / 2.0
-
-    for s_idx in range(time_slices):
-        start = s_idx * slice_len
-        end = min(len(samples), start + slice_len)
-        slice_samples = samples[start:end]
-        if len(slice_samples) < 64:
-            matrix.append([-80.0] * SPECTROGRAM_BAND_COUNT)
-            continue
-
-        # Estimate energy in each frequency band using DFT bins
-        band_energies: List[float] = []
-        n_pts = min(2048, len(slice_samples))
-        # Precompute window
-        win = [0.5 * (1.0 - math.cos(2.0 * math.pi * n / (n_pts - 1))) for n in range(n_pts)]
-        windowed = [slice_samples[n] * win[n] for n in range(n_pts)]
-
-        for f_center in SPECTROGRAM_FREQUENCIES_HZ:
-            if f_center >= nyquist:
-                band_energies.append(-80.0)
-                continue
-
-            # Goertzel / Single-bin DFT magnitude for f_center
-            k = int(round(f_center * n_pts / sample_rate))
-            omega = 2.0 * math.pi * k / n_pts
-            coeff = 2.0 * math.cos(omega)
-            q1 = 0.0
-            q2 = 0.0
-            for sample in windowed:
-                q0 = coeff * q1 - q2 + sample
-                q2 = q1
-                q1 = q0
-
-            mag_sq = q1 * q1 + q2 * q2 - q1 * q2 * coeff
-            mag = math.sqrt(max(0.0, mag_sq)) / (n_pts / 2.0)
-            db_val = _db(mag, floor=-80.0)
-            band_energies.append(db_val)
-
-        matrix.append(band_energies)
-
-    return matrix
+    return [
+        [-80.0 if math.isnan(mag) else _db(float(mag), floor=-80.0) for mag in row]
+        for row in features["spectrogram"]
+    ]
 
 
 def detect_weak_areas(
@@ -415,7 +380,7 @@ def detect_weak_areas(
     if mud_energy > -42.0 and mud_energy > (mid_energy + 4.5):
         peak_mud_idx = 10 if avg_bands[10] >= avg_bands[11] and avg_bands[10] >= avg_bands[12] else (11 if avg_bands[11] >= avg_bands[12] else 12)
         mud_freq = float(SPECTROGRAM_FREQUENCIES_HZ[peak_mud_idx])
-        # If scipy found a clinical peak in the 200..450 Hz range, use its exact frequency
+        # If the Welch PSD found a resonance peak in 200..450 Hz, use its exact frequency.
         if resonant_peaks:
             for rp in resonant_peaks:
                 rf = rp.get("frequency_hz", 0.0)
@@ -451,7 +416,7 @@ def detect_weak_areas(
     if harsh_energy > -38.0 and harsh_energy > (mid_energy + 3.0):
         harsh_idx = 21 if avg_bands[21] >= avg_bands[22] and avg_bands[21] >= avg_bands[23] else (22 if avg_bands[22] >= avg_bands[23] else 23)
         harsh_freq = float(SPECTROGRAM_FREQUENCIES_HZ[harsh_idx])
-        # If scipy found a clinical peak in the 2.5k..4.5k Hz range, use its exact frequency
+        # If the Welch PSD found a resonance peak in 2.4..4.8 kHz, use its exact frequency.
         if resonant_peaks:
             for rp in resonant_peaks:
                 rf = rp.get("frequency_hz", 0.0)
@@ -552,78 +517,24 @@ def detect_weak_areas(
     return weak_areas
 
 
-def _extract_dsp_features_with_open_source_tools(
-    samples: List[float],
-    sample_rate: int,
-    channels: Optional[List[List[float]]] = None,
-) -> Dict[str, Any]:
-    """Extract clinical acoustic features using librosa, pyloudnorm, and scipy."""
-    result: Dict[str, Any] = {
-        "lufs_integrated": None,
-        "spectral_centroid_hz": None,
-        "spectral_flatness": None,
-        "resonant_peaks": [],
-    }
-    try:
-        import numpy as np
-
-        audio_np = np.array(samples, dtype=np.float32)
-
-        # 1. ITU-R BS.1770 LUFS via pyloudnorm, on the real channels: BS.1770
-        # sums channel powers, so a downmix reads stereo 3 dB low.
-        try:
-            import pyloudnorm as pyln
-            meter = pyln.Meter(sample_rate)
-            lufs = meter.integrated_loudness(np.array(channels, dtype=np.float32).T if channels else audio_np)
-            if not math.isnan(lufs) and not math.isinf(lufs):
-                result["lufs_integrated"] = round(float(lufs), 2)
-        except Exception:
-            pass
-
-        # 2. Spectral Centroid and Flatness via librosa
-        try:
-            import librosa
-            centroid = librosa.feature.spectral_centroid(y=audio_np, sr=sample_rate)
-            flatness = librosa.feature.spectral_flatness(y=audio_np)
-            if centroid.size:
-                result["spectral_centroid_hz"] = round(float(np.mean(centroid)), 1)
-            if flatness.size:
-                result["spectral_flatness"] = round(float(np.mean(flatness)), 5)
-        except Exception:
-            pass
-
-        # 3. Clinical Resonance Detection via scipy Welch PSD & peak prominence
-        try:
-            from scipy import signal
-            nperseg = min(4096, max(512, len(samples) // 4))
-            freqs, psd = signal.welch(audio_np, sample_rate, nperseg=nperseg)
-            psd_db = 10 * np.log10(np.maximum(psd, 1e-12))
-            peaks_idx, _ = signal.find_peaks(psd_db, prominence=5.0, distance=8)
-            found_peaks = []
-            for p in peaks_idx:
-                f_val = round(float(freqs[p]), 1)
-                db_val = round(float(psd_db[p]), 1)
-                if 40.0 <= f_val <= 14000.0:
-                    found_peaks.append({"frequency_hz": f_val, "level_db": db_val})
-            found_peaks.sort(key=lambda x: x["level_db"], reverse=True)
-            result["resonant_peaks"] = found_peaks[:6]
-        except Exception:
-            pass
-    except Exception as exc:
-        logger.debug("Open source DSP extractor fallback: %s", exc)
-
-    return result
-
-
 def analyze_track_diagnostic(
     payload: bytes,
     filename: str = "track.wav",
     track_info: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """Perform full diagnostic on audio payload for a track."""
+    """Perform full diagnostic on audio payload for a track via the native C++ DSP extension."""
     started = time.perf_counter()
     track_name = track_info.get("track_name", "Track") if track_info else "Track"
     track_index = int(track_info.get("track_index", 0)) if track_info else 0
+
+    if not native_fft.available():
+        # DSP is C++ only: abstain cleanly when the native extension is disabled or missing.
+        return {
+            "ok": False,
+            "error": "the native DSP extension is not built or is disabled",
+            "track_name": track_name,
+            "track_index": track_index,
+        }
 
     try:
         channels, sample_rate, duration = _decode_pcm_channels(payload)
@@ -636,8 +547,7 @@ def analyze_track_diagnostic(
             "track_index": track_index,
         }
 
-    samples = _analysis_signal(channels)
-    if not samples:
+    if not channels or len(channels[0]) == 0:
         return {
             "ok": False,
             "error": "Audio file contains no playable samples.",
@@ -645,34 +555,70 @@ def analyze_track_diagnostic(
             "track_index": track_index,
         }
 
-    # Signal measurements
+    features = native_fft.track_diagnostic_features(
+        channels,
+        sample_rate,
+        SPECTROGRAM_FREQUENCIES_HZ,
+        time_slices=SPECTROGRAM_TIME_SLICES,
+        waveform_points=WAVEFORM_POINTS,
+    )
+    if features is None:
+        # available() is true but the loaded extension predates track_diagnostic_features.
+        return {
+            "ok": False,
+            "error": "the native DSP extension is out of date and has no track diagnostic analysis",
+            "track_name": track_name,
+            "track_index": track_index,
+        }
+
     # Peak is the loudest channel and RMS the mean of channel RMS, matching
     # analyze_wav, so the two routes agree on the same file.
-    peak_val = max((abs(v) for ch in channels for v in ch), default=0.0)
-    rms_val = sum(math.sqrt(sum(v * v for v in ch) / len(ch)) for ch in channels) / len(channels)
-    peak_dbfs = _db(peak_val)
-    rms_dbfs = _db(rms_val)
+    peak_dbfs = _db(float(features["peak"]))
+    rms_dbfs = _db(float(features["rms"]))
     crest_factor = round(peak_dbfs - rms_dbfs, 2)
 
-    # Waveform envelope points
-    waveform_peaks, waveform_rms = compute_waveform_envelope(samples, points=WAVEFORM_POINTS)
+    waveform_peaks = [round(min(1.0, float(p)), 4) for p in features["waveform_peaks"]]
+    waveform_rms = [round(min(1.0, float(r)), 4) for r in features["waveform_rms"]]
+    spectrogram_matrix = [
+        [-80.0 if math.isnan(mag) else _db(float(mag), floor=-80.0) for mag in row]
+        for row in features["spectrogram"]
+    ]
 
-    # 2D Spectrogram Matrix
-    spectrogram_matrix = compute_spectrogram_matrix(samples, sample_rate, time_slices=SPECTROGRAM_TIME_SLICES)
+    lufs_integrated: Optional[float] = None
+    if len(channels) in (1, 2):
+        try:
+            loudness = native_fft.loudness_metrics(channels, sample_rate)
+            if loudness is not None and loudness.get("integrated_lufs") is not None:
+                lufs = float(loudness["integrated_lufs"])
+                if math.isfinite(lufs):
+                    lufs_integrated = round(lufs, 2)
+        except (TypeError, ValueError, RuntimeError):
+            # Clips too short for BS.1770 gating, gated below -70 LUFS, or unsupported rates leave LUFS as None.
+            lufs_integrated = None
 
-    # Open-source DSP extraction (librosa, pyloudnorm, scipy)
-    dsp_extra = _extract_dsp_features_with_open_source_tools(samples, sample_rate, channels)
+    centroid_raw = features["spectral_centroid_hz"]
+    flatness_raw = features["spectral_flatness"]
+    spectral_centroid_hz = round(float(centroid_raw), 1) if centroid_raw is not None else None
+    spectral_flatness = round(float(flatness_raw), 5) if flatness_raw is not None else None
 
-    # Weak areas detection
+    found_peaks = []
+    for freq_hz, level_db in features["resonances"]:
+        f_val = round(float(freq_hz), 1)
+        db_val = round(float(level_db), 1)
+        if 40.0 <= f_val <= 14000.0:
+            found_peaks.append({"frequency_hz": f_val, "level_db": db_val})
+    found_peaks.sort(key=lambda x: x["level_db"], reverse=True)
+    resonant_peaks = found_peaks[:6]
+
     weak_areas = detect_weak_areas(
-        samples=samples,
+        samples=[],
         sample_rate=sample_rate,
         peak_dbfs=peak_dbfs,
         rms_dbfs=rms_dbfs,
         spectrogram=spectrogram_matrix,
         track_name=track_name,
         track_index=track_index,
-        resonant_peaks=dsp_extra.get("resonant_peaks"),
+        resonant_peaks=resonant_peaks,
     )
 
     elapsed_ms = round((time.perf_counter() - started) * 1000.0, 1)
@@ -688,10 +634,10 @@ def analyze_track_diagnostic(
             "peak_dbfs": peak_dbfs,
             "rms_dbfs": rms_dbfs,
             "crest_factor_db": crest_factor,
-            "lufs_integrated": dsp_extra.get("lufs_integrated"),
-            "spectral_centroid_hz": dsp_extra.get("spectral_centroid_hz"),
-            "spectral_flatness": dsp_extra.get("spectral_flatness"),
-            "resonant_peaks": dsp_extra.get("resonant_peaks", []),
+            "lufs_integrated": lufs_integrated,
+            "spectral_centroid_hz": spectral_centroid_hz,
+            "spectral_flatness": spectral_flatness,
+            "resonant_peaks": resonant_peaks,
             "duration_seconds": round(duration, 3),
             "sample_rate_hz": sample_rate,
         },

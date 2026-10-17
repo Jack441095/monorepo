@@ -59,14 +59,15 @@ Decisions already made:
   Existing Python DSP is moved, not extended. Each piece moves when a C++ replacement
   matches it (or beats it on labelled audio, where there is no reference to match),
   and a Python copy that nothing needs as a fallback is then deleted.
-  Still in Python on 17 Oct: the librosa feature load in `sample_embeddings.py`,
-  spectral centroid and flatness in `track_diagnostic.py`, AIFF decode for sample
-  BPM/key, and the pyloudnorm/NumPy fallbacks behind the native defaults. Audited
-  17 Oct: `target_curves.py` and `acoustic_calibration.py` do no DSP (arithmetic on
-  measured summaries); in `psychoacoustics.py` only `compute_erb_spectrum` (FFT bins
-  to 40 ERB bands, used by the reference matcher) is DSP, the rest is masking maths
-  on band profiles. A whole-backend rewrite is outside this plan.
-  - [ ] Key/tempo review fixes before merge (adversary review, 17 Oct). Blockers:
+   Still in Python on 17 Oct: the librosa feature load in `sample_embeddings.py`,
+  AIFF decode for sample BPM/key, and the pyloudnorm/NumPy fallbacks behind the
+  native defaults. Audited 17 Oct: `target_curves.py` and `acoustic_calibration.py`
+  do no DSP (arithmetic on measured summaries); in `psychoacoustics.py` only
+  `compute_erb_spectrum` (FFT bins to 40 ERB bands, used by the reference
+  matcher) is DSP, the rest is masking maths on band profiles. A whole-backend
+  rewrite is outside this plan.
+  - [x] Key/tempo review fixes before merge (adversary review, 17 Oct, landed
+    `dcd1c48f`). Blockers:
     a WAV declaring a 2 Hz sample rate sends the chroma loop into an endless
     loop (hop 0) with the GIL released; and held tones get an invented BPM
     (an 8 s 220 Hz sine reads 112 BPM at strength 0.955, where librosa said
@@ -114,7 +115,7 @@ Decisions already made:
         receipt times that disagree (9.2, 10.1 and 10.2 s), and a "random
         chops" line that overclaims.
     - Blocker and all three should-fixes, nits, receipt and tests completed
-      the same day (17 Oct), awaiting fresh reviewer re-check:
+      the same day (17 Oct) and landed on `main` (`dcd1c48f`):
       - Each band's rise is now measured from the loudest of its previous 4
         frames (`kOnsetReferenceFrames`), not from the frame before.
       - Held tones getting a BPM: 61 → 4 of 1020 at 44.1 kHz and 0 at
@@ -149,18 +150,39 @@ Decisions already made:
         restored afterwards.
       - 140 scoped tests pass; full suite is 6404 passed, 48 skipped, 3
         pre-existing failures (`test_mixing_doctor` x2,
-        `test_fixed_session_grounded_benchmark_qualifies`). Waiting on a fresh
-        adversary review before committing and merging.
-  - [ ] Next: move `track_diagnostic.py` (the audio-upload track diagnostic) to C++.
-    It decodes, measures peak/RMS, builds the waveform envelope and a 64-slice
-    Goertzel spectrogram in pure Python loops, and calls pyloudnorm, librosa
-    (centroid, flatness) and scipy (Welch resonance peaks): 4.6 s on one 200 s
-    stem. Decode, peak/RMS and loudness reuse existing kernels; one new kernel
-    does the rest. The Python decoder stays only for 8-bit and multichannel WAVs.
-    Bug found 17 Oct, fix with the move: silent frames count as perfectly flat,
-    so on that guitar stem (38% silent frames) flatness read 0.376 where the
-    playing frames average 0.0002, and the centroid read 998 Hz instead of
-    1524 Hz. Skip frames 60 dB under the loudest, as key/tempo does.
+        `test_fixed_session_grounded_benchmark_qualifies`).
+  - [ ] Move `track_diagnostic.py` (the audio-upload track diagnostic) to C++
+    (implemented on `feature/native-track-diagnostic`, 17 Oct; awaiting
+    adversary review before merge).
+    - Wired `tooling/native/dsp_core/track_diagnostic_bindings.cpp` into
+      `_kenn_dsp_native` and `native_fft.track_diagnostic_features`, switched
+      `track_diagnostic.py` to `native_fft.decode_pcm`,
+      `native_fft.loudness_metrics` and `track_diagnostic_features`, deleted
+      `_extract_dsp_features_with_open_source_tools` and all `librosa`,
+      `scipy` and `pyloudnorm` uses in that file, and fixed the docstring from
+      40 bark bands to 31 log bands. The Python decoder stays only for 8-bit
+      and >2-channel WAVs.
+    - Parity across 20 corpus stems (`docs/research/CPP_DSP_TRACK_DIAGNOSTIC_RECEIPT.md`):
+      0.0 difference on `peak_dbfs`, `rms_dbfs`, `lufs_integrated` (all 19
+      voiced stems match to 0.00 LU; silent `06_Claps.wav` is `None` on both),
+      all 300 `waveform` peak/RMS points, all 39,680 `spectrogram` cells, and
+      all `resonant_peaks` frequencies and levels. End-to-end time across the
+      20 stems dropped from 34.37 s to 14.97 s (`al_james/29_ElecGtr4.wav`
+      from 3.75 s to 0.82 s).
+    - Silent-frame flatness and centroid fix: frames more than 60 dB below the
+      loudest frame are skipped, and pure silence returns `None` for both. On
+      the 4M-frame analysis window of `al_james/29_ElecGtr4.wav` (5152 of 7813
+      frames silent, 65.9%; the earlier 38% figure was on all 8.84M frames),
+      flatness moves from `0.65787` to `0.00016` and centroid from `538.8 Hz`
+      to `1558.3 Hz`. On digital silence (`06_Claps.wav`), centroid and
+      flatness move from `0.0 Hz` and `1.0` to `None`.
+    - Added 4 tests in `test_track_diagnostic.py` (polarity-flipped `L = -R`
+      waveform, silence returning `None` for centroid/flatness, stale extension
+      abstaining cleanly, unsupported ADPCM WAV returning `ok=False`); all 13
+      tests in `test_track_diagnostic.py` pass on both Accelerate and scalar
+      (`-DKENN_USE_ACCELERATE=OFF`) builds, and the full suite is 6408 passed,
+      48 skipped, 3 pre-existing failures (`test_mixing_doctor` x2,
+      `test_fixed_session_grounded_benchmark_qualifies`).
   - [ ] Then `compute_erb_spectrum`, and the librosa load in `sample_embeddings.py`.
 - AbletonOSC is the Live transport owner. UI, HTTP, voice and MCP must share the
   same typed policy and execution services, without a second write authority.

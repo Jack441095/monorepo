@@ -234,6 +234,49 @@ def key_tempo_features(samples: Any, sample_rate: int) -> dict[str, Any] | None:
     return dict(function(values, int(sample_rate)))
 
 
+def track_diagnostic_features(
+    channels: list[Any] | Any,
+    sample_rate: int,
+    band_frequencies_hz: list[float] | tuple[float, ...],
+    *,
+    time_slices: int = 64,
+    waveform_points: int = 300,
+) -> dict[str, Any] | None:
+    """Return native waveform envelope, Goertzel spectrogram, spectral shape and Welch resonances; None when unavailable.
+
+    Accepts a sequence of 1D per-channel arrays or a 2D ``(frames, channels)``
+    array. Silent frames (>60 dB below the loudest frame) are excluded from the
+    spectral centroid and flatness means, and pure silence reports ``None`` for
+    both rather than 0 Hz and 1.0.
+    """
+    module = _load()
+    function = None if module is None else getattr(module, "track_diagnostic_features", None)
+    if function is None:
+        return None
+    import numpy as np
+
+    if isinstance(channels, np.ndarray) and channels.ndim == 2:
+        matrix = np.ascontiguousarray(channels, dtype=np.float32)
+    else:
+        arrays = [np.asarray(ch, dtype=np.float32) for ch in channels]
+        if not arrays or any(arr.ndim != 1 or arr.size == 0 for arr in arrays):
+            raise ValueError("native track diagnostic requires non-empty one-dimensional channels")
+        if any(arr.shape != arrays[0].shape for arr in arrays[1:]):
+            raise ValueError("native track diagnostic requires equal-length channels")
+        matrix = np.ascontiguousarray(np.column_stack(arrays), dtype=np.float32)
+    if matrix.shape[0] == 0 or matrix.shape[1] == 0:
+        raise ValueError("native track diagnostic requires a non-empty (frames, channels) matrix")
+    return dict(
+        function(
+            matrix,
+            float(sample_rate),
+            [float(f) for f in band_frequencies_hz],
+            int(time_slices),
+            int(waveform_points),
+        )
+    )
+
+
 __all__ = [
     "available",
     "channel_metrics",
@@ -242,4 +285,5 @@ __all__ = [
     "loudness_metrics",
     "masking_band_energy",
     "spectral_powers",
+    "track_diagnostic_features",
 ]
