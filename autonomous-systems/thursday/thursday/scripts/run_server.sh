@@ -10,23 +10,17 @@
 # means a reassignment (re-auth, device re-registration) doesn't leave the
 # service silently bound to a stale, wrong address.
 #
-# Working directory is THIS repo (autonomous-systems/thursday), not
-# Audio_Too -- `python -m thursday.server` resolves the `thursday` package
-# from cwd first, so this is what makes the extraction's copy the one that
-# actually runs. thursday.repo_root.audio_too_root() (an upward search,
-# not a fixed relative path -- see that module's docstring) still finds
-# real Audio_Too/ on disk at runtime for the genuine live integrations
-# documented in docs/EXTRACTION_COUPLING.md (Ableton bridge, AudioGen,
-# Kokoro TTS model files, business/app/db, etc) -- this script does not
-# need to know where Audio_Too lives.
+# Working directory is THIS repo (autonomous-systems/thursday) --
+# `python -m thursday.server` resolves the `thursday` package from cwd
+# first. Audio_Too, which held the live integrations listed in
+# docs/EXTRACTION_COUPLING.md (Ableton bridge, Kokoro model files, the
+# business DB, .env), was removed on 18 Oct 2026, so Thursday is parked:
+# the server starts, but those integrations report missing until they get
+# a new home. See thursday/repo_root.py for the archive tag.
 #
-# Python interpreter: reuses Audio_Too's own .venv rather than maintaining
-# a duplicate one here. Every dependency this repo's pyproject.toml lists
-# as a lazy/optional extra (numpy, onnxruntime, httpx, PyYAML,
-# faster-whisper, kokoro-onnx, sounddevice, soundfile, psutil) is already
-# installed there for the exact same real features (TTS/STT, HTTP calls,
-# YAML configs) -- installing a second copy would just be duplication of
-# the same real dependency set, not decoupling from anything.
+# Python interpreter: this project's own .venv (gitignored) when present.
+# It used to borrow Audio_Too/.venv, which had already disappeared before
+# Audio_Too itself was removed, so the launchd job had been exiting 78.
 #
 # Invoked by ~/Library/LaunchAgents/com.nitedsp.thursday-server.plist.
 # Can also be run directly for a one-off foreground start.
@@ -54,12 +48,12 @@ fi
 
 PORT="${THURSDAY_SERVER_PORT:-8092}"
 
-# Reuses Audio_Too's .venv (see header comment) -- resolved relative to
-# THURSDAY_REPO_DIR's sibling Audio_Too/ so this still works if the
-# monorepo is checked out somewhere other than this exact path.
-AUDIO_TOO_VENV_PYTHON="$THURSDAY_REPO_DIR/../../Audio_Too/.venv/bin/python3"
-if [[ -x "$AUDIO_TOO_VENV_PYTHON" ]]; then
-  PYTHON="$AUDIO_TOO_VENV_PYTHON"
+# No venv yet falls back to the system python3: `import thursday` is pure
+# standard library, so the server still starts and only the optional
+# extras (TTS/STT, httpx, YAML) fail lazily when called.
+VENV_PYTHON="$THURSDAY_REPO_DIR/.venv/bin/python3"
+if [[ -x "$VENV_PYTHON" ]]; then
+  PYTHON="$VENV_PYTHON"
 else
   PYTHON="python3"
 fi

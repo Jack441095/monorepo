@@ -19,12 +19,12 @@ import pytest
 import thursday.shadow_adapters as sa
 
 # The two live-checkout tests below assert dev-machine reality (full
-# monorepo with Audio_Too). On the purpose-built server deploy
+# monorepo checkout). On the purpose-built server deploy
 # (THURSDAY_DEPLOY_PROFILE=server), which intentionally ships only the
 # business corpus, they skip honestly instead of faking a 12G checkout.
 _server_deploy = pytest.mark.skipif(
     os.environ.get("THURSDAY_DEPLOY_PROFILE") == "server",
-    reason="needs full monorepo checkout with Audio_Too (dev machine only)",
+    reason="needs full monorepo checkout (dev machine only)",
 )
 
 
@@ -33,13 +33,12 @@ def test_nite_dsp_root_uses_env_var_override(monkeypatch):
     assert sa._nite_dsp_root() == "/tmp/fake-nite-dsp"
 
 
-def test_nite_dsp_root_search_finds_real_directory_containing_audio_too_and_products(monkeypatch, tmp_path):
+def test_nite_dsp_root_search_finds_real_directory_containing_products_and_autonomous_systems(monkeypatch, tmp_path):
     monkeypatch.delenv("NITE_DSP_ROOT", raising=False)
     fake_root = tmp_path / "nite_dsp_root"
-    (fake_root / "Audio_Too").mkdir(parents=True)
-    (fake_root / "products").mkdir()
-    fake_thursday_dir = fake_root / "Audio_Too" / "thursday"
-    fake_thursday_dir.mkdir()
+    (fake_root / "products").mkdir(parents=True)
+    fake_thursday_dir = fake_root / "autonomous-systems" / "thursday" / "thursday"
+    fake_thursday_dir.mkdir(parents=True)
     fake_module = fake_thursday_dir / "shadow_adapters.py"
     fake_module.write_text("x = 1\n")
 
@@ -49,7 +48,7 @@ def test_nite_dsp_root_search_finds_real_directory_containing_audio_too_and_prod
 
 def test_adapters_registered_for_all_real_current_products():
     assert set(sa.ADAPTERS) == {
-        "nite_submit", "slo", "kenn", "audio_too",
+        "nite_submit", "slo", "kenn",
         "thursday_extraction", "platform_support", "layer_alignment",
     }
     for adapter in sa.ADAPTERS.values():
@@ -66,8 +65,8 @@ def test_registered_adapter_paths_actually_exist_on_this_machine():
 
 
 @_server_deploy
-def test_get_git_state_on_real_audio_too_returns_real_fields():
-    state = sa.ADAPTERS["audio_too"].get_git_state()
+def test_get_git_state_on_real_kenn_returns_real_fields():
+    state = sa.ADAPTERS["kenn"].get_git_state()
     assert state["head_sha"] != "UNKNOWN"
     assert state["head_sha"] != "ERROR"
     assert len(state["head_sha"]) == 40

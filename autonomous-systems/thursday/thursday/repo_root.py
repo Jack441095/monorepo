@@ -1,18 +1,20 @@
-"""Shared upward-search helpers for locating the NITE DSP monorepo root and
-Audio_Too within it.
+"""Shared upward-search helpers for locating the NITE DSP monorepo root, and
+the retired Audio_Too tree for the integrations that still name it.
 
-A number of modules need Audio_Too's real, live integrations (app.db, the
-Ableton bridge, Kokoro's model files under studio/kenn, scripts/
-action_policy, etc). Historically each computed that path itself with a
-fixed ``Path(__file__).resolve().parent.parent`` -- correct only by
-coincidence, because Audio_Too/thursday/X.py's parent.parent happens to
-equal Audio_Too/. This extraction (autonomous-systems/thursday) lives one
-level deeper AND is a *sibling* of Audio_Too, not an ancestor -- no amount
-of ".parent" from here ever reaches it. An upward search for the shared
-NITE_DSP root (same pattern as thursday.shadow_adapters._nite_dsp_root())
-is the only fix that's correct unmodified from both copies, which is what
-lets this file be identical in Audio_Too/thursday/ and here rather than
-needing a per-copy fallback-depth divergence like the ops/ modules.
+A number of modules were written against Audio_Too's live integrations
+(app.db, the Ableton bridge, Kokoro's model files under studio/kenn,
+scripts/action_policy, etc). Audio_Too was removed from the monorepo on
+18 Oct 2026; its last state is the tag ``archive/audio-too-final``. Most of
+those integrations were already dead before that (business/ had been
+renamed server/, the .venv and the audio_too package were gone), so
+Thursday is parked rather than running: the modules still import, and the
+calls that reach into Audio_Too fail with FileNotFoundError /
+ModuleNotFoundError instead of finding a wrong path.
+
+An upward search for the monorepo root is used instead of a fixed
+``Path(__file__).parents[N]`` because this file used to exist in two copies
+at different depths (Audio_Too/thursday/ and autonomous-systems/thursday/),
+and a fixed index was right in only one of them.
 """
 
 from __future__ import annotations
@@ -23,8 +25,9 @@ from pathlib import Path
 
 def nite_dsp_root() -> Path:
     """NITE_DSP_ROOT env var wins if set. Otherwise search upward from this
-    file for the monorepo root (identified by containing both Audio_Too/
-    and products/). Bounded to 8 levels so a misconfigured environment
+    file for the monorepo root (identified by containing both products/
+    and autonomous-systems/; until 18 Oct 2026 the second marker was
+    Audio_Too/). Bounded to 8 levels so a misconfigured environment
     fails with a clear wrong-but-findable fallback rather than walking to
     filesystem root.
     """
@@ -34,21 +37,24 @@ def nite_dsp_root() -> Path:
 
     here = Path(__file__).resolve()
     for candidate in list(here.parents)[:8]:
-        if (candidate / "Audio_Too").is_dir() and (candidate / "products").is_dir():
+        if (candidate / "products").is_dir() and (candidate / "autonomous-systems").is_dir():
             return candidate
 
-    # Nothing found -- fall back to this file's own known depth in
-    # Audio_Too/thursday/ (parents[1]). Callers relying on real Audio_Too
-    # integrations will fail honestly (FileNotFoundError / ModuleNotFoundError)
+    # Nothing found -- fall back to this file's own known depth
+    # (autonomous-systems/thursday/thursday/repo_root.py -> parents[3]).
+    # Callers will fail honestly (FileNotFoundError / ModuleNotFoundError)
     # rather than silently using a wrong path, since this guess almost
     # certainly won't contain the real monorepo layout either if the
     # search above found nothing.
-    return here.parents[1]
+    return here.parents[3]
 
 
 def audio_too_root() -> Path:
     """AUDIO_TOO_ROOT env var wins if set. Otherwise Audio_Too/ inside
-    nite_dsp_root().
+    nite_dsp_root(), which no longer exists after the 18 Oct 2026 removal,
+    so every path built from it reports missing. To bring the legacy
+    integrations back for a one-off, check out ``archive/audio-too-final``
+    in a worktree and point AUDIO_TOO_ROOT at its Audio_Too/.
     """
     configured = os.environ.get("AUDIO_TOO_ROOT", "").strip()
     if configured:
@@ -67,7 +73,7 @@ def search_upward(anchor: Path, targets: tuple[str, ...], depth: int = 8,
     only the target relative path(s) and the fallback depth differ, so
     those stay with the caller: this returns the first ancestor of
     `anchor` containing any of `targets` (file or directory), or None.
-    With require_all=True (shadow_adapters' Audio_Too+products markers)
+    With require_all=True (shadow_adapters' products+autonomous-systems markers)
     the ancestor must contain every target. Callers keep their own
     fallback + honest "Evidence missing" behavior. NITE_DSP_ROOT env var
     still wins when set.

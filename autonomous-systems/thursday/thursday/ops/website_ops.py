@@ -107,7 +107,7 @@ def pricing_check() -> str:
     lines.append(f"  Truth-sheet beta: {version or 'not found live'}")
     offerings = fo.get_offerings()
     if offerings:
-        lines.append(f"  Audio_Too services (business_knowledge.json, NOT website products): "
+        lines.append(f"  Studio services (business_knowledge.json, NOT website products): "
                      f"{len(offerings)} offerings from £{min(o.get('price_from_gbp', 0) for o in offerings)}")
         lines.append("  Scope note: website sells PRODUCTS (Submit £3 planned, SLO/KENN at-launch); "
                      "business_knowledge sells SERVICES (£45-180). No drift check applies across lines -- "

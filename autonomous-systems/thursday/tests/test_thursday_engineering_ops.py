@@ -45,14 +45,14 @@ def test_release_hygiene_never_claims_a_code_review():
 
 def test_release_hygiene_unreachable_repo_reported_honestly(monkeypatch):
     # "real" is whatever this machine actually has: on a dev checkout
-    # Audio_Too resolves (1 unreachable: ghost); on the purpose-built
+    # KENN resolves (1 unreachable: ghost); on the purpose-built
     # server deploy it doesn't (2 unreachable). The test pins the honest
     # behavior (UNKNOWN named + count math), not a fixed count.
-    real_state = sa.ADAPTERS["audio_too"].get_git_state()
+    real_state = sa.ADAPTERS["kenn"].get_git_state()
     real_unreachable = real_state.get("branch") in ("UNKNOWN", "ERROR")
     fake_adapters = {
         "ghost": sa.ShadowAdapter("ghost", "/nonexistent/path/xyz"),
-        "real": sa.ADAPTERS["audio_too"],
+        "real": sa.ADAPTERS["kenn"],
     }
     monkeypatch.setattr(sa, "ADAPTERS", fake_adapters)
     out = eng.release_hygiene_check()

@@ -1,7 +1,7 @@
 """Support (Thursday Ops upgrade, phase 10).
 
 Two real, live sources, neither paraphrased into code:
-- `business/app/business_knowledge.json`'s `faqs` list — the real,
+- `data/business_knowledge.json`'s `faqs` list — the real,
   current FAQ content already shown to real enquirers, read fresh every
   call (shares finance_ops.py's `_business_knowledge_path()` resolution).
 - `qa_ops.beta_readiness_check()`'s live-parsed checklist state — private-preview handoff gate's

@@ -1,8 +1,8 @@
 """Finance / Admin (Thursday Ops upgrade, phase 9).
 
 Scoped to exactly one real, live data source:
-`business/app/business_knowledge.json`'s `offerings` list — the real,
-current Audio_Too service price list, read fresh every call so a price
+`data/business_knowledge.json`'s `offerings` list — the real,
+current studio-services price list, read fresh every call so a price
 change there is reflected immediately, never stale.
 
 **Deliberately does not add invoice listing.** Checked first (per the
@@ -32,51 +32,23 @@ from thursday.redaction import get_logger as _get_redacting_logger
 
 logger = _get_redacting_logger(__name__)
 
-_BUSINESS_KNOWLEDGE_RELATIVE_PATHS = (
-    # In Audio_Too/thursday/ops/, 2 parents up *is* Audio_Too, so the bare
-    # "business/..." path happens to resolve there directly. This
-    # extraction copy is a sibling of Audio_Too, not nested under it, so
-    # "Audio_Too/business/..." is added to still reach the same real,
-    # live file from any NITE_DSP-root-or-above candidate -- deliberately
-    # not vendoring a copy of Audio_Too's business data, same reasoning
-    # as the DEFAULT_LLM coupling in registry/handlers.py (see
-    # docs/EXTRACTION_COUPLING.md).
-    # NOTE 2026-09-18: Audio_Too renamed business/ -> server/ (see
-    # Audio_Too/server/app/business_knowledge.json). Both layouts are
-    # listed so old and new checkouts resolve.
-    "business/app/business_knowledge.json",
-    "server/app/business_knowledge.json",
-    "Audio_Too/business/app/business_knowledge.json",
-    "Audio_Too/server/app/business_knowledge.json",
-)
+# Thursday's own copy, moved out of Audio_Too/server/app/ on 18 Oct 2026
+# when Audio_Too was retired (earlier history under archive/audio-too-final).
+# A fixed path is right here, unlike the upward searches elsewhere, because
+# the file now lives inside this project: ops/ -> thursday/ -> project root.
+_BUSINESS_KNOWLEDGE_FILE = Path(__file__).resolve().parents[2] / "data" / "business_knowledge.json"
 
 
 def _business_knowledge_path() -> Path | None:
-    # Content-aware upward search delegated to
-    # thursday.repo_root.search_upward (2026-09-18 audit fix) -- same
-    # reasoning as qa_ops.nite_dsp_root(): a fixed parents[N] index breaks
-    # the moment the module moves (as it did, thursday/finance_ops.py ->
-    # thursday/ops/finance_ops.py, 2026-09-02), while an upward search for
-    # the actual target finds it correctly regardless of nesting depth.
-    # THURSDAY_BUSINESS_KNOWLEDGE_FILE wins when set (server deploys where
-    # the monorepo layout doesn't exist -- see deploy notes).
+    # THURSDAY_BUSINESS_KNOWLEDGE_FILE wins when set (server deploys that
+    # ship the corpus somewhere else -- see deploy notes). A missing file
+    # returns None so callers print "Evidence missing" rather than prices
+    # they cannot back up.
     import os
 
     configured = os.environ.get("THURSDAY_BUSINESS_KNOWLEDGE_FILE", "").strip()
-    if configured:
-        candidate = Path(configured).expanduser()
-        return candidate if candidate.is_file() else None
-    from thursday.repo_root import search_upward
-
-    here = Path(__file__).resolve()
-    found = search_upward(here, _BUSINESS_KNOWLEDGE_RELATIVE_PATHS, depth=7)
-    if found is None:
-        return None
-    for rel in _BUSINESS_KNOWLEDGE_RELATIVE_PATHS:
-        p = found / rel
-        if p.exists():
-            return p
-    return None
+    candidate = Path(configured).expanduser() if configured else _BUSINESS_KNOWLEDGE_FILE
+    return candidate if candidate.is_file() else None
 
 
 def get_offerings() -> list[dict]:
@@ -100,7 +72,7 @@ def pricing_summary() -> str:
         return (
             "PRICING SUMMARY\n\n"
             "Evidence missing — could not read the real service price "
-            "list (business/app/business_knowledge.json)."
+            "list (data/business_knowledge.json)."
         )
 
     lines = ["PRICING SUMMARY", ""]

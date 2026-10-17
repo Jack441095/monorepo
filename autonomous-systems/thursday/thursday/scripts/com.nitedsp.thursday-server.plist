@@ -17,10 +17,9 @@
 
       Auth: THURSDAY_SERVER_TOKEN, loaded by server.py itself from
       Audio_Too/.env (gitignored, not in this plist) via
-      thursday.repo_root.audio_too_root()'s upward search -- Audio_Too
-      still holds the real credentials/model files/business data this
-      server's live integrations need (see docs/EXTRACTION_COUPLING.md),
-      independent of which repo's server.py process is actually running.
+      thursday.repo_root.audio_too_root(). Audio_Too was removed on
+      18 Oct 2026, so until the .env has a new home set AUDIO_TOO_ROOT
+      to wherever it now lives (see thursday/repo_root.py).
 
       Kill switch: `launchctl unload ~/Library/LaunchAgents/com.nitedsp.thursday-server.plist`
       or remove this file. The server is read/write against local state
@@ -62,7 +61,7 @@
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
-        <string>/usr/local/bin:/usr/bin:/bin:/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/Audio_Too/.venv/bin</string>
+        <string>/usr/local/bin:/usr/bin:/bin</string>
     </dict>
 </dict>
 </plist>

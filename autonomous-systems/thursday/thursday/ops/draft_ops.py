@@ -41,7 +41,7 @@ def quote_draft(service_query: str, client_name: str = "") -> str:
     offerings = _offerings()
     if not offerings:
         return ("QUOTE DRAFT — NOT SENT\n\nEvidence missing — could not read the real "
-                "service price list (business/app/business_knowledge.json).")
+                "service price list (data/business_knowledge.json).")
     q = service_query.strip().lower()
     match = next((o for o in offerings
                   if q in str(o.get("id", "")).lower() or q in str(o.get("name", "")).lower()

@@ -1,0 +1,92 @@
+{
+  "disclaimer": "Indicative guidance only — final quotes depend on track count, length, and deadline. Use the enquiry form for a confirmed price.",
+  "contact_email": "audio_too@outlook.com",
+  "offerings": [
+    {
+      "id": "mixing",
+      "name": "Mixing",
+      "summary": "Balance, clarity, and polish for finished-sounding tracks. Stereo mix delivery; stems optional on request.",
+      "price_from_gbp": 180,
+      "turnaround": "Typically 5–10 working days after stems are received",
+      "includes": ["Two revision rounds included in the standard package", "Stem or stereo mix delivery (WAV)", "Level-matched preview before final print"],
+      "keywords": ["mix", "mixing", "mixdown", "balance", "stems", "revision"]
+    },
+    {
+      "id": "mastering",
+      "name": "Mastering",
+      "summary": "Final loudness, tone, and format prep for streaming or release.",
+      "price_from_gbp": 60,
+      "turnaround": "Typically 2–5 working days",
+      "includes": ["One revision round", "Streaming-ready WAV (and MP3 on request)", "LUFS guidance for your platform"],
+      "keywords": ["master", "mastering", "loudness", "lufs", "release", "streaming"]
+    },
+    {
+      "id": "recording",
+      "name": "Vocal recording",
+      "summary": "Session prep and recording support for vocals at home or in studio.",
+      "price_from_gbp": 120,
+      "turnaround": "By appointment — share your deadline in the enquiry",
+      "includes": ["Pre-session checklist", "Clean exports for your mix engineer"],
+      "keywords": ["record", "recording", "vocal", "vocals", "session"]
+    },
+    {
+      "id": "podcast",
+      "name": "Podcast editing",
+      "summary": "Dialogue cleanup, edits, leveling, and export for your host platform.",
+      "price_from_gbp": 90,
+      "turnaround": "Typically 3–7 working days per episode (length dependent)",
+      "includes": ["Noise reduction and leveling", "Edit points as agreed", "Export to your preferred format"],
+      "keywords": ["podcast", "dialogue", "episode", "edit", "cleanup"]
+    },
+    {
+      "id": "cleanup",
+      "name": "Audio cleanup",
+      "summary": "Noise reduction, repair, and restoration for problem recordings.",
+      "price_from_gbp": 75,
+      "turnaround": "Typically 3–5 working days",
+      "includes": ["Assessment before work starts", "Before/after preview where useful"],
+      "keywords": ["cleanup", "restore", "noise", "repair", "restoration"]
+    },
+    {
+      "id": "consultation",
+      "name": "Consultation",
+      "summary": "Short call or written feedback on session prep, workflow, or delivery.",
+      "price_from_gbp": 45,
+      "turnaround": "Usually within 48 hours of booking",
+      "includes": ["Actionable next steps", "No obligation to book mixing/mastering"],
+      "keywords": ["consult", "consultation", "advice", "call", "feedback"]
+    }
+  ],
+  "faqs": [
+    {
+      "id": "quote",
+      "question": "How do I get a quote?",
+      "answer": "Send an enquiry with service type, deadline, track count, and what files you have ready. You'll get a clear next step — not an automated contract price.",
+      "keywords": ["quote", "price", "pricing", "cost", "how much", "rate", "fee"]
+    },
+    {
+      "id": "stems",
+      "question": "How should I send stems?",
+      "answer": "Export WAV stems at the same sample rate, with processing off unless agreed. Label tracks clearly (kick, bass, vocals, etc.). Include a rough mix reference if you have one.",
+      "keywords": ["stem", "stems", "handoff", "export", "wav", "files", "upload"]
+    },
+    {
+      "id": "revisions",
+      "question": "How many revisions are included?",
+      "answer": "Standard mixing includes two revision rounds after the first mix. Mastering includes one revision round. Extra rounds can be quoted if the scope grows.",
+      "keywords": ["revision", "revisions", "changes", "feedback", "round"]
+    },
+    {
+      "id": "turnaround",
+      "question": "What turnaround should I expect?",
+      "answer": "Turnaround starts when stems or files are received and any questions are answered. Rush deadlines may be possible — mention your date in the enquiry.",
+      "keywords": ["turnaround", "deadline", "how long", "timeline", "when", "delivery"]
+    },
+    {
+      "id": "payment",
+      "question": "When is payment due?",
+      "answer": "Payment terms are confirmed in your quote or invoice. Typically a deposit or full payment is agreed before final delivery files are released.",
+      "keywords": ["payment", "pay", "deposit", "invoice", "upfront"]
+    }
+  ]
+}

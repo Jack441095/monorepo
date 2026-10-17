@@ -56,7 +56,7 @@
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
-        <string>/usr/local/bin:/usr/bin:/bin:/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/Audio_Too/.venv/bin</string>
+        <string>/usr/local/bin:/usr/bin:/bin</string>
     </dict>
 </dict>
 </plist>

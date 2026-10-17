@@ -62,7 +62,8 @@ class ShadowAdapter:
 def _nite_dsp_root() -> str:
     """NITE_DSP_ROOT env var wins if set. Otherwise search upward from
     this file for the monorepo root (identified by containing both
-    Audio_Too/ and products/) -- mirrors thursday.ops.qa_ops.nite_dsp_root(),
+    products/ and autonomous-systems/; Audio_Too/ was the second marker
+    until it was removed on 18 Oct 2026) -- mirrors thursday.ops.qa_ops.nite_dsp_root(),
     which replaced an equivalent fixed-parent-index bug found 2026-09-02
     (see docs/NITE_DSP_THURSDAY_AUDIT_AND_UPGRADE_PLAN_V1.md). The paths
     below were previously hardcoded to a pre-NITE_DSP directory layout
@@ -81,7 +82,7 @@ def _nite_dsp_root() -> str:
     from pathlib import Path as _Path
     from thursday.repo_root import search_upward
     here = _Path(__file__).resolve()
-    found = search_upward(here, ("Audio_Too", "products"), depth=7, require_all=True)
+    found = search_upward(here, ("products", "autonomous-systems"), depth=7, require_all=True)
     if found is not None:
         return str(found)
     return _os.path.dirname(_os.path.dirname(_os.path.dirname(str(here.parent))))
@@ -96,7 +97,6 @@ ADAPTERS = {
     "nite_submit": ShadowAdapter("nite_submit", os.path.join(PARENT_DIR, "products", "nite-submit")),
     "slo": ShadowAdapter("slo", os.path.join(PARENT_DIR, "products", "slo")),
     "kenn": ShadowAdapter("kenn", os.path.join(PARENT_DIR, "products", "kenn")),
-    "audio_too": ShadowAdapter("audio_too", os.path.join(PARENT_DIR, "Audio_Too")),
     "thursday_extraction": ShadowAdapter("thursday_extraction", os.path.join(PARENT_DIR, "autonomous-systems", "thursday")),
     "platform_support": ShadowAdapter("platform_support", os.path.join(PARENT_DIR, "autonomous-systems", "platform-support")),
     "layer_alignment": ShadowAdapter("layer_alignment", os.path.join(PARENT_DIR, "audio-technology", "layer-alignment")),
