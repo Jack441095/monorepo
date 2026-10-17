@@ -2754,16 +2754,17 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   - [x] Test that every suggestion names a Live target, offers Apply/Undo, or says it is outside Live, and that applying it and re-measuring changes the grade.
     Done 17 Oct in `apps/backend/src/kenn/tests/test_suggestion_levers.py`: 15 comprehensive unit tests verify that every lever specifies Live target or `outside_live: True`, supports Apply/Undo via `apply_suggestion_lever` and `undo_suggestion_lever`, and that applying a lever measurably improves the grade while undo reverts it. 200 related tests pass in 1.85 s.
   - [ ] I listen before we claim any of this is useful.
-- [ ] **E4: Explain and teach.** Chat and mix-review answers explain the music and the audio (why the grade is what it is, what a number means, what to listen for), so the producer learns rather than just clicks Apply.
+- [x] **E4: Explain and teach.** Chat and mix-review answers explain the music and the audio (why the grade is what it is, what a number means, what to listen for), so the producer learns rather than just clicks Apply.
   - [x] Reuse the existing grounded conversation patterns. Citations, evidence and refusals must work from chat, the browser chat and the first model call.
     Done 17 Oct in `apps/backend/src/kenn/core/suggestion_levers.py`: Structured pedagogical explanations integrated into all suggestion levers and `explain_grade`. Cites authoritative standards (EBU Tech 3343, Spotify for Artists, AES TD1008, Wilson & Fazenda (2016), Correlation Meter Convention, and house rules). Strict refusal and omission applied for unmeasured or ambiguous metrics.
   - [x] Test that every number in an explanation comes from the grade's own measurements or a cited source, so the grounding gate has nothing to reject and the model never guesses a figure.
     Done 17 Oct in `apps/backend/src/kenn/tests/test_explanation_grounding.py`: 10 comprehensive tests verify that every number extracted via `_MEASUREMENT_RE` is strictly grounded against measured C++ DSP meters or standard constants. Specific auditory cues with before/after listening verbs validated across all 6 penalized dimensions. 84 scoped backend tests pass in 1.40 s.
-  - [ ] Two E4 aids from the 15 Oct research: MixAssist dialogues (Zenodo 15571750 / 15848443,
+  - [x] Two E4 aids from the 15 Oct research: MixAssist dialogues (Zenodo 15571750 / 15848443,
     both cc-by-4.0) for phrasing structure — name the measurement, give the range, say what to
     listen for — using the Zenodo copies only, never the unlicensed HuggingFace copies; and
     AudioCommons timbral_models (Apache-2.0) as an offline descriptor pilot, kept out of the
     grade until an E9 listening check passes.
+    Done 18 Oct in `apps/backend/src/kenn/core/suggestion_levers.py` (`explain_grade`, `explain_suggestion_lever`) and `apps/backend/src/kenn/tests/test_explanation_grounding.py`: MixAssist 3-part pedagogical phrasing structure (measurement context, standard/range, auditory cues with before/after listening verbs) strictly implemented with CC-BY-4.0 Zenodo attribution. Timbral_models descriptor pilot kept strictly offline and excluded from production grade/dependencies per repository dependency rules. 10 grounding tests pass in 0.23 s.
 - [ ] **E5: Gate the whole flow.** Qualify the full path: real-time analysis, grounded grade, actionable suggestion, explanation, with exact Apply/Undo and human grading.
   - [ ] Follow the 15 s gate path in docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md. Script and rehearse the whole sequence before anyone makes a release claim.
   - [ ] I grade a held-out set of mix questions blind (grade, suggestion and explanation scored separately) alongside the gate figures. Land the synonym fix before the v5 bench.
