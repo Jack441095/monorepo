@@ -1,9 +1,11 @@
 # KENN V2-A Evaluation Workspace
 
-This isolated repository holds a black-box, synthetic qualification harness for
-the current KENN/Mix Review implementation. `Audio_Too` is read-only.
-
-Run: `python benchmark/run_golden_benchmark.py`
+Synthetic qualification harnesses and their frozen results. The V2-A golden
+benchmark and the V2-D product-qualification runner drove the Python Mix Review
+engine inside `Audio_Too`; both were removed with it on 18 Oct 2026 (last state
+under the tag `archive/audio-too-final`). Their reports and results stay here as
+evidence. The V2-B/V2-C recommendation-gate scripts in `benchmark/` are
+self-contained and still run.
 
 Engine-level chat hard cases (grounding, answer quality, and self-check):
 
