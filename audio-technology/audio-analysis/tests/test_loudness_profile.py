@@ -23,7 +23,7 @@ from audio_analysis.analysis_core.loudness import (
     calculate_loudness_profile_numpy,
 )
 from audio_analysis.analysis_core.analysis_interpretation import review_flags, LESSON_LIBRARY
-from mix_features import extract_feature_vector, FEATURE_VECTOR_KEYS
+from audio_analysis.mix_features import extract_feature_vector, FEATURE_VECTOR_KEYS
 from audio_analysis.analysis_core.anomaly_detector import ANOMALY_FEATURES
 from audio_analysis.integration.quality_predictor import QUALITY_FEATURES
 

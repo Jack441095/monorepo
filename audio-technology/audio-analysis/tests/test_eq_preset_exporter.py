@@ -1,7 +1,7 @@
 """Unit tests for EQ Preset Exporter."""
 
 import json
-from studio.audio_analysis.audio_analysis.export.eq_preset_exporter import (
+from audio_analysis.export.eq_preset_exporter import (
     EQPresetExporter,
     ExportableBand,
 )

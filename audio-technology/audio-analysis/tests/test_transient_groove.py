@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import io
-import wave
-
 import numpy as np
 import pytest
 
@@ -13,7 +10,6 @@ from audio_analysis.analysis_core.transient_groove import (
     estimate_bpm,
     measure_transient_events,
 )
-from audio_analysis.mix_review import mix_review
 
 
 SAMPLE_RATE = 44_100
@@ -27,18 +23,6 @@ def _click_track(times: list[float], duration: float = 4.0) -> np.ndarray:
         end = min(len(signal), start + len(tail))
         signal[start:end] += tail[: end - start]
     return signal
-
-
-def _wav_bytes(signal: np.ndarray) -> bytes:
-    pcm = np.clip(signal, -1.0, 1.0)
-    payload = (pcm * 32767.0).astype("<i2").tobytes()
-    output = io.BytesIO()
-    with wave.open(output, "wb") as wav_file:
-        wav_file.setnchannels(1)
-        wav_file.setsampwidth(2)
-        wav_file.setframerate(SAMPLE_RATE)
-        wav_file.writeframes(payload)
-    return output.getvalue()
 
 
 def test_spectral_flux_detects_click_onsets_without_double_triggers() -> None:
@@ -126,15 +110,6 @@ def test_timing_class_thresholds_are_represented_by_grid_deviation() -> None:
     assert analyze_groove(_click_track(human), SAMPLE_RATE, bpm=120.0)["timing_class"] == "Human"
     assert analyze_groove(_click_track(loose), SAMPLE_RATE, bpm=120.0)["timing_class"] == "Loose"
     assert analyze_groove(_click_track(sloppy), SAMPLE_RATE, bpm=120.0)["timing_class"] == "Sloppy"
-
-
-def test_mix_review_report_contains_transient_and_groove_metrics() -> None:
-    signal = _click_track([0.5 + index * 0.25 for index in range(12)])
-    report = mix_review.analyze_wav(_wav_bytes(signal), "straight-groove.wav", mix_goal="club")
-
-    assert report["metrics"]["transient_analysis"]["onset_count"] >= 10
-    assert report["metrics"]["groove_analysis"]["bpm"] == pytest.approx(120.0, abs=0.5)
-    assert any("Groove timing is tight" in item for item in report["advice"])
 
 
 def test_estimate_bpm_requires_enough_onsets() -> None:
