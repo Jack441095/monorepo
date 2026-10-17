@@ -162,6 +162,21 @@ def test_a_tonal_gap_costs_points_and_names_the_band_and_the_source():
     assert tonal["source"] == "the reference track you supplied"
 
 
+def test_bands_tied_at_the_gain_clamp_name_the_band_whose_energy_moved_most():
+    # 17 Oct 2026: a mix that only lifted a 6 kHz partial was told its largest gap was bass,
+    # because both bands clamped at 6 dB and bass sorts first.
+    comparison = _comparison(gains={"bass": 6.0, "mids": 3.1, "sibilance": -6.0})
+    comparison["tonal_balance"] = [
+        {"band": "bass", "delta_pct": -23.4},
+        {"band": "mids", "delta_pct": -10.4},
+        {"band": "sibilance", "delta_pct": 33.8},
+    ]
+
+    tonal = next(p for p in score_reference_match(comparison)["parts"] if p["part"] == "tonal_balance")
+
+    assert "sibilance at -6.0 dB" in tonal["detail"]
+
+
 def test_a_squashed_mix_loses_dynamics_points():
     score = score_reference_match(_comparison(crest_delta=-7.5))
 

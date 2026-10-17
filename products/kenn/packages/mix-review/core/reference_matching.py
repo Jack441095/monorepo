@@ -387,7 +387,15 @@ def score_reference_match(comparison: dict[str, Any]) -> dict[str, Any]:
         # Per-band losses are averaged rather than summed so one bad band cannot zero the whole part by itself.
         losses = [_loss_fraction(abs(g), TONAL_TOLERANCE_DB, TONAL_FULL_LOSS_DB) for g in bands.values()]
         available = REFERENCE_MATCH_POINTS["tonal_balance"]
-        worst = max(bands, key=lambda b: abs(bands[b]))
+        # Gains clamp at +/-6 dB, so a big shift ties two bands at the clamp and plain max() named
+        # whichever sorts first. Lifting only a 6 kHz partial was reported as a bass gap (17 Oct 2026),
+        # so a tie falls to the larger unclamped energy-share delta, the band that actually moved.
+        energy_delta = {
+            row.get("band"): abs(row["delta_pct"])
+            for row in comparison.get("tonal_balance") or []
+            if isinstance(row, dict) and measured(row.get("delta_pct"))
+        }
+        worst = max(bands, key=lambda b: (abs(bands[b]), energy_delta.get(b, 0.0)))
         parts.append({
             "part": "tonal_balance",
             "points": round(available * (1.0 - sum(losses) / len(losses)), 1),
