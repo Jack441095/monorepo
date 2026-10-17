@@ -122,6 +122,8 @@ def grade_session(
     meters: Optional[dict[str, Any]] = None,
     request: str = "",
     reference_match: Optional[dict[str, Any]] = None,
+    session_snapshot: Optional[dict[str, Any]] = None,
+    include_levers: bool = False,
 ) -> dict[str, Any]:
     """The combined grade for one audit: `technical` is `MixAuditReport.to_dict()`, `meters` a telemetry frame dict.
 
@@ -133,4 +135,9 @@ def grade_session(
     declared = score_declared_target(
         meters.get("integrated_lufs"), meters.get("true_peak_dbtp"), **stated_target_from_text(request)
     )
-    return combine_grade(technical=technical, declared_target=declared, reference_match=reference_match)
+    grade = combine_grade(technical=technical, declared_target=declared, reference_match=reference_match)
+    if include_levers:
+        # Milestone E3: Generate actionable suggestion levers when the grade needs help.
+        from kenn.core.suggestion_levers import generate_suggestion_levers
+        grade["levers"] = generate_suggestion_levers(grade, session_snapshot, meters=meters)
+    return grade
