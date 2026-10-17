@@ -5,12 +5,11 @@ import kenn.orchestrator as orchestrator
 
 
 def test_low_end_name_and_fader_overlap_is_an_advisory_candidate() -> None:
-    mixing_doctor._run_session_audits([
+    alerts = mixing_doctor._run_session_audits([
         {"index": 0, "name": "Kick", "volume": 0.9, "pan": 0.0, "muted": False},
         {"index": 1, "name": "Sub Bass", "volume": 0.85, "pan": 0.0, "muted": False},
     ])
 
-    alerts = mixing_doctor.get_mixing_alerts()
     overlap = next(item for item in alerts if item["type"] == "low_end_overlap_candidate")
     assert overlap["severity"] == "info"
     assert overlap["track_indices"] == [0, 1]
@@ -19,19 +18,19 @@ def test_low_end_name_and_fader_overlap_is_an_advisory_candidate() -> None:
 
 
 def test_muted_low_end_track_does_not_create_overlap_candidate() -> None:
-    mixing_doctor._run_session_audits([
+    alerts = mixing_doctor._run_session_audits([
         {"index": 0, "name": "Kick", "volume": 0.9, "pan": 0.0, "muted": False},
         {"index": 1, "name": "Sub Bass", "volume": 0.85, "pan": 0.0, "muted": True},
     ])
 
     assert not any(
         item["type"] == "low_end_overlap_candidate"
-        for item in mixing_doctor.get_mixing_alerts()
+        for item in alerts
     )
 
 
 def test_near_ceiling_track_meter_creates_track_specific_headroom_advisory() -> None:
-    mixing_doctor._run_session_audits([
+    alerts = mixing_doctor._run_session_audits([
         {
             "index": 3,
             "name": "Lead Vocal",
@@ -43,9 +42,9 @@ def test_near_ceiling_track_meter_creates_track_specific_headroom_advisory() -> 
         },
     ])
 
-    alerts = mixing_doctor.get_mixing_alerts()
     headroom = next(item for item in alerts if item["type"] == "headroom")
-    assert headroom["track_index"] == 0
+    # _run_session_audits preserves the host track["index"] (3), not the list position (0).
+    assert headroom["track_index"] == 3
     assert headroom["severity"] == "warning"
     assert "0.99" in headroom["message"]
     assert "true-peak" in headroom["fix_action"]
