@@ -77,3 +77,31 @@ rights-cleared corpus validation remain promotion gates.
 - Full synthetic Mix Review qualification: 100% precision/recall/F1,
   0% false-positive rate, 4.39 ms steady-state mean, and 100% corrupted-input
   recovery with the candidate enabled.
+
+## 17 Oct 2026: 8x true peak, and the native meter becomes the default
+
+The owner chose 8x true peak. Both the Python reference (`TRUE_PEAK_OVERSAMPLE_FACTOR`
+in `local_engine.py`, `loudness_analysis.true_peak_dbtp`) and the C++ kernel now
+use scipy's default `resample_poly(x, 8, 1)` filter (161-tap Kaiser, beta 5).
+The C++ builds that filter at load instead of carrying a table, and matches
+scipy 8x to 5e-15 dB on random and near-Nyquist test signals.
+
+Worth knowing: the 28-of-98 tone failures behind the 4x/8x question came from
+the plug-in's short 48-tap 4x FIR. scipy's 81-tap 4x filter was already close:
+on 459 tones (44.1, 48 and 96 kHz, up to 20 kHz, 17 phases) its worst
+under-read was 0.016 dB, against 0.0004 dB at 8x. So for this meter 8x is a
+small accuracy gain. Cost: about 0.8 s more scipy time on a 4-minute stereo
+mix; the native call takes 0.34 s for the whole loudness measurement.
+
+The no-scipy fallback `_numpy_true_peak_dbtp` was zero-padding the time signal,
+not the spectrum, so it returned the sample peak (3 dB low on a quarter-rate
+sine). Fixed, with a regression test.
+
+Real-file promotion: on the owner's Audio-Assets corpus (25 files under the
+150 MB cap, 24 measurable: ten full mixdowns and every sample-pack format) the
+native meter matched pyloudnorm on rounded integrated LUFS, LRA and true peak
+for every file. Full mix review took 8.3 s native against 38.3 s with
+pyloudnorm. `KENN_DSP_LOUDNESS_NATIVE` now defaults to on; `=0`, or
+`KENN_DSP_NATIVE=0`, falls back to pyloudnorm, as does a missing extension.
+Not changed: `kenn.core.loudness_analysis` (track diagnostic) still measures
+with pyloudnorm directly, now at 8x.

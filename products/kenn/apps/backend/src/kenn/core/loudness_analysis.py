@@ -1,7 +1,7 @@
 """Broadcast-style loudness, true peak, key, and tempo measurements.
 
 Libraries: pyloudnorm (MIT) for ITU-R BS.1770 K-weighted loudness, scipy (BSD)
-for 4x oversampled true peak, librosa (ISC) for chroma and beat tracking.
+for 8x oversampled true peak, librosa (ISC) for chroma and beat tracking.
 Loudness range follows EBU Tech 3342 using 3 s short-term windows at a 1 s
 hop and is labelled as an approximation of a certified meter. Key and tempo
 are estimates with explicit confidence; they are never presented as facts.
@@ -36,10 +36,14 @@ def _db(value: float) -> float | None:
 
 
 def true_peak_dbtp(data: np.ndarray) -> float | None:
-    """4x oversampled inter-sample peak (ITU-R BS.1770-4 Annex 2 method)."""
+    """8x oversampled inter-sample peak (the ITU-R BS.1770-4 Annex 2 method at twice its minimum ratio).
+
+    8x to match the mix-review meter (see TRUE_PEAK_OVERSAMPLE_FACTOR in
+    local_engine.py for the measurement behind it).
+    """
     from scipy.signal import resample_poly
 
-    peak = max(float(np.max(np.abs(resample_poly(data[:, ch], 4, 1)))) for ch in range(data.shape[1]))
+    peak = max(float(np.max(np.abs(resample_poly(data[:, ch], 8, 1)))) for ch in range(data.shape[1]))
     return _db(peak)
 
 
@@ -86,7 +90,7 @@ def measure_loudness(path: Path | str | bytes) -> dict[str, Any]:
         "true_peak_dbtp": true_peak_dbtp(data),
         "sample_peak_dbfs": _db(sample_peak),
         "duration_s": round(data.shape[0] / rate, 2),
-        "method": "ITU-R BS.1770 (pyloudnorm); true peak 4x oversampled; LRA per EBU Tech 3342, approximate",
+        "method": "ITU-R BS.1770 (pyloudnorm); true peak 8x oversampled; LRA per EBU Tech 3342, approximate",
     }
 
 

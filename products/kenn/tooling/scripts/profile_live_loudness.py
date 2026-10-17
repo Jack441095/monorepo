@@ -61,9 +61,9 @@ def _finite_or_none(value: float) -> float | None:
 
 
 def reference_metrics(samples: np.ndarray, rate: int) -> dict[str, float | None]:
-    """Return unrounded clip LUFS/4x peak; silence returns absent measurements."""
+    """Return unrounded clip LUFS/8x peak; silence returns absent measurements."""
     values = samples.astype(np.float64)
-    peak = float(np.max(np.abs(resample_poly(values, 4, 1, axis=0))))
+    peak = float(np.max(np.abs(resample_poly(values, 8, 1, axis=0))))
     return {
         "integrated_lufs": _finite_or_none(pyln.Meter(rate).integrated_loudness(values)),
         "true_peak_dbtp": 20.0 * math.log10(peak) if peak > 0.0 else None,
@@ -207,8 +207,8 @@ def run(
                      "native_source_sha256": hashlib.sha256((PRODUCT_ROOT / "tooling/native/dsp_core/loudness_bindings.cpp").read_bytes()).hexdigest()},
         "update_hz": UPDATE_HZ, "cases": cases, "semantic_probes": semantic_probes(native),
         "measurement_scope": {
-            "native": "Complete existing clip API: integrated LUFS, LRA and 4x peak, including per-call workspace allocation.",
-            "reference": "Integrated LUFS and 4x peak only; no LRA. This is a parity oracle and timing context, not an equal-work speed comparison.",
+            "native": "Complete existing clip API: integrated LUFS, LRA and 8x peak, including per-call workspace allocation.",
+            "reference": "Integrated LUFS and 8x peak only; no LRA. This is a parity oracle and timing context, not an equal-work speed comparison.",
         },
         "promotion_decision": "Do not attach the stateless clip kernel to the realtime worker as a live M/S meter.",
         "limitations": [

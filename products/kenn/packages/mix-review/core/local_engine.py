@@ -68,7 +68,14 @@ PHASE_CORRELATION_FLAG = -0.5      # Pearson correlation below this suggests a p
 MONO_SUM_DROP_FLAG_DB = 3.0
 HOT_LOUDNESS_ESTIMATE_DBFS = -14.0  # unweighted RMS proxy threshold, not a calibrated LUFS target
 DC_OFFSET_FLAG = 0.02
-TRUE_PEAK_OVERSAMPLE_FACTOR = 4  # ITU-R BS.1770-4 Annex 2 minimum oversampling ratio
+# 8x since 17 Oct 2026, the owner's 4x/8x call. BS.1770-4 Annex 2 allows 4x, and
+# scipy's long 81-tap 4x filter was already close: on 459 sine tones (44.1, 48
+# and 96 kHz, up to 20 kHz, 17 phases) its worst under-read was 0.016 dB, against
+# 0.0004 dB at 8x. The 28-of-98 failures that prompted the call were the plug-in's
+# short 4x FIR, not this one. 8x costs about 0.8 s more scipy time on a 4-minute
+# stereo mix and nothing measurable natively. loudness_bindings.cpp uses the
+# same factor and filter.
+TRUE_PEAK_OVERSAMPLE_FACTOR = 8
 TARGET_INTEGRATED_LUFS = -14.0  # common streaming reference; informational only, not a pass/fail gate
 TRUE_PEAK_CEILING_DBTP = -1.0   # common delivery ceiling; informational only, not a pass/fail gate
 
@@ -94,7 +101,7 @@ NOT_EVALUATED_FAULT_FAMILIES = (
 GLOBAL_LIMITATIONS = (
     "loudness_estimate remains an unweighted RMS proxy, not calibrated LUFS -- use the "
     "separate calibrated_lufs_bs1770/true_peak_intersample findings for a real ITU-R "
-    "BS.1770-4 integrated LUFS/LRA and 4x-oversampled true-peak measurement (both abstain "
+    "BS.1770-4 integrated LUFS/LRA and 8x-oversampled true-peak measurement (both abstain "
     "explicitly if the optional pyloudnorm/scipy dependency is not installed). "
     "No masking, tonal-balance, arrangement, dynamics, or genre-context analysis is "
     "performed -- those fault families are explicitly not evaluated. Only mono or "
@@ -1249,11 +1256,12 @@ def _numpy_integrated_lufs_and_lra(
 
 
 def _numpy_true_peak_dbtp(channels: list[Any]) -> float | None:
-    """4x bandlimited (FFT zero-pad) true peak per BS.1770-4 Annex 2.
+    """Oversampled true peak by spectral zero-padding, for hosts without scipy.
 
-    Spectral zero-padding is exact sinc interpolation, so inter-sample
-    overshoot reads at or above the sample peak. Chunked with overlap for
-    long inputs. Returns None only for all-empty input.
+    Zero-padding the spectrum is periodic sinc interpolation, so inter-sample
+    overshoot reads at or above the sample peak; the wrap only touches the
+    first and last few samples of each chunk. Chunked with overlap for long
+    inputs. Returns None only for all-empty input.
     """
     peak = 0.0
     for ch in channels:
@@ -1275,7 +1283,12 @@ def _numpy_true_peak_dbtp(channels: list[Any]) -> float | None:
         for start, end in pieces:
             seg = x[start:end]
             m = int(seg.shape[0])
-            up = _np.fft.irfft(_np.fft.rfft(seg, n=4 * m), n=4 * m)
+            # Until 17 Oct 2026 this zero-padded the time signal instead
+            # (rfft(seg, n=4m)), which interpolates nothing and returned the
+            # sample peak. Padding the spectrum and scaling by the factor is
+            # the interpolation.
+            factor = TRUE_PEAK_OVERSAMPLE_FACTOR
+            up = _np.fft.irfft(_np.fft.rfft(seg), n=factor * m) * factor
             peak = max(peak, float(_np.max(_np.abs(up))) if up.size else 0.0)
     if peak <= 0.0:
         return None
@@ -1285,7 +1298,7 @@ def _numpy_true_peak_dbtp(channels: list[Any]) -> float | None:
 def _calibrated_loudness_and_true_peak(
     channel_data: list[array], framerate: int
 ) -> tuple[dict[str, float] | None, str | None]:
-    """Real ITU-R BS.1770-4 integrated LUFS/LRA and 4x-oversampled true-peak.
+    """Real ITU-R BS.1770-4 integrated LUFS/LRA and 8x-oversampled true-peak.
 
     Returns ``(measurements, abstain_reason)``: exactly one of the two is
     non-None. Prefers pyloudnorm/scipy when installed (battle-tested);
@@ -1303,8 +1316,13 @@ def _calibrated_loudness_and_true_peak(
         # pyloudnorm's gating blocks are 400 ms; shorter audio has no
         # well-defined integrated loudness under BS.1770.
         return None, "audio is shorter than the 400 ms BS.1770 gating block"
-    native_loudness_enabled = os.environ.get("KENN_DSP_LOUDNESS_NATIVE", "0").strip().lower() in {
-        "1", "true", "on", "yes",
+    # Default-on since 17 Oct 2026. On 24 measured files from the owner's
+    # Audio-Assets (ten full mixdowns plus every sample-pack format) the C++
+    # meter matched pyloudnorm on rounded LUFS, LRA and 8x true peak for every
+    # file, and the whole review took 8.3 s against 38.3 s. pyloudnorm stays as
+    # the fallback when the extension is missing, and =0 forces it.
+    native_loudness_enabled = os.environ.get("KENN_DSP_LOUDNESS_NATIVE", "1").strip().lower() not in {
+        "0", "false", "off", "no",
     }
     # Native decoding already produced contiguous float32 channels. Keep that
     # representation for the native loudness call so it does not immediately

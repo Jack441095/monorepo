@@ -523,3 +523,32 @@ def test_waveform_and_spectral_analysis_metrics_emitted() -> None:
     assert "timestamps" in timeline and "correlation" in timeline and "balance" in timeline
     assert len(timeline["timestamps"]) == len(timeline["correlation"]) == len(timeline["balance"])
 
+
+
+def test_numpy_true_peak_fallback_reads_between_the_samples() -> None:
+    # Until 17 Oct 2026 the no-scipy fallback zero-padded the time signal, so it
+    # returned the sample peak. A quarter-rate sine sampled at +/-45 degrees has
+    # every sample at 0.707 of its true peak, 3.01 dB short.
+    np = pytest.importorskip("numpy")
+    n = 4096
+    tone = 0.5 * np.sin(np.pi / 2 * np.arange(n) + np.pi / 4)
+    assert local_engine._numpy_true_peak_dbtp([tone]) == pytest.approx(20 * math.log10(0.5), abs=0.05)
+
+
+def test_calibrated_loudness_takes_the_native_meter_by_default(monkeypatch) -> None:
+    # The C++ meter became the default on 17 Oct 2026; =0 must still reach pyloudnorm.
+    native_fft = pytest.importorskip("kenn.core.native_fft")
+    calls = []
+
+    def fake(channels, rate):
+        calls.append(rate)
+        return {"integrated_lufs": -9.0, "loudness_range_lu": 1.0, "true_peak_dbtp": -0.5}
+
+    monkeypatch.setattr(native_fft, "loudness_metrics", fake)
+    monkeypatch.delenv("KENN_DSP_LOUDNESS_NATIVE", raising=False)
+    tone = _sine(int(4.0 * 44100), 997.0, 44100, amplitude=0.5)
+    payload = _wav_bytes([tone, tone], framerate=44100)
+    assert local_engine.analyze_wav(payload, filename="default.wav")["metrics"]["integrated_lufs"] == -9.0
+    monkeypatch.setenv("KENN_DSP_LOUDNESS_NATIVE", "0")
+    assert local_engine.analyze_wav(payload, filename="rollback.wav")["metrics"]["integrated_lufs"] != -9.0
+    assert calls == [44100]

@@ -83,3 +83,21 @@ def test_true_peak_does_not_under_read_a_sine_wherever_its_peaks_fall(freq_hz):
         error_db = true_peak_dbtp(tone[:, None]) - 20.0 * math.log10(amplitude)
 
         assert -0.2 <= error_db <= 0.1, f"{freq_hz} Hz at phase {phase:.2f} read {error_db:+.3f} dB"
+
+
+def test_native_true_peak_reads_the_same_8x_filter_as_scipy() -> None:
+    # Both meters moved from 4x to 8x on 17 Oct 2026; a kernel left on the old
+    # factor or filter would drift from the Python reference by up to 0.016 dB.
+    from scipy.signal import resample_poly
+
+    from kenn.core import native_fft
+
+    if not native_fft.available():
+        pytest.skip("native extension not built")
+    rng = np.random.default_rng(7)
+    t = np.arange(RATE) / RATE
+    left = (0.2 * rng.standard_normal(RATE) + 0.7 * np.sin(2 * np.pi * 11_700.0 * t + 0.3)).astype(np.float32)
+    right = (0.2 * rng.standard_normal(RATE)).astype(np.float32)
+    native = native_fft.loudness_metrics([left, right], RATE)["true_peak_dbtp"]
+    reference = 20 * math.log10(max(np.max(np.abs(resample_poly(c.astype(np.float64), 8, 1))) for c in (left, right)))
+    assert native == pytest.approx(reference, abs=1e-9)

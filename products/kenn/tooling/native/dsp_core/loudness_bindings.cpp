@@ -37,33 +37,60 @@ struct BlockMeasurement {
     std::vector<double> channel_powers;
 };
 
-// scipy.signal.resample_poly(x, 4, 1) uses firwin(81, 0.25,
-// window=("kaiser", 5.0)) * 4 by default. Keeping the audited coefficients
-// here lets the native true-peak candidate use the same zero-phase FIR rather
-// than substituting a perceptually different interpolator.
-constexpr std::array<double, 81> kTruePeakFilter {{
-    -1.4319646207876955e-18, -0.0011305975791844614, -0.0021031678617178758, -0.0019016679348927712,
-    3.7090410940238961e-18, 0.0029265141089618871, 0.0050185309234718201, 0.0042523190668551048,
-    -6.9891223043615986e-18, -0.0059320518437837155, -0.0097908339711988927, -0.0080261254612654931,
-    1.1214237028997421e-17, 0.010605090076805454, 0.017115155028976113, 0.01375395907063175,
-    -1.6183952382363027e-17, -0.017579165251157443, -0.02798327701095811, -0.022219885567699757,
-    2.1564830647503017e-17, 0.027866916359520887, 0.044051484099836259, 0.034795254750361118,
-    -2.6922559134588186e-17, -0.043423086442114837, -0.068688534985681365, -0.054425491068782507,
-    3.177298294598318e-17, 0.068972338798174965, 0.11058973007292544, 0.089283348532046142,
-    -3.5644656557647813e-17, -0.1201343501545469, -0.20188442282305527, -0.17397774297154042,
-    3.8143133424221183e-17, 0.29654281960437512, 0.63347608687987322, 0.89963257101020833,
-    1.0006365650891118, 0.89963257101020833, 0.63347608687987322, 0.29654281960437512,
-    3.8143133424221183e-17, -0.17397774297154042, -0.20188442282305527, -0.1201343501545469,
-    -3.5644656557647813e-17, 0.089283348532046142, 0.11058973007292544, 0.068972338798174965,
-    3.177298294598318e-17, -0.054425491068782507, -0.068688534985681365, -0.043423086442114837,
-    -2.6922559134588186e-17, 0.034795254750361118, 0.044051484099836259, 0.027866916359520887,
-    2.1564830647503017e-17, -0.022219885567699757, -0.02798327701095811, -0.017579165251157443,
-    -1.6183952382363027e-17, 0.01375395907063175, 0.017115155028976113, 0.010605090076805454,
-    1.1214237028997421e-17, -0.0080261254612654931, -0.0097908339711988927, -0.0059320518437837155,
-    -6.9891223043615986e-18, 0.0042523190668551048, 0.0050185309234718201, 0.0029265141089618871,
-    3.7090410940238961e-18, -0.0019016679348927712, -0.0021031678617178758, -0.0011305975791844614,
-    -1.4319646207876955e-18,
-}};
+// True peak is read at 8x since 17 Oct 2026 (owner's call), in step with
+// TRUE_PEAK_OVERSAMPLE_FACTOR in local_engine.py, which records the tone sweep.
+// The whole loudness call takes about 0.34 s on a 4-minute stereo mix at 8x.
+constexpr std::size_t kTruePeakUp = 8;
+// scipy.signal.resample_poly(x, 8, 1) designs firwin(2 * 10 * 8 + 1, 1 / 8,
+// window=("kaiser", 5.0)) * 8 by default. We design the same filter here rather
+// than substituting another interpolator, so the Python reference and this
+// kernel agree to rounding.
+constexpr std::size_t kTruePeakHalfLength = 10 * kTruePeakUp;
+constexpr std::size_t kTruePeakTaps = 2 * kTruePeakHalfLength + 1;
+// resample_poly front-pads the filter by one zero and drops the first
+// half-length + 1 outputs, which keeps the interpolation zero-phase.
+constexpr std::size_t kTruePeakPadded = kTruePeakTaps + 1;
+constexpr std::size_t kTruePeakDelay = kTruePeakHalfLength + 1;
+constexpr std::size_t kTruePeakPhaseTaps = kTruePeakTaps / kTruePeakUp + 1;
+
+double bessel_i0(double x)
+{
+    // Power series; at the Kaiser beta of 5 it converges to double precision
+    // in about 20 terms, so 60 is a cap, not the expected count.
+    double sum = 1.0;
+    double term = 1.0;
+    for (int k = 1; k < 60; ++k) {
+        term *= (x / (2.0 * k)) * (x / (2.0 * k));
+        sum += term;
+        if (term < sum * 1e-17)
+            break;
+    }
+    return sum;
+}
+
+std::array<double, kTruePeakPadded> make_true_peak_filter()
+{
+    constexpr double beta = 5.0;
+    constexpr double cutoff = 1.0 / static_cast<double>(kTruePeakUp);
+    std::array<double, kTruePeakPadded> padded {};
+    double sum = 0.0;
+    for (std::size_t index = 0; index < kTruePeakTaps; ++index) {
+        const double m = static_cast<double>(index) - static_cast<double>(kTruePeakHalfLength);
+        const double x = cutoff * m;
+        const double sinc = x == 0.0 ? 1.0 : std::sin(std::numbers::pi * x) / (std::numbers::pi * x);
+        const double ratio = 2.0 * static_cast<double>(index) / static_cast<double>(kTruePeakTaps - 1) - 1.0;
+        const double window = bessel_i0(beta * std::sqrt(1.0 - ratio * ratio)) / bessel_i0(beta);
+        padded[index + 1] = cutoff * sinc * window;
+        sum += padded[index + 1];
+    }
+    // firwin scales to unity gain at DC; resample_poly then multiplies by the
+    // up factor to restore the level lost to zero insertion.
+    for (auto& value : padded)
+        value *= static_cast<double>(kTruePeakUp) / sum;
+    return padded;
+}
+
+const std::array<double, kTruePeakPadded> kTruePeakFilter = make_true_peak_filter();
 
 Biquad rbj_filter(double gain_db, double q, double frequency_hz, double sample_rate, bool high_shelf)
 {
@@ -310,31 +337,28 @@ double true_peak_channel(
 {
     if (frame_count == 0)
         return 0.0;
-    std::array<double, 82> padded_filter {};
-    for (std::size_t index = 0; index < kTruePeakFilter.size(); ++index)
-        padded_filter[index + 1] = kTruePeakFilter[index];
     double peak = 0.0;
 #if defined(KENN_HAS_ACCELERATE)
-    // Split the zero-inserted 4x interpolation into four polyphase FIRs.
-    // Reversing the source lets vDSP_convD evaluate each phase as a forward
-    // correlation while preserving scipy's zero-padded boundary behavior.
+    // Split the zero-inserted interpolation into one polyphase FIR per output
+    // phase. Reversing the source lets vDSP_convD evaluate each phase as a
+    // forward correlation while preserving scipy's zero-padded boundary behavior.
     // The scratch buffers are owned by true_peak_dbtp and reused across
     // channels/phases. This avoids one large allocation per phase and avoids
     // materialising a contiguous copy for each interleaved channel.
     std::fill(reversed.begin(), reversed.end(), 0.0);
     for (std::size_t index = 0; index < frame_count; ++index)
-        reversed[41 + index] = static_cast<double>(samples[(frame_count - 1 - index) * sample_stride]);
-    for (std::size_t phase = 0; phase < 4; ++phase) {
-        const auto taps = (81 - phase) / 4 + 1;
-        std::array<double, 21> coefficients {};
+        reversed[kTruePeakDelay + index] = static_cast<double>(samples[(frame_count - 1 - index) * sample_stride]);
+    for (std::size_t phase = 0; phase < kTruePeakUp; ++phase) {
+        const auto taps = (kTruePeakTaps - phase) / kTruePeakUp + 1;
+        std::array<double, kTruePeakPhaseTaps> coefficients {};
         for (std::size_t tap = 0; tap < taps; ++tap)
-            coefficients[tap] = padded_filter[phase + tap * 4];
-        const auto first_r = (41 - phase + 3) / 4;
-        const auto last_r = (4 * frame_count + 40 - phase) / 4;
+            coefficients[tap] = kTruePeakFilter[phase + tap * kTruePeakUp];
+        const auto first_r = (kTruePeakDelay - phase + kTruePeakUp - 1) / kTruePeakUp;
+        const auto last_r = (kTruePeakUp * frame_count + kTruePeakDelay - 1 - phase) / kTruePeakUp;
         if (last_r < first_r)
             continue;
         const auto output_count = last_r - first_r + 1;
-        const auto source_offset = static_cast<std::ptrdiff_t>(41 + frame_count - 1 - last_r);
+        const auto source_offset = static_cast<std::ptrdiff_t>(kTruePeakDelay + frame_count - 1 - last_r);
         vDSP_convD(
             reversed.data() + source_offset, 1, coefficients.data(), 1,
             output.data(), 1, static_cast<vDSP_Length>(output_count),
@@ -343,16 +367,16 @@ double true_peak_channel(
             peak = std::max(peak, std::abs(output[index]));
     }
 #else
-    for (std::size_t output_index = 0; output_index < frame_count * 4; ++output_index) {
-        const auto time_index = output_index + 41;
+    for (std::size_t output_index = 0; output_index < frame_count * kTruePeakUp; ++output_index) {
+        const auto time_index = output_index + kTruePeakDelay;
         double value = 0.0;
-        for (std::size_t tap = 0; tap < padded_filter.size(); ++tap) {
+        for (std::size_t tap = 0; tap < kTruePeakFilter.size(); ++tap) {
             const auto source_index = time_index >= tap ? time_index - tap : 0;
-            if (time_index < tap || source_index % 4 != 0)
+            if (time_index < tap || source_index % kTruePeakUp != 0)
                 continue;
-            const auto frame = source_index / 4;
+            const auto frame = source_index / kTruePeakUp;
             if (frame < frame_count)
-                value += padded_filter[tap] * static_cast<double>(samples[frame * sample_stride]);
+                value += kTruePeakFilter[tap] * static_cast<double>(samples[frame * sample_stride]);
         }
         peak = std::max(peak, std::abs(value));
     }
@@ -367,10 +391,10 @@ std::optional<double> true_peak_dbtp(
 {
     double peak = 0.0;
 #if defined(KENN_HAS_ACCELERATE)
-    // One reusable workspace covers all channels and all four polyphase
+    // One reusable workspace covers all channels and all eight polyphase
     // passes. The output vector is sized to the largest phase result; only
     // the prefix requested by vDSP_convD is read on each pass.
-    std::vector<double> reversed(frame_count + 82, 0.0);
+    std::vector<double> reversed(frame_count + kTruePeakPadded, 0.0);
     std::vector<double> output(frame_count + 1, 0.0);
 #endif
     for (std::size_t channel = 0; channel < channel_count; ++channel) {

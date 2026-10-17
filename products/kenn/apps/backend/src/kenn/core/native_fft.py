@@ -161,7 +161,7 @@ def loudness_metrics(channels: list[list[float]] | Any, sample_rate: int) -> dic
     """Compute an opt-in native K-weighted loudness/LRA candidate.
 
     The native candidate mirrors pyloudnorm's default K-weighting, gating, and
-    4x true-peak FIR contract. Callers must compare rounded LUFS/LRA/true-peak
+    8x true-peak FIR contract (scipy resample_poly's default filter). Callers must compare rounded LUFS/LRA/true-peak
     output before promoting it.
     """
     module = _load()
