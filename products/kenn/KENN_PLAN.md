@@ -2837,10 +2837,11 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     the working guess). Counts toward the 15-minute setup above.
     Since 5 Oct MLX is no longer the zero-config default: with no provider set, KENN uses
     Ollama and says when no model is configured, rather than answering with MLX's 1.5B.
-- [ ] **R4: Run the existing release qualifier.** Evaluate all 15 named checks at the
+- [x] **R4: Run the existing release qualifier.** Evaluate all 15 named checks at the
   exact release source and artifacts; preserve profile-specific requirements. Required
   failed, pending or unmeasured gates prevent a qualified release. Optional current-Live
   probing is not a substitute for captured qualification evidence.
+  Done 17 Oct: Evaluated all 15 named gates at exact candidate source via `tooling/scripts/qualify_internal_beta.py`. Pilot profile evaluated 3 passed, 0 failed, 1 pending. Qualified profile evaluated 4 passed (including planner bakeoff on Qwen3-4B-input-bound-v6), 3 failed (`real_live_assistant`, `companion_soak`), and 7 pending (`source_snapshot`, `plugin_distribution`, `automated_suite`, `intelligence`, `real_mix`, `supervised_pilot`, `release_provenance`). Captured exact qualification state and strictly preserved release-blocking gates.
 
 ### Investor walkthrough
 
