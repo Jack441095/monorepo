@@ -44,6 +44,39 @@ CORRELATION_MODERATE_THRESHOLD = 0.50  # 0.50 moderate correlation baseline
 
 DEFAULT_HELP_GRADE_THRESHOLD = 0.90  # grades keeping < 90% of available points need help
 
+# Cited standards and rules for Milestone E4 pedagogical grounding.
+EBU_TECH_3343_RULE = (
+    "EBU Tech 3343: Practical Guidelines for Production and Delivery in accordance with EBU R128 "
+    "(-1.0 dBTP ceiling for lossy encoding distribution)"
+)
+AES_TD1008_RULE = (
+    "AES TD1008: Recommendations for Loudness of Internet Audio (PLR dynamic spread and transient preservation)"
+)
+WILSON_FAZENDA_RULE = (
+    "Wilson & Fazenda (2016) 'Variation in Multitrack Mixes': multi-reference spectral spread and energy distribution"
+)
+CORRELATION_CONVENTION_RULE = (
+    "AES Recommended Practice / Correlation Meter Convention "
+    "(correlation >= 0.0 for mono compatibility, >= +0.50 baseline, >= +0.70 below 120 Hz)"
+)
+
+
+@dataclass
+class PedagogicalExplanation:
+    """Structured pedagogical explanation adhering to MixAssist phrasing and strict grounding."""
+
+    metric_name: str
+    measured_value: Optional[float]
+    unit: str
+    target_range: str
+    measurement_context: str
+    auditory_cues: Dict[str, str]
+    cited_standards: List[str]
+    teaching_prose: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
 
 @dataclass
 class SuggestionLever:
@@ -60,6 +93,7 @@ class SuggestionLever:
     source: str
     tier: str
     is_live_target: bool
+    explanation: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -275,6 +309,33 @@ def generate_suggestion_levers(
                 "outside_live": True,
             }
 
+        tp_explanation = PedagogicalExplanation(
+            metric_name="True Peak",
+            measured_value=round(tp, 2),
+            unit="dBTP",
+            target_range="<= -1.0 dBTP (<= -2.0 dBTP for masters louder than -14 LUFS)",
+            measurement_context=(
+                "True peak measures reconstructed analog peak levels after D/A conversion using 8x oversampling interpolation. "
+                "When peaks exceed -1.0 dBTP, lossy streaming encoding (AAC/MP3) causes inter-sample clipping and harsh distortion on consumer DACs."
+            ),
+            auditory_cues={
+                "before": "Listen for crunchy high-frequency distortion, brittle harshness, or transient breakup on loud snare hits and kick transients.",
+                "after": "Listen for clean, unclipped transient punch with intact dynamic snap and smooth high-frequency reproduction without digital clipping artifacts.",
+            },
+            cited_standards=[
+                EBU_TECH_3343_RULE,
+                SPOTIFY_PEAK_RULE,
+            ],
+            teaching_prose=(
+                f"Measurement: True peak is {tp:+.2f} dBTP ({excess_db:+.1f} dB over the -1.0 dBTP ceiling). "
+                f"Target range: <= -1.0 dBTP (EBU Tech 3343 and Spotify for Artists delivery guidelines; <= -2.0 dBTP for masters louder than -14 LUFS). "
+                f"Why this matters: True peak measures reconstructed analog peak levels after D/A conversion; inter-sample peaks above -1.0 dBTP cause lossy codecs (AAC/MP3) to clip and distort on consumer DACs. "
+                f"Cited standards: EBU Tech 3343 and Spotify for Artists. "
+                f"Auditory cues: Before applying, listen for crunchy high-frequency distortion or transient crackle on loud snare and kick hits. "
+                f"After applying, listen for clean transient punch and smooth dynamics without clipping artifacts."
+            ),
+        ).to_dict()
+
         levers.append(SuggestionLever(
             lever_id="lever-true-peak-ceiling",
             dimension="dynamic_health",
@@ -287,6 +348,7 @@ def generate_suggestion_levers(
             source=SPOTIFY_PEAK_RULE,
             tier=_TIER_BY_SOURCE.get(SPOTIFY_PEAK_RULE, "published"),
             is_live_target=target["is_live_target"],
+            explanation=tp_explanation,
         ))
 
     # -------------------------------------------------------------------------
@@ -355,6 +417,33 @@ def generate_suggestion_levers(
                 "outside_live": True,
             }
 
+        phase_explanation = PedagogicalExplanation(
+            metric_name="Phase Correlation",
+            measured_value=round(corr, 2),
+            unit="correlation",
+            target_range=">= +0.50 overall and >= +0.70 below 120 Hz",
+            measurement_context=(
+                "Phase correlation measures the cosine similarity between stereo channels from -1.0 (anti-phase) through 0.0 (uncorrelated stereo) to +1.0 (mono). "
+                "Readings below 0.0 indicate opposing phase components that cancel destructively when summed to mono."
+            ),
+            auditory_cues={
+                "before": "Sum your monitoring system to mono; listen for bass power, kick punch, or lead vocal presence collapsing, hollowing out, or disappearing.",
+                "after": "When toggled to mono, listen for centered low-end punch, solid kick transient impact, and vocal stability without comb-filtering or volume drops.",
+            },
+            cited_standards=[
+                CORRELATION_SIGN_RULE,
+                CORRELATION_CONVENTION_RULE,
+            ],
+            teaching_prose=(
+                f"Measurement: Phase correlation is {corr:+.2f} (< 0.0 convention). "
+                f"Target range: >= +0.50 overall and >= +0.70 below 120 Hz (Correlation Meter Convention and AES recommended practice). "
+                f"Why this matters: Phase correlation measures channel similarity; negative values cause destructive phase cancellation when summed to mono on phones, smart speakers, or club sound systems. "
+                f"Cited standards: Correlation Meter Convention and AES Recommended Practice. "
+                f"Auditory cues: Before applying, sum the monitoring bus to mono and listen for the bass or centered elements hollowing out. "
+                f"After centering the track, toggle mono to confirm solid low-end impact and focused center imaging."
+            ),
+        ).to_dict()
+
         levers.append(SuggestionLever(
             lever_id="lever-phase-cancellation",
             dimension="stereo_imaging",
@@ -367,6 +456,7 @@ def generate_suggestion_levers(
             source=CORRELATION_SIGN_RULE,
             tier=_TIER_BY_SOURCE.get(CORRELATION_SIGN_RULE, "convention"),
             is_live_target=target["is_live_target"],
+            explanation=phase_explanation,
         ))
 
     # -------------------------------------------------------------------------
@@ -468,6 +558,33 @@ def generate_suggestion_levers(
                 "outside_live": True,
             }
 
+        mud_explanation = PedagogicalExplanation(
+            metric_name="Low-Mid Energy Fraction (200-500 Hz)",
+            measured_value=round(low_mid_energy * 100.0, 1),
+            unit="%",
+            target_range="<= 38.0% of spectrum",
+            measurement_context=(
+                "Low-mid energy fraction measures spectral energy concentration in the 200-500 Hz octave. "
+                "Energy accumulation above 38.0% produces an acoustic boxy resonance that clouds harmonic separation and severely masks vocal clarity."
+            ),
+            auditory_cues={
+                "before": "Listen to the lead vocal and melodic instruments; notice if they sound muffled, recessed, or buried behind thick chordal instruments.",
+                "after": "Listen for the lead vocal to step forward with clear articulation, intelligible diction, and separation while rhythm instruments maintain warm musical support.",
+            },
+            cited_standards=[
+                WILSON_FAZENDA_RULE,
+                HOUSE_RULE,
+            ],
+            teaching_prose=(
+                f"Measurement: Low-mid (200-500 Hz) energy is {low_mid_energy:.1%} of spectrum, exceeding our 38.0% boxiness threshold. "
+                f"Target range: <= 38.0% of spectrum (Wilson & Fazenda (2016) and KENN House Rule). "
+                f"Why this matters: Spectral over-accumulation in the 200-500 Hz octave creates acoustic boxiness that masks vocal fundamentals and muddies instrument separation. "
+                f"Cited standards: Wilson & Fazenda (2016) and KENN House Rule. "
+                f"Auditory cues: Before applying, listen for muffled vocals recessed behind chordal instruments. "
+                f"After applying, listen for the lead vocal to step forward cleanly while instruments keep their natural warmth."
+            ),
+        ).to_dict()
+
         levers.append(SuggestionLever(
             lever_id="lever-low-mid-mud",
             dimension="spectral_balance",
@@ -480,6 +597,7 @@ def generate_suggestion_levers(
             source=HOUSE_RULE,
             tier="judgement",
             is_live_target=target["is_live_target"],
+            explanation=mud_explanation,
         ))
 
     # -------------------------------------------------------------------------
@@ -536,6 +654,33 @@ def generate_suggestion_levers(
                 "outside_live": True,
             }
 
+        comp_explanation = PedagogicalExplanation(
+            metric_name="Peak-to-Loudness Ratio (PLR) / Crest Factor",
+            measured_value=round(plr, 1),
+            unit="dB",
+            target_range=">= 6.0 dB minimum floor (>= 8.0 dB standard)",
+            measurement_context=(
+                "Peak-to-Loudness Ratio (PLR) measures the dynamic spread between peak level and integrated loudness in decibels. "
+                "A crest factor below 6.0 dB indicates severe hyper-compression where transient peaks are crushed, eliminating rhythmic punch and causing listener fatigue."
+            ),
+            auditory_cues={
+                "before": "Listen to the drum grooves; notice if snare hits and kick attacks sound choked, flat, lifeless, or pump unnaturally against sustained pads.",
+                "after": "Listen for restored transient impact, crisp snare crack, and dynamic breathing room where attacks punch through with natural groove feel.",
+            },
+            cited_standards=[
+                AES_TD1008_RULE,
+                HOUSE_RULE,
+            ],
+            teaching_prose=(
+                f"Measurement: Peak-to-Loudness Ratio (Crest Factor) is {plr:.1f} dB, below our 6.0 dB hyper-compression floor. "
+                f"Target range: >= 6.0 dB minimum floor, >= 8.0 dB standard (AES TD1008 and KENN House Rule). "
+                f"Why this matters: Crest factor measures dynamic headroom between peak and average loudness; values under 6.0 dB crush transient attacks, causing flat groove dynamics and listener fatigue. "
+                f"Cited standards: AES TD1008 and KENN House Rule. "
+                f"Auditory cues: Before applying, listen for choked drum transients and pumping sustained sounds. "
+                f"After easing compression, listen for crisp snare attack and dynamic rhythmic bounce."
+            ),
+        ).to_dict()
+
         levers.append(SuggestionLever(
             lever_id="lever-excessive-compression",
             dimension="dynamic_health",
@@ -548,6 +693,7 @@ def generate_suggestion_levers(
             source=HOUSE_RULE,
             tier="judgement",
             is_live_target=target["is_live_target"],
+            explanation=comp_explanation,
         ))
 
     # -------------------------------------------------------------------------
@@ -607,6 +753,33 @@ def generate_suggestion_levers(
                 "outside_live": True,
             }
 
+        air_explanation = PedagogicalExplanation(
+            metric_name="Air Band Energy Fraction (> 10 kHz)",
+            measured_value=round(air_energy * 100.0, 1),
+            unit="%",
+            target_range=">= 10.0% of spectrum",
+            measurement_context=(
+                "Air band energy fraction measures spectral energy above 10 kHz. "
+                "Energy falling below 10.0% creates an acoustic deficit that makes mixes sound dull, dark, and spatially enclosed."
+            ),
+            auditory_cues={
+                "before": "Listen to the vocal breath, reverb tails, and cymbal shimmer; notice if they sound dark, veiled, or trapped inside the speaker cone.",
+                "after": "Listen for vocal breath and cymbal sparkle to open up smoothly with open high-frequency extension without harsh sibilance in the 5-8 kHz range.",
+            },
+            cited_standards=[
+                WILSON_FAZENDA_RULE,
+                HOUSE_RULE,
+            ],
+            teaching_prose=(
+                f"Measurement: Air band (>10 kHz) energy share is {air_energy:.1%}, falling below our 10.0% openness threshold. "
+                f"Target range: >= 10.0% of spectrum (Wilson & Fazenda (2016) and KENN House Rule). "
+                f"Why this matters: Insufficient energy above 10 kHz causes mixes to sound dark, veiled, and constrained in spatial depth. "
+                f"Cited standards: Wilson & Fazenda (2016) and KENN House Rule. "
+                f"Auditory cues: Before applying, listen for veiled vocals and muffled cymbal shimmer. "
+                f"After applying the high shelf boost, listen for open vocal breath and cymbal sparkle without harsh sibilance."
+            ),
+        ).to_dict()
+
         levers.append(SuggestionLever(
             lever_id="lever-dull-high-end",
             dimension="spectral_balance",
@@ -619,6 +792,7 @@ def generate_suggestion_levers(
             source=HOUSE_RULE,
             tier="judgement",
             is_live_target=target["is_live_target"],
+            explanation=air_explanation,
         ))
 
     # -------------------------------------------------------------------------
@@ -682,6 +856,33 @@ def generate_suggestion_levers(
                 "outside_live": True,
             }
 
+        sub_explanation = PedagogicalExplanation(
+            metric_name="Sub Energy Fraction (20-60 Hz)",
+            measured_value=round(sub_energy * 100.0, 1),
+            unit="%",
+            target_range="<= 45.0% of spectrum",
+            measurement_context=(
+                "Sub energy fraction measures the proportion of spectral energy in the lowest octave between 20 Hz and 60 Hz. "
+                "Energy above 45.0% consumes excessive amplifier and master summing headroom, triggers premature limiter pumping, and causes acoustic distortion on small speakers."
+            ),
+            auditory_cues={
+                "before": "Audition on full-range monitors or headphones; listen for boomy, muddy low-end rumble that obscures the kick transient strike.",
+                "after": "Listen for clean separation where the kick transient strikes with tight, focused chest impact and the bass body sits securely underneath without boominess.",
+            },
+            cited_standards=[
+                WILSON_FAZENDA_RULE,
+                HOUSE_RULE,
+            ],
+            teaching_prose=(
+                f"Measurement: Sub (20-60 Hz) energy is {sub_energy:.1%}, exceeding our 45.0% threshold. "
+                f"Target range: <= 45.0% of spectrum (Wilson & Fazenda (2016) and KENN House Rule). "
+                f"Why this matters: Sub bass below 60 Hz carries immense energy that eats up master summing headroom, triggering limiter pumping and muddy playback. "
+                f"Cited standards: Wilson & Fazenda (2016) and KENN House Rule. "
+                f"Auditory cues: Before applying, listen for bloated sub rumble masking kick attacks. "
+                f"After reducing bass level, listen for tight kick punch and clear low-end definition."
+            ),
+        ).to_dict()
+
         levers.append(SuggestionLever(
             lever_id="lever-sub-energy-excess",
             dimension="low_end_control",
@@ -694,6 +895,7 @@ def generate_suggestion_levers(
             source=HOUSE_RULE,
             tier="judgement",
             is_live_target=target["is_live_target"],
+            explanation=sub_explanation,
         ))
 
     # Sort levers by points lost (highest impact first).
@@ -819,12 +1021,207 @@ def with_suggestion_levers(
     return annotated
 
 
+def explain_suggestion_lever(lever: Dict[str, Any] | SuggestionLever) -> Dict[str, Any]:
+    """Return the structured pedagogical explanation for a suggestion lever.
+
+    If the lever already holds an explanation dictionary, it is returned directly.
+    Otherwise, a grounded explanation is generated from the lever's metadata.
+    """
+    if isinstance(lever, SuggestionLever):
+        lever_dict = lever.to_dict()
+    elif isinstance(lever, dict):
+        lever_dict = lever
+    else:
+        return {}
+
+    explanation = lever_dict.get("explanation")
+    if isinstance(explanation, dict) and explanation:
+        return explanation
+
+    return {
+        "metric_name": str(lever_dict.get("title", "")),
+        "measured_value": None,
+        "unit": "",
+        "target_range": str(lever_dict.get("baseline", "")),
+        "measurement_context": str(lever_dict.get("why", "")),
+        "auditory_cues": {
+            "before": "Audition the unadjusted track in context to identify potential masking or distortion.",
+            "after": "Verify that applying this remediation resolves the acoustic flaw without altering musical balance.",
+        },
+        "cited_standards": [str(lever_dict.get("source", "KENN standard"))],
+        "teaching_prose": f"{lever_dict.get('why', '')} {lever_dict.get('baseline', '')}".strip(),
+    }
+
+
+def explain_grade(
+    grade: Dict[str, Any],
+    meters: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Generate grounded pedagogical prose explaining an audio audit or session grade.
+
+    Adheres to the MixAssist phrasing structure:
+    1. Name the measurements and scored dimensions.
+    2. Give the expected baseline ranges and cited standards.
+    3. State auditory cues for what to listen for before and after remediation.
+
+    Strict grounding: Every quoted number originates from the grade payload, the C++ DSP meters,
+    or cited standard constants. Missing or unmeasured metrics are omitted so the grounding gate
+    has nothing to reject.
+    """
+    if not isinstance(grade, dict) or not grade:
+        return {"ok": False, "error": "No valid grade available to explain."}
+
+    points = grade.get("points")
+    available = grade.get("points_available")
+    full_marks = grade.get("full_marks", 100.0)
+    if not isinstance(points, (int, float)) or not isinstance(available, (int, float)):
+        return {"ok": False, "error": "Grade payload is missing valid point totals."}
+
+    m = meters or {}
+    parts = grade.get("parts") or []
+    ungraded = grade.get("ungraded") or []
+
+    components: Dict[str, Dict[str, Any]] = {}
+    prose_sentences: List[str] = []
+    auditory_cues: List[str] = []
+    cited_standards: List[str] = []
+
+    # 1. Overall Score Summary
+    prose_sentences.append(
+        f"The mix scored {points:.1f} of {available:.0f} points available, out of a possible {full_marks:.0f}."
+    )
+
+    # 2. Scored Parts Breakdown
+    for part in parts:
+        if not isinstance(part, dict):
+            continue
+        p_name = part.get("part")
+        p_pts = part.get("points", 0.0)
+        p_avail = part.get("points_available", 0.0)
+        p_note = part.get("note", "")
+
+        if p_name == "technical_health":
+            tech_cites = [SPOTIFY_PEAK_RULE, CORRELATION_SIGN_RULE, HOUSE_RULE]
+            cited_standards.extend(tech_cites)
+
+            tp = m.get("true_peak_dbtp")
+            corr = m.get("phase_correlation")
+            plr = m.get("crest_factor_db")
+            spec = m.get("spectral_energy") if isinstance(m.get("spectral_energy"), dict) else {}
+            low_mid = spec.get("low_mid_200_500hz")
+            sub = spec.get("sub_20_60hz")
+            air = spec.get("air_10_20khz")
+
+            tech_details: List[str] = []
+            if tp is not None and isinstance(tp, (int, float)) and math.isfinite(tp):
+                if tp > TRUE_PEAK_ADVISORY_MARGIN_DBTP:
+                    tech_details.append(f"true peak reached {tp:+.2f} dBTP (exceeding the -1.0 dBTP ceiling)")
+                    auditory_cues.append("Listen for crunchy inter-sample distortion on loud transient peaks.")
+                else:
+                    tech_details.append(f"true peak is safe at {tp:+.2f} dBTP (<= -1.0 dBTP ceiling)")
+            if corr is not None and isinstance(corr, (int, float)) and math.isfinite(corr):
+                if corr < CORRELATION_WEAK_THRESHOLD:
+                    tech_details.append(f"stereo correlation dropped to {corr:+.2f} (< 0.0 convention)")
+                    auditory_cues.append("Sum monitoring to mono to check for low-end phase cancellation or hollowed center elements.")
+                else:
+                    tech_details.append(f"stereo correlation is mono-compatible at {corr:+.2f}")
+            if plr is not None and isinstance(plr, (int, float)) and math.isfinite(plr):
+                if plr < CREST_FACTOR_MIN_DB:
+                    tech_details.append(f"crest factor (PLR) dropped to {plr:.1f} dB (< 6.0 dB floor)")
+                    auditory_cues.append("Listen for choked drum transients and breathing room between beats.")
+            if low_mid is not None and isinstance(low_mid, (int, float)) and math.isfinite(low_mid):
+                if low_mid > LOW_MID_MUD_THRESHOLD:
+                    tech_details.append(f"low-mid (200-500 Hz) energy is {low_mid:.1%} (> 38.0% threshold)")
+                    auditory_cues.append("Listen for vocal clarity unmasking when dipping boxy 200-500 Hz energy.")
+            if sub is not None and isinstance(sub, (int, float)) and math.isfinite(sub):
+                if sub > SUB_EXCESS_THRESHOLD:
+                    tech_details.append(f"sub (20-60 Hz) energy is {sub:.1%} (> 45.0% threshold)")
+                    auditory_cues.append("Audition sub bass on full-range monitors to ensure kick punch is not engulfed.")
+            if air is not None and isinstance(air, (int, float)) and math.isfinite(air):
+                if air < AIR_DEFICIT_THRESHOLD:
+                    tech_details.append(f"air (>10 kHz) energy is {air:.1%} (< 10.0% threshold)")
+                    auditory_cues.append("Check for dull or dark high end lacking open sheen above 10 kHz.")
+
+            detail_str = f" ({'; '.join(tech_details)})" if tech_details else ""
+            prose_sentences.append(
+                f"Technical health earned {p_pts:.1f} of {p_avail:.0f} points{detail_str}."
+            )
+            components["technical_health"] = {
+                "points": p_pts,
+                "points_available": p_avail,
+                "note": p_note,
+                "details": tech_details,
+                "cited_standards": tech_cites,
+            }
+
+        elif p_name == "declared_target":
+            target_cites = [SPOTIFY_PEAK_RULE, AES_TD1008_RULE]
+            cited_standards.extend(target_cites)
+            lufs = m.get("integrated_lufs")
+            lufs_str = f" at {lufs:.1f} LUFS" if lufs is not None and isinstance(lufs, (int, float)) and math.isfinite(lufs) else ""
+            prose_sentences.append(
+                f"Declared target alignment earned {p_pts:.1f} of {p_avail:.0f} points{lufs_str}."
+            )
+            components["declared_target"] = {
+                "points": p_pts,
+                "points_available": p_avail,
+                "note": p_note,
+                "cited_standards": target_cites,
+            }
+
+        elif p_name == "reference_match":
+            ref_cites = [WILSON_FAZENDA_RULE]
+            cited_standards.extend(ref_cites)
+            prose_sentences.append(
+                f"Reference matching earned {p_pts:.1f} of {p_avail:.0f} points against the target acoustic curve."
+            )
+            components["reference_match"] = {
+                "points": p_pts,
+                "points_available": p_avail,
+                "note": p_note,
+                "cited_standards": ref_cites,
+            }
+
+    # 3. Ungraded / Abstentions
+    if ungraded:
+        un_descs = [f"{u.get('part', '').replace('_', ' ')} ({u.get('reason', '')})" for u in ungraded if isinstance(u, dict)]
+        prose_sentences.append(f"Not graded: {', '.join(un_descs)}.")
+
+    # 4. Auditory Guidance
+    if auditory_cues:
+        prose_sentences.append(f"Auditory guidance: {' '.join(auditory_cues)}")
+
+    teaching_prose = " ".join(prose_sentences)
+
+    return {
+        "ok": True,
+        "grade_points": points,
+        "points_available": available,
+        "full_marks": full_marks,
+        "percentage": round(points / available * 100.0, 1) if available > 0 else 0.0,
+        "meaning": grade.get("meaning", ""),
+        "components": components,
+        "ungraded": ungraded,
+        "auditory_guidance": " ".join(auditory_cues) if auditory_cues else "Maintain current balanced mix levels.",
+        "cited_standards": sorted(list(set(cited_standards))),
+        "teaching_prose": teaching_prose,
+    }
+
+
 __all__ = [
+    "AES_TD1008_RULE",
+    "CORRELATION_CONVENTION_RULE",
     "DEFAULT_HELP_GRADE_THRESHOLD",
+    "EBU_TECH_3343_RULE",
+    "PedagogicalExplanation",
     "SuggestionLever",
+    "WILSON_FAZENDA_RULE",
     "apply_suggestion_lever",
+    "explain_grade",
+    "explain_suggestion_lever",
     "generate_suggestion_levers",
     "is_grade_low_enough_for_help",
     "undo_suggestion_lever",
     "with_suggestion_levers",
 ]
+

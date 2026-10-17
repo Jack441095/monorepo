@@ -124,6 +124,7 @@ def grade_session(
     reference_match: Optional[dict[str, Any]] = None,
     session_snapshot: Optional[dict[str, Any]] = None,
     include_levers: bool = False,
+    include_explanation: bool = False,
 ) -> dict[str, Any]:
     """The combined grade for one audit: `technical` is `MixAuditReport.to_dict()`, `meters` a telemetry frame dict.
 
@@ -140,4 +141,13 @@ def grade_session(
         # Milestone E3: Generate actionable suggestion levers when the grade needs help.
         from kenn.core.suggestion_levers import generate_suggestion_levers
         grade["levers"] = generate_suggestion_levers(grade, session_snapshot, meters=meters)
+    if include_explanation:
+        # Milestone E4: Grounded pedagogical explanations explaining the grade.
+        from kenn.core.suggestion_levers import explain_grade
+        grade["explanation"] = explain_grade(grade, meters=meters)
     return grade
+
+
+# Re-export explain_grade for callers importing from kenn.core.grade
+from kenn.core.suggestion_levers import explain_grade
+

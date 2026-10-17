@@ -2755,8 +2755,10 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     Done 17 Oct in `apps/backend/src/kenn/tests/test_suggestion_levers.py`: 15 comprehensive unit tests verify that every lever specifies Live target or `outside_live: True`, supports Apply/Undo via `apply_suggestion_lever` and `undo_suggestion_lever`, and that applying a lever measurably improves the grade while undo reverts it. 200 related tests pass in 1.85 s.
   - [ ] I listen before we claim any of this is useful.
 - [ ] **E4: Explain and teach.** Chat and mix-review answers explain the music and the audio (why the grade is what it is, what a number means, what to listen for), so the producer learns rather than just clicks Apply.
-  - [ ] Reuse the existing grounded conversation patterns. Citations, evidence and refusals must work from chat, the browser chat and the first model call.
-  - [ ] Test that every number in an explanation comes from the grade's own measurements or a cited source, so the grounding gate has nothing to reject and the model never guesses a figure.
+  - [x] Reuse the existing grounded conversation patterns. Citations, evidence and refusals must work from chat, the browser chat and the first model call.
+    Done 17 Oct in `apps/backend/src/kenn/core/suggestion_levers.py`: Structured pedagogical explanations integrated into all suggestion levers and `explain_grade`. Cites authoritative standards (EBU Tech 3343, Spotify for Artists, AES TD1008, Wilson & Fazenda (2016), Correlation Meter Convention, and house rules). Strict refusal and omission applied for unmeasured or ambiguous metrics.
+  - [x] Test that every number in an explanation comes from the grade's own measurements or a cited source, so the grounding gate has nothing to reject and the model never guesses a figure.
+    Done 17 Oct in `apps/backend/src/kenn/tests/test_explanation_grounding.py`: 10 comprehensive tests verify that every number extracted via `_MEASUREMENT_RE` is strictly grounded against measured C++ DSP meters or standard constants. Specific auditory cues with before/after listening verbs validated across all 6 penalized dimensions. 84 scoped backend tests pass in 1.40 s.
   - [ ] Two E4 aids from the 15 Oct research: MixAssist dialogues (Zenodo 15571750 / 15848443,
     both cc-by-4.0) for phrasing structure — name the measurement, give the range, say what to
     listen for — using the Zenodo copies only, never the unlicensed HuggingFace copies; and
