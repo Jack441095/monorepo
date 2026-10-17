@@ -283,15 +283,31 @@ def test_analyze_sample_audio_abstains_honestly_when_the_native_extension_is_off
     assert "not built or is disabled" in reason
 
 
-def test_an_aiff_sample_abstains_without_librosa_rather_than_guessing(tmp_path, monkeypatch) -> None:
+def test_an_aiff_sample_decodes_natively_and_abstains_when_malformed(tmp_path) -> None:
     if not native_fft.available():
         pytest.skip("the native DSP extension is not built in this environment")
-    monkeypatch.setattr(sample_library, "_librosa", None)
-    path = tmp_path / "pad.aif"
-    path.write_bytes(b"FORM" + b"\x00" * 40)
-    result, reason = analyze_sample_audio(path)
+    broken_path = tmp_path / "broken.aif"
+    broken_path.write_bytes(b"FORM" + b"\x00" * 40)
+    result, reason = analyze_sample_audio(broken_path)
     assert result is None
-    assert "AIFF" in reason
+    assert "AIFF could not be decoded" in reason
+
+    # Build a valid 16-bit big-endian 44.1 kHz mono AIFF containing a 2.0 s 440 Hz A4 sine
+    rate = 44100
+    frames = rate * 2
+    t = np.arange(frames, dtype=np.float64) / rate
+    pcm_be = (0.8 * np.sin(2.0 * np.pi * 440.0 * t) * 32767.0).astype(">i2").tobytes()
+    # 44100.0 in 80-bit IEEE 754 extended precision is 0x400E AC44000000000000
+    comm_data = struct.pack(">hIhHQ", 1, frames, 16, 0x400E, 0xAC44000000000000)
+    ssnd_data = struct.pack(">II", 0, 0) + pcm_be
+    form_body = b"AIFF" + b"COMM" + struct.pack(">I", len(comm_data)) + comm_data + b"SSND" + struct.pack(">I", len(ssnd_data)) + ssnd_data
+    valid_aiff = tmp_path / "tone_440.aif"
+    valid_aiff.write_bytes(b"FORM" + struct.pack(">I", len(form_body)) + form_body)
+
+    aiff_res, aiff_reason = analyze_sample_audio(valid_aiff)
+    assert aiff_reason is None
+    assert aiff_res is not None
+    assert aiff_res["estimated_key_pitch_class"] == "A"
 
 
 def test_a_stereo_sample_is_folded_to_mono_and_capped_at_the_analysis_window(tmp_path) -> None:

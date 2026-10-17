@@ -274,8 +274,7 @@ def test_a_stale_extension_without_track_diagnostic_abstains_cleanly(monkeypatch
 
 
 def test_an_unsupported_wav_format_returns_ok_false_with_a_reason() -> None:
-    # Format tag 2 (ADPCM) with 16-bit samples is refused by both the native
-    # decoder and the Python 8-bit/multichannel fallback.
+    # Format tag 2 (ADPCM) with 16-bit samples is refused by the native decoder.
     header = struct.pack(
         "<4sI4s4sIHHIIHH4sI",
         b"RIFF",
@@ -297,3 +296,41 @@ def test_an_unsupported_wav_format_returns_ok_false_with_a_reason() -> None:
     assert "unsupported WAV sample format" in res["error"]
 
 
+def test_eight_bit_and_multichannel_wavs_decode_natively() -> None:
+    # 8-bit WAVs are unsigned with 128 as silence; 4-channel WAVs average across
+    # all channels for the display mono sum while measuring peak across channels.
+    rate = 44100
+    frames = rate // 2
+    buf_8bit = io.BytesIO()
+    with wave.open(buf_8bit, "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(1)
+        wf.setframerate(rate)
+        wf.writeframes(bytes(
+            int(128 + round(64.0 * math.sin(2.0 * math.pi * 440.0 * i / rate)))
+            for i in range(frames)
+        ))
+    res_8 = analyze_track_diagnostic(buf_8bit.getvalue())
+    assert res_8["ok"] is True
+    assert abs(res_8["metrics"]["peak_dbfs"] - (-6.02)) < 0.25
+
+    buf_4ch = io.BytesIO()
+    with wave.open(buf_4ch, "wb") as wf:
+        wf.setnchannels(4)
+        wf.setsampwidth(2)
+        wf.setframerate(rate)
+        wf.writeframes(b"".join(
+            struct.pack(
+                "<hhhh",
+                int(0.5 * math.sin(2.0 * math.pi * 440.0 * i / rate) * 32767.0),
+                0,
+                0,
+                0,
+            )
+            for i in range(frames)
+        ))
+    res_4ch = analyze_track_diagnostic(buf_4ch.getvalue())
+    assert res_4ch["ok"] is True
+    assert abs(res_4ch["metrics"]["peak_dbfs"] - (-6.02)) < 0.2
+    # Mean of channel RMS across 1 active (0.3536 RMS) and 3 silent channels is 0.0884 (-21.07 dBFS).
+    assert abs(res_4ch["metrics"]["rms_dbfs"] - (-21.07)) < 0.2

@@ -212,13 +212,31 @@ Decisions already made:
       files dropped from `792.2 ms` to `61.9 ms` (`12.8x`), and end-to-end
       embedding time (including ONNX inference) dropped from `2.144 s` to
       `1.153 s`.
-    - Added tests in `test_sample_embeddings.py` for WAV decoding without
+    - Added tests in `test_sample_embeddings.py` for WAV and AIFF decoding without
       `librosa`, stereo folding and 5.0 s padding, coprime sample rate
       (`44101 Hz`), `2 Hz` and `60 MHz` rate rejection, `NaN` rejection, stale
       extension fallback, and `KENN_DSP_NATIVE=0` abstention; all 12 tests pass
-      on both Accelerate and scalar (`-DKENN_USE_ACCELERATE=OFF`) builds, and
-      the full suite is 6412 passed, 48 skipped, 3 pre-existing failures
-      (`test_mixing_doctor` x2, `test_fixed_session_grounded_benchmark_qualifies`).
+      on both Accelerate and scalar (`-DKENN_USE_ACCELERATE=OFF`) builds.
+  - [x] Move AIFF/AIFC container decode (`sample_library.py`,
+    `sample_embeddings.py`) and 8-bit/multichannel WAV decode
+    (`track_diagnostic.py`) to C++ `decode_pcm` (17 Oct).
+    - Extended `decode_pcm` in `tooling/native/dsp_core/kenn_dsp_native.cpp` and
+      `native_fft.py` with `allow_8bit`, `max_channels`, `allow_aiff`,
+      `max_frames`, and `total_frames` output, plus `FORM` (`AIFF` and
+      uncompressed `AIFC` `NONE`/`twos`/`sowt`/`fl32`/`FL32` with 80-bit IEEE
+      754 extended float sample rate) parsing, while keeping defaults
+      (`allow_8bit=False, max_channels=2, allow_aiff=False, max_frames=0`) so
+      `audio_analysis.py` and `local_engine.py` keep their strict stereo 16/24/32-bit
+      contract.
+    - Removed `import librosa` from `sample_library.py` and
+      `sample_embeddings.py` (leaving zero `librosa` imports in KENN), and
+      removed the Python `array`/`struct` WAV fallback from
+      `track_diagnostic.py`.
+    - Verified `0.000e+00` max abs float32 difference against `libsndfile` on
+      all 4 real `.aif` files in `Audio-Assets/SLO-Testing/sample_pack_testing`,
+      and added native AIFF and 8-bit/4-channel WAV tests in
+      `test_sample_library.py`, `test_sample_embeddings.py`, and
+      `test_track_diagnostic.py`.
 - AbletonOSC is the Live transport owner. UI, HTTP, voice and MCP must share the
   same typed policy and execution services, without a second write authority.
 - Preferences require explicit opt-in. Session inference, diagnostic hypotheses

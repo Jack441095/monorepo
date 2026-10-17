@@ -83,8 +83,15 @@ def spectral_powers(
     return result
 
 
-def decode_pcm(payload: bytes | bytearray | memoryview) -> dict[str, Any] | None:
-    """Decode a PCM WAV payload through the optional native boundary.
+def decode_pcm(
+    payload: bytes | bytearray | memoryview,
+    *,
+    allow_8bit: bool = False,
+    max_channels: int = 2,
+    allow_aiff: bool = False,
+    max_frames: int = 0,
+) -> dict[str, Any] | None:
+    """Decode a PCM/float WAV or AIFF/AIFC payload through the optional native boundary.
 
     The payload is exposed as a uint8 view so nanobind can parse it without a
     second Python bytes allocation. The returned channel arrays are float32
@@ -97,10 +104,21 @@ def decode_pcm(payload: bytes | bytearray | memoryview) -> dict[str, Any] | None
 
     values = np.frombuffer(payload, dtype=np.uint8)
     try:
-        result = dict(module.decode_pcm(values))
+        if allow_8bit or max_channels != 2 or allow_aiff or max_frames != 0:
+            result = dict(
+                module.decode_pcm(
+                    values,
+                    bool(allow_8bit),
+                    int(max_channels),
+                    bool(allow_aiff),
+                    int(max_frames),
+                )
+            )
+        else:
+            result = dict(module.decode_pcm(values))
     except (TypeError, ValueError, RuntimeError):
-        # Let the audited Python parser produce the stable public error for
-        # malformed or unsupported WAV payloads.
+        # Let the caller produce its stable public error or abstention reason
+        # for malformed or unsupported audio containers.
         return None
     result["channels"] = [np.asarray(channel, dtype=np.float32, order="C") for channel in result["channels"]]
     result["input_copied"] = False

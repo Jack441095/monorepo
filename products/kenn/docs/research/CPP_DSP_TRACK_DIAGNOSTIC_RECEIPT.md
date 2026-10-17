@@ -11,11 +11,11 @@ together with `decode_pcm` and `loudness_metrics`. Its callers are
 
 ## What it computes
 
-- **Decode:** mono and stereo 16/24/32-bit PCM and 32-bit float WAVs decode
-  through `native_fft.decode_pcm` (capped at the first 4,000,000 frames, 83 s
-  at 48 kHz, while `duration_seconds` still reports the full file). The Python
-  `_decode_pcm_channels` path stays only for 8-bit WAVs and files with more
-  than 2 channels, which `decode_pcm` refuses.
+- **Decode:** 8/16/24/32-bit PCM and 32-bit float WAVs across up to 64 channels
+  decode through `native_fft.decode_pcm(payload, allow_8bit=True, max_channels=64, max_frames=4000000)`
+  (capped at the first 4,000,000 frames, 83 s at 48 kHz, while `total_frames`
+  from C++ preserves the full file `duration_seconds`), removing the Python
+  `array`/`struct` WAV parser fallback completely.
 - **Peak and RMS:** peak across all channels and the mean of per-channel RMS,
   matching `analyze_wav`.
 - **Analysis signal:** the mono mean across channels, or the side signal

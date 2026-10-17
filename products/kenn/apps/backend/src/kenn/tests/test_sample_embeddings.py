@@ -57,14 +57,28 @@ def test_extract_embedding_abstains_honestly_without_onnxruntime(tmp_path, monke
     assert "not installed" in reason
 
 
-def test_extract_embedding_abstains_honestly_without_librosa_on_aiff_and_decodes_wav_natively(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr(sample_embeddings, "_librosa", None)
-    aiff_path = tmp_path / "pad.aif"
-    aiff_path.write_bytes(b"FORM" + b"\x00" * 40)
-    window, aiff_reason = sample_embeddings._decode_and_resample_window(aiff_path)
+def test_decode_and_resample_window_decodes_wav_and_aiff_natively_and_abstains_on_broken_aiff(tmp_path) -> None:
+    broken_aiff = tmp_path / "broken.aif"
+    broken_aiff.write_bytes(b"FORM" + b"\x00" * 40)
+    window, aiff_reason = sample_embeddings._decode_and_resample_window(broken_aiff)
     assert window is None
-    assert "AIFF" in aiff_reason
-    assert "not installed" in aiff_reason
+    assert "AIFF could not be decoded" in aiff_reason
+
+    rate = 44100
+    frames = rate
+    pcm_be = b"".join(
+        struct.pack(">h", int(0.6 * math.sin(2.0 * math.pi * 440.0 * i / rate) * 32767))
+        for i in range(frames)
+    )
+    comm_data = struct.pack(">hIhHQ", 1, frames, 16, 0x400E, 0xAC44000000000000)
+    ssnd_data = struct.pack(">II", 0, 0) + pcm_be
+    form_body = b"AIFF" + b"COMM" + struct.pack(">I", len(comm_data)) + comm_data + b"SSND" + struct.pack(">I", len(ssnd_data)) + ssnd_data
+    valid_aiff = tmp_path / "tone.aif"
+    valid_aiff.write_bytes(b"FORM" + struct.pack(">I", len(form_body)) + form_body)
+    aiff_window, valid_aiff_reason = sample_embeddings._decode_and_resample_window(valid_aiff)
+    assert valid_aiff_reason is None
+    assert aiff_window is not None
+    assert aiff_window.shape == (sample_embeddings.TARGET_WINDOW_SAMPLES,)
 
     wav_path = _tone_wav(tmp_path, "tone.wav", framerate=44100)
     wav_window, wav_reason = sample_embeddings._decode_and_resample_window(wav_path)

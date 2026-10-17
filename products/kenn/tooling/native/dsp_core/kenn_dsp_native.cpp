@@ -81,6 +81,7 @@ struct ChannelSummary {
 struct DecodedWav {
     std::vector<std::unique_ptr<float[]>> channels;
     std::size_t frame_count = 0;
+    std::size_t total_frame_count = 0;
     std::size_t sample_rate = 0;
     std::size_t bit_depth = 0;
 };
@@ -122,10 +123,69 @@ std::int32_t read_i24(const std::uint8_t* data)
     return value;
 }
 
-DecodedWav decode_pcm(const std::uint8_t* payload, std::size_t length)
+std::uint16_t read_be_u16(const std::uint8_t* data)
 {
-    if (length < 12 || std::string(reinterpret_cast<const char*>(payload), 4) != "RIFF" ||
-        std::string(reinterpret_cast<const char*>(payload + 8), 4) != "WAVE")
+    return static_cast<std::uint16_t>(
+        (static_cast<std::uint16_t>(data[0]) << 8) |
+        static_cast<std::uint16_t>(data[1]));
+}
+
+std::uint32_t read_be_u32(const std::uint8_t* data)
+{
+    return (static_cast<std::uint32_t>(data[0]) << 24) |
+        (static_cast<std::uint32_t>(data[1]) << 16) |
+        (static_cast<std::uint32_t>(data[2]) << 8) |
+        static_cast<std::uint32_t>(data[3]);
+}
+
+std::int32_t read_be_i24(const std::uint8_t* data)
+{
+    std::int32_t value = (static_cast<std::int32_t>(data[0]) << 16) |
+        (static_cast<std::int32_t>(data[1]) << 8) |
+        static_cast<std::int32_t>(data[2]);
+    if ((value & 0x00800000) != 0)
+        value |= static_cast<std::int32_t>(0xff000000);
+    return value;
+}
+
+double read_be_f80(const std::uint8_t* data)
+{
+    const std::uint16_t sign_exp = read_be_u16(data);
+    const std::uint64_t mantissa =
+        (static_cast<std::uint64_t>(read_be_u32(data + 2)) << 32) |
+        static_cast<std::uint64_t>(read_be_u32(data + 6));
+    const int sign = (sign_exp >> 15) & 1;
+    const int exp = sign_exp & 0x7FFF;
+    if (exp == 0 && mantissa == 0)
+        return 0.0;
+    if (exp == 0x7FFF)
+        return std::numeric_limits<double>::quiet_NaN();
+    // 80-bit IEEE 754 extended has an explicit integer bit at bit 63 of the
+    // mantissa and an exponent bias of 16383: value = mantissa * 2^(exp - 16383 - 63).
+    const double magnitude = std::ldexp(static_cast<double>(mantissa), exp - 16383 - 63);
+    return sign ? -magnitude : magnitude;
+}
+
+DecodedWav decode_pcm(
+    const std::uint8_t* payload,
+    std::size_t length,
+    bool allow_8bit = false,
+    std::size_t max_channels = 2,
+    bool allow_aiff = false,
+    std::size_t max_frames = 0)
+{
+    // Cap channel count at 64 even when callers request multichannel support so
+    // a corrupt header cannot allocate tens of thousands of channel arrays.
+    const std::size_t channel_limit = std::clamp<std::size_t>(max_channels, 1, 64);
+
+    if (length < 12)
+        throw nb::value_error("invalid audio container: payload shorter than 12-byte header");
+
+    const std::string magic(reinterpret_cast<const char*>(payload), 4);
+    const std::string form_type(reinterpret_cast<const char*>(payload + 8), 4);
+    const bool is_wav = (magic == "RIFF" && form_type == "WAVE");
+    const bool is_aiff = allow_aiff && (magic == "FORM" && (form_type == "AIFF" || form_type == "AIFC"));
+    if (!is_wav && !is_aiff)
         throw nb::value_error("invalid WAV: file does not start with RIFF/WAVE id");
 
     bool have_format = false;
@@ -133,54 +193,118 @@ DecodedWav decode_pcm(const std::uint8_t* payload, std::size_t length)
     std::size_t sample_width = 0;
     std::size_t sample_rate = 0;
     std::uint16_t audio_format = 0;
+    bool little_endian = is_wav;
+    bool unsigned_8bit = is_wav;
     const std::uint8_t* raw = nullptr;
     std::size_t raw_length = 0;
     std::size_t position = 12;
-    while (position + 8 <= length) {
-        const auto* chunk = payload + position;
-        const auto chunk_size = static_cast<std::size_t>(read_u32(chunk + 4));
-        const auto data_start = position + 8;
-        const auto available = std::min(chunk_size, length - data_start);
-        const auto* chunk_data = payload + data_start;
-        if (std::string(reinterpret_cast<const char*>(chunk), 4) == "fmt " && available >= 16) {
-            audio_format = read_u16(chunk_data);
-            channels = read_u16(chunk_data + 2);
-            sample_rate = read_u32(chunk_data + 4);
-            sample_width = read_u16(chunk_data + 14) / 8;
-            if (audio_format == 0xfffe && available >= 26)
-                audio_format = read_u16(chunk_data + 24);
-            have_format = true;
-        } else if (std::string(reinterpret_cast<const char*>(chunk), 4) == "data") {
-            raw = chunk_data;
-            raw_length = available;
+
+    if (is_wav) {
+        while (position + 8 <= length) {
+            const auto* chunk = payload + position;
+            const auto chunk_size = static_cast<std::size_t>(read_u32(chunk + 4));
+            const auto data_start = position + 8;
+            const auto available = std::min(chunk_size, length - data_start);
+            const auto* chunk_data = payload + data_start;
+            const std::string chunk_id(reinterpret_cast<const char*>(chunk), 4);
+            if (chunk_id == "fmt " && available >= 16) {
+                audio_format = read_u16(chunk_data);
+                channels = read_u16(chunk_data + 2);
+                sample_rate = read_u32(chunk_data + 4);
+                const std::uint16_t bits_per_sample = read_u16(chunk_data + 14);
+                sample_width = (bits_per_sample % 8 == 0) ? (bits_per_sample / 8) : 0;
+                if (audio_format == 0xfffe && available >= 26)
+                    audio_format = read_u16(chunk_data + 24);
+                have_format = true;
+            } else if (chunk_id == "data") {
+                raw = chunk_data;
+                raw_length = available;
+            }
+            const auto advance = 8 + chunk_size + (chunk_size & 1U);
+            if (advance > length - position)
+                break;
+            position += advance;
         }
-        const auto advance = 8 + chunk_size + (chunk_size & 1U);
-        if (advance > length - position)
-            break;
-        position += advance;
+    } else {
+        const bool is_aifc = (form_type == "AIFC");
+        while (position + 8 <= length) {
+            const auto* chunk = payload + position;
+            const auto chunk_size = static_cast<std::size_t>(read_be_u32(chunk + 4));
+            const auto data_start = position + 8;
+            const auto available = std::min(chunk_size, length - data_start);
+            const auto* chunk_data = payload + data_start;
+            const std::string chunk_id(reinterpret_cast<const char*>(chunk), 4);
+            if (chunk_id == "COMM" && available >= 18) {
+                channels = read_be_u16(chunk_data);
+                const std::uint16_t bits_per_sample = read_be_u16(chunk_data + 6);
+                sample_width = (bits_per_sample % 8 == 0) ? (bits_per_sample / 8) : 0;
+                const double rate_f = read_be_f80(chunk_data + 8);
+                if (std::isfinite(rate_f) && rate_f > 0.0 && rate_f <= 1e9)
+                    sample_rate = static_cast<std::size_t>(std::llround(rate_f));
+                audio_format = 1;
+                little_endian = false;
+                if (is_aifc) {
+                    if (available < 22) {
+                        audio_format = 0;
+                    } else {
+                        const std::string comp(reinterpret_cast<const char*>(chunk_data + 18), 4);
+                        if (comp == "NONE" || comp == "twos") {
+                            audio_format = 1;
+                            little_endian = false;
+                        } else if (comp == "sowt") {
+                            audio_format = 1;
+                            little_endian = true;
+                        } else if (comp == "fl32" || comp == "FL32") {
+                            audio_format = 3;
+                            little_endian = false;
+                        } else {
+                            audio_format = 0;
+                        }
+                    }
+                }
+                have_format = true;
+            } else if (chunk_id == "SSND" && available >= 8) {
+                const auto ssnd_offset = static_cast<std::size_t>(read_be_u32(chunk_data));
+                if (8 + ssnd_offset <= available) {
+                    raw = chunk_data + 8 + ssnd_offset;
+                    raw_length = available - (8 + ssnd_offset);
+                }
+            }
+            const auto advance = 8 + chunk_size + (chunk_size & 1U);
+            if (advance > length - position)
+                break;
+            position += advance;
+        }
     }
 
     if (!have_format)
         throw nb::value_error("invalid WAV: fmt chunk missing in WAV file");
     if (raw == nullptr)
         throw nb::value_error("invalid WAV: data chunk missing in WAV file");
-    if (channels != 1 && channels != 2)
+    if (channels < 1 || channels > channel_limit)
         throw nb::value_error("only mono and stereo WAV files are supported");
-    if (sample_width != 2 && sample_width != 3 && sample_width != 4)
+    const bool valid_width = (sample_width == 2 || sample_width == 3 || sample_width == 4)
+        || (allow_8bit && sample_width == 1 && audio_format == 1);
+    if (!valid_width)
         throw nb::value_error("only 16-bit, 24-bit, and 32-bit WAV files are supported");
-    if (audio_format != 1 && audio_format != 3)
+    if (audio_format != 1 && (audio_format != 3 || sample_width != 4))
         throw nb::value_error("unsupported WAV audio format tag");
     if (sample_rate == 0 || raw_length == 0)
         throw nb::value_error("WAV contains no audio frames");
 
     const auto bytes_per_frame = channels * sample_width;
-    const auto frame_count = raw_length / bytes_per_frame;
-    if (frame_count == 0)
+    const auto total_frame_count = raw_length / bytes_per_frame;
+    if (total_frame_count == 0)
         throw nb::value_error("WAV contains no audio frames");
+    const auto frame_count = (max_frames > 0)
+        ? std::min(total_frame_count, max_frames)
+        : total_frame_count;
+
     DecodedWav result;
     result.sample_rate = sample_rate;
     result.bit_depth = sample_width * 8;
     result.frame_count = frame_count;
+    result.total_frame_count = total_frame_count;
     result.channels.resize(channels);
     for (auto& channel : result.channels)
         channel = std::make_unique<float[]>(frame_count);
@@ -188,18 +312,27 @@ DecodedWav decode_pcm(const std::uint8_t* payload, std::size_t length)
         for (std::size_t channel = 0; channel < channels; ++channel) {
             const auto* sample = raw + frame * bytes_per_frame + channel * sample_width;
             float value = 0.0f;
-            if (sample_width == 2) {
-                const auto integer = static_cast<std::int16_t>(read_u16(sample));
+            if (sample_width == 1) {
+                if (unsigned_8bit) {
+                    value = static_cast<float>(static_cast<int>(sample[0]) - 128) / 128.0f;
+                } else {
+                    value = static_cast<float>(static_cast<std::int8_t>(sample[0])) / 128.0f;
+                }
+            } else if (sample_width == 2) {
+                const auto integer = static_cast<std::int16_t>(
+                    little_endian ? read_u16(sample) : read_be_u16(sample));
                 value = static_cast<float>(integer) / 32768.0f;
             } else if (sample_width == 3) {
-                value = static_cast<float>(read_i24(sample)) / 8388608.0f;
+                const auto integer = little_endian ? read_i24(sample) : read_be_i24(sample);
+                value = static_cast<float>(integer) / 8388608.0f;
             } else if (audio_format == 3) {
-                std::uint32_t bits = read_u32(sample);
+                std::uint32_t bits = little_endian ? read_u32(sample) : read_be_u32(sample);
                 float decoded;
                 std::memcpy(&decoded, &bits, sizeof(decoded));
                 value = decoded;
             } else {
-                const auto integer = static_cast<std::int32_t>(read_u32(sample));
+                const auto integer = static_cast<std::int32_t>(
+                    little_endian ? read_u32(sample) : read_be_u32(sample));
                 value = static_cast<float>(integer) / 2147483648.0f;
             }
             result.channels[channel][frame] = value;
@@ -763,7 +896,12 @@ nb::list spectral_peak_list(const std::vector<SpectralPeak>& peaks)
     return output;
 }
 
-nb::dict decode_pcm_wav(ByteInput payload)
+nb::dict decode_pcm_wav(
+    ByteInput payload,
+    bool allow_8bit,
+    std::size_t max_channels,
+    bool allow_aiff,
+    std::size_t max_frames)
 {
     if (payload.ndim() != 1 || payload.shape(0) == 0)
         throw nb::value_error("payload must be a non-empty one-dimensional uint8 NumPy array");
@@ -771,7 +909,13 @@ nb::dict decode_pcm_wav(ByteInput payload)
     DecodedWav decoded;
     {
         nb::gil_scoped_release release;
-        decoded = decode_pcm(payload.data(), payload.shape(0));
+        decoded = decode_pcm(
+            payload.data(),
+            payload.shape(0),
+            allow_8bit,
+            max_channels,
+            allow_aiff,
+            max_frames);
     }
     nb::list channel_outputs;
     for (auto& channel : decoded.channels)
@@ -781,6 +925,7 @@ nb::dict decode_pcm_wav(ByteInput payload)
     output["sample_rate"] = decoded.sample_rate;
     output["channel_count"] = decoded.channels.size();
     output["bit_depth"] = decoded.bit_depth;
+    output["total_frames"] = decoded.total_frame_count;
     output["backend"] = "cpp-native-decoder";
     return output;
 }
@@ -1114,7 +1259,11 @@ NB_MODULE(_kenn_dsp_native, module)
     module.doc() = "KENN native offline DSP kernels";
     module.def("decode_pcm", &decode_pcm_wav,
                nb::arg("payload"),
-               "Decode a bounded PCM WAV payload into contiguous float32 channel arrays.");
+               nb::arg("allow_8bit") = false,
+               nb::arg("max_channels") = 2,
+               nb::arg("allow_aiff") = false,
+               nb::arg("max_frames") = 0,
+               "Decode a bounded PCM/float WAV or AIFF/AIFC payload into contiguous float32 channel arrays.");
     module.def("spectral_power", &spectral_power,
                nb::arg("samples"), nb::arg("fft_size") = 16384,
                nb::arg("sample_rate") = 0, nb::arg("include_ltas") = false,

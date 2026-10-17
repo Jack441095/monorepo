@@ -16,7 +16,6 @@ import os
 import re
 import time
 import xml.etree.ElementTree as ET
-from array import array
 from typing import Any, Dict, List, Optional, Tuple
 
 from kenn.core import native_fft
@@ -172,74 +171,20 @@ def build_tracks_from_live_session(
 
 
 def _decode_pcm_channels(payload: bytes) -> Tuple[List[Any], int, float]:
-    """Decode a WAV payload into per-channel float32 samples, sample_rate and full duration.
-
-    Mono and stereo 16/24/32-bit PCM and float WAVs go through the C++
-    decoder (`native_fft.decode_pcm`). The Python parser stays only for 8-bit
-    WAVs and files with more than two channels, which the native decoder
-    refuses.
-    """
-    decoded = native_fft.decode_pcm(payload)
-    if decoded is not None:
-        channels = decoded["channels"]
-        framerate = int(decoded["sample_rate"])
-        total_frames = len(channels[0]) if channels else 0
-        duration = total_frames / framerate if framerate > 0 else 0.0
-        return [ch[:_MAX_ANALYSIS_FRAMES] for ch in channels], framerate, duration
-
-    from kenn.core.audio_analysis import _parse_wav
-    channels_count, sampwidth, framerate, data_bytes, audio_format = _parse_wav(payload)
-    if channels_count < 1 or framerate <= 0:
-        raise ValueError("WAV header has no channels or no sample rate")
-
-    total_frames = len(data_bytes) // (channels_count * sampwidth)
-    duration = total_frames / framerate
-    frames_to_read = min(total_frames, _MAX_ANALYSIS_FRAMES)
-    count = frames_to_read * channels_count
-    if count == 0:
-        # Empty data chunk: return empty channels so the caller reports "no playable samples".
-        return [array("f") for _ in range(channels_count)], framerate, duration
-
-    if sampwidth == 1 and audio_format == 1:
-        # 8-bit WAV is unsigned with its midpoint at 128; native_fft.decode_pcm only accepts 16/24/32-bit.
-        return [
-            array("f", ((v - 128) / 128.0 for v in data_bytes[ch:count:channels_count]))
-            for ch in range(channels_count)
-        ], framerate, duration
-
-    if channels_count > 2:
-        # Multichannel (>2 ch) WAVs are refused by native_fft.decode_pcm; decode
-        # each channel here and pass the (frames, channels) matrix to the C++ kernel.
-        import sys
-
-        def typed(code: str) -> array:
-            values = array(code)
-            values.frombytes(data_bytes[: count * values.itemsize])
-            if sys.byteorder == "big":
-                values.byteswap()
-            return values
-
-        if sampwidth == 2 and audio_format == 1:
-            ints, scale = typed("h"), 32768.0
-        elif sampwidth == 4 and audio_format == 3:
-            floats = typed("f")
-            return [floats[ch::channels_count] for ch in range(channels_count)], framerate, duration
-        elif sampwidth == 4 and audio_format == 1:
-            ints, scale = typed("i"), 2147483648.0
-        elif sampwidth == 3 and audio_format == 1:
-            ints = array("i", (
-                int.from_bytes(data_bytes[offset : offset + 3], byteorder="little", signed=True)
-                for offset in range(0, count * 3, 3)
-            ))
-            scale = 8388608.0
-        else:
-            raise ValueError(f"unsupported WAV sample format ({sampwidth * 8}-bit, format tag {audio_format})")
-        return [
-            array("f", (v / scale for v in ints[ch::channels_count]))
-            for ch in range(channels_count)
-        ], framerate, duration
-
-    raise ValueError(f"unsupported WAV sample format ({sampwidth * 8}-bit, format tag {audio_format})")
+    """Decode a WAV payload into per-channel float32 samples, sample_rate and full duration via C++."""
+    decoded = native_fft.decode_pcm(
+        payload,
+        allow_8bit=True,
+        max_channels=64,
+        max_frames=_MAX_ANALYSIS_FRAMES,
+    )
+    if decoded is None:
+        raise ValueError("unsupported WAV sample format or malformed WAV payload (requires 8/16/24/32-bit PCM or 32-bit float WAV)")
+    channels = decoded["channels"]
+    framerate = int(decoded["sample_rate"])
+    total_frames = int(decoded.get("total_frames", len(channels[0]) if channels else 0))
+    duration = total_frames / framerate if framerate > 0 else 0.0
+    return channels, framerate, duration
 
 
 def compute_waveform_envelope(samples: List[float], points: int = WAVEFORM_POINTS) -> Tuple[List[float], List[float]]:

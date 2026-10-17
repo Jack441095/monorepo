@@ -1,4 +1,4 @@
-# Native sample-embedding WAV decode and 32 kHz resampler, 17 Oct 2026
+# Native sample-embedding WAV/AIFF decode and 32 kHz resampler, 17 Oct 2026
 
 Audio loading and resampling in
 [sample_embeddings.py](../../apps/backend/src/kenn/core/sample_embeddings.py)
@@ -7,15 +7,20 @@ moved from `librosa.load(path, sr=32000, mono=True, duration=5.0)` and
 [kenn_dsp_native.cpp](../../tooling/native/dsp_core/kenn_dsp_native.cpp),
 wrapped by `native_fft.resample_mono_window` in
 [native_fft.py](../../apps/backend/src/kenn/core/native_fft.py).
-`_librosa` stays optional only for `.aif`/`.aiff` container decoding (loaded at
-native rate `sr=None` and then resampled by `resample_mono_window` in C++),
-matching `sample_library.py`.
+Both `sample_embeddings.py` and `sample_library.py` now decode `.wav`, `.aif`,
+and `.aiff` files in C++ via `native_fft.decode_pcm(payload, allow_aiff=is_aiff)`,
+removing `import librosa` from KENN completely.
 
 ## What it computes
 
-- **Bounded WAV decode:** reads at most the first 32 MiB of a `.wav` file
-  (`_MAX_WAV_READ_BYTES`, covering >5.0 s of stereo 32-bit float up to 768 kHz)
-  and decodes 16/24/32-bit PCM or 32-bit float via `native_fft.decode_pcm`.
+- **Bounded WAV and AIFF/AIFC decode:** reads at most the first 32 MiB of a
+  `.wav`, `.aif`, or `.aiff` file (`_MAX_WAV_READ_BYTES`, covering >5.0 s of
+  stereo 32-bit float up to 768 kHz) and decodes mono/stereo 16/24/32-bit PCM
+  or 32-bit float (`FORM` `AIFF` and uncompressed `AIFC` `NONE`/`twos`/`sowt`/`fl32`/`FL32`
+  with 80-bit IEEE 754 extended sample rates) via `native_fft.decode_pcm`. Across
+  all 4 real `.aif` files in `Audio-Assets/SLO-Testing/sample_pack_testing`,
+  C++ `decode_pcm(allow_aiff=True)` matches `libsndfile` (`soundfile`) with
+  `0.000e+00` max abs float32 difference.
 - **Rate and finiteness guards:** refuses sample rates outside `8000..768000 Hz`
   and any `NaN`/`Inf` sample with an honest abstention message rather than
   allocating multi-gigabyte filter buffers or passing non-finite tensors to

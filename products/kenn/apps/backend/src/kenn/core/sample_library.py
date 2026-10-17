@@ -35,11 +35,6 @@ from typing import Any
 
 from kenn.core import native_fft
 
-try:  # Only for decoding AIFF, which the native decoder does not read.
-    import librosa as _librosa
-except ImportError:
-    _librosa = None
-
 # Bound per-file decode/analysis work; a bulk scan never calls this path,
 # so this only bounds one on-demand request, not the whole library.
 MAX_ANALYSIS_SECONDS = 60.0
@@ -245,30 +240,22 @@ def analyze_sample_audio(path: Path) -> tuple[dict[str, Any] | None, str | None]
 
 
 def _decode_mono(path: Path) -> tuple[Any, int] | str:
-    """Return ``(mono float32 samples, rate)`` for one file, or the reason it could not be decoded."""
+    """Return ``(mono float32 samples, rate)`` for one WAV or AIFF file, or the reason it could not be decoded."""
     import numpy as np
 
-    if path.suffix.lower() == ".wav":
-        with path.open("rb") as handle:
-            payload = handle.read(_MAX_WAV_READ_BYTES)
-        decoded = native_fft.decode_pcm(payload)
-        if decoded is None:
-            # The native decoder reads mono or stereo 16/24/32-bit PCM and
-            # 32-bit float; 8-bit, multichannel, compressed, empty or
-            # malformed files land here, and abstaining is the honest answer.
-            return "this WAV could not be decoded (mono or stereo 16/24/32-bit PCM or float only)"
-        channels = decoded["channels"]
-        mono = channels[0] if len(channels) == 1 else np.mean(np.stack(channels), axis=0, dtype=np.float32)
-        return mono, int(decoded["sample_rate"])
-    if _librosa is None:
-        # AIFF has no native decoder yet, and the app bundle ships without
-        # librosa, so AIFF samples abstain there.
-        return "AIFF decoding needs the optional librosa dependency, which is not installed"
-    try:
-        mono, rate = _librosa.load(str(path), sr=None, mono=True, duration=MAX_ANALYSIS_SECONDS)
-    except Exception as exc:
-        return f"librosa failed to decode this file: {exc}"
-    return np.asarray(mono, dtype=np.float32), int(rate)
+    with path.open("rb") as handle:
+        payload = handle.read(_MAX_WAV_READ_BYTES)
+    is_aiff = path.suffix.lower() in {".aif", ".aiff"}
+    decoded = native_fft.decode_pcm(payload, allow_aiff=is_aiff)
+    if decoded is None:
+        # The native decoder reads mono or stereo 16/24/32-bit PCM and 32-bit
+        # float WAV/AIFF/AIFC; 8-bit, multichannel, compressed, empty or
+        # malformed files land here, and abstaining is the honest answer.
+        container = "AIFF" if is_aiff else "WAV"
+        return f"this {container} could not be decoded (mono or stereo 16/24/32-bit PCM or float only)"
+    channels = decoded["channels"]
+    mono = channels[0] if len(channels) == 1 else np.mean(np.stack(channels), axis=0, dtype=np.float32)
+    return mono, int(decoded["sample_rate"])
 
 
 def _profile_tonic(chroma: list[float]) -> int | None:
