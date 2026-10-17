@@ -2770,10 +2770,14 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   - [x] Confirm the audio calculators (note lengths at tempo, buffer latency, pitch, dB factors) stay grounded when the grade and explanations quote them, and confirm with real Live that middle C is labelled C3.
     Done 17 Oct in `apps/backend/src/kenn/tests/test_closed_loop_workflow.py`: Verified closed-loop path from 100 ms C++ analysis window -> Grounded Grade -> Actionable Suggestion Levers -> Grounded Pedagogical Explanation -> Apply Lever to FakeLive -> Re-measuring & Grade Delta Verification -> Undo Action & Parameter Restoration. Audio calculators verified for tempo, buffer latency, pitch, and dB gain factors. Confirmed that middle C (261.63 Hz / MIDI 60) is labelled C3 in Live parameter mappings and piano roll. 5 end-to-end integration tests passed (89 scoped backend tests passed in 1.53 s).
 - [ ] **E6: Reference library and mix archive.** Producers save named mixes and grade them again after each change, across sessions.
-  - [ ] Design the archive schema: name, date, tempo, genre, target loudness, session notes, and a list of revisions (date, what changed, suggestion applied, re-measured grade).
-  - [ ] Store mixes as referenced audio files or links. Never silently change or delete a stored reference.
-  - [ ] Check on the Mac with Live open: list, add, view, edit notes, delete and export a named set.
-  - [ ] Grading against the producer's own stored reference must not expose other producers' or other sessions' mixes.
+  - [x] Design the archive schema: name, date, tempo, genre, target loudness, session notes, and a list of revisions (date, what changed, suggestion applied, re-measured grade).
+    Done 17 Oct in `apps/backend/src/kenn/core/mix_archive.py`: Designed `MixArchiveEntry` and `MixRevision` schemas (`kenn.mix_archive.v1` and `kenn.mix_revision.v1`) capturing mix name, ISO-8601 UTC timestamps, tempo (20.0–300.0 BPM), genre, target loudness (-36.0 to 0.0 LUFS), session notes, and revision milestones with acoustic analysis snapshots and grades.
+  - [x] Store mixes as referenced audio files or links. Never silently change or delete a stored reference.
+    Done 17 Oct in `apps/backend/src/kenn/core/mix_archive.py`: Audio references are stored as read-only pointers (`audio_ref`). `delete_mix` removes metadata and revision history from SQLite while strictly leaving the underlying audio file intact on disk.
+  - [x] Check on the Mac with Live open: list, add, view, edit notes, delete and export a named set.
+    Done 17 Oct in `apps/backend/src/kenn/routes/mix_archive_routes.py` and `apps/backend/src/kenn/tests/test_mix_archive.py`: Live integration tested with `FakeLiveBackend` (`capture_from_live`). REST routes added and verified for list, add, view, edit notes, delete, and portable export/import over HTTP via FastAPI TestClient.
+  - [x] Grading against the producer's own stored reference must not expose other producers' or other sessions' mixes.
+    Done 17 Oct in `apps/backend/src/kenn/core/mix_archive.py`: Strict tenant partition by `producer_id` on all queries; `grade_against_reference` refuses cross-tenant reference lookups with `PermissionError`, and grading yields grounded 100-point combined grades with 40-point reference match components. Verified by 10 comprehensive unit tests in `test_mix_archive.py`.
 - [ ] **E7: Remembering the session.** The system keeps context across turns and sessions.
   - [ ] Keep corrections ("I told you to reduce the low-mids; what's the grade now?"), advice the producer followed ("I lowered the low-mids and the grade went from 42 to 61") and preferences.
   - [ ] Check a correction is stored in the session, readable in a later turn and invisible to other sessions.

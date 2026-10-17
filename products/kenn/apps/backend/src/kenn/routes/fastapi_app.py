@@ -41,6 +41,17 @@ from kenn.routes.mix_review_routes import (
     handle_mix_review_reference_json,
     handle_reference_preset_download,
 )
+from kenn.routes.mix_archive_routes import (
+    handle_list_mixes,
+    handle_get_mix,
+    handle_add_mix,
+    handle_update_notes,
+    handle_add_revision,
+    handle_delete_mix,
+    handle_export_archive,
+    handle_import_archive,
+    handle_grade_against_reference,
+)
 from kenn.core.local_mix_review_service import local_mix_review
 
 app = FastAPI(
@@ -322,3 +333,97 @@ async def reference_preset_endpoint(review_id: str):
         media_type="application/octet-stream",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+# --- Mix Archive & Reference Library Endpoints (Milestone E6) ----------------
+
+class MixAddRequest(BaseModel):
+    producer_id: str
+    name: str
+    audio_ref: str
+    tempo: Optional[float] = 120.0
+    genre: Optional[str] = "electronic"
+    target_loudness: Optional[float] = -14.0
+    session_notes: Optional[str] = ""
+    reference_track_ref: Optional[str] = None
+    session_id: Optional[str] = None
+    initial_grade: Optional[dict[str, Any]] = None
+    initial_snapshot: Optional[dict[str, Any]] = None
+
+
+class MixNotesRequest(BaseModel):
+    mix_id: str
+    producer_id: str
+    session_notes: str
+
+
+class MixRevisionRequest(BaseModel):
+    mix_id: str
+    producer_id: str
+    what_changed: str
+    suggestion_applied: Optional[dict[str, Any]] = None
+    analysis_snapshot: Optional[dict[str, Any]] = None
+    measured_grade: Optional[dict[str, Any]] = None
+
+
+class MixGradeReferenceRequest(BaseModel):
+    reference_mix_id: str
+    producer_id: str
+    current_meters: dict[str, Any]
+    technical_report: Optional[dict[str, Any]] = None
+    request_text: Optional[str] = ""
+
+
+@app.get("/api/mix-archive/list")
+async def mix_archive_list_endpoint(producer_id: str, session_id: Optional[str] = None):
+    status, result = handle_list_mixes(producer_id, session_id=session_id)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.get("/api/mix-archive/mix/{mix_id}")
+async def mix_archive_get_endpoint(mix_id: str, producer_id: str):
+    status, result = handle_get_mix(mix_id, producer_id)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/mix-archive/add")
+async def mix_archive_add_endpoint(req: MixAddRequest):
+    status, result = handle_add_mix(req.model_dump())
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/mix-archive/notes")
+async def mix_archive_notes_endpoint(req: MixNotesRequest):
+    status, result = handle_update_notes(req.model_dump())
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/mix-archive/revision")
+async def mix_archive_revision_endpoint(req: MixRevisionRequest):
+    status, result = handle_add_revision(req.model_dump())
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.delete("/api/mix-archive/mix/{mix_id}")
+async def mix_archive_delete_endpoint(mix_id: str, producer_id: str):
+    status, result = handle_delete_mix(mix_id, producer_id)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.get("/api/mix-archive/export")
+async def mix_archive_export_endpoint(producer_id: str):
+    status, result = handle_export_archive(producer_id)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/mix-archive/import")
+async def mix_archive_import_endpoint(producer_id: str, payload: dict[str, Any]):
+    status, result = handle_import_archive(producer_id, payload)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/mix-archive/grade-reference")
+async def mix_archive_grade_reference_endpoint(req: MixGradeReferenceRequest):
+    status, result = handle_grade_against_reference(req.model_dump())
+    return JSONResponse(status_code=status, content=result)
+
