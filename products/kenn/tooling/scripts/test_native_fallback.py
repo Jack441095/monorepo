@@ -5,8 +5,8 @@ from __future__ import annotations
 
 import io
 import math
-import struct
 import os
+import struct
 import wave
 
 # Native is on by default where the extension is built, so this check forces the

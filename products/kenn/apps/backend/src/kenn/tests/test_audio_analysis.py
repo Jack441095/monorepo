@@ -236,8 +236,11 @@ def test_native_peak_and_ltas_reports_match_reference(monkeypatch) -> None:
 def test_a_silent_channel_has_no_correlation_on_either_path(monkeypatch) -> None:
     # Until 17 Oct 2026 the native path reported 0.0 here and the reference None,
     # so one silent side read as "fully decorrelated" only when native was built.
+    import pytest
     from kenn.core import native_fft
 
+    if not native_fft.available():
+        pytest.skip("native extension not built; both halves would run the reference")
     one_side = wav([sine(1.0, 440.0), [0.0] * 48000])
     all_silent = wav([[0.0] * 48000, [0.0] * 48000])
     native = [analyze_wav(payload, filename="flat.wav")["metrics"]["correlation"] for payload in (one_side, all_silent)]
