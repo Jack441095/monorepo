@@ -735,7 +735,9 @@ def test_near_silent_source_withholds_comparison_metrics_below_the_existing_sign
     assert not {"tonal_balance_7band", "dynamics", "stereo", "coaching", "recommendations", "eq8_preset_adv_base64"} & comparison.keys()
 
 
-def test_antiphase_stereo_below_the_scorer_floor_withholds_comparison_details():
+def test_antiphase_stereo_withholds_comparison_details_and_names_the_cancellation():
+    # Withheld since 15 Oct; until 17 Oct the reason wrongly said the mix RMS was below
+    # -60 dBFS, because levels were read from the mono downmix of a full-level file.
     antiphase = _antiphase_wav_bytes()
     audible = _wav_bytes(amplitude=0.2, frequency_hz=100)
 
@@ -744,7 +746,7 @@ def test_antiphase_stereo_below_the_scorer_floor_withholds_comparison_details():
     reference = next(u for u in result["grade"]["ungraded"] if u["part"] == "reference_match")
 
     assert comparison["reference_match_score"]["points_available"] == 0.0
-    assert "mix RMS" in reference["reason"]
+    assert "mix cancels in mono" in reference["reason"]
     assert comparison["largest_spectral_difference"] is None
     assert comparison["largest_ltas_difference"] is None
     assert comparison["ltas_40_band_deltas"] == []

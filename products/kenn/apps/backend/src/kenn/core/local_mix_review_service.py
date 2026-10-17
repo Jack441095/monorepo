@@ -473,6 +473,9 @@ def compare_reference_audio(
     comparison_is_significant = all(
         (rms := _finite((dynamics.get(source) or {}).get("rms_dbfs"))) is not None
         and rms > _REFERENCE_MIN_RMS_DBFS
+        # The scorer withholds a source that cancels in mono (L = -R); details shown
+        # beside that withheld score would grade the file it just refused to grade.
+        and (dynamics.get(source) or {}).get("mono_cancels") is not True
         for source in ("mix", "reference")
     )
 

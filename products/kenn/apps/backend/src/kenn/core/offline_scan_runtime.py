@@ -65,8 +65,15 @@ def _fake_fingerprint() -> str:
     return FAKE_ARRANGEMENT_FINGERPRINT
 
 
-def get_offline_scan_service() -> OfflineScanService | None:
-    """Return the shared FakeLive scan service, or None when Live is real."""
+def get_offline_scan_service(*, before_start: bool = False) -> OfflineScanService | None:
+    """Return the shared FakeLive scan service, or None when Live is real.
+
+    ``before_start`` reruns recovery even after it has succeeded once. A fake export
+    that raises leaves its job cleanup_pending, and the service refuses every new
+    start while one exists; recovering only at startup (until 17 Oct 2026) meant one
+    failure blocked scans until the backend restarted. Status and cancel skip the
+    rerun so a poll never deletes anything.
+    """
     global _service, _recovered
     if not _fake_live_selected():
         # Real Live has no qualified exporter yet; None keeps every caller on the
@@ -84,12 +91,13 @@ def get_offline_scan_service() -> OfflineScanService | None:
                 runtime_dir, exporter=fake_tone_exporter, read_source_fingerprint=_fake_fingerprint,
             )
             _service = service
-        if not _recovered:
+        if not _recovered or before_start:
             try:
-                # A previous backend that died mid-scan left its job directory behind.
-                # The fake exporter writes in-process, so with that process gone no
-                # writer can still hold the WAV and absence is provable here. A real
-                # exporter must supply its own Live-side readback instead.
+                # A previous backend that died mid-scan, or a worker here whose fake export
+                # raised, left its job directory behind. The fake exporter writes
+                # synchronously in-process, so once that process is gone or that worker has
+                # released the lease, no writer can still hold the WAV and absence is
+                # provable here. A real exporter must supply its own Live-side readback instead.
                 _service.recover_abandoned(writer_is_absent=lambda request: True)
                 _recovered = True
             except RuntimeError:

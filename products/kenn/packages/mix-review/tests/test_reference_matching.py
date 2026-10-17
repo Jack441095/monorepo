@@ -222,6 +222,20 @@ def test_unavailable_measurements_remove_only_their_reference_parts(value):
     assert len(score["unscored"]) == 4
 
 
+def test_a_polarity_flipped_mix_is_withheld_for_cancelling_not_for_silence():
+    # Until 17 Oct 2026 levels read the mono downmix, so L = -R measured -90 dBFS and the
+    # producer was told the mix was silent rather than that it cancels in mono.
+    reference = _make_wav(freq_left=80.0, freq_right=80.0)
+    flipped = _make_wav(freq_left=80.0, freq_right=80.0, gain_right=-0.5)
+
+    result = compare_mix_to_reference(flipped, reference)
+    score = result["reference_match_score"]
+
+    assert abs(result["dynamics"]["mix"]["rms_dbfs"] - result["dynamics"]["reference"]["rms_dbfs"]) < 0.1
+    assert score["points_available"] == 0.0
+    assert "mix cancels in mono" in score["note"]
+
+
 def test_silent_wavs_do_not_earn_a_reference_grade():
     silent = _make_wav(gain_left=0.0, gain_right=0.0)
 

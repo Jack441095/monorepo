@@ -163,6 +163,27 @@ def test_cancel_during_export_discards_the_late_report_and_the_wav(post, tmp_pat
     assert not list((tmp_path / "held").rglob("*.wav"))
 
 
+def test_one_failed_fake_export_does_not_block_every_later_scan(post, monkeypatch):
+    # Until 17 Oct 2026 recovery ran once per process, so an exporter that raised left its job
+    # cleanup_pending and every later start was refused until the backend restarted.
+    real_export = offline_scan_runtime.fake_tone_exporter
+    calls = []
+
+    def fails_first(request, cancelled):
+        calls.append(request["output_path"])
+        if len(calls) == 1:
+            raise OSError("synthetic exporter failure")
+        return real_export(request, cancelled)
+
+    monkeypatch.setattr(offline_scan_runtime, "fake_tone_exporter", fails_first)
+    first = _start(post, _propose(post))[1]
+    assert _wait_for_terminal(post, first["job_id"])["state"] == "cleanup_pending"
+
+    status, second = _start(post, _propose(post))
+    assert status == 202, second
+    assert _wait_for_terminal(post, second["job_id"])["state"] == "completed"
+
+
 def test_malformed_bodies_are_rejected_before_any_job_exists(post):
     assert post("/api/ableton/offline-scan/proposal", {"session_id": OWNER, "source": SOURCE})[0] == 400
     assert post("/api/ableton/offline-scan/start", {"session_id": OWNER, "proposal": {}, "confirm_token": 5, "idempotency_key": "k"})[0] == 400

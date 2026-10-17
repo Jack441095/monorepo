@@ -338,7 +338,12 @@ def reference_comparison_has_activity(comparison: dict[str, Any] | None) -> bool
     if not isinstance(dynamics, dict):
         # Older receipts without per-source RMS must abstain until they are reanalysed.
         return False
-    return all(uploaded_metrics_have_activity(dynamics.get(source)) for source in ("mix", "reference"))
+    # A source whose mono sum cancels has level but no comparable sum; the scorer withholds
+    # it with that reason, and details shown beside a withheld score would contradict it.
+    return all(
+        uploaded_metrics_have_activity(dynamics.get(source)) and dynamics[source].get("mono_cancels") is not True
+        for source in ("mix", "reference")
+    )
 
 
 def plugin_context_for_advice(context: dict[str, Any] | None) -> dict[str, Any] | None:

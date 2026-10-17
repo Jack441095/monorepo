@@ -138,7 +138,7 @@ def handle_offline_scan_start(payload: dict[str, Any]) -> tuple[int, dict[str, A
         or not isinstance(payload["confirm_token"], str) or len(payload["confirm_token"]) > 512
     ):
         return 400, {"ok": False, "error": "Supply exactly session_id, proposal, confirm_token and idempotency_key."}
-    result = LiveActionService(offline_scans=get_offline_scan_service()).execute_offline_scan(
+    result = LiveActionService(offline_scans=get_offline_scan_service(before_start=True)).execute_offline_scan(
         payload["proposal"], confirm_token=payload["confirm_token"], session_id=session_id,
         idempotency_key=payload["idempotency_key"],
     )

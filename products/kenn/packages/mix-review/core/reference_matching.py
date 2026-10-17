@@ -98,29 +98,35 @@ def compute_7band_spectrum(samples: Any, sample_rate: int) -> dict[str, float]:
 
 
 def compute_dynamics_profile(samples: Any, sample_rate: int) -> dict[str, float]:
-    """Extract Peak, RMS, Crest Factor, and dynamic spread."""
+    """Extract Peak, RMS, Crest Factor, and dynamic spread.
+
+    A (channels, frames) array is measured per channel: peak is the loudest channel and
+    RMS the mean channel power, so L = -R reads at its real level instead of silent.
+    """
     if np is not None:
         arr = np.asarray(samples, dtype=np.float64)
-        if arr.ndim > 1:
-            arr = np.mean(arr, axis=0)
-        if len(arr) == 0:
+        if arr.size == 0:
             return {"peak_dbfs": -90.0, "rms_dbfs": -90.0, "crest_factor_db": 0.0, "dynamic_spread_db": 0.0}
         peak = float(np.max(np.abs(arr)))
-        rms = float(np.sqrt(np.mean(arr ** 2)))
+        # Until 17 Oct 2026 the channels were averaged to mono first, so a polarity-flipped
+        # mix read -90 dBFS and the reference gate called it silent. Mean power per frame
+        # equals the mono power when L = R, so centred mixes measure as they did before.
+        power = np.mean(arr ** 2, axis=0) if arr.ndim > 1 else arr ** 2
+        rms = float(np.sqrt(np.mean(power)))
         peak_dbfs = _safe_db(peak)
         rms_dbfs = _safe_db(rms)
         crest_factor_db = max(0.0, peak_dbfs - rms_dbfs)
 
         # Rolling RMS dynamic spread (500ms windows)
         w_size = max(64, int(sample_rate * 0.5))
-        if len(arr) >= w_size:
+        if len(power) >= w_size:
             hop = max(1, w_size // 2)
-            n_hops = (len(arr) - w_size) // hop + 1
+            n_hops = (len(power) - w_size) // hop + 1
             if n_hops > 0:
                 # Subsample up to 200 windows for fast stats
-                indices = np.linspace(0, len(arr) - w_size, min(n_hops, 200), dtype=int)
+                indices = np.linspace(0, len(power) - w_size, min(n_hops, 200), dtype=int)
                 window_rmss = [
-                    float(np.sqrt(np.mean(arr[idx : idx + w_size] ** 2)))
+                    float(np.sqrt(np.mean(power[idx : idx + w_size])))
                     for idx in indices
                 ]
                 dbs = [_safe_db(r) for r in window_rmss if r > 1e-6]
@@ -354,6 +360,13 @@ def score_reference_match(comparison: dict[str, Any]) -> dict[str, Any]:
             return _unscored_reference_match(
                 f"{source} RMS missing, non-finite or at/below {REFERENCE_MIN_RMS_DBFS:g} dBFS"
             )
+        if (dynamics.get(source) or {}).get("mono_cancels") is True:
+            # A loud L = -R file has real level, but against a mono reference nothing below
+            # can see the cancellation and it would score full marks while vanishing on a
+            # mono speaker. Withholding with the cause is the honest answer (17 Oct 2026).
+            return _unscored_reference_match(
+                f"{source} cancels in mono: left and right are opposite polarity, so flip one channel before comparing"
+            )
 
     def add(name: str, gap: float, unit: str, tolerance: float, full_loss: float, detail: str) -> None:
         available = REFERENCE_MATCH_POINTS[name]
@@ -429,6 +442,28 @@ def score_reference_match(comparison: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _equal_length(channels: list[Any]) -> list[Any]:
+    frames = min(len(channel) for channel in channels)
+    return [channel[:frames] for channel in channels]
+
+
+def _spectral_signal(channels: list[Any], num_ch: int) -> tuple[Any, bool]:
+    """Return the signal the tonal-balance bands read, and whether the mono sum cancels.
+
+    Same rule as track_diagnostic._analysis_signal: an L = -R file sums to nothing, and
+    7-band shares of nothing are noise, so we read L - R to keep the real tonal balance.
+    """
+    if num_ch < 2 or np is None:
+        # Mono, or no NumPy: the pure-Python spectrum path has always read channel 0.
+        return channels[0], False
+    mono = (channels[0] + channels[1]) * 0.5
+    channel_peak = float(max(np.max(np.abs(channels[0])), np.max(np.abs(channels[1]))))
+    # -60 dB below the louder channel: the sum is gone but the channels are not.
+    if channel_peak > 0.0 and float(np.max(np.abs(mono))) < channel_peak * 0.001:
+        return (channels[0] - channels[1]) * 0.5, True
+    return mono, False
+
+
 def compare_mix_to_reference(
     mix_bytes: bytes,
     ref_bytes: bytes,
@@ -448,16 +483,17 @@ def compare_mix_to_reference(
     mix_channels, mix_sr, mix_num_ch = _decode_channels(mix_bytes)
     ref_channels, ref_sr, ref_num_ch = _decode_channels(ref_bytes)
 
-    mix_mono = (
-        (mix_channels[0] + mix_channels[1]) * 0.5
-        if mix_num_ch >= 2 and np is not None
-        else mix_channels[0]
-    )
-    ref_mono = (
-        (ref_channels[0] + ref_channels[1]) * 0.5
-        if ref_num_ch >= 2 and np is not None
-        else ref_channels[0]
-    )
+    if np is not None:
+        # A data chunk cut mid-frame leaves channel 0 one sample longer than channel 1,
+        # and the sums and stacks below need equal lengths.
+        mix_channels = _equal_length(mix_channels)
+        ref_channels = _equal_length(ref_channels)
+    mix_mono, mix_cancels = _spectral_signal(mix_channels, mix_num_ch)
+    ref_mono, ref_cancels = _spectral_signal(ref_channels, ref_num_ch)
+    # Dynamics read both channels (see compute_dynamics_profile). Without NumPy the
+    # channels are plain arrays, so the pure-Python path keeps reading the first one.
+    mix_levels = np.stack(mix_channels[:2]) if mix_num_ch >= 2 and np is not None else mix_channels[0]
+    ref_levels = np.stack(ref_channels[:2]) if ref_num_ch >= 2 and np is not None else ref_channels[0]
 
     # 3. Tonal balance analysis
     mix_bands = compute_7band_spectrum(mix_mono, mix_sr)
@@ -479,8 +515,12 @@ def compare_mix_to_reference(
         })
 
     # 4. Dynamics profile
-    mix_dyn = compute_dynamics_profile(mix_mono, mix_sr)
-    ref_dyn = compute_dynamics_profile(ref_mono, ref_sr)
+    mix_dyn = compute_dynamics_profile(mix_levels, mix_sr)
+    ref_dyn = compute_dynamics_profile(ref_levels, ref_sr)
+    # Carried with the levels because score_reference_match and the evidence gate read
+    # only this dict; see score_reference_match for why a cancelling source is withheld.
+    mix_dyn["mono_cancels"] = mix_cancels
+    ref_dyn["mono_cancels"] = ref_cancels
     crest_delta = round(mix_dyn["crest_factor_db"] - ref_dyn["crest_factor_db"], 2)
 
     # 5. Stereo profile

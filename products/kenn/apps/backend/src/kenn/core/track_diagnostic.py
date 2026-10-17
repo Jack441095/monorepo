@@ -14,10 +14,11 @@ import logging
 import math
 import os
 import re
-import struct
+import sys
 import time
 import uuid
 import xml.etree.ElementTree as ET
+from array import array
 from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger("kenn.track_diagnostic")
@@ -186,26 +187,41 @@ def _decode_pcm_channels(payload: bytes) -> Tuple[List[List[float]], int, float]
     frames_to_read = min(total_frames, 4_000_000)
     count = frames_to_read * channels
 
+    # Samples land in array("d") (8 bytes each), never lists of Python floats (about
+    # 32 bytes each): on a full 4M-frame 16-bit stereo file, decode plus _analysis_signal
+    # peaked at 596 MB with lists and 107 MB with arrays (tracemalloc, 17 Oct 2026).
+    def typed(code: str) -> array:
+        values = array(code)
+        values.frombytes(data_bytes[: count * values.itemsize])
+        if sys.byteorder == "big":
+            values.byteswap()  # WAV is little-endian on disk
+        return values
+
     if sampwidth == 2 and audio_format == 1:
-        values = [v / 32768.0 for v in struct.unpack_from(f"<{count}h", data_bytes)]
+        ints, scale = typed("h"), 32768.0
     elif sampwidth == 4 and audio_format == 3:
-        values = list(struct.unpack_from(f"<{count}f", data_bytes))
+        floats = typed("f")
+        return [array("d", floats[ch::channels]) for ch in range(channels)], framerate, duration
     elif sampwidth == 4 and audio_format == 1:
-        values = [v / 2147483648.0 for v in struct.unpack_from(f"<{count}i", data_bytes)]
+        ints, scale = typed("i"), 2147483648.0
     elif sampwidth == 3 and audio_format == 1:
-        values = [
-            int.from_bytes(data_bytes[offset : offset + 3], byteorder="little", signed=True) / 8388608.0
+        # No 24-bit array type, so widen each sample to a signed int on the way in.
+        ints = array("i", (
+            int.from_bytes(data_bytes[offset : offset + 3], byteorder="little", signed=True)
             for offset in range(0, count * 3, 3)
-        ]
+        ))
+        scale = 8388608.0
     elif sampwidth == 1 and audio_format == 1:
         # 8-bit WAV is unsigned with its midpoint at 128.
-        values = [(v - 128) / 128.0 for v in data_bytes[:count]]
+        return [
+            array("d", ((v - 128) / 128.0 for v in data_bytes[ch:count:channels])) for ch in range(channels)
+        ], framerate, duration
     else:
         # The old fallback read any other layout as 8-bit bytes and measured
         # nonsense; refusing is the truthful answer for a diagnostic.
         raise ValueError(f"unsupported WAV sample format ({sampwidth * 8}-bit, format tag {audio_format})")
 
-    return [values[ch::channels] for ch in range(channels)], framerate, duration
+    return [array("d", (v / scale for v in ints[ch::channels])) for ch in range(channels)], framerate, duration
 
 
 def _analysis_signal(channels: List[List[float]]) -> List[float]:
@@ -217,12 +233,12 @@ def _analysis_signal(channels: List[List[float]]) -> List[float]:
     if len(channels) == 1:
         return channels[0]
     count = len(channels)
-    mono = [sum(frame) / count for frame in zip(*channels)]
-    mono_peak = max((abs(v) for v in mono), default=0.0)
-    channel_peak = max((abs(v) for ch in channels for v in ch), default=0.0)
+    mono = array("d", (sum(frame) / count for frame in zip(*channels)))
+    mono_peak = max(max(mono, default=0.0), -min(mono, default=0.0))
+    channel_peak = max(max(max(ch, default=0.0), -min(ch, default=0.0)) for ch in channels)
     # -60 dB below the louder channel: the sum is gone but the channels are not.
     if channel_peak > 0.0 and mono_peak < channel_peak * 0.001 and count == 2:
-        return [(left - right) * 0.5 for left, right in zip(channels[0], channels[1])]
+        return array("d", ((left - right) * 0.5 for left, right in zip(channels[0], channels[1])))
     return mono
 
 
