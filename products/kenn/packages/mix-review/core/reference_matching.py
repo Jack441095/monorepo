@@ -390,6 +390,8 @@ def score_reference_match(comparison: dict[str, Any]) -> dict[str, Any]:
         # Gains clamp at +/-6 dB, so a big shift ties two bands at the clamp and plain max() named
         # whichever sorts first. Lifting only a 6 kHz partial was reported as a bass gap (17 Oct 2026),
         # so a tie falls to the larger unclamped energy-share delta, the band that actually moved.
+        # A band with no finite delta (a hand-built comparison without tonal_balance) counts as 0.0,
+        # which only changes which tied band is named: gap and points are the same either way.
         energy_delta = {
             row.get("band"): abs(row["delta_pct"])
             for row in comparison.get("tonal_balance") or []

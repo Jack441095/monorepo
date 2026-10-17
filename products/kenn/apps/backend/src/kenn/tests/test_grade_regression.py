@@ -18,18 +18,21 @@ SAMPLE_RATE = 44100
 # 4 s: long enough for integrated loudness (400 ms blocks) and the crest/width windows to settle,
 # short enough that the six comparisons below cost about 4 s on the M-series Air.
 SECONDS = 4
+# Low-end mono and the 7-band spectrum both read the mid here (the 80 Hz partial has no side), so
+# they are regression guards, not isolation proofs; the wide and bright fixtures carry the isolation.
+REFERENCE_PARTS = ("tonal_balance", "dynamics", "low_end_mono", "stereo_width")
 
 
 def _fixture(*, low=0.3, high=0.1, side=0.05, gain=1.0, pumped=False) -> bytes:
     """A 16-bit stereo WAV: 80 Hz, 1 kHz and 6 kHz partials in the middle, a 2.5 kHz partial in the side."""
     t = np.arange(SAMPLE_RATE * SECONDS) / SAMPLE_RATE
     mid = low * np.sin(2 * np.pi * 80 * t) + 0.2 * np.sin(2 * np.pi * 1000 * t) + high * np.sin(2 * np.pi * 6000 * t)
-    # 1 rad offset keeps the side partial out of phase with the 1 kHz mid one so neither channel cancels.
     side_signal = side * np.sin(2 * np.pi * 2500 * t + 1.0)
     if pumped:
-        # A 2 Hz square gate between 0.3 and 1.0 on mid and side together, so only the crest
-        # factor moves; gating the mid alone also shifted the side/mid ratio by 2.6 dB.
-        envelope = 0.3 + 0.7 * (np.sin(2 * np.pi * 2 * t) > 0)
+        # A 2 Hz square gate between 0.1 and 1.0 (-20 dB) on mid and side together, so only the crest
+        # factor moves; gating the mid alone also shifted the side/mid ratio by 2.6 dB. A 0.3 floor
+        # left the crest gap 0.14 dB past the 2.5 dB tolerance, too close to survive a meter tweak.
+        envelope = 0.1 + 0.9 * (np.sin(2 * np.pi * 2 * t) > 0)
         mid, side_signal = mid * envelope, side_signal * envelope
     frames = np.clip(np.stack([gain * (mid + side_signal), gain * (mid - side_signal)], axis=1), -1.0, 1.0)
     output = io.BytesIO()
@@ -66,7 +69,7 @@ def graded():
 
 
 def test_the_known_fixture_keeps_its_pinned_grade(graded):
-    # Pinned 17 Oct 2026 on main 90437949. If this moves, a meter, tolerance or weighting changed:
+    # Pinned 17 Oct 2026 (main 90437949 plus the clamp tie-break, which changes no points). If this moves, a meter, tolerance or weighting changed:
     # say which in the commit, and re-pin only once the new number is the intended one.
     grade = graded["same"]["grade"]
 
@@ -90,34 +93,37 @@ def test_the_same_inputs_grade_the_same_even_after_other_comparisons(graded):
     assert again["reference_comparison"]["reference_match_score"] == graded["same"]["reference_comparison"]["reference_match_score"]
 
 
-def test_plain_gain_moves_the_declared_target_and_not_the_reference_match(graded):
+def _moved_reference_parts(graded, name: str) -> set[str]:
+    """The reference-match components whose points differ from the unchanged mix's."""
+    variant, same = _parts(graded[name]), _parts(graded["same"])
+    return {part for part in REFERENCE_PARTS if variant[part] != same[part]}
+
+
+def test_plain_gain_leaves_the_level_matched_reference_score_alone(graded):
     louder, same = _parts(graded["louder"]), _parts(graded["same"])
 
+    assert _moved_reference_parts(graded, "louder") == set()
     assert louder["declared_target"] < same["declared_target"]
-    assert louder["reference_match"] == same["reference_match"] == 40.0
+    # Technical health moves too, and should: +3.5 dB takes true peak to about -0.4 dBTP,
+    # past the Mix Doctor's -0.8 dBTP headroom advisory.
+    assert louder["technical_health"] < same["technical_health"]
 
 
-def test_a_brighter_mix_loses_tonal_points_and_names_the_band_that_moved(graded):
-    bright, same = _parts(graded["bright"]), _parts(graded["same"])
+def test_a_brighter_mix_loses_only_tonal_points_and_names_the_band_that_moved(graded):
     tonal = next(p for p in graded["bright"]["reference_comparison"]["reference_match_score"]["parts"] if p["part"] == "tonal_balance")
 
-    assert bright["tonal_balance"] < same["tonal_balance"]
+    assert _moved_reference_parts(graded, "bright") == {"tonal_balance"}
     assert "sibilance" in tonal["detail"]
-    assert bright["low_end_mono"] == same["low_end_mono"]
-    assert bright["dynamics"] == same["dynamics"]
 
 
-def test_a_wider_mix_loses_width_points_and_keeps_its_tonal_points(graded):
-    wide, same = _parts(graded["wide"]), _parts(graded["same"])
-
-    assert wide["stereo_width"] < same["stereo_width"]
-    assert wide["tonal_balance"] == same["tonal_balance"]
-    assert wide["low_end_mono"] == same["low_end_mono"]
+def test_a_wider_mix_loses_only_width_points(graded):
+    assert _moved_reference_parts(graded, "wide") == {"stereo_width"}
 
 
-def test_a_pumping_mix_loses_dynamics_points_and_keeps_its_width(graded):
+def test_a_pumping_mix_loses_only_dynamics_points(graded):
     pumped, same = _parts(graded["pumped"]), _parts(graded["same"])
 
-    assert pumped["dynamics"] < same["dynamics"]
-    assert pumped["stereo_width"] == same["stereo_width"]
-    assert pumped["tonal_balance"] == same["tonal_balance"]
+    assert _moved_reference_parts(graded, "pumped") == {"dynamics"}
+    # The gated file's peak-to-loudness ratio rises past the 6 dB hyper-compression line, so its
+    # own technical health improves even while it drifts from the reference. Both are correct readings.
+    assert pumped["technical_health"] > same["technical_health"]
