@@ -33,6 +33,16 @@ How to review:
    claim is not a break until you have seen it fail.
 4. Check the plan's fixed values were not changed: `ANSWER_QUALITY_MIN_SCORE`, the 0.16 overlap
    threshold, `_RANGE_RE`, `_MEASUREMENT_RE`, `_measurements`, `EVIDENCE_SCAN_WINDOW`.
+5. Check the standing rules the diff could quietly break:
+   - DSP and audio analysis are C++ only (top of KENN_PLAN.md, 17 Oct 2026). Any new or grown
+     numpy, scipy or librosa signal code in Python is a break, prototypes included.
+   - If the branch came from kenn-app or touches the sync, Abrar's commits (`git log --author=abrar`)
+     must survive with their authorship. A diff that drops or rewrites his work is a break.
+   - If main's tip is a soak or real-Live receipts commit, merging anything now drops those receipts
+     out of the gate (`source_git_commit` must be HEAD or HEAD^). Say so before anything else.
+   - Commits carry no AI attribution trailer.
+6. If the branch or its handover claims a gate result, don't take it on trust: flag it for the
+   `gate-verifier` agent and judge the code on its own.
 
 Report, plainly:
 - Each break: the input, what happened, what should have happened, and a failing pytest the
