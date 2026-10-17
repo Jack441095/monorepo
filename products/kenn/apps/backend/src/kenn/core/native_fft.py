@@ -233,6 +233,64 @@ def loudness_metrics(channels: list[list[float]] | Any, sample_rate: int) -> dic
     return result
 
 
+def true_peak_dbtp(samples: Any) -> float | None:
+    """Compute native 8x oversampled true peak in dBTP for a 1D or 2D (frames, channels) array; None when unavailable."""
+    module = _load()
+    function = None if module is None else getattr(module, "true_peak_dbtp", None)
+    if function is None:
+        # An older or disabled extension lacks the standalone true-peak kernel.
+        return None
+    import numpy as np
+
+    arr = np.asarray(samples, dtype=np.float32)
+    if arr.ndim == 1:
+        arr = arr.reshape(-1, 1)
+    if arr.ndim != 2 or arr.size == 0:
+        return None
+    matrix = np.ascontiguousarray(arr, dtype=np.float32)
+    result = function(matrix)
+    return float(result) if result is not None else None
+
+
+def loudness_range_lu(short_term: Any) -> float | None:
+    """Compute native EBU Tech 3342 gated loudness range (P95 - P10) from short-term LUFS values; None when unavailable."""
+    module = _load()
+    function = None if module is None else getattr(module, "loudness_range_lu", None)
+    if function is None:
+        # An older or disabled extension lacks the standalone LRA kernel.
+        return None
+    import numpy as np
+
+    values = np.ascontiguousarray(short_term, dtype=np.float64)
+    if values.ndim != 1 or values.size < 2:
+        return None
+    result = function(values)
+    return float(result) if result is not None else None
+
+
+def windowed_loudness(
+    samples: Any,
+    sample_rate: int,
+    window_s: float,
+    hop_s: float,
+) -> list[float] | None:
+    """Compute native K-weighted rectangular window LUFS values at the given window and hop seconds; None when unavailable."""
+    module = _load()
+    function = None if module is None else getattr(module, "windowed_loudness", None)
+    if function is None:
+        # An older or disabled extension lacks the standalone windowed loudness kernel.
+        return None
+    import numpy as np
+
+    arr = np.asarray(samples, dtype=np.float32)
+    if arr.ndim == 1:
+        arr = arr.reshape(-1, 1)
+    if arr.ndim != 2 or arr.size == 0:
+        return []
+    matrix = np.ascontiguousarray(arr, dtype=np.float32)
+    return [float(x) for x in function(matrix, int(sample_rate), float(window_s), float(hop_s))]
+
+
 def key_tempo_features(samples: Any, sample_rate: int) -> dict[str, Any] | None:
     """Return native mean chroma (index 0 = C) and a tempo estimate for mono audio; None when unavailable.
 
@@ -363,8 +421,11 @@ __all__ = [
     "erb_spectrum",
     "key_tempo_features",
     "loudness_metrics",
+    "loudness_range_lu",
     "masking_band_energy",
     "resample_mono_window",
     "spectral_powers",
     "track_diagnostic_features",
+    "true_peak_dbtp",
+    "windowed_loudness",
 ]

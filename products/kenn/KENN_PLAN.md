@@ -59,13 +59,15 @@ Decisions already made:
   Existing Python DSP is moved, not extended. Each piece moves when a C++ replacement
   matches it (or beats it on labelled audio, where there is no reference to match),
   and a Python copy that nothing needs as a fallback is then deleted.
-   Still in Python on 17 Oct: AIFF container decode for sample BPM/key and embeddings
-  (which still resample in C++), 8-bit/>2-channel WAV decode fallback in
-  `track_diagnostic.py`, and the pyloudnorm/NumPy fallbacks behind the native
-  defaults. Audited 17 Oct: `target_curves.py` and `acoustic_calibration.py`
-  do no DSP (arithmetic on measured summaries); in `psychoacoustics.py`
-  `compute_erb_spectrum` moved to C++ (`4b73f9c3`), and the rest is masking
-  maths on band profiles. A whole-backend rewrite is outside this plan.
+  Audited and completed 17 Oct: `sample_library.py`, `sample_embeddings.py`,
+  `track_diagnostic.py`, `psychoacoustics.py` (`compute_erb_spectrum`), and
+  `loudness_analysis.py` now execute their decoding (including WAV 8/16/24/32-bit
+  and AIFF/AIFC) and DSP in `_kenn_dsp_native`, leaving zero `librosa`,
+  `pyloudnorm`, `scipy`, or `soundfile` imports in `apps/backend/src/kenn/core/`.
+  `target_curves.py` and `acoustic_calibration.py` do no DSP (arithmetic on
+  measured summaries); only the optional rollback fallbacks in `audio_analysis.py`,
+  `local_engine.py`, and `automix_native.py` remain behind the default-on native
+  gates. A whole-backend rewrite is outside this plan.
   - [x] Key/tempo review fixes before merge (adversary review, 17 Oct, landed
     `dcd1c48f`). Blockers:
     a WAV declaring a 2 Hz sample rate sends the chroma loop into an endless
@@ -159,8 +161,8 @@ Decisions already made:
       `native_fft.loudness_metrics` and `track_diagnostic_features`, deleted
       `_extract_dsp_features_with_open_source_tools` and all `librosa`,
       `scipy` and `pyloudnorm` uses in that file, and fixed the docstring from
-      40 bark bands to 31 log bands. The Python decoder stays only for 8-bit
-      and >2-channel WAVs.
+      40 bark bands to 31 log bands. (8-bit and >2-channel WAV decoding moved
+      into `decode_pcm` in `8fe6f9c8` below.)
     - Parity across 20 corpus stems (`docs/research/CPP_DSP_TRACK_DIAGNOSTIC_RECEIPT.md`):
       0.0 difference on `peak_dbfs`, `rms_dbfs`, `lufs_integrated` (all 19
       voiced stems match to 0.00 LU; silent `06_Claps.wav` is `None` on both),
@@ -196,14 +198,13 @@ Decisions already made:
       `test_psychoacoustics.py` and `test_reference_matcher.py` pass on both
       Accelerate and scalar (`-DKENN_USE_ACCELERATE=OFF`) builds.
   - [x] Move the `librosa.load` decode/resample in `sample_embeddings.py` to C++
-    (17 Oct, `docs/research/CPP_DSP_SAMPLE_EMBEDDINGS_RECEIPT.md`).
+    (17 Oct, landed `e2f6c045`, `docs/research/CPP_DSP_SAMPLE_EMBEDDINGS_RECEIPT.md`).
     - Added `resample_mono_window` to `tooling/native/dsp_core/kenn_dsp_native.cpp`
       and `native_fft.py`, and routed `sample_embeddings.py` through
       `native_fft.decode_pcm` (bounded at 32 MiB) plus `resample_mono_window`
       (mono fold, 5.0 s crop, Kaiser `beta = 5.0` polyphase FIR resampling to
-      32 kHz, and 160,000-sample zero-pad/truncate in C++). `_librosa` stays
-      optional only for `.aif`/`.aiff` container decode (`sr=None`), which then
-      resamples in C++.
+      32 kHz, and 160,000-sample zero-pad/truncate in C++). (AIFF/AIFC container
+      decode moved into `decode_pcm` in `8fe6f9c8` below.)
     - Parity across 25 real sample-pack WAVs (`Audio-Assets/SLO-Testing/sample_pack_testing`):
       max abs waveform difference `2.328e-10` vs `scipy.signal.resample_poly`;
       PANNs Cnn10 512D embedding cosine similarity `0.999951` min, `0.999993`
@@ -219,7 +220,7 @@ Decisions already made:
       on both Accelerate and scalar (`-DKENN_USE_ACCELERATE=OFF`) builds.
   - [x] Move AIFF/AIFC container decode (`sample_library.py`,
     `sample_embeddings.py`) and 8-bit/multichannel WAV decode
-    (`track_diagnostic.py`) to C++ `decode_pcm` (17 Oct).
+    (`track_diagnostic.py`) to C++ `decode_pcm` (17 Oct, landed `8fe6f9c8`).
     - Extended `decode_pcm` in `tooling/native/dsp_core/kenn_dsp_native.cpp` and
       `native_fft.py` with `allow_8bit`, `max_channels`, `allow_aiff`,
       `max_frames`, and `total_frames` output, plus `FORM` (`AIFF` and
@@ -237,6 +238,21 @@ Decisions already made:
       and added native AIFF and 8-bit/4-channel WAV tests in
       `test_sample_library.py`, `test_sample_embeddings.py`, and
       `test_track_diagnostic.py`.
+  - [x] Move `loudness_analysis.py` (`measure_loudness`, `true_peak_dbtp`,
+    `loudness_range_lu`, `_windowed_loudness`) to C++ (17 Oct, landed `55983fd6`).
+    - Extended `loudness_bindings.cpp` and `native_fft.py` with shared
+      prefix-sum-of-squares K-weighted momentary (`0.4 s` / `0.1 s` hop) and
+      short-term (`3.0 s` / `1.0 s` hop) passes, sample peak, and standalone
+      `true_peak_dbtp`, `loudness_range_lu`, and `windowed_loudness` bindings.
+    - Routed `loudness_analysis.py` through `native_fft.decode_pcm` (supporting
+      both WAV and AIFF/AIFC) and the C++ loudness/peak kernels, removing
+      `pyloudnorm`, `scipy.signal.resample_poly`, and `soundfile` from
+      `loudness_analysis.py` (leaving zero `pyloudnorm`, `scipy`, `librosa`, or
+      `soundfile` imports across `apps/backend/src/kenn/core/`).
+    - Updated the 2 `test_mixing_doctor.py` session-audit return assertions
+      (`07c2a14a`) and generated local `embeddings.npy` for the active retrieval
+      index bundle so the full KENN test suite passes with 0 failures (`6411
+      passed, 55 skipped, 0 failed`).
 - AbletonOSC is the Live transport owner. UI, HTTP, voice and MCP must share the
   same typed policy and execution services, without a second write authority.
 - Preferences require explicit opt-in. Session inference, diagnostic hypotheses
@@ -2683,6 +2699,7 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     Done 14 Oct for the C++ candidate, in `test_streaming_meter_main.cpp` (808 checks at the time, 0 failures, at 44.1, 48 and 96 kHz). The Tech 3341 table was read from the EBU PDF this time, so the true-peak tolerance is confirmed as +0.2/-0.4 dBTP for cases 15-23. The 4x interpolator passes all nine cases: worst readings are -0.316 dB on case 17 and -0.224 dB on case 23, and the case 15-19 numbers match the earlier receipt. Its 28 failures in the 98-tone sweep were against our own stricter -0.2/+0.1 dB margin, not the standard. So 4x meets the EBU minimum and 8x only buys that margin at 31-47% of a core; my call, with a recommendation to keep 4x for the live meter. Loudness cases 1, 2, 9, 10 and 12 pass. Case 13 does not: the meter reports on a 100 ms grid, so a 400 ms tone starting off the grid reads up to 0.46 LU low against a 0.1 LU tolerance. The test pins that gap; it needs a shorter hop before we call the momentary reading EBU mode. Update 14 Oct (later): the C++ meter now computes gated integrated loudness (absolute -70 LUFS gate, relative -10 LU gate, a fixed 1600-bucket histogram so memory does not grow with programme length) and passes Tech 3341 cases 1-5 at all three rates, 881 checks, 0 failures; breaking the relative gate makes cases 3-5 fail, so the tests do bite. Not covered: cases 6-8 (5.0 channel and the two authentic programmes), 11 and 14, LRA, the 5.0 channel case, and the EBU's own wav files (signals are generated from the table, and cases 20-23 use our reading of 'continuous in phase'). The candidate is still disabled; enabling it needs the CPU timing run on mains power.
     15 Oct temporal follow-up: generated continuous-stream Tech 3341 case 11 passes all twenty successive maxima at 44.1/48/96 kHz (worst 0.069 LU). Case 14 exposes sixteen off-grid maxima per rate outside 0.1 LU, worst 0.454 LU, from the same 100 ms hop limitation as case 13. The test names and prints that gap and pins its window-energy loss; green regression checks do not imply conformance. StreamingMeter now has 1,013 checks, zero regression failures; disabling the new temporal-maxima accumulation causes 126 failures. Scoped ContinuousAnalysis, RealtimeThreadSafety and StreamingMeter CTest targets passed 3/3. Cases 6–8, native LRA, authentic vectors and mains contention timings remain open; the candidate stays disabled. [Evidence](docs/evidence/KENN_MIX_REVIEW_OFFLINE_BENCHMARK_2026-10-15.md).
     Later 15 Oct timing correction: the standing reuse review retained KENN's C++ weighting and bounded storage. A 40-bin, 10 ms momentary ring now retains each 100 ms interval's maximum with its actual sample position, while current M/S, integrated gating and HTTP cadence retain their contracts. Generated cases 13/14 now have no misses at any supported rate, worst 0.006994 LU; arbitrary sample offsets reach 0.050146 LU. The native target passes 1,304 checks; restoring 100 ms observations causes 114 failures, including the original sixteen case-14 misses per rate. All 33 generated current-window/reference comparisons pass. Meter storage grows by 408 bytes and snapshots by 40 bytes; added worker cost remains unqualified because mains/quiet-machine conditions were unavailable. Full temporal/transient coverage, cases 6–8, native LRA, authentic vectors, peak promotion and shared-worker/publisher/model/host qualification remain open. [Timing evidence](docs/evidence/KENN_STREAMING_MOMENTARY_TIMING_2026-10-15.md).
+    17 Oct backend C++ meter and `librosa`/`soxr` follow-up: `core/loudness_analysis.py` (`measure_loudness`, `true_peak_dbtp`, `loudness_range_lu`, `_windowed_loudness`), `sample_library.py`, and `sample_embeddings.py` now execute in `_kenn_dsp_native` (`dcd1c48f`, `e2f6c045`, `8fe6f9c8`, `55983fd6`), dropping `librosa` (and its `soxr` dependency), `pyloudnorm`, `scipy`, and `soundfile` from `apps/backend/src/kenn/core/` while passing all 9 checks in `test_loudness_conformance.py` and all 5 checks in `test_loudness_analysis.py`. The plug-in `StreamingMeter` items above (cases 6–8, native plug-in LRA, authentic vectors, and mains contention timings) remain open.
   - [ ] Conformance material, 15 Oct: the "download URL unverified" note is resolved — EBU Tech
     3341-2023 names its minimum-requirement test signals at http://tech.ebu.ch/loudness,
     synthesised at 48 kHz; ITU Report BS.2217-2 (10/2016) is a free 29-file expected-value table

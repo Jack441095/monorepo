@@ -13,6 +13,7 @@
 
 #include <nanobind/ndarray.h>
 #include <nanobind/nanobind.h>
+#include <nanobind/stl/vector.h>
 
 #if defined(KENN_HAS_ACCELERATE)
 #include <Accelerate/Accelerate.h>
@@ -21,6 +22,7 @@
 namespace nb = nanobind;
 
 using FloatMatrixInput = nb::ndarray<nb::numpy, const float, nb::ndim<2>, nb::c_contig, nb::device::cpu>;
+using DoubleVectorInput = nb::ndarray<nb::numpy, const double, nb::ndim<1>, nb::c_contig, nb::device::cpu>;
 
 namespace {
 
@@ -182,30 +184,15 @@ std::vector<std::vector<double>> k_weight_channels(
     return channels;
 }
 
-std::vector<BlockMeasurement> measure_blocks(
-    const std::vector<std::vector<double>>& channels,
-    double sample_rate,
-    double block_seconds,
-    double overlap)
+// The BS.1770 and EBU Tech 3341/3342 windows overlap heavily (75% for
+// integrated/momentary, 67% for 1 Hz short-term, and 97% for pyloudnorm LRA).
+// Build one double-precision prefix sum of squares per channel so every block
+// power in all four passes is two reads instead of another full scan.
+std::vector<std::vector<double>> build_squared_prefix(
+    const std::vector<std::vector<double>>& channels)
 {
-    if (channels.empty() || channels.front().empty())
-        return {};
-    const auto frame_count = channels.front().size();
-    const double duration = static_cast<double>(frame_count) / sample_rate;
-    const double step = 1.0 - overlap;
-    const auto block_count = static_cast<long long>(std::llround(
-        (duration - block_seconds) / (block_seconds * step))) + 1;
-    if (block_count <= 0)
-        return {};
-
     const auto channel_count = channels.size();
-    // The BS.1770 windows overlap heavily (75% for integrated loudness and
-    // 97% for LRA). Calling vDSP_svesqD independently for every window would
-    // rescan most samples many times. Build one prefix sum of squares per
-    // channel so each block power is two reads instead of another full scan.
-    // The accumulation stays in double, matching the existing native
-    // channel representation and keeping the reference-level numerical
-    // tolerance unchanged.
+    const auto frame_count = channel_count > 0 ? channels.front().size() : 0;
     std::vector<std::vector<double>> squared_prefix(channel_count);
     for (std::size_t channel = 0; channel < channel_count; ++channel) {
         const auto& source = channels[channel];
@@ -214,6 +201,26 @@ std::vector<BlockMeasurement> measure_blocks(
         for (std::size_t index = 0; index < frame_count; ++index)
             prefix[index + 1] = prefix[index] + source[index] * source[index];
     }
+    return squared_prefix;
+}
+
+std::vector<BlockMeasurement> measure_blocks(
+    const std::vector<std::vector<double>>& squared_prefix,
+    std::size_t frame_count,
+    double sample_rate,
+    double block_seconds,
+    double overlap)
+{
+    if (squared_prefix.empty() || frame_count == 0)
+        return {};
+    const double duration = static_cast<double>(frame_count) / sample_rate;
+    const double step = 1.0 - overlap;
+    const auto block_count = static_cast<long long>(std::llround(
+        (duration - block_seconds) / (block_seconds * step))) + 1;
+    if (block_count <= 0)
+        return {};
+
+    const auto channel_count = squared_prefix.size();
     std::vector<BlockMeasurement> result;
     result.reserve(static_cast<std::size_t>(block_count));
     for (long long block = 0; block < block_count; ++block) {
@@ -238,6 +245,40 @@ std::vector<BlockMeasurement> measure_blocks(
         result.push_back(std::move(measurement));
     }
     return result;
+}
+
+// Evaluates full-length K-weighted rectangular windows at an integer sample
+// hop (0.4 s at 0.1 s hop for momentary, 3.0 s at 1.0 s hop for short-term).
+// Windows below the -70.0 LUFS BS.1770 absolute gate are omitted so digital
+// silence never reports a finite reading.
+std::vector<double> measure_sliding_windows(
+    const std::vector<std::vector<double>>& squared_prefix,
+    std::size_t frame_count,
+    double sample_rate,
+    double window_seconds,
+    double hop_seconds)
+{
+    const auto window = static_cast<std::size_t>(window_seconds * sample_rate);
+    const auto hop = static_cast<std::size_t>(hop_seconds * sample_rate);
+    if (squared_prefix.empty() || window == 0 || hop == 0 || frame_count < window)
+        return {};
+    const auto channel_count = squared_prefix.size();
+    std::vector<double> values;
+    values.reserve((frame_count - window) / hop + 1);
+    for (std::size_t start = 0; start + window <= frame_count; start += hop) {
+        const auto upper = start + window;
+        double total_power = 0.0;
+        for (std::size_t channel = 0; channel < channel_count; ++channel) {
+            const auto& prefix = squared_prefix[channel];
+            total_power += (prefix[upper] - prefix[start]) / static_cast<double>(window);
+        }
+        if (total_power > 0.0) {
+            const double loudness = -0.691 + 10.0 * std::log10(total_power);
+            if (loudness >= -70.0 && std::isfinite(loudness))
+                values.push_back(loudness);
+        }
+    }
+    return values;
 }
 
 std::optional<double> integrated_loudness(const std::vector<BlockMeasurement>& blocks)
@@ -323,6 +364,54 @@ std::optional<double> loudness_range(const std::vector<BlockMeasurement>& blocks
     if (relative.empty())
         return std::nullopt;
     return percentile(relative, 0.95) - percentile(relative, 0.10);
+}
+
+// EBU Tech 3342 loudness range over an explicit short-term LUFS sequence:
+// -70.0 LUFS absolute gate and -20.0 LU relative gate, requiring at least two
+// surviving windows at each stage so a single window cannot report 0.0 LU.
+std::optional<double> loudness_range_from_short_term(const double* values, std::size_t count)
+{
+    std::vector<double> gated;
+    gated.reserve(count);
+    for (std::size_t index = 0; index < count; ++index) {
+        const double value = values[index];
+        if (std::isfinite(value) && value > -70.0)
+            gated.push_back(value);
+    }
+    if (gated.size() < 2)
+        return std::nullopt;
+    double mean_power = 0.0;
+    for (const double value : gated)
+        mean_power += std::pow(10.0, value / 10.0);
+    mean_power /= static_cast<double>(gated.size());
+    if (mean_power <= 0.0)
+        return std::nullopt;
+    const double relative_threshold = 10.0 * std::log10(mean_power) - 20.0;
+    std::vector<double> kept;
+    kept.reserve(gated.size());
+    for (const double value : gated) {
+        if (value > relative_threshold)
+            kept.push_back(value);
+    }
+    if (kept.size() < 2)
+        return std::nullopt;
+    return percentile(kept, 0.95) - percentile(kept, 0.10);
+}
+
+std::optional<double> sample_peak_dbfs(const float* samples, std::size_t sample_count)
+{
+    if (sample_count == 0)
+        return std::nullopt;
+    float peak = 0.0f;
+#if defined(KENN_HAS_ACCELERATE)
+    vDSP_maxmgv(samples, 1, &peak, static_cast<vDSP_Length>(sample_count));
+#else
+    for (std::size_t index = 0; index < sample_count; ++index)
+        peak = std::max(peak, std::abs(samples[index]));
+#endif
+    if (peak <= 0.0f)
+        return std::nullopt;
+    return 20.0 * std::log10(static_cast<double>(peak));
 }
 
 double true_peak_channel(
@@ -420,33 +509,112 @@ std::optional<double> true_peak_dbtp(
     return 20.0 * std::log10(peak);
 }
 
+nb::object true_peak_dbtp_binding(FloatMatrixInput samples)
+{
+    if (samples.ndim() != 2 || samples.shape(0) == 0 || samples.shape(1) == 0)
+        throw nb::value_error("samples must be a non-empty 2D float32 matrix");
+    std::optional<double> result;
+    {
+        nb::gil_scoped_release release;
+        result = true_peak_dbtp(samples.data(), samples.shape(0), samples.shape(1));
+    }
+    if (result.has_value() && std::isfinite(*result))
+        return nb::cast(*result);
+    return nb::none();
+}
+
+nb::object loudness_range_lu_binding(DoubleVectorInput short_term)
+{
+    if (short_term.ndim() != 1)
+        throw nb::value_error("short_term must be a 1D float64 array");
+    std::optional<double> result;
+    {
+        nb::gil_scoped_release release;
+        result = loudness_range_from_short_term(short_term.data(), short_term.shape(0));
+    }
+    if (result.has_value() && std::isfinite(*result))
+        return nb::cast(*result);
+    return nb::none();
+}
+
+std::vector<double> windowed_loudness_binding(
+    FloatMatrixInput samples,
+    std::size_t sample_rate,
+    double window_s,
+    double hop_s)
+{
+    if (samples.ndim() != 2 || samples.shape(0) == 0 || samples.shape(1) == 0 || samples.shape(1) > 2)
+        throw nb::value_error("samples must be a non-empty float32 matrix with one or two channels");
+    if (sample_rate == 0 || window_s <= 0.0 || hop_s <= 0.0)
+        throw nb::value_error("sample_rate, window_s and hop_s must be positive");
+    const auto frame_count = samples.shape(0);
+    const auto channel_count = samples.shape(1);
+    const float* data = samples.data();
+    std::vector<double> result;
+    {
+        nb::gil_scoped_release release;
+        const auto filtered = k_weight_channels(data, frame_count, channel_count, static_cast<double>(sample_rate));
+        const auto squared_prefix = build_squared_prefix(filtered);
+        result = measure_sliding_windows(
+            squared_prefix, frame_count, static_cast<double>(sample_rate), window_s, hop_s);
+    }
+    return result;
+}
+
 nb::dict loudness_metrics(FloatMatrixInput samples, std::size_t sample_rate)
 {
     if (samples.ndim() != 2 || samples.shape(0) == 0 || samples.shape(1) == 0 || samples.shape(1) > 2)
         throw nb::value_error("samples must be a non-empty float32 matrix with one or two channels");
     if (sample_rate == 0)
         throw nb::value_error("sample_rate must be positive");
-    if (samples.shape(0) < static_cast<std::size_t>(0.4 * sample_rate))
+    const auto frame_count = samples.shape(0);
+    const auto channel_count = samples.shape(1);
+    if (frame_count < static_cast<std::size_t>(0.4 * sample_rate))
         throw nb::value_error("samples are shorter than the 400 ms BS.1770 gating block");
 
-    std::vector<std::vector<double>> filtered;
+    const float* data = samples.data();
     std::optional<double> true_peak;
+    std::optional<double> sample_peak;
+    std::optional<double> integrated;
+    std::optional<double> lra;
+    std::optional<double> short_term_lra;
+    std::optional<double> momentary_max;
+    std::optional<double> short_term_max;
     {
         nb::gil_scoped_release release;
-        true_peak = true_peak_dbtp(samples.data(), samples.shape(0), samples.shape(1));
-        filtered = k_weight_channels(samples.data(), samples.shape(0), samples.shape(1), static_cast<double>(sample_rate));
-    }
-    const auto integrated_blocks = measure_blocks(filtered, static_cast<double>(sample_rate), 0.4, 0.75);
-    const auto integrated = integrated_loudness(integrated_blocks);
+        const double rate = static_cast<double>(sample_rate);
+        true_peak = true_peak_dbtp(data, frame_count, channel_count);
+        sample_peak = sample_peak_dbfs(data, frame_count * channel_count);
+        const auto filtered = k_weight_channels(data, frame_count, channel_count, rate);
+        auto squared_prefix = build_squared_prefix(filtered);
 
-    const auto silence_count = static_cast<std::size_t>(1.5 * sample_rate);
-    for (auto& channel : filtered)
-        channel.resize(channel.size() + silence_count, 0.0);
-    const auto lra_blocks = measure_blocks(filtered, static_cast<double>(sample_rate), 3.0, 0.97);
-    const auto lra = loudness_range(lra_blocks);
+        const auto integrated_blocks = measure_blocks(squared_prefix, frame_count, rate, 0.4, 0.75);
+        integrated = integrated_loudness(integrated_blocks);
+
+        const auto momentary_windows = measure_sliding_windows(squared_prefix, frame_count, rate, 0.4, 0.1);
+        if (!momentary_windows.empty())
+            momentary_max = *std::max_element(momentary_windows.begin(), momentary_windows.end());
+
+        const auto short_term_windows = measure_sliding_windows(squared_prefix, frame_count, rate, 3.0, 1.0);
+        if (!short_term_windows.empty()) {
+            short_term_max = *std::max_element(short_term_windows.begin(), short_term_windows.end());
+            short_term_lra = loudness_range_from_short_term(
+                short_term_windows.data(), short_term_windows.size());
+        }
+
+        // pyloudnorm appends 1.5 s of silence for its 97%-overlap LRA pass;
+        // extending the prefix sum with its final value avoids resizing the
+        // channel buffers or rescanning the K-weighted frames a second time.
+        const auto silence_count = static_cast<std::size_t>(1.5 * sample_rate);
+        for (auto& prefix : squared_prefix)
+            prefix.resize(frame_count + silence_count + 1, prefix.back());
+        const auto lra_blocks = measure_blocks(
+            squared_prefix, frame_count + silence_count, rate, 3.0, 0.97);
+        lra = loudness_range(lra_blocks);
+    }
 
     nb::dict output;
-    if (integrated.has_value())
+    if (integrated.has_value() && std::isfinite(*integrated))
         output["integrated_lufs"] = *integrated;
     else
         output["integrated_lufs"] = nb::none();
@@ -454,10 +622,26 @@ nb::dict loudness_metrics(FloatMatrixInput samples, std::size_t sample_rate)
         output["loudness_range_lu"] = *lra;
     else
         output["loudness_range_lu"] = nb::none();
+    if (short_term_lra.has_value() && std::isfinite(*short_term_lra))
+        output["short_term_lra_lu"] = *short_term_lra;
+    else
+        output["short_term_lra_lu"] = nb::none();
+    if (short_term_max.has_value() && std::isfinite(*short_term_max))
+        output["short_term_max_lufs"] = *short_term_max;
+    else
+        output["short_term_max_lufs"] = nb::none();
+    if (momentary_max.has_value() && std::isfinite(*momentary_max))
+        output["momentary_max_lufs"] = *momentary_max;
+    else
+        output["momentary_max_lufs"] = nb::none();
     if (true_peak.has_value() && std::isfinite(*true_peak))
         output["true_peak_dbtp"] = *true_peak;
     else
         output["true_peak_dbtp"] = nb::none();
+    if (sample_peak.has_value() && std::isfinite(*sample_peak))
+        output["sample_peak_dbfs"] = *sample_peak;
+    else
+        output["sample_peak_dbfs"] = nb::none();
     output["backend"] = "cpp-native-k-weighting";
     return output;
 }
@@ -468,5 +652,14 @@ void init_loudness_bindings(nb::module_& module)
 {
     module.def("loudness_metrics", &loudness_metrics,
                nb::arg("samples"), nb::arg("sample_rate"),
-               "Compute BS.1770 K-weighted integrated loudness, LRA and 8x true peak.");
+               "Compute BS.1770 K-weighted integrated/momentary/short-term loudness, LRA and 8x true peak.");
+    module.def("true_peak_dbtp", &true_peak_dbtp_binding,
+               nb::arg("samples"),
+               "Compute 8x oversampled inter-sample true peak in dBTP for a (frames, channels) float32 matrix.");
+    module.def("loudness_range_lu", &loudness_range_lu_binding,
+               nb::arg("short_term"),
+               "Compute EBU Tech 3342 gated loudness range (P95 - P10) from short-term LUFS values.");
+    module.def("windowed_loudness", &windowed_loudness_binding,
+               nb::arg("samples"), nb::arg("sample_rate"), nb::arg("window_s"), nb::arg("hop_s"),
+               "Compute K-weighted rectangular window LUFS values at the given window and hop seconds.");
 }
