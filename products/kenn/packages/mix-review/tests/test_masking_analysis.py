@@ -234,16 +234,19 @@ def test_abstains_honestly_when_numpy_is_unavailable(monkeypatch) -> None:
     ("backend", "setting", "expect_native"),
     [
         ("cpp-accelerate", None, True),
-        ("cpp-scalar", None, False),
+        ("cpp-scalar", None, True),
+        ("", None, False),
         ("cpp-accelerate", "0", False),
+        ("cpp-scalar", "0", False),
         ("cpp-scalar", "1", True),
     ],
 )
-def test_masking_takes_native_by_default_only_on_the_accelerate_build(
+def test_masking_takes_native_by_default_on_accelerate_and_scalar_builds(
     monkeypatch, backend, setting, expect_native
 ) -> None:
-    # The scalar build measured slower than NumPy, so only Accelerate defaults
-    # to native. Gating on the OS was wrong: a Mac can build scalar (review, 17 Oct).
+    # Both Accelerate and portable scalar (RealFFTPlan) builds beat NumPy and
+    # match to machine precision, while an older module without a valid backend
+    # label still falls back unless explicitly forced with =1.
     native_fft = pytest.importorskip("kenn.core.native_fft")
 
     class FakeModule:
@@ -261,3 +264,21 @@ def test_masking_takes_native_by_default_only_on_the_accelerate_build(
     result = native_fft.masking_band_energy([0.0] * 4096, 44100)
 
     assert (result is not None) == expect_native
+
+
+def test_masking_band_energy_matches_numpy_reference(monkeypatch) -> None:
+    native_fft = pytest.importorskip("kenn.core.native_fft")
+    if not native_fft.available():
+        pytest.skip("native DSP module not built")
+
+    n = int(2.0 * 48000)
+    signal = masking_analysis._np.asarray(_sine(n, 440.0, 48000, amplitude=0.4), dtype=float)
+    monkeypatch.setenv("KENN_DSP_MASKING_NATIVE", "1")
+    native_energy, native_backend = masking_analysis._band_energy_over_time_with_backend(signal, 48000)
+    monkeypatch.setenv("KENN_DSP_MASKING_NATIVE", "0")
+    ref_energy, ref_backend = masking_analysis._band_energy_over_time_with_backend(signal, 48000)
+
+    assert native_backend in {"cpp-accelerate", "cpp-scalar"}
+    assert ref_backend == "python-numpy-reference"
+    assert native_energy.shape == ref_energy.shape
+    assert float(masking_analysis._np.max(masking_analysis._np.abs(native_energy - ref_energy))) < 1e-6

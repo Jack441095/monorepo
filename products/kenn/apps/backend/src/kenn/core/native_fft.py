@@ -165,14 +165,12 @@ def masking_band_energy(
     callers must retain their reference implementation when the extension is
     unavailable or explicitly disabled.
     """
-    # Default-on for the Accelerate build since 17 Oct 2026: on 260 real stems
-    # (8 songs, 26 groups of up to 12, one arm64 Mac) the masking report was
-    # identical to the NumPy reference apart from the implementation label, in
-    # 10.0 s against 29.0 s. The portable scalar build measured slower than
-    # NumPy (see CPP_DSP_PHASE4_MASKING_NATIVE_POC_RECEIPT.md), so it stays off
-    # by default. We gate on the backend the module reports, not the OS, because
-    # a Mac build with -DKENN_USE_ACCELERATE=OFF is scalar too. =1 forces native
-    # on any build, =0 forces NumPy.
+    # Default-on for both Accelerate and portable scalar builds: on 260 real
+    # stems (8 songs, 26 groups of up to 12, one arm64 Mac) the masking report
+    # was identical to the NumPy reference apart from the implementation label.
+    # The portable scalar build now uses a half-length real FFT with precomputed
+    # twiddle and Hann tables (1.66 ms vs 3.57 ms per 5 s 48 kHz stem in NumPy).
+    # =1 forces native on any build, =0 forces NumPy.
     setting = os.environ.get("KENN_DSP_MASKING_NATIVE", "").strip().lower()
     if setting in {"0", "false", "off", "no"}:
         return None
@@ -181,7 +179,10 @@ def masking_band_energy(
         return None
     import numpy as np
 
-    if setting not in {"1", "true", "on", "yes"} and _masking_backend(module) != "cpp-accelerate":
+    if setting not in {"1", "true", "on", "yes"} and _masking_backend(module) not in {
+        "cpp-accelerate",
+        "cpp-scalar",
+    }:
         return None
 
     source = samples

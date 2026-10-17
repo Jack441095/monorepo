@@ -601,12 +601,12 @@ SpectralResult compute_window_powers(
     result.window_rms.resize(starts.size(), 0.0);
     result.averaged.resize(bins, 0.0);
     std::vector<double> segment(fft_size);
+    std::vector<double> frame_powers;
 #if defined(KENN_HAS_ACCELERATE)
     AccelerateFFTSetup accelerate_setup(fft_size);
-    std::vector<double> accelerated_powers;
     result.backend = "cpp-accelerate";
 #else
-    std::vector<kenn::dsp::Complex> spectrum(fft_size);
+    kenn::dsp::RealFFTPlan scalar_setup(fft_size);
 #endif
     for (std::size_t window_index = 0; window_index < starts.size(); ++window_index)
     {
@@ -620,31 +620,19 @@ SpectralResult compute_window_powers(
             if (index < valid_length)
                 sum_squares += sample * sample;
             segment[index] = sample * window[index];
-#if defined(KENN_HAS_ACCELERATE)
-            // Keep the windowed input in a contiguous double buffer for vDSP's
-            // real FFT.  Applying the window here avoids a second full pass.
-#else
-            spectrum[index] = segment[index];
-#endif
         }
         result.window_rms[window_index] = static_cast<float>(std::sqrt(sum_squares / static_cast<double>(valid_length)));
 #if defined(KENN_HAS_ACCELERATE)
-        accelerate_setup.power_spectrum(segment, accelerated_powers);
-        for (std::size_t bin = 0; bin < bins; ++bin)
-        {
-            const auto power = accelerated_powers[bin];
-            result.windows[window_index * bins + bin] = power;
-            result.averaged[bin] += power;
-        }
+        accelerate_setup.power_spectrum(segment, frame_powers);
 #else
-        kenn::dsp::fft_in_place(spectrum);
+        scalar_setup.power_spectrum(segment.data(), frame_powers);
+#endif
         for (std::size_t bin = 0; bin < bins; ++bin)
         {
-            const auto power = std::norm(spectrum[bin]);
+            const auto power = frame_powers[bin];
             result.windows[window_index * bins + bin] = power;
             result.averaged[bin] += power;
         }
-#endif
     }
     for (auto& value : result.averaged)
         value /= static_cast<double>(starts.size());
@@ -753,13 +741,13 @@ BandEnergyResult compute_band_energy(
             : std::pair<std::size_t, std::size_t> { 0, 0 };
     }
 
+    std::vector<double> segment(fft_size);
+    std::vector<double> frame_powers;
 #if defined(KENN_HAS_ACCELERATE)
     AccelerateFFTSetup accelerate_setup(fft_size);
-    std::vector<double> segment(fft_size);
-    std::vector<double> accelerated_powers;
     result.backend = "cpp-accelerate";
 #else
-    std::vector<kenn::dsp::Complex> spectrum(fft_size);
+    kenn::dsp::RealFFTPlan scalar_setup(fft_size);
 #endif
     for (std::size_t frame = 0; frame < result.frames; ++frame)
     {
@@ -768,16 +756,12 @@ BandEnergyResult compute_band_energy(
         {
             const auto source_index = start + index;
             const auto sample = source_index < length ? static_cast<double>(samples[source_index]) : 0.0;
-#if defined(KENN_HAS_ACCELERATE)
             segment[index] = sample * window[index];
-#else
-            spectrum[index] = sample * window[index];
-#endif
         }
 #if defined(KENN_HAS_ACCELERATE)
-        accelerate_setup.power_spectrum(segment, accelerated_powers);
+        accelerate_setup.power_spectrum(segment, frame_powers);
 #else
-        kenn::dsp::fft_in_place(spectrum);
+        scalar_setup.power_spectrum(segment.data(), frame_powers);
 #endif
         for (std::size_t band = 0; band < result.bands; ++band)
         {
@@ -786,11 +770,7 @@ BandEnergyResult compute_band_energy(
                 continue;
             double sum = 0.0;
             for (std::size_t bin = first; bin < last; ++bin)
-#if defined(KENN_HAS_ACCELERATE)
-                sum += accelerated_powers[bin];
-#else
-                sum += std::norm(spectrum[bin]);
-#endif
+                sum += frame_powers[bin];
             result.values[frame * result.bands + band] = std::sqrt(sum / static_cast<double>(last - first));
         }
     }

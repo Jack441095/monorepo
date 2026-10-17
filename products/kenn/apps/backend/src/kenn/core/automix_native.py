@@ -15,10 +15,10 @@ _load_attempted = False
 
 def _load() -> Any | None:
     global _native, _load_attempted
-    # Still default-off, unlike native_fft: the 17 Oct 2026 real-file parity run
-    # that made native audio analysis the default never exercised these kernels.
-    # The flag is shared, so KENN_DSP_NATIVE=1 turns both on and =0 turns both off.
-    if os.environ.get("KENN_DSP_NATIVE", "0").strip().lower() in {"0", "false", "off", "no"}:
+    # Default-on since Stage 2: mirrors native_fft so all qualified C++ DSP
+    # kernels run natively when the extension is present. Set KENN_DSP_NATIVE=0
+    # to force pure-Python reference paths for rollback or parity comparisons.
+    if os.environ.get("KENN_DSP_NATIVE", "1").strip().lower() in {"0", "false", "off", "no"}:
         return None
     if _load_attempted:
         return _native
@@ -58,6 +58,8 @@ def biquad(sos: Any, values: Any) -> Any | None:
     import numpy as np
 
     sections = np.ascontiguousarray(sos, dtype=np.float64)
+    if sections.ndim != 2 or sections.shape[0] == 0 or sections.shape[1] != 6:
+        raise ValueError("sos must have shape (sections, 6) with at least one section")
     return module.biquad(sections, _vector(values))
 
 
