@@ -52,6 +52,8 @@ public:
     KENNAnalysisSnapshot snapshot() const;
     std::array<KENNAnalysisSnapshot, 6> recentSnapshots() const; // Last 600 ms for asynchronous paired publishers.
     void drainPending(); // Only the shared worker, or a prepared synchronous test, may consume.
+    static size_t activeWorkerInstanceCount();
+    static bool isWorkerThreadRunning();
 
     static constexpr int packetSamples = 64; // Frames per copy packet, independent of host blocks.
     static constexpr int packetSlots = 257; // 256 usable packets: up to 16,384 stereo frames.

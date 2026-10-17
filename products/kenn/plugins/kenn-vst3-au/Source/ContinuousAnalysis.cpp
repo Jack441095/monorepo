@@ -10,12 +10,18 @@ public:
     void add(KENNContinuousAnalysis& analyser)
     {
         const juce::ScopedLock lock(registryLock);
-        instances.push_back(&analyser);
+        if (std::find(instances.begin(), instances.end(), &analyser) == instances.end())
+            instances.push_back(&analyser);
     }
     void remove(KENNContinuousAnalysis& analyser)
     {
         const juce::ScopedLock lock(registryLock);
         instances.erase(std::remove(instances.begin(), instances.end(), &analyser), instances.end());
+    }
+    size_t count() const
+    {
+        const juce::ScopedLock lock(registryLock);
+        return instances.size();
     }
     void run() override
     {
@@ -23,7 +29,11 @@ public:
         {
             {
                 const juce::ScopedLock lock(registryLock);
-                for (auto* analyser : instances) analyser->drainPending();
+                for (auto* analyser : instances)
+                {
+                    if (threadShouldExit()) break; // Exit promptly without completing remaining pending drains on teardown.
+                    analyser->drainPending();
+                }
             }
             wait(2); // 2 ms polling avoids a callback-side condition-variable wake-up.
         }
@@ -31,9 +41,19 @@ public:
 private:
     KENNAnalysisWorker() : juce::Thread("KENN insert analysis") { startThread(juce::Thread::Priority::low); }
     ~KENNAnalysisWorker() override { stopThread(-1); } // Never destroy storage while the reader can use it.
-    juce::CriticalSection registryLock;
+    mutable juce::CriticalSection registryLock;
     std::vector<KENNContinuousAnalysis*> instances;
 };
+
+size_t KENNContinuousAnalysis::activeWorkerInstanceCount()
+{
+    return KENNAnalysisWorker::instance().count();
+}
+
+bool KENNContinuousAnalysis::isWorkerThreadRunning()
+{
+    return KENNAnalysisWorker::instance().isThreadRunning();
+}
 
 KENNContinuousAnalysis::~KENNContinuousAnalysis() { release(); }
 

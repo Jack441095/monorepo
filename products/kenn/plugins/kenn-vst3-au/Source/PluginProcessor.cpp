@@ -15,7 +15,8 @@ public:
         const juce::ScopedLock lifetime(lifetimeLock);
         {
             const juce::ScopedLock lock(registryLock);
-            entries.push_back({ &owner });
+            if (std::find_if(entries.begin(), entries.end(), [&owner](const Entry& entry) { return entry.owner == &owner; }) == entries.end())
+                entries.push_back({ &owner });
         }
         if (! isThreadRunning()) startThread(juce::Thread::Priority::low);
     }
@@ -32,6 +33,12 @@ public:
         // alive. Leaving a polling singleton until static teardown crashed
         // the 2026-10-13 active HTTP profile on macOS at thread pool cleanup.
         if (empty) stopThread(-1);
+    }
+
+    size_t count() const
+    {
+        const juce::ScopedLock lock(registryLock);
+        return entries.size();
     }
 
     void run() override
@@ -53,20 +60,23 @@ public:
                 // The local companion shares this machine's wall clock. Anchor
                 // ages before collection so serialization and stalled HTTP cannot
                 // give already-exported audio a new diagnosis lifetime on receipt.
-                const auto exportedAt = juce::Time::getCurrentTime().toMilliseconds() / 1000.0;
+                const auto exportedAt = static_cast<double>(juce::Time::getCurrentTime().toMilliseconds()) / 1000.0;
                 std::vector<Batch> batches;
                 {
                     const juce::ScopedLock lock(registryLock);
                     for (auto& entry : entries)
                     {
+                        if (threadShouldExit()) break; // Host teardown should stop gathering frames immediately.
                         auto& owner = *entry.owner;
-                        if (owner.apvts.getRawParameterValue("live_context_enabled")->load() < 0.5f)
+                        const auto* liveContextParam = owner.apvts.getRawParameterValue("live_context_enabled");
+                        if (liveContextParam == nullptr || liveContextParam->load() < 0.5f)
                         {
                             entry.lastSequence = 0;
                             continue; // Re-enabling publication sends the latest frame once.
                         }
                         const auto frame = owner.analysisSnapshot();
-                        const bool enabled = owner.apvts.getRawParameterValue("analysis_enabled")->load() >= 0.5f;
+                        const auto* analysisParam = owner.apvts.getRawParameterValue("analysis_enabled");
+                        const bool enabled = analysisParam != nullptr && analysisParam->load() >= 0.5f;
                         if (frame.sequence == 0 || (frame.sequence == entry.lastSequence && frame.generation == entry.lastGeneration
                             && frame.valid == entry.lastValid && enabled == entry.lastEnabled))
                             continue; // Stopped audio never consumes bandwidth or rejuvenates evidence.
@@ -82,24 +92,45 @@ public:
                 }
                 // Own the JSON before releasing the registry: destruction can now
                 // remove an insert while HTTP waits, with no dangling processor access.
-                for (const auto& batch : batches)
+                const auto sendBatch = [&](const Batch& b, auto& self) -> void
                 {
+                    if (b.frames.isEmpty() || b.endpoint.isEmpty() || threadShouldExit()) return;
                     auto payload = std::make_unique<juce::DynamicObject>();
                     payload->setProperty("schema", "kenn.plugin_handoff_batch.v1");
                     payload->setProperty("exported_at_epoch", exportedAt);
-                    payload->setProperty("frames", batch.frames);
+                    payload->setProperty("frames", b.frames);
                     // Multiline indentation alone pushed the 64-insert profile
                     // over 1 MiB. Omit whitespace without rounding measured power
                     // or dropping the history needed to pair asynchronous inserts.
                     const auto body = juce::JSON::toString(juce::var(payload.release()),
                         juce::JSON::FormatOptions().withSpacing(juce::JSON::Spacing::none));
-                    if (body.getNumBytesAsUTF8() > 1024 * 1024) continue; // The companion's 1 MiB limit also bounds native transport; oversized evidence expires.
+                    if (body.getNumBytesAsUTF8() > 1024 * 1024)
+                    {
+                        if (b.frames.size() > 1)
+                        {
+                            // If rich metadata pushes a full 64-insert batch past 1 MiB,
+                            // subdivide into smaller sibling batches so all inserts remain fresh.
+                            const int half = b.frames.size() / 2;
+                            Batch first { b.endpoint, {} }, second { b.endpoint, {} };
+                            for (int i = 0; i < half; ++i) first.frames.add(b.frames[i]);
+                            for (int i = half; i < b.frames.size(); ++i) second.frames.add(b.frames[i]);
+                            self(first, self);
+                            self(second, self);
+                            return;
+                        }
+                        return; // A single frame exceeding 1024 * 1024 bytes cannot be divided further; oversized evidence expires.
+                    }
                     const auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inPostData)
                         .withConnectionTimeoutMs(1200).withNumRedirectsToFollow(0); // 1,200 ms local timeout, with no redirect to another destination.
-                    auto response = juce::URL(batch.endpoint + "/api/plugin-handoff-batch").withPOSTData(body).createInputStream(options);
-                    if (response == nullptr) continue; // A missing companion cannot delay playback; a newer window retries on the next tick.
+                    auto response = juce::URL(b.endpoint + "/api/plugin-handoff-batch").withPOSTData(body).createInputStream(options);
+                    if (response == nullptr) return; // A missing companion cannot delay playback; a newer window retries on the next tick.
                     juce::MemoryBlock acknowledgement;
                     response->readIntoMemoryBlock(acknowledgement, 64 * 1024); // 64 KiB acknowledgement cap; no response audio/body can grow native memory without bound.
+                };
+                for (const auto& batch : batches)
+                {
+                    if (threadShouldExit()) break;
+                    sendBatch(batch, sendBatch);
                 }
             }
         }
@@ -115,10 +146,20 @@ private:
     struct Batch { juce::String endpoint; juce::Array<juce::var> frames; };
     KENNLiveContextPublisherThread() : juce::Thread("KENN Live Context Publisher") {}
     ~KENNLiveContextPublisherThread() override { stopThread(-1); } // Owned payloads must finish before the shared transport disappears.
-    juce::CriticalSection registryLock; // Lifetime and JSON collection only; never held during HTTP or from processBlock().
+    mutable juce::CriticalSection registryLock; // Lifetime and JSON collection only; never held during HTTP or from processBlock().
     juce::CriticalSection lifetimeLock; // Serialize final join/restart without holding the registry needed by run().
     std::vector<Entry> entries;
 };
+
+size_t KENNMixAssistantAudioProcessor::activePublisherInstanceCount()
+{
+    return KENNLiveContextPublisherThread::instance().count();
+}
+
+bool KENNMixAssistantAudioProcessor::isPublisherThreadRunning()
+{
+    return KENNLiveContextPublisherThread::instance().isThreadRunning();
+}
 
 namespace
 {
@@ -287,7 +328,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout KENNMixAssistantAudioProcess
 
 juce::String KENNMixAssistantAudioProcessor::getAssistantMode() const
 {
-    const auto index = juce::jlimit(0, 3, juce::roundToInt(apvts.getRawParameterValue("assistant_mode")->load()));
+    const auto* modeParam = apvts.getRawParameterValue("assistant_mode");
+    const auto index = modeParam != nullptr ? juce::jlimit(0, 3, juce::roundToInt(modeParam->load())) : 1;
     return juce::StringArray { "ask", "suggest", "assist", "auto" }[index];
 }
 
@@ -314,7 +356,9 @@ void KENNMixAssistantAudioProcessor::processBlock(juce::AudioBuffer<float>& buff
         if (const auto position = playHead->getPosition())
             if (const auto samples = position->getTimeInSamples(); samples && position->getIsPlaying())
                 host = { *samples, true };
-    continuousAnalysis.push(buffer, apvts.getRawParameterValue("analysis_enabled")->load() >= 0.5f, host);
+    const auto* analysisParam = apvts.getRawParameterValue("analysis_enabled");
+    const bool analysisEnabled = analysisParam != nullptr && analysisParam->load() >= 0.5f;
+    continuousAnalysis.push(buffer, analysisEnabled, host);
     // Intentional transparent pass-through.  AutoMix rendering is offline and
     // stem-based, therefore no processing is silently applied to this bus.
 }
@@ -341,7 +385,7 @@ juce::var KENNMixAssistantAudioProcessor::handoffPayload() const
     const juce::ScopedLock sourceLock(hostTrackLock);
     // Ask, file export and single uploads can wait independently of the shared
     // publisher. Their audio ages must also include collection/transport delay.
-    const auto exportedAt = juce::Time::getCurrentTime().toMilliseconds() / 1000.0;
+    const auto exportedAt = static_cast<double>(juce::Time::getCurrentTime().toMilliseconds()) / 1000.0;
     // Rename and publication generations are checked together; all scalar
     // metrics and bands below come from one worker publication.
     const auto frame = continuousAnalysis.snapshot();
@@ -428,12 +472,16 @@ juce::var KENNMixAssistantAudioProcessor::handoffPayload() const
             pairedWindows.add(juce::var(entry.release()));
         }
     message->setProperty("paired_windows", pairedWindows); // Six feature windows bridge the 500 ms publisher phase offset.
-    message->setProperty("target_lufs", apvts.getRawParameterValue("target_lufs")->load());
+    const auto* targetParam = apvts.getRawParameterValue("target_lufs");
+    const float targetLufs = targetParam != nullptr ? targetParam->load() : -14.0f;
+    message->setProperty("target_lufs", targetLufs);
     auto pluginState = std::make_unique<juce::DynamicObject>();
     pluginState->setProperty("assistant_mode", getAssistantMode());
-    pluginState->setProperty("target_lufs", apvts.getRawParameterValue("target_lufs")->load());
-    pluginState->setProperty("analysis_enabled", apvts.getRawParameterValue("analysis_enabled")->load() >= 0.5f);
-    pluginState->setProperty("live_context_enabled", apvts.getRawParameterValue("live_context_enabled")->load() >= 0.5f);
+    pluginState->setProperty("target_lufs", targetLufs);
+    const auto* analysisParam = apvts.getRawParameterValue("analysis_enabled");
+    pluginState->setProperty("analysis_enabled", analysisParam != nullptr && analysisParam->load() >= 0.5f);
+    const auto* liveContextParam = apvts.getRawParameterValue("live_context_enabled");
+    pluginState->setProperty("live_context_enabled", liveContextParam != nullptr && liveContextParam->load() >= 0.5f);
     message->setProperty("plugin_state", juce::var(pluginState.release()));
     message->setProperty("peak_dbfs", data.peakDb); message->setProperty("rms_dbfs", data.rmsDb);
     message->setProperty("stereo_correlation", data.correlation); message->setProperty("stereo_width", data.stereoWidth);
@@ -611,8 +659,9 @@ juce::String KENNMixAssistantAudioProcessor::localDiagnosticSummary() const
     lines.add("Local KENN Mix Check (no companion required)");
     lines.add("Measured from the current plug-in bus; audio is not sent anywhere.");
     const auto ageSeconds = juce::Time::highResolutionTicksToSeconds(juce::Time::getHighResolutionTicks()-frame.capturedTicks);
+    const auto* analysisParam = apvts.getRawParameterValue("analysis_enabled");
     if (! frame.valid || data.analysedSamples <= 0 || ageSeconds > 1.0
-        || apvts.getRawParameterValue("analysis_enabled")->load() < 0.5f) // 1 second matches continuous companion diagnosis.
+        || analysisParam == nullptr || analysisParam->load() < 0.5f) // 1 second matches continuous companion diagnosis.
     {
         // Gaps, disabled analysis and stopped playback cannot justify current local advice.
         lines.add("No current complete audio window. Play audio through this bus with analysis enabled, then run the check again.");

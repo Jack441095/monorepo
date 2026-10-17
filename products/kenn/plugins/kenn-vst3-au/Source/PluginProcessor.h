@@ -56,12 +56,14 @@ public:
     void recordTargetAction(const juce::String& event, float before, float after, const juce::String& reason);
     juce::String latestTargetActionSummary() const;
     bool syncWebParameters();
+    juce::var handoffPayload() const;
+    static size_t activePublisherInstanceCount();
+    static bool isPublisherThreadRunning();
     juce::AudioProcessorValueTreeState apvts;
 
 private:
     friend class KENNLiveContextPublisherThread;
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-    juce::var handoffPayload() const;
     static bool validateLocalEndpoint(const juce::String& endpoint, juce::String& normalised, juce::String& error);
     KENNContinuousAnalysis continuousAnalysis;
     // JUCE delivers host names on the message thread; only the handoff worker

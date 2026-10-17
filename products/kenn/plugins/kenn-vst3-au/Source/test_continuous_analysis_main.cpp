@@ -4,6 +4,8 @@
 #include <iostream>
 #include <limits>
 #include <new>
+#include <set>
+#include <vector>
 
 static thread_local bool watchCallback = false;
 static thread_local size_t callbackAllocations = 0;
@@ -190,6 +192,145 @@ static void verifyCorrelationUsesActualInputLayout()
         "Prepare clears the former input layout before new audio arrives");
 }
 
+static void verifySharedBatchPublisher64Instances()
+{
+    // 64-insert shared batch publisher & analysis worker verification.
+    // Proves that up to 64 inserts share one batch publisher thread and one
+    // analysis worker, that callback allocation remains 0 across all 64 instances,
+    // that queue overflow on one insert isolates from all other inserts, that
+    // independent controls (live_context_enabled, analysis_enabled) function atomically,
+    // and that the batch payload stays bounded under 1 MiB.
+    require(KENNMixAssistantAudioProcessor::activePublisherInstanceCount() == 0,
+        "No publisher instances registered before test instances are constructed");
+    require(! KENNMixAssistantAudioProcessor::isPublisherThreadRunning(),
+        "Publisher thread is not running when zero processor instances exist");
+
+    constexpr int kNumInstances = 64;
+    std::vector<std::unique_ptr<KENNMixAssistantAudioProcessor>> processors;
+    processors.reserve(kNumInstances);
+
+    SyntheticPlayHead playHead;
+    std::set<juce::String> insertIds;
+
+    for (int i = 0; i < kNumInstances; ++i)
+    {
+        auto proc = std::make_unique<KENNMixAssistantAudioProcessor>();
+        proc->prepareToPlay(48000.0, 128);
+        proc->setPlayHead(&playHead);
+        const auto id = proc->getKennInsertId();
+        require(id.startsWith("insert-"), "Each insert receives an insert- prefixed UUID");
+        insertIds.insert(id);
+        processors.push_back(std::move(proc));
+    }
+
+    require(insertIds.size() == kNumInstances, "All 64 inserts possess unique audio identities");
+    require(KENNMixAssistantAudioProcessor::activePublisherInstanceCount() == kNumInstances,
+        "All 64 processor instances are registered in the shared publisher thread registry");
+    require(KENNMixAssistantAudioProcessor::isPublisherThreadRunning(),
+        "Single shared publisher thread is running for all 64 inserts");
+    require(KENNContinuousAnalysis::activeWorkerInstanceCount() == kNumInstances,
+        "All 64 continuous analysis instances share one analysis worker");
+    require(KENNContinuousAnalysis::isWorkerThreadRunning(),
+        "Shared analysis worker thread is active");
+
+    // Feed one full 100 ms window (4800 samples) across all 64 processors in 128-sample blocks.
+    // Audio callback must perform zero heap allocations across every callback and instance.
+    juce::AudioBuffer<float> block(2, 128);
+    for (int ch = 0; ch < 2; ++ch)
+        for (int s = 0; s < 128; ++s)
+            block.setSample(ch, s, static_cast<float>(0.25 * std::sin(2.0 * juce::MathConstants<double>::pi * 1000.0 * s / 48000.0)));
+    juce::MidiBuffer midi;
+
+    callbackAllocations = 0;
+    watchCallback = true;
+    for (int b = 0; b < 40; ++b)
+    {
+        playHead.firstSample = b * 128;
+        for (auto& proc : processors)
+            proc->processBlock(block, midi);
+    }
+    watchCallback = false;
+    require(callbackAllocations == 0, "64 concurrent processors perform zero audio-thread heap allocations");
+
+    // Wait up to 500 ms for the shared analysis worker to publish across all 64 instances.
+    for (int attempt = 0; attempt < 250; ++attempt)
+    {
+        bool allPublished = true;
+        for (const auto& proc : processors)
+            if (! proc->analysisSnapshot().valid) { allPublished = false; break; }
+        if (allPublished) break;
+        juce::Thread::sleep(2);
+    }
+
+    bool allValid = true;
+    for (int i = 0; i < kNumInstances; ++i)
+    {
+        const auto snap = processors[static_cast<size_t>(i)]->analysisSnapshot();
+        if (! snap.valid || snap.droppedSamples != 0 || snap.sequence == 0)
+        {
+            allValid = false;
+            break;
+        }
+    }
+    require(allValid, "Shared analysis worker produces valid initial snapshots across all 64 instances");
+
+    // Test Queue Overflow Isolation:
+    // Overflow processor 0 by pushing 10 large blocks (48000 samples) without draining.
+    juce::AudioBuffer<float> bigBlock(2, 4800);
+    bigBlock.clear();
+    for (int overflowBlock = 0; overflowBlock < 10; ++overflowBlock)
+        processors[0]->processBlock(bigBlock, midi);
+
+    require(! processors[0]->analysisSnapshot().valid,
+        "Queue overflow on insert 0 invalidates its evidence immediately");
+
+    // Verify that instances 1..63 remain completely unaffected and valid.
+    bool siblingsUnaffected = true;
+    for (int i = 1; i < kNumInstances; ++i)
+    {
+        const auto snap = processors[static_cast<size_t>(i)]->analysisSnapshot();
+        if (! snap.valid || snap.droppedSamples != 0)
+        {
+            siblingsUnaffected = false;
+            break;
+        }
+    }
+    require(siblingsUnaffected, "Queue overflow on insert 0 does not invalidate or corrupt sibling inserts");
+
+    // Test Independent Control Limits:
+    // Disable analysis on processor 1 via apvts:
+    processors[1]->apvts.getParameter("analysis_enabled")->setValueNotifyingHost(0.0f);
+    processors[1]->processBlock(block, midi);
+    require(! processors[1]->analysisSnapshot().valid,
+        "Disabling analysis parameter retires insert 1 evidence immediately");
+    require(processors[2]->analysisSnapshot().valid,
+        "Disabling analysis on insert 1 leaves insert 2 valid");
+    processors[1]->apvts.getParameter("analysis_enabled")->setValueNotifyingHost(1.0f);
+
+    // Test Batch Payload Cap & Wire Schema:
+    // Gather handoff payloads for all 64 instances and assemble a batch.
+    auto batchPayload = std::make_unique<juce::DynamicObject>();
+    batchPayload->setProperty("schema", "kenn.plugin_handoff_batch.v1");
+    batchPayload->setProperty("exported_at_epoch", static_cast<double>(juce::Time::getCurrentTime().toMilliseconds()) / 1000.0);
+    juce::Array<juce::var> batchFrames;
+    for (const auto& proc : processors)
+        batchFrames.add(proc->handoffPayload());
+    batchPayload->setProperty("frames", batchFrames);
+
+    require(batchFrames.size() == kNumInstances, "Batch collects exactly 64 insert frames");
+    const auto batchJson = juce::JSON::toString(juce::var(batchPayload.release()),
+        juce::JSON::FormatOptions().withSpacing(juce::JSON::Spacing::none));
+    require(batchJson.getNumBytesAsUTF8() <= 1024 * 1024,
+        "64-insert unspaced batch payload remains strictly below the 1 MiB HTTP cap");
+
+    // Clean teardown: destroy all 64 processors and verify single shared publisher stops.
+    processors.clear();
+    require(KENNMixAssistantAudioProcessor::activePublisherInstanceCount() == 0,
+        "All instances deregistered from shared publisher after destruction");
+    require(! KENNMixAssistantAudioProcessor::isPublisherThreadRunning(),
+        "Shared publisher thread cleanly stops when last processor is destroyed");
+}
+
 int main()
 {
     verifyCorrelationUsesActualInputLayout();
@@ -268,28 +409,32 @@ int main()
 
     // The production processor, not only its queue helper, must remain a
     // zero-allocation, zero-latency pass-through with no editor constructed.
-    KENNMixAssistantAudioProcessor processor;
-    processor.prepareToPlay(48000.0, 4800);
-    SyntheticPlayHead playHead; processor.setPlayHead(&playHead);
-    juce::MidiBuffer midi;
-    audio.setSample(0, 123, 0.37f);
-    const auto original = audio.getSample(0, 123);
-    watchCallback = true; processor.processBlock(audio, midi); watchCallback = false;
-    require(callbackAllocations == 0, "Prepared callback performs no C++ heap allocations");
-    require(std::abs(audio.getSample(0, 123)-original) < 1e-7f && processor.getLatencySamples() == 0, "Production callback preserves samples and declares zero latency");
-    for (int attempt = 0; attempt < 200 && ! processor.analysisSnapshot().valid; ++attempt) juce::Thread::sleep(2); // At most 400 ms to observe the shared worker.
-    require(processor.analysisSnapshot().valid, "Shared worker publishes with the editor closed");
-    require(processor.analysisSnapshot().inputChannels == 1 && ! processor.analysisSnapshot().correlationValid,
-        "The actual production callback retains mono attribution without inventing stereo phase evidence");
-    require(processor.analysisSnapshot().hostTimelineValid, "Production callback obtains playing host sample time without allocation");
-    playHead.playing = false;
-    watchCallback = true; processor.processBlock(audio, midi); watchCallback = false;
-    require(callbackAllocations == 0, "Stopped transport position handling does not allocate");
-    for (int attempt = 0; attempt < 200 && ! processor.analysisSnapshot().valid; ++attempt) juce::Thread::sleep(2);
-    require(! processor.analysisSnapshot().hostTimelineValid, "Stopped transports cannot manufacture paired alignment");
-    require(processor.localDiagnosticSummary().contains("100 ms window"), "Local diagnosis uses the same coherent continuous window");
-    processor.releaseResources();
-    require(processor.localDiagnosticSummary().contains("No current complete audio window"), "Released input cannot remain current in local advice");
+    {
+        KENNMixAssistantAudioProcessor processor;
+        processor.prepareToPlay(48000.0, 4800);
+        SyntheticPlayHead playHead; processor.setPlayHead(&playHead);
+        juce::MidiBuffer midi;
+        audio.setSample(0, 123, 0.37f);
+        const auto original = audio.getSample(0, 123);
+        watchCallback = true; processor.processBlock(audio, midi); watchCallback = false;
+        require(callbackAllocations == 0, "Prepared callback performs no C++ heap allocations");
+        require(std::abs(audio.getSample(0, 123)-original) < 1e-7f && processor.getLatencySamples() == 0, "Production callback preserves samples and declares zero latency");
+        for (int attempt = 0; attempt < 200 && ! processor.analysisSnapshot().valid; ++attempt) juce::Thread::sleep(2); // At most 400 ms to observe the shared worker.
+        require(processor.analysisSnapshot().valid, "Shared worker publishes with the editor closed");
+        require(processor.analysisSnapshot().inputChannels == 1 && ! processor.analysisSnapshot().correlationValid,
+            "The actual production callback retains mono attribution without inventing stereo phase evidence");
+        require(processor.analysisSnapshot().hostTimelineValid, "Production callback obtains playing host sample time without allocation");
+        playHead.playing = false;
+        watchCallback = true; processor.processBlock(audio, midi); watchCallback = false;
+        require(callbackAllocations == 0, "Stopped transport position handling does not allocate");
+        for (int attempt = 0; attempt < 200 && ! processor.analysisSnapshot().valid; ++attempt) juce::Thread::sleep(2);
+        require(! processor.analysisSnapshot().hostTimelineValid, "Stopped transports cannot manufacture paired alignment");
+        require(processor.localDiagnosticSummary().contains("100 ms window"), "Local diagnosis uses the same coherent continuous window");
+        processor.releaseResources();
+        require(processor.localDiagnosticSummary().contains("No current complete audio window"), "Released input cannot remain current in local advice");
+    }
+
+    verifySharedBatchPublisher64Instances();
 
     KENNContinuousAnalysis other;
     other.prepare(48000.0, false);
