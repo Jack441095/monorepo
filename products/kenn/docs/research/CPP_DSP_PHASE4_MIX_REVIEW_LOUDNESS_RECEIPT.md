@@ -104,7 +104,9 @@ sine). The first fix interpolated each chunk periodically, which review showed
 reading a crest-cut loop at +1.23 dBTP against scipy's +0.20; each chunk now
 carries 4096 samples of real or zero context per side and only its interior is
 read, and the Nyquist bin is halved. Both have regression tests. Its ideal-sinc
-interpolation still reads 0.17 dB above scipy on full-band white noise.
+interpolation still differs from scipy near Nyquist: 0.38 dB under to 0.72 dB
+over across 25 white-noise draws, and about 8 dB hot on a tone gated hard at
+Nyquist. Band-limited material agrees within about 0.05 dB.
 
 Real-file promotion, one local run on Jack's Mac with a scratch runner (the
 corpus is owner data and stays out of the repo, so this is recorded, not

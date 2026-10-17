@@ -1265,9 +1265,11 @@ def _numpy_true_peak_dbtp(channels: list[Any]) -> float | None:
     all-empty input.
 
     The interpolation is ideal sinc, where scipy's Kaiser filter rolls off near
-    Nyquist, so content close to fs/2 reads high here: 0.17 dB on full-band
-    white noise, more on a tone gated hard at Nyquist (17 Oct 2026 probes).
-    That errs towards flagging a peak, the safe side for a ceiling advisory.
+    Nyquist, so content close to fs/2 reads differently: across 25 full-band
+    white-noise draws it ranged 0.38 dB under to 0.72 dB over scipy, usually
+    over, and a tone gated hard at Nyquist reads about 8 dB hot (17 Oct 2026
+    probes). Band-limited material agrees within about 0.05 dB. Only hosts with
+    neither the native extension nor scipy reach this path.
     """
     factor = TRUE_PEAK_OVERSAMPLE_FACTOR
     # 2**20 samples (about 24 s at 44.1 kHz) per FFT keeps memory bounded on
