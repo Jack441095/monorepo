@@ -563,3 +563,132 @@ async def regrade_against_original_endpoint(req: BeforeAfterRegradeRequest):
     return JSONResponse(status_code=200, content={"ok": True, "result": result})
 
 
+# --- Curriculum Endpoints (Milestone E8) -------------------------------------
+
+
+class CurriculumStartRequest(BaseModel):
+    session_id: str
+    topic_id: str
+    current_meters: dict[str, Any]
+    current_grade: Optional[dict[str, Any]] = None
+
+
+class CurriculumEvaluateRequest(BaseModel):
+    session_id: str
+    current_meters: dict[str, Any]
+    current_grade: Optional[dict[str, Any]] = None
+    last_applied_lever: Optional[dict[str, Any]] = None
+
+
+class CurriculumActionRequest(BaseModel):
+    session_id: str
+
+
+@app.get("/api/curriculum/catalog")
+async def get_curriculum_catalog_endpoint():
+    """Return authored curriculum catalog with verifiable objectives and cited standards."""
+    from kenn.core.mix_curriculum import MixCurriculumManager
+
+    manager = MixCurriculumManager()
+    catalog = manager.list_catalog()
+    return JSONResponse(status_code=200, content={"ok": True, "catalog": catalog})
+
+
+@app.post("/api/curriculum/start")
+async def start_curriculum_lesson_endpoint(req: CurriculumStartRequest):
+    """Start a structured mixing curriculum session with objective and starting grade."""
+    from kenn.core.mix_curriculum import MixCurriculumManager
+
+    manager = MixCurriculumManager()
+    try:
+        session = manager.start_lesson(
+            session_id=req.session_id,
+            topic_id=req.topic_id,
+            current_meters=req.current_meters,
+            current_grade=req.current_grade,
+        )
+        return JSONResponse(status_code=200, content={"ok": True, "session": session})
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.get("/api/curriculum/status")
+async def get_curriculum_status_endpoint(session_id: str):
+    """Retrieve active curriculum session state, objective, and failed suggestions log."""
+    from kenn.core.mix_curriculum import MixCurriculumManager
+
+    manager = MixCurriculumManager()
+    session = manager.get_session_status(session_id)
+    if session is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No active curriculum session found for session '{session_id}'",
+        )
+    return JSONResponse(status_code=200, content={"ok": True, "session": session})
+
+
+@app.post("/api/curriculum/evaluate")
+async def evaluate_curriculum_progress_endpoint(req: CurriculumEvaluateRequest):
+    """Evaluate telemetry against active curriculum objective and log failed suggestion gaps."""
+    from kenn.core.mix_curriculum import MixCurriculumManager
+
+    manager = MixCurriculumManager()
+    result = manager.evaluate_progress(
+        session_id=req.session_id,
+        current_meters=req.current_meters,
+        current_grade=req.current_grade,
+        last_applied_lever=req.last_applied_lever,
+    )
+    if not result.get("ok"):
+        raise HTTPException(status_code=404, detail=result.get("error", "Evaluation failed"))
+    return JSONResponse(status_code=200, content=result)
+
+
+@app.post("/api/curriculum/pause")
+async def pause_curriculum_lesson_endpoint(req: CurriculumActionRequest):
+    """Pause an in-progress curriculum lesson without discarding telemetry."""
+    from kenn.core.mix_curriculum import MixCurriculumManager
+
+    manager = MixCurriculumManager()
+    success = manager.pause_lesson(req.session_id)
+    if not success:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Could not pause: session '{req.session_id}' not found",
+        )
+    return JSONResponse(status_code=200, content={"ok": True, "status": "paused"})
+
+
+@app.post("/api/curriculum/resume")
+async def resume_curriculum_lesson_endpoint(req: CurriculumActionRequest):
+    """Resume a paused curriculum lesson."""
+    from kenn.core.mix_curriculum import MixCurriculumManager
+
+    manager = MixCurriculumManager()
+    success = manager.resume_lesson(req.session_id)
+    if not success:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Could not resume: session '{req.session_id}' not found",
+        )
+    return JSONResponse(status_code=200, content={"ok": True, "status": "in_progress"})
+
+
+@app.post("/api/curriculum/abandon")
+async def abandon_curriculum_lesson_endpoint(req: CurriculumActionRequest):
+    """Mark curriculum lesson as abandoned while preserving log history."""
+    from kenn.core.mix_curriculum import MixCurriculumManager
+
+    manager = MixCurriculumManager()
+    success = manager.abandon_lesson(req.session_id)
+    if not success:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Could not abandon: session '{req.session_id}' not found",
+        )
+    return JSONResponse(status_code=200, content={"ok": True, "status": "abandoned"})
+
+
+

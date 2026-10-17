@@ -160,6 +160,22 @@ def _get_db() -> sqlite3.Connection:
     )
     conn.execute(
         """
+        CREATE TABLE IF NOT EXISTS curriculum_sessions (
+            session_id TEXT PRIMARY KEY,
+            topic_id TEXT NOT NULL,
+            status TEXT NOT NULL,
+            state_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+        """
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_curriculum_status "
+        "ON curriculum_sessions(status, updated_at DESC)"
+    )
+    conn.execute(
+        """
         CREATE TABLE IF NOT EXISTS semantic_cache (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             session_id TEXT NOT NULL DEFAULT '',
@@ -1820,20 +1836,40 @@ def reset_session_data(session_id: str) -> dict[str, int]:
         return {"deleted": 0}
 
     counts: dict[str, int] = {}
+    conn = _get_db()
     try:
-        conn = _get_db()
-        counts["sessions"] = conn.execute("DELETE FROM sessions WHERE session_id = ?", (clean_session,)).rowcount
-        counts["corrections"] = conn.execute("DELETE FROM session_corrections WHERE session_id = ?", (clean_session,)).rowcount
-        counts["followed_advice"] = conn.execute("DELETE FROM session_followed_advice WHERE session_id = ?", (clean_session,)).rowcount
-        counts["preferences"] = conn.execute("DELETE FROM producer_preferences WHERE session_id = ?", (clean_session,)).rowcount
-        counts["episodes"] = conn.execute("DELETE FROM production_episodes WHERE session_id = ?", (clean_session,)).rowcount
-        counts["mix_versions"] = conn.execute("DELETE FROM mix_versions WHERE session_id = ?", (clean_session,)).rowcount
-        counts["audition_feedback"] = conn.execute("DELETE FROM audition_feedback WHERE session_id = ?", (clean_session,)).rowcount
-        counts["before_after"] = conn.execute("DELETE FROM before_after_comparisons WHERE session_id = ?", (clean_session,)).rowcount
-        counts["semantic_cache"] = conn.execute("DELETE FROM semantic_cache WHERE session_id = ?", (clean_session,)).rowcount
+        # Inspect sqlite_master so optional tables (preferences, episodes) that haven't been
+        # touched yet don't abort deletion of the remaining session data.
+        existing_tables = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            ).fetchall()
+        }
+
+        def _delete_if_table_exists(table_name: str, result_key: str) -> None:
+            if table_name in existing_tables:
+                counts[result_key] = conn.execute(
+                    f"DELETE FROM {table_name} WHERE session_id = ?", (clean_session,)
+                ).rowcount
+            else:
+                counts[result_key] = 0
+
+        _delete_if_table_exists("sessions", "sessions")
+        _delete_if_table_exists("session_corrections", "corrections")
+        _delete_if_table_exists("session_followed_advice", "followed_advice")
+        _delete_if_table_exists("producer_preferences", "preferences")
+        _delete_if_table_exists("production_episodes", "episodes")
+        _delete_if_table_exists("mix_versions", "mix_versions")
+        _delete_if_table_exists("audition_feedback", "audition_feedback")
+        _delete_if_table_exists("before_after_comparisons", "before_after")
+        _delete_if_table_exists("curriculum_sessions", "curriculum")
+        _delete_if_table_exists("semantic_cache", "semantic_cache")
         conn.commit()
     except (sqlite3.Error, OSError):
         pass
+    finally:
+        conn.close()
 
     drop_session_semantic_cache(clean_session)
     return counts

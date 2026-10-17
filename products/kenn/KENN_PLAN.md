@@ -2785,11 +2785,14 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     Done 17 Oct in `apps/backend/src/kenn/core/session_memory.py` and `apps/backend/src/kenn/tests/test_session_memory_corrections.py`: SQLite `session_corrections` table stores corrections with turn IDs and timestamps. Verified that a correction recorded in session A is readable in future turns and completely invisible to session B.
   - [x] Check export and reset: one session's data can be exported and deleted without touching another session or producer.
     Done 17 Oct in `apps/backend/src/kenn/core/session_memory.py` and `apps/backend/src/kenn/tests/test_session_memory_corrections.py`: Implemented `export_session_data` (bundling state, preferences, episodes, corrections, advice, and versions) and `reset_session_data` (purging all session records across 8 tables without touching other sessions). Verified across 7 tests in `test_session_memory_corrections.py`.
-- [ ] **E8: Learning path versus one-off help.** Keep a formal curriculum separate from ad-hoc questions.
-  - [ ] Define the curriculum: session objectives, before and after grades, lesson notes, and gaps found from suggestions that failed.
-  - [ ] Add a simple session: the producer picks a topic and gets an objective, a starting grade and a suggested path.
-  - [ ] Check that one-off questions don't corrupt curriculum state, and that curriculum state never blocks a one-off question.
-  - [ ] Curriculum material, 15 Oct: no open mixing curriculum exists to reuse — author lesson
+- [x] **E8: Learning path versus one-off help.** Keep a formal curriculum separate from ad-hoc questions.
+  - [x] Define the curriculum: session objectives, before and after grades, lesson notes, and gaps found from suggestions that failed.
+    Done 17 Oct in `apps/backend/src/kenn/core/mix_curriculum.py`: `CurriculumObjective` and `CurriculumSession` schemas (`kenn.curriculum_objective.v1` and `kenn.curriculum_session.v1`). In-house authored curriculum catalog with 5 fundamental mix topics (`spectral_clarity`, `low_end_control`, `loudness_and_peaks`, `stereo_imaging`, `dynamic_control`) with explicit thresholds, operators, lesson notes, cited standards, and gap tracking in `failed_suggestions_log`.
+  - [x] Add a simple session: the producer picks a topic and gets an objective, a starting grade and a suggested path.
+    Done 17 Oct in `apps/backend/src/kenn/core/mix_curriculum.py` and `apps/backend/src/kenn/routes/fastapi_app.py`: `start_lesson` sets initial grade and meters; `evaluate_progress` checks objective completion, computes grade score delta, and updates session lifecycle (`in_progress`, `completed`, `paused`, `abandoned`). Served over REST via `/api/curriculum/catalog`, `/api/curriculum/start`, `/api/curriculum/status`, `/api/curriculum/evaluate`, `/api/curriculum/pause`, `/api/curriculum/resume`, and `/api/curriculum/abandon`.
+  - [x] Check that one-off questions don't corrupt curriculum state, and that curriculum state never blocks a one-off question.
+    Done 17 Oct in `apps/backend/src/kenn/tests/test_mix_curriculum.py`: Verified that ad-hoc natural-language questions through `handle_ask` never mutate curriculum state, and active curriculum sessions never block or interfere with normal answering. Clean per-session deletion verified in `reset_session_data` without cross-session leakage across 8 comprehensive tests.
+  - [x] Curriculum material, 15 Oct: no open mixing curriculum exists to reuse — author lesson
     content in-house. Utilities are clean: fsrs (MIT) scheduler; music21 (BSD-3, keep bundled
     corpus files out unless checked); partitura (Apache-2.0); tonal (MIT); VexFlow (MIT). The six
     MED CC BY songs are the only clean external listening set. Competitive note: 0–100-with-
