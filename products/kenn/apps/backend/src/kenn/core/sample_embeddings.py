@@ -26,6 +26,8 @@ import os
 from pathlib import Path
 from typing import Any
 
+from kenn.core import native_fft
+
 try:  # Optional; abstain honestly rather than fabricate a similarity score.
     import numpy as _np
 except ImportError:
@@ -36,7 +38,7 @@ try:
 except ImportError:
     _ort = None
 
-try:
+try:  # Only for decoding AIFF containers, which the native WAV decoder does not read.
     import librosa as _librosa
 except ImportError:
     _librosa = None
@@ -45,6 +47,12 @@ EMBEDDING_DIM = 512
 TARGET_SAMPLE_RATE = 32000
 TARGET_WINDOW_SAMPLES = 160_000  # 5 seconds at 32kHz, matching the model's validated input
 MAX_CANDIDATES = 25  # bound the per-request inference cost; never a silent full-library scan
+# Read at most 32 MiB of a WAV: covers >5.0 s of stereo 32-bit float at up to
+# 768 kHz. The native decoder accepts a truncated data chunk directly so long
+# stems are never read into memory past the 5 s embedding window.
+_MAX_WAV_READ_BYTES = 32 * 1024 * 1024
+_MIN_SAMPLE_RATE_HZ = 8000
+_MAX_SAMPLE_RATE_HZ = 768000
 
 _DEFAULT_MODEL_DIR = Path(__file__).resolve().parents[1] / "artifacts" / "models" / "panns_cnn10"
 
@@ -81,6 +89,61 @@ def _get_session() -> Any | None:
     return _session
 
 
+def _decode_and_resample_window(path: Path) -> tuple[Any, None] | tuple[None, str]:
+    """Decode up to 5.0 s of audio and resample to a 160,000-sample 32 kHz mono float32 window in C++."""
+    if not native_fft.available():
+        # All resampling and WAV decoding run in the C++ extension; abstain when disabled or missing.
+        return None, "the native DSP extension is not built or is disabled"
+
+    if path.suffix.lower() == ".wav":
+        with path.open("rb") as handle:
+            payload = handle.read(_MAX_WAV_READ_BYTES)
+        decoded = native_fft.decode_pcm(payload)
+        if decoded is None:
+            # 8-bit, multichannel (>2 ch), compressed, empty or malformed WAVs land here.
+            return None, "this WAV could not be decoded (mono or stereo 16/24/32-bit PCM or float only)"
+        channels = decoded["channels"]
+        if not channels or channels[0].size == 0:
+            return None, "audio decoded to zero samples"
+        rate = int(decoded["sample_rate"])
+    else:
+        if _librosa is None:
+            # AIFF has no native container parser yet, and the app bundle ships without librosa.
+            return None, "AIFF decoding needs the optional librosa dependency, which is not installed"
+        try:
+            mono, rate_f = _librosa.load(
+                str(path),
+                sr=None,
+                mono=True,
+                duration=TARGET_WINDOW_SAMPLES / TARGET_SAMPLE_RATE,
+            )
+        except Exception as exc:
+            return None, f"librosa failed to decode this file: {exc}"
+        if mono.size == 0:
+            return None, "audio decoded to zero samples"
+        channels = [mono]
+        rate = int(rate_f)
+
+    if rate < _MIN_SAMPLE_RATE_HZ:
+        return None, f"the file declares a {rate} Hz sample rate, below the {_MIN_SAMPLE_RATE_HZ} Hz embedding minimum"
+    if rate > _MAX_SAMPLE_RATE_HZ:
+        return None, f"the file declares a {rate} Hz sample rate, above the {_MAX_SAMPLE_RATE_HZ} Hz embedding maximum"
+
+    try:
+        y = native_fft.resample_mono_window(
+            channels,
+            rate,
+            target_sample_rate=TARGET_SAMPLE_RATE,
+            target_samples=TARGET_WINDOW_SAMPLES,
+        )
+    except ValueError as exc:
+        # Non-finite (NaN/Inf) samples or malformed channel geometry are rejected by the C++ kernel.
+        return None, f"the audio contains invalid samples: {exc}"
+    if y is None:
+        return None, "the native DSP extension is out of date and has no embedding resampler"
+    return y, None
+
+
 def extract_embedding(path: Path) -> tuple[Any, None] | tuple[None, str]:
     """Real 512D embedding for one audio file, or an honest abstention reason.
 
@@ -90,8 +153,6 @@ def extract_embedding(path: Path) -> tuple[Any, None] | tuple[None, str]:
     """
     if _np is None:
         return None, "the optional numpy dependency is not installed"
-    if _librosa is None:
-        return None, "the optional librosa dependency is not installed"
     session = _get_session()
     if session is None:
         if _ort is None:
@@ -99,18 +160,11 @@ def extract_embedding(path: Path) -> tuple[Any, None] | tuple[None, str]:
         return None, "the embedding model could not be loaded"
     if not path.is_file():
         return None, "sample file was not found on disk"
+    y, decode_reason = _decode_and_resample_window(path)
+    if y is None:
+        return None, decode_reason
     try:
-        y, _sr = _librosa.load(str(path), sr=TARGET_SAMPLE_RATE, mono=True, duration=5.0)
-    except Exception as exc:
-        return None, f"librosa failed to decode this file: {exc}"
-    if y.size == 0:
-        return None, "audio decoded to zero samples"
-    if y.size < TARGET_WINDOW_SAMPLES:
-        y = _np.pad(y, (0, TARGET_WINDOW_SAMPLES - y.size))
-    else:
-        y = y[:TARGET_WINDOW_SAMPLES]
-    try:
-        output = session.run(None, {"input": y.astype(_np.float32)[None, :]})[0]
+        output = session.run(None, {"input": y[None, :]})[0]
     except Exception as exc:
         return None, f"embedding inference raised on this input: {exc}"
     vector = output[0]

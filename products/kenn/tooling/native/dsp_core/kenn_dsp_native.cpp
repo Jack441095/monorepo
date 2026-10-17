@@ -6,6 +6,7 @@
 #include <cstring>
 #include <memory>
 #include <numbers>
+#include <numeric>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -28,6 +29,7 @@
 
 namespace nb = nanobind;
 using FloatInput = nb::ndarray<nb::numpy, const float, nb::ndim<1>, nb::c_contig, nb::device::cpu>;
+using FloatMatrixInput = nb::ndarray<nb::numpy, const float, nb::ndim<2>, nb::c_contig, nb::device::cpu>;
 using DoubleInput = nb::ndarray<nb::numpy, const double, nb::ndim<1>, nb::c_contig, nb::device::cpu>;
 using ByteInput = nb::ndarray<nb::numpy, const std::uint8_t, nb::ndim<1>, nb::c_contig, nb::device::cpu>;
 using FloatOutput = nb::ndarray<nb::numpy, double, nb::shape<-1, -1>, nb::device::cpu>;
@@ -926,6 +928,185 @@ DoubleVectorOutput erb_spectrum(
     return make_owned_double_vector_output(std::move(energies));
 }
 
+double bessel_i0_resample(double x)
+{
+    // Power series for the zero-order modified Bessel function I0(x); at the
+    // Kaiser beta of 5.0 it converges to double precision in ~20 terms, so 60
+    // is a hard loop cap rather than the typical iteration count.
+    double sum = 1.0;
+    double term = 1.0;
+    for (int k = 1; k < 60; ++k) {
+        term *= (x / (2.0 * static_cast<double>(k))) * (x / (2.0 * static_cast<double>(k)));
+        sum += term;
+        if (term < sum * 1e-17)
+            break;
+    }
+    return sum;
+}
+
+std::vector<float> resample_mono_window_kernel(
+    const float* samples,
+    std::size_t frame_count,
+    std::size_t channel_count,
+    std::int64_t sample_rate,
+    std::int64_t target_sample_rate,
+    std::int64_t target_samples)
+{
+    if (frame_count == 0 || channel_count == 0)
+        throw std::invalid_argument("samples must be non-empty");
+    // Refuse implausible rates outside 8..768 kHz so a malformed WAV header
+    // cannot trigger multi-gigabyte allocations or degenerate filter ratios.
+    if (sample_rate < 8000 || sample_rate > 768000)
+        throw std::invalid_argument("sample_rate must be in 8000..768000 Hz");
+    if (target_sample_rate < 8000 || target_sample_rate > 768000)
+        throw std::invalid_argument("target_sample_rate must be in 8000..768000 Hz");
+    // Cap at 16,000,000 output samples (~500 s at 32 kHz, 64 MiB float32).
+    if (target_samples <= 0 || target_samples > 16000000)
+        throw std::invalid_argument("target_samples must be in 1..16000000");
+
+    // Crop input to the target window duration before resampling, matching
+    // librosa.load(..., sr=target_sample_rate, mono=True, duration=target_samples/target_sample_rate).
+    const auto max_in_frames = static_cast<std::size_t>(std::max<std::int64_t>(
+        1,
+        std::llround(static_cast<double>(target_samples) * static_cast<double>(sample_rate)
+                     / static_cast<double>(target_sample_rate))));
+    const std::size_t in_frames = std::min(frame_count, max_in_frames);
+
+    std::vector<double> mono(in_frames, 0.0);
+    const double inv_channels = 1.0 / static_cast<double>(channel_count);
+    for (std::size_t frame = 0; frame < in_frames; ++frame) {
+        double sum = 0.0;
+        const float* row = samples + frame * channel_count;
+        for (std::size_t ch = 0; ch < channel_count; ++ch) {
+            const float value = row[ch];
+            if (!std::isfinite(value))
+                throw std::invalid_argument("audio samples must be finite");
+            sum += static_cast<double>(value);
+        }
+        mono[frame] = sum * inv_channels;
+    }
+
+    const auto out_capacity = static_cast<std::size_t>(target_samples);
+    std::vector<float> output(out_capacity, 0.0f);
+    if (sample_rate == target_sample_rate) {
+        // Already at target rate; copy mono samples directly and leave any tail zero-padded.
+        const std::size_t copy_count = std::min(in_frames, out_capacity);
+        for (std::size_t i = 0; i < copy_count; ++i)
+            output[i] = static_cast<float>(mono[i]);
+        return output;
+    }
+
+    const std::int64_t g = std::gcd(target_sample_rate, sample_rate);
+    const auto up = static_cast<std::size_t>(target_sample_rate / g);
+    const auto down = static_cast<std::size_t>(sample_rate / g);
+    const std::size_t max_rate = std::max(up, down);
+    const std::size_t out_frames = std::min(
+        out_capacity,
+        static_cast<std::size_t>((static_cast<std::uint64_t>(in_frames) * up + down - 1) / down));
+
+    // Standard audio rates (8, 11.025, 16, 22.05, 24, 32, 44.1, 48, 88.2, 96,
+    // 176.4, 192, 352.8, 384, 768 kHz -> 32 kHz) all have max(up, down) <= 1411.
+    // Use the exact scipy.signal.resample_poly Kaiser (beta = 5.0, half_len = 10 * max_rate)
+    // polyphase FIR when max_rate <= 2048, and fall back to direct continuous-time
+    // Kaiser-sinc evaluation for arbitrary coprime rates so filter memory stays bounded.
+    constexpr double kKaiserBeta = 5.0;
+    const double denom_i0 = bessel_i0_resample(kKaiserBeta);
+    if (max_rate <= 2048) {
+        const std::size_t half_len = 10 * max_rate;
+        const std::size_t taps = 2 * half_len + 1;
+        const double cutoff = 1.0 / static_cast<double>(max_rate);
+        std::vector<double> h(taps, 0.0);
+        double h_sum = 0.0;
+        for (std::size_t idx = 0; idx < taps; ++idx) {
+            const double m = static_cast<double>(idx) - static_cast<double>(half_len);
+            const double x = cutoff * m;
+            const double sinc = (x == 0.0)
+                ? 1.0
+                : std::sin(std::numbers::pi * x) / (std::numbers::pi * x);
+            const double ratio = 2.0 * static_cast<double>(idx) / static_cast<double>(taps - 1) - 1.0;
+            const double win = bessel_i0_resample(
+                kKaiserBeta * std::sqrt(std::max(0.0, 1.0 - ratio * ratio))) / denom_i0;
+            h[idx] = cutoff * sinc * win;
+            h_sum += h[idx];
+        }
+        const double gain = static_cast<double>(up) / h_sum;
+        for (double& coeff : h)
+            coeff *= gain;
+
+        const std::size_t taps_per_phase = (taps + up - 1) / up;
+        std::vector<double> poly(up * taps_per_phase, 0.0);
+        for (std::size_t phase = 0; phase < up; ++phase) {
+            double* row = poly.data() + phase * taps_per_phase;
+            for (std::size_t k = 0; phase + k * up < taps; ++k)
+                row[k] = h[phase + k * up];
+        }
+
+        for (std::size_t y_idx = 0; y_idx < out_frames; ++y_idx) {
+            const std::uint64_t u = static_cast<std::uint64_t>(y_idx) * down + half_len;
+            const auto phase = static_cast<std::size_t>(u % up);
+            const auto base_n = static_cast<std::size_t>(u / up);
+            const std::size_t k_min = (base_n >= in_frames) ? (base_n - (in_frames - 1)) : 0;
+            const std::size_t max_k_for_phase = (taps - 1 - phase) / up;
+            const std::size_t k_max = std::min(base_n, max_k_for_phase);
+            const double* phase_row = poly.data() + phase * taps_per_phase;
+            double acc = 0.0;
+            for (std::size_t k = k_min; k <= k_max; ++k)
+                acc += phase_row[k] * mono[base_n - k];
+            output[y_idx] = static_cast<float>(acc);
+        }
+        return output;
+    }
+
+    const double step = static_cast<double>(sample_rate) / static_cast<double>(target_sample_rate);
+    const double cutoff = std::min(1.0, 1.0 / step);
+    const double half_width = 10.0 / cutoff;
+    for (std::size_t y_idx = 0; y_idx < out_frames; ++y_idx) {
+        const double center = static_cast<double>(y_idx) * step;
+        const auto n_min = std::max<std::int64_t>(
+            0, static_cast<std::int64_t>(std::ceil(center - half_width)));
+        const auto n_max = std::min<std::int64_t>(
+            static_cast<std::int64_t>(in_frames) - 1,
+            static_cast<std::int64_t>(std::floor(center + half_width)));
+        double acc = 0.0;
+        for (std::int64_t n = n_min; n <= n_max; ++n) {
+            const double delta = center - static_cast<double>(n);
+            const double x = cutoff * delta;
+            const double sinc = (x == 0.0)
+                ? 1.0
+                : std::sin(std::numbers::pi * x) / (std::numbers::pi * x);
+            const double ratio = delta / half_width;
+            const double win = bessel_i0_resample(
+                kKaiserBeta * std::sqrt(std::max(0.0, 1.0 - ratio * ratio))) / denom_i0;
+            acc += cutoff * sinc * win * mono[static_cast<std::size_t>(n)];
+        }
+        output[y_idx] = static_cast<float>(acc);
+    }
+    return output;
+}
+
+FloatVectorOutput resample_mono_window(
+    FloatMatrixInput samples,
+    std::int64_t sample_rate,
+    std::int64_t target_sample_rate,
+    std::int64_t target_samples)
+{
+    if (samples.ndim() != 2 || samples.shape(0) == 0 || samples.shape(1) == 0)
+        throw nb::value_error("samples must be a non-empty 2D (frames, channels) float32 NumPy array");
+
+    std::vector<float> resampled;
+    {
+        nb::gil_scoped_release release;
+        resampled = resample_mono_window_kernel(
+            samples.data(),
+            samples.shape(0),
+            samples.shape(1),
+            sample_rate,
+            target_sample_rate,
+            target_samples);
+    }
+    return make_owned_float_vector_output(std::move(resampled));
+}
+
 } // namespace
 
 NB_MODULE(_kenn_dsp_native, module)
@@ -946,6 +1127,10 @@ NB_MODULE(_kenn_dsp_native, module)
                nb::arg("magnitudes"), nb::arg("sample_rate") = 44100,
                nb::arg("fft_size") = 4096, nb::arg("num_bands") = 40,
                "Group one-sided FFT magnitudes into discrete Glasberg & Moore ERB band energies.");
+    module.def("resample_mono_window", &resample_mono_window,
+               nb::arg("samples"), nb::arg("sample_rate"),
+               nb::arg("target_sample_rate") = 32000, nb::arg("target_samples") = 160000,
+               "Fold multichannel audio to mono, resample via a Kaiser-windowed polyphase FIR, and pad/truncate to target_samples.");
     module.def("mono_metrics", &mono_metrics,
                nb::arg("samples"),
                "Compute bulk mono channel statistics for an opt-in native analysis path.");

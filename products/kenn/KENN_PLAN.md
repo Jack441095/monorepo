@@ -59,13 +59,13 @@ Decisions already made:
   Existing Python DSP is moved, not extended. Each piece moves when a C++ replacement
   matches it (or beats it on labelled audio, where there is no reference to match),
   and a Python copy that nothing needs as a fallback is then deleted.
-   Still in Python on 17 Oct: the librosa feature load in `sample_embeddings.py`,
-  AIFF decode for sample BPM/key, and the pyloudnorm/NumPy fallbacks behind the
-  native defaults. Audited 17 Oct: `target_curves.py` and `acoustic_calibration.py`
-  do no DSP (arithmetic on measured summaries); in `psychoacoustics.py` only
-  `compute_erb_spectrum` (FFT bins to 40 ERB bands, used by the reference
-  matcher) is DSP, the rest is masking maths on band profiles. A whole-backend
-  rewrite is outside this plan.
+   Still in Python on 17 Oct: AIFF container decode for sample BPM/key and embeddings
+  (which still resample in C++), 8-bit/>2-channel WAV decode fallback in
+  `track_diagnostic.py`, and the pyloudnorm/NumPy fallbacks behind the native
+  defaults. Audited 17 Oct: `target_curves.py` and `acoustic_calibration.py`
+  do no DSP (arithmetic on measured summaries); in `psychoacoustics.py`
+  `compute_erb_spectrum` moved to C++ (`4b73f9c3`), and the rest is masking
+  maths on band profiles. A whole-backend rewrite is outside this plan.
   - [x] Key/tempo review fixes before merge (adversary review, 17 Oct, landed
     `dcd1c48f`). Blockers:
     a WAV declaring a 2 Hz sample rate sends the chroma loop into an endless
@@ -183,7 +183,7 @@ Decisions already made:
       48 skipped, 3 pre-existing failures (`test_mixing_doctor` x2,
       `test_fixed_session_grounded_benchmark_qualifies`).
   - [x] Move `compute_erb_spectrum` in `psychoacoustics.py` to C++ (17 Oct,
-    `docs/research/CPP_DSP_ERB_SPECTRUM_RECEIPT.md`).
+    landed `4b73f9c3`, `docs/research/CPP_DSP_ERB_SPECTRUM_RECEIPT.md`).
     - Added `erb_spectrum` to `tooling/native/dsp_core/kenn_dsp_native.cpp` and
       `native_fft.py`, routed `compute_erb_spectrum` through it, and removed
       `import numpy as np` from `psychoacoustics.py`.
@@ -195,7 +195,30 @@ Decisions already made:
       boundary/NaN/band-count validation); all 29 tests across
       `test_psychoacoustics.py` and `test_reference_matcher.py` pass on both
       Accelerate and scalar (`-DKENN_USE_ACCELERATE=OFF`) builds.
-  - [ ] Move the `librosa.load` decode/resample in `sample_embeddings.py` to C++.
+  - [x] Move the `librosa.load` decode/resample in `sample_embeddings.py` to C++
+    (17 Oct, `docs/research/CPP_DSP_SAMPLE_EMBEDDINGS_RECEIPT.md`).
+    - Added `resample_mono_window` to `tooling/native/dsp_core/kenn_dsp_native.cpp`
+      and `native_fft.py`, and routed `sample_embeddings.py` through
+      `native_fft.decode_pcm` (bounded at 32 MiB) plus `resample_mono_window`
+      (mono fold, 5.0 s crop, Kaiser `beta = 5.0` polyphase FIR resampling to
+      32 kHz, and 160,000-sample zero-pad/truncate in C++). `_librosa` stays
+      optional only for `.aif`/`.aiff` container decode (`sr=None`), which then
+      resamples in C++.
+    - Parity across 25 real sample-pack WAVs (`Audio-Assets/SLO-Testing/sample_pack_testing`):
+      max abs waveform difference `2.328e-10` vs `scipy.signal.resample_poly`;
+      PANNs Cnn10 512D embedding cosine similarity `0.999951` min, `0.999993`
+      mean, `1.000000` median vs `librosa.load`, with `25/25` top-1
+      nearest-neighbour agreement. Decode + resample latency across the 25
+      files dropped from `792.2 ms` to `61.9 ms` (`12.8x`), and end-to-end
+      embedding time (including ONNX inference) dropped from `2.144 s` to
+      `1.153 s`.
+    - Added tests in `test_sample_embeddings.py` for WAV decoding without
+      `librosa`, stereo folding and 5.0 s padding, coprime sample rate
+      (`44101 Hz`), `2 Hz` and `60 MHz` rate rejection, `NaN` rejection, stale
+      extension fallback, and `KENN_DSP_NATIVE=0` abstention; all 12 tests pass
+      on both Accelerate and scalar (`-DKENN_USE_ACCELERATE=OFF`) builds, and
+      the full suite is 6412 passed, 48 skipped, 3 pre-existing failures
+      (`test_mixing_doctor` x2, `test_fixed_session_grounded_benchmark_qualifies`).
 - AbletonOSC is the Live transport owner. UI, HTTP, voice and MCP must share the
   same typed policy and execution services, without a second write authority.
 - Preferences require explicit opt-in. Session inference, diagnostic hypotheses

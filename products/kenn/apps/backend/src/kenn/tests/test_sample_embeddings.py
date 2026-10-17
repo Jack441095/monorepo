@@ -57,12 +57,87 @@ def test_extract_embedding_abstains_honestly_without_onnxruntime(tmp_path, monke
     assert "not installed" in reason
 
 
-def test_extract_embedding_abstains_honestly_without_librosa(tmp_path, monkeypatch) -> None:
+def test_extract_embedding_abstains_honestly_without_librosa_on_aiff_and_decodes_wav_natively(tmp_path, monkeypatch) -> None:
     monkeypatch.setattr(sample_embeddings, "_librosa", None)
-    path = _tone_wav(tmp_path, "tone.wav")
-    vector, reason = extract_embedding(path)
-    assert vector is None
-    assert "not installed" in reason
+    aiff_path = tmp_path / "pad.aif"
+    aiff_path.write_bytes(b"FORM" + b"\x00" * 40)
+    window, aiff_reason = sample_embeddings._decode_and_resample_window(aiff_path)
+    assert window is None
+    assert "AIFF" in aiff_reason
+    assert "not installed" in aiff_reason
+
+    wav_path = _tone_wav(tmp_path, "tone.wav", framerate=44100)
+    wav_window, wav_reason = sample_embeddings._decode_and_resample_window(wav_path)
+    assert wav_reason is None
+    assert wav_window is not None
+    assert wav_window.shape == (sample_embeddings.TARGET_WINDOW_SAMPLES,)
+
+
+def test_native_resample_mono_window_folds_stereo_and_pads_or_truncates_to_5_seconds(tmp_path) -> None:
+    from kenn.core import native_fft
+
+    if not native_fft.available() or sample_embeddings._np is None:
+        pytest.skip("native DSP extension or numpy is not available in this environment")
+    np = sample_embeddings._np
+
+    # 1.5 s stereo 48 kHz 440 Hz tone -> resampled to 48,000 active samples + 112,000 zero-padded tail at 32 kHz
+    sr = 48000
+    t = np.arange(int(1.5 * sr), dtype=np.float64) / sr
+    left = (0.6 * np.sin(2.0 * np.pi * 440.0 * t)).astype(np.float32)
+    right = (0.2 * np.sin(2.0 * np.pi * 440.0 * t)).astype(np.float32)
+    window = native_fft.resample_mono_window([left, right], sr)
+    assert window is not None
+    assert window.shape == (sample_embeddings.TARGET_WINDOW_SAMPLES,)
+    # Active region (skipping 20-sample filter edge transient) has peak ~0.4 (mean of 0.6 and 0.2)
+    assert float(np.max(np.abs(window[100:47900]))) == pytest.approx(0.4, abs=0.01)
+    # Tail beyond 1.5 s (48,000 samples at 32 kHz) is zero-padded
+    assert float(np.max(np.abs(window[48005:]))) == 0.0
+
+    # Coprime sample rate (44,101 Hz) exercises the continuous-time Kaiser-sinc branch
+    t_coprime = np.arange(44101, dtype=np.float64) / 44101.0
+    mono_coprime = (0.5 * np.sin(2.0 * np.pi * 440.0 * t_coprime)).astype(np.float32)
+    coprime_win = native_fft.resample_mono_window([mono_coprime], 44101)
+    assert coprime_win.shape == (sample_embeddings.TARGET_WINDOW_SAMPLES,)
+    assert float(np.max(np.abs(coprime_win[100:31900]))) == pytest.approx(0.5, abs=0.01)
+    assert float(np.max(np.abs(coprime_win[32005:]))) == 0.0
+
+
+def test_decode_and_resample_window_rejects_out_of_range_rates_nan_and_stale_extension(tmp_path, monkeypatch) -> None:
+    from kenn.core import native_fft
+
+    if not native_fft.available() or sample_embeddings._np is None:
+        pytest.skip("native DSP extension or numpy is not available in this environment")
+    np = sample_embeddings._np
+
+    for bad_rate, label in ((2, "2 Hz"), (60_000_000, "60000000 Hz")):
+        bad_wav = tmp_path / f"rate_{bad_rate}.wav"
+        with wave.open(str(bad_wav), "wb") as handle:
+            handle.setnchannels(1)
+            handle.setsampwidth(2)
+            handle.setframerate(bad_rate)
+            handle.writeframes(np.full(2000, 1000, dtype="<i2").tobytes())
+        y, reason = sample_embeddings._decode_and_resample_window(bad_wav)
+        assert y is None
+        assert label in reason
+
+    with pytest.raises(ValueError, match="finite"):
+        native_fft.resample_mono_window([np.array([0.1, float("nan"), 0.2], dtype=np.float32)], 44100)
+
+    monkeypatch.setenv("KENN_DSP_NATIVE", "0")
+    y_off, off_reason = sample_embeddings._decode_and_resample_window(_tone_wav(tmp_path, "off.wav"))
+    assert y_off is None
+    assert "not built or is disabled" in off_reason
+    monkeypatch.delenv("KENN_DSP_NATIVE", raising=False)
+
+    real_module = native_fft._load()
+
+    class _StaleModule:
+        decode_pcm = staticmethod(real_module.decode_pcm)
+
+    monkeypatch.setattr(native_fft, "_load", lambda: _StaleModule)
+    y_stale, stale_reason = sample_embeddings._decode_and_resample_window(_tone_wav(tmp_path, "stale.wav"))
+    assert y_stale is None
+    assert "out of date" in stale_reason
 
 
 def test_cosine_similarity_of_identical_vectors_is_one() -> None:

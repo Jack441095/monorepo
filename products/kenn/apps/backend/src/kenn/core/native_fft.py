@@ -297,6 +297,47 @@ def erb_spectrum(
     return [float(x) for x in function(values, int(sample_rate), int(fft_size), int(num_bands))]
 
 
+def resample_mono_window(
+    channels: list[Any] | Any,
+    sample_rate: int,
+    *,
+    target_sample_rate: int = 32000,
+    target_samples: int = 160000,
+) -> Any | None:
+    """Fold channels to mono, resample via a Kaiser-windowed polyphase FIR, and pad/truncate to target_samples.
+
+    Returns a 1D float32 NumPy array of length ``target_samples``, or ``None`` when the
+    native extension is disabled or predates ``resample_mono_window``.
+    """
+    module = _load()
+    function = None if module is None else getattr(module, "resample_mono_window", None)
+    if function is None:
+        # An older or disabled extension lacks the kernel; let the caller abstain honestly.
+        return None
+    import numpy as np
+
+    if isinstance(channels, np.ndarray) and channels.ndim == 2:
+        matrix = np.ascontiguousarray(channels, dtype=np.float32)
+    elif isinstance(channels, np.ndarray) and channels.ndim == 1:
+        if channels.size == 0:
+            raise ValueError("native resample_mono_window requires non-empty channels")
+        matrix = np.ascontiguousarray(channels.reshape(-1, 1), dtype=np.float32)
+    else:
+        arrays = [np.asarray(ch, dtype=np.float32) for ch in channels]
+        if not arrays or any(arr.ndim != 1 or arr.size == 0 for arr in arrays):
+            raise ValueError("native resample_mono_window requires non-empty one-dimensional channels")
+        if any(arr.shape != arrays[0].shape for arr in arrays[1:]):
+            raise ValueError("native resample_mono_window requires equal-length channels")
+        matrix = np.ascontiguousarray(np.column_stack(arrays), dtype=np.float32)
+    if matrix.shape[0] == 0 or matrix.shape[1] == 0:
+        raise ValueError("native resample_mono_window requires a non-empty (frames, channels) matrix")
+    return np.asarray(
+        function(matrix, int(sample_rate), int(target_sample_rate), int(target_samples)),
+        dtype=np.float32,
+        order="C",
+    )
+
+
 __all__ = [
     "available",
     "channel_metrics",
@@ -305,6 +346,7 @@ __all__ = [
     "key_tempo_features",
     "loudness_metrics",
     "masking_band_energy",
+    "resample_mono_window",
     "spectral_powers",
     "track_diagnostic_features",
 ]
