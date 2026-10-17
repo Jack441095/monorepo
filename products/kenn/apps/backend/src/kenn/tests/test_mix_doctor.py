@@ -389,3 +389,82 @@ def test_the_report_has_no_letter_grade():
     assert not hasattr(report, "grade")
     assert "grade" not in report.to_dict()
     assert report.to_dict()["meaning"] == report.meaning
+
+
+def test_seven_band_spectral_harmonization_bridges_analyser_to_doctor_bands():
+    # Analyser emits 7 bands (sub, bass, low_mids, mids, presence, sibilance, air).
+    # Mix Doctor harmonizes these into the 4 classic diagnostic bands:
+    # sub -> sub_20_60hz, low_mids -> low_mid_200_500hz,
+    # presence + 0.5 * sibilance -> high_mid_2_6khz, air -> air_10_20khz.
+    session = {"tracks": [], "master": {}}
+    meters = {
+        "integrated_lufs": -14.0,
+        "true_peak_dbtp": -1.2,
+        "phase_correlation": 0.90,
+        "bands": {
+            "sub": 0.20,
+            "bass": 0.15,
+            "low_mids": 0.25,
+            "mids": 0.15,
+            "presence": 0.10,
+            "sibilance": 0.08,
+            "air": 0.07,
+        },
+    }
+    report = MixDoctor().audit_session(session, meters=meters)
+
+    # 4 of 5 dimensions measured (spectral_balance is now scored from harmonized 7 bands)
+    assert report.points_available == 24.0
+    telemetry = report.loudness_telemetry
+    assert telemetry["sub_energy"] == pytest.approx(0.20, abs=1e-4)
+    assert telemetry["low_mid_energy"] == pytest.approx(0.25, abs=1e-4)
+    # presence (0.10) + 0.5 * sibilance (0.08) = 0.14
+    assert telemetry["high_mid_energy"] == pytest.approx(0.14, abs=1e-4)
+    assert telemetry["air_energy"] == pytest.approx(0.07, abs=1e-4)
+    # Air under 10% loses 3 working points (0.9 report points) under the house rule
+    spectral_score = report.dimension_scores["spectral_balance"]
+    assert spectral_score == pytest.approx(5.1, abs=0.1)
+
+
+def test_reference_free_tonal_bump_detection_in_mix_doctor():
+    # Log LTAS with a prominent 6 dB resonant peak at ~3 kHz among adjacent bands at -18 dB
+    log_bands = [-18.0] * 40
+    log_bands[22] = -11.0  # 7 dB prominence above -18 dB baseline
+    session = {"tracks": [], "master": {}}
+    meters = {
+        "integrated_lufs": -14.0,
+        "true_peak_dbtp": -1.0,
+        "phase_correlation": 0.92,
+        "log_bands_40": log_bands,
+    }
+    report = MixDoctor().audit_session(session, meters=meters)
+
+    bump_issues = [i for i in report.all_issues if "Resonant tonal bump" in i.message]
+    assert len(bump_issues) == 1
+    issue = bump_issues[0]
+    assert issue.severity == "WARNING"  # Prominence >= 5.0 dB triggers WARNING severity
+    assert issue.points_lost > 0.0
+    assert issue.remediation_proposal is not None
+    assert issue.remediation_proposal["action"] == "apply_eq_cut"
+    # Remediation DAG contains matching EQ cut step
+    assert any(step["action"] == "apply_eq_cut" for step in report.remediation_dag)
+
+
+def test_stem_significance_gate_withholds_near_silent_readings_under_minus_80_dbfs():
+    # When a track or master source is below -80 dBFS, meter readings reflect digital noise
+    # floor rather than intentional audio; telemetry must withhold readings to avoid false findings.
+    session = {"tracks": [], "master": {}}
+    quiet_meters = {
+        "integrated_lufs": -85.0,
+        "true_peak_dbtp": -82.0,
+        "phase_correlation": 0.99,
+        "spectral_energy": {"sub_20_60hz": 0.25},
+    }
+    report = MixDoctor().audit_session(session, meters=quiet_meters)
+
+    # All telemetry is withheld (set to None)
+    assert all(val is None for val in report.loudness_telemetry.values())
+    # No dimensions scored because telemetry was withheld
+    assert report.points_available == 0.0
+    assert report.mqm_score == 0.0
+

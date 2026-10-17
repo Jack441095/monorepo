@@ -25,6 +25,7 @@ status of this and the other explicitly-not-evaluated fault families.
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 try:
@@ -75,6 +76,8 @@ ACTIVE_FLOOR_DBFS = -50.0
 COMPETING_WITHIN_DB = 6.0
 COMPETING_FRACTION_FLAG = 0.20
 MAX_STEMS = 12
+# Same -60 dBFS significance boundary as local_engine's silence detector
+STEM_MIN_RMS_DBFS = -60.0
 
 
 def _evidence_packet(
@@ -256,12 +259,32 @@ def analyze_stem_masking(stems: list[tuple[str, bytes]]) -> dict[str, Any]:
     band_energy_db = {label: _to_dbfs(energy) for label, energy in band_energy.items()}
 
     frame_count = next(iter(band_energy_db.values())).shape[0]
+
+    # Stem significance gate: compute overall level/RMS for each stem.
+    # Stems at or below -60.0 dBFS are silent or near-silent; zero out active_frames
+    # so they cannot participate in active masking pairs or trigger competition candidates.
+    stem_rms: dict[str, float] = {}
+    for label, (mono, _fr) in decoded.items():
+        mono_seg = mono[:shortest]
+        if len(mono_seg) > 0 and _np is not None:
+            p = float(_np.mean(mono_seg ** 2))
+            stem_rms[label] = 10.0 * math.log10(max(1e-12, p))
+        else:
+            stem_rms[label] = -90.0
+
     # Pair activity spans any measured band: two playing stems in separate
     # frequency ranges can support a measured zero without competing in one band.
-    active_frames = {
-        label: (db_energy > ACTIVE_FLOOR_DBFS).any(axis=1)
-        for label, db_energy in band_energy_db.items()
-    }
+    active_frames: dict[str, Any] = {}
+    silent_stems: set[str] = set()
+    for label, db_energy in band_energy_db.items():
+        max_energy_db = float(db_energy.max()) if db_energy.size > 0 else -90.0
+        effective_level_db = max(stem_rms.get(label, -90.0), max_energy_db)
+        if effective_level_db <= STEM_MIN_RMS_DBFS:
+            active_frames[label] = _np.zeros(frame_count, dtype=bool) if _np is not None else []
+            silent_stems.add(label)
+        else:
+            active_frames[label] = (db_energy > ACTIVE_FLOOR_DBFS).any(axis=1)
+
     activity_pairs = [
         {
             "stems": [label_a, label_b],
@@ -284,6 +307,9 @@ def analyze_stem_masking(stems: list[tuple[str, bytes]]) -> dict[str, Any]:
     findings: list[dict[str, Any]] = []
     for i, label_a in enumerate(labels):
         for label_b in labels[i + 1 :]:
+            if label_a in silent_stems or label_b in silent_stems:
+                # Withhold competition candidates for silent or near-silent stems (< -60 dBFS)
+                continue
             db_a, db_b = band_energy_db[label_a], band_energy_db[label_b]
             n_frames = db_a.shape[0]
             if n_frames == 0:
@@ -337,6 +363,10 @@ def analyze_stem_masking(stems: list[tuple[str, bytes]]) -> dict[str, Any]:
         # Without an active pair, no candidate count can distinguish no conflict from no signal.
         limitations.append(
             f"No stem pair was simultaneously active above {ACTIVE_FLOOR_DBFS:g} dBFS; masking candidate count and strongest-pair evidence are withheld."
+        )
+    for s_label in sorted(silent_stems):
+        limitations.append(
+            f"Stem '{s_label}' is silent or near-silent (RMS <= {STEM_MIN_RMS_DBFS:g} dBFS); active frames and masking candidates are withheld."
         )
     return {
         "schema": SCHEMA,

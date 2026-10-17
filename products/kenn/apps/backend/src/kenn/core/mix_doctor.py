@@ -130,6 +130,113 @@ def score_stereo_correlation(correlation: Any) -> Optional[Dict[str, Any]]:
     }
 
 
+def detect_tonal_bumps(
+    spectrum: Any,
+    *,
+    threshold_db: float = 3.5,
+    sample_rate: int = 44100,
+) -> List[Dict[str, Any]]:
+    """Reference-free tonal-bump detector for the no-reference case.
+
+    Flags resonant peaks that stick up relative to their immediate frequency neighbours by at least
+    `threshold_db` (default 3.5 dB). Operates on 40-band logarithmic LTAS (20 Hz to 20 kHz) or
+    7 standard mixing bands. A smooth broadband slope (e.g. pink noise at -3 dB/octave) has zero
+    prominence and triggers no findings; only resonant peaks deviating from the local baseline are flagged.
+    """
+    if not spectrum:
+        return []
+
+    bumps: List[Dict[str, Any]] = []
+
+    # Case 1: 40-band logarithmic LTAS (or arbitrary list of dB band values)
+    if isinstance(spectrum, (list, tuple)):
+        bands = [float(v) for v in spectrum if isinstance(v, (int, float)) and math.isfinite(v)]
+        n = len(bands)
+        if n < 3:
+            return []
+        f_min, f_max = 20.0, 20000.0
+        centers = [f_min * ((f_max / f_min) ** (i / float(max(1, n - 1)))) for i in range(n)]
+
+        for i in range(1, n - 1):
+            baseline = (bands[i - 1] + bands[i + 1]) * 0.5
+            prominence = bands[i] - baseline
+            # Must be a local peak and exceed prominence threshold
+            if bands[i] > bands[i - 1] and bands[i] > bands[i + 1] and prominence >= threshold_db:
+                fc = centers[i]
+                gain_cut = -round(min(6.0, max(1.0, prominence * 0.7)), 1)
+                severity = "WARNING" if prominence >= 5.0 else "ADVISORY"
+                bumps.append({
+                    "band_index": i,
+                    "center_hz": round(fc, 1),
+                    "prominence_db": round(prominence, 2),
+                    "level_db": round(bands[i], 2),
+                    "baseline_db": round(baseline, 2),
+                    "severity": severity,
+                    "remediation": {
+                        "action": "apply_eq_cut",
+                        "frequency_hz": round(fc, 1),
+                        "gain_delta_db": gain_cut,
+                        "q": 2.5,
+                        "rationale": f"Attenuate resonant tonal bump at {int(fc)} Hz (+{prominence:.1f} dB prominence above adjacent bands).",
+                    },
+                })
+        return bumps
+
+    # Case 2: 7 standard mixing bands dict
+    if isinstance(spectrum, dict):
+        band_order = ["sub", "bass", "low_mids", "mids", "presence", "sibilance", "air"]
+        centers_7 = {
+            "sub": 45.0,
+            "bass": 120.0,
+            "low_mids": 350.0,
+            "mids": 1000.0,
+            "presence": 3000.0,
+            "sibilance": 6000.0,
+            "air": 12000.0,
+        }
+        present_bands = [b for b in band_order if b in spectrum]
+        if len(present_bands) < 3:
+            return []
+
+        raw_vals = [float(spectrum[b]) for b in present_bands if isinstance(spectrum[b], (int, float)) and math.isfinite(spectrum[b])]
+        if len(raw_vals) != len(present_bands):
+            return []
+
+        # If linear energy fractions (values <= 1.0), convert to dB to measure relative log prominence
+        if all(v <= 1.0 for v in raw_vals) and sum(raw_vals) > 0.0:
+            db_vals = [10.0 * math.log10(max(1e-6, v)) for v in raw_vals]
+        else:
+            db_vals = raw_vals
+
+        for i in range(1, len(present_bands) - 1):
+            baseline = (db_vals[i - 1] + db_vals[i + 1]) * 0.5
+            prominence = db_vals[i] - baseline
+            if db_vals[i] > db_vals[i - 1] and db_vals[i] > db_vals[i + 1] and prominence >= threshold_db:
+                b_name = present_bands[i]
+                fc = centers_7.get(b_name, 1000.0)
+                gain_cut = -round(min(6.0, max(1.0, prominence * 0.7)), 1)
+                severity = "WARNING" if prominence >= 5.0 else "ADVISORY"
+                bumps.append({
+                    "band_index": i,
+                    "band_name": b_name,
+                    "center_hz": round(fc, 1),
+                    "prominence_db": round(prominence, 2),
+                    "level_db": round(db_vals[i], 2),
+                    "baseline_db": round(baseline, 2),
+                    "severity": severity,
+                    "remediation": {
+                        "action": "apply_eq_cut",
+                        "frequency_hz": round(fc, 1),
+                        "gain_delta_db": gain_cut,
+                        "q": 2.0,
+                        "rationale": f"Attenuate resonant tonal bump in {b_name} band at {int(fc)} Hz (+{prominence:.1f} dB prominence).",
+                    },
+                })
+        return bumps
+
+    return []
+
+
 class MixDoctor:
     """Deterministic Multi-Track Session Auditor and MQM Metric Evaluator."""
 
@@ -152,12 +259,24 @@ class MixDoctor:
 
         telemetry = self._extract_telemetry(meters, tracks, master)
 
+        # Reference-free tonal-bump analysis: check 40-band log LTAS or 7 standard mixing bands
+        log_bands = None
+        if isinstance(meters, dict):
+            log_bands = meters.get("log_bands_40")
+            if not isinstance(log_bands, list) and isinstance(meters.get("spectral"), dict):
+                log_bands = meters["spectral"].get("log_bands_40")
+        has_log_bands = isinstance(log_bands, list) and len(log_bands) >= 3
+        bump_source = log_bands if has_log_bands else (meters.get("bands") if isinstance(meters, dict) else None) or {}
+        bumps = detect_tonal_bumps(bump_source)
+
         # Each dimension reports a score, or None when none of the readings it judges came from a meter.
         # A missing meter must not look like a healthy mix (it used to: the old defaults scored 20/20),
         # so an unscored dimension is left out of the total instead of being filled in.
         s_dynamic, dynamic_issues, dynamic_recs = self._audit_dynamic_health(tracks, master, telemetry)
         s_low_end, low_end_issues, low_end_recs = self._audit_low_end_control(tracks, telemetry)
-        s_spectral, spectral_issues, spectral_recs = self._audit_spectral_balance(tracks, telemetry)
+        s_spectral, spectral_issues, spectral_recs = self._audit_spectral_balance(
+            tracks, telemetry, bumps=bumps, has_log_bands=has_log_bands
+        )
         # Stem separation is never scored: its only checks guess from track names and fader positions, and they
         # are advice-only now, so a score here would be 6 points nobody could lose.
         s_unmasking, unmasking_issues, unmasking_recs = self._audit_stem_separation(tracks, telemetry)
@@ -240,18 +359,71 @@ class MixDoctor:
                     return number
             return None
 
+        # Stem significance gate: sources at or below -80 dBFS are silent or near-silent.
+        # Withhold meter readings rather than grading digital noise floor or placeholder silence.
+        level_candidates = [
+            reading(m, "true_peak_dbtp", "peak_dbfs"),
+            reading(m, "integrated_lufs", "lufs"),
+            reading(m, "rms_dbfs", "rms"),
+        ]
+        present_levels = [lvl for lvl in level_candidates if lvl is not None]
+        if m.get("is_silent") is True or (present_levels and max(present_levels) <= -80.0):
+            return {
+                "integrated_lufs": None,
+                "true_peak_dbtp": None,
+                "phase_correlation": None,
+                "crest_factor_db": None,
+                "sub_energy": None,
+                "low_mid_energy": None,
+                "high_mid_energy": None,
+                "air_energy": None,
+            }
+
         spectral = m.get("spectral_energy")
         spectral = spectral if isinstance(spectral, dict) else {}
+
+        # Look for 7-band spectral distributions in bands, spectral_energy, or top-level meters
+        # Analyser bands: "sub" (20-60 Hz), "bass" (60-250 Hz), "low_mids" (250-500 Hz),
+        # "mids" (500-2000 Hz), "presence" (2000-4000 Hz), "sibilance" (4000-8000 Hz), "air" (8000-20000 Hz).
+        bands_dict: Dict[str, Any] = {}
+        for cand in (m.get("bands"), (m.get("spectral") or {}).get("bands"), spectral, m):
+            if isinstance(cand, dict) and any(k in cand for k in ("sub", "bass", "low_mids", "mids", "presence", "sibilance", "air")):
+                bands_dict = cand
+                break
+
+        sub = reading(spectral, "sub_20_60hz")
+        if sub is None and bands_dict:
+            sub = reading(bands_dict, "sub")
+
+        low_mid = reading(spectral, "low_mid_200_500hz")
+        if low_mid is None and bands_dict:
+            low_mid = reading(bands_dict, "low_mids", "low_mid")
+
+        high_mid = reading(spectral, "high_mid_2_6khz")
+        if high_mid is None and bands_dict:
+            presence = reading(bands_dict, "presence")
+            sibilance = reading(bands_dict, "sibilance")
+            if presence is not None and sibilance is not None:
+                # 2-6 kHz spans presence (2-4 kHz) and the lower half of sibilance (4-8 kHz)
+                high_mid = round(presence + 0.5 * sibilance, 4)
+            elif presence is not None:
+                high_mid = presence
+            else:
+                high_mid = reading(bands_dict, "high_mids", "high_mid")
+
+        air = reading(spectral, "air_10_20khz")
+        if air is None and bands_dict:
+            air = reading(bands_dict, "air")
 
         return {
             "integrated_lufs": reading(m, "integrated_lufs", "lufs"),
             "true_peak_dbtp": reading(m, "true_peak_dbtp", "peak_dbfs"),
             "phase_correlation": reading(m, "phase_correlation", "correlation"),
             "crest_factor_db": reading(m, "crest_factor_db", "crest_db"),
-            "sub_energy": reading(spectral, "sub_20_60hz"),
-            "low_mid_energy": reading(spectral, "low_mid_200_500hz"),
-            "high_mid_energy": reading(spectral, "high_mid_2_6khz"),
-            "air_energy": reading(spectral, "air_10_20khz"),
+            "sub_energy": sub,
+            "low_mid_energy": low_mid,
+            "high_mid_energy": high_mid,
+            "air_energy": air,
         }
 
     def _audit_dynamic_health(
@@ -424,6 +596,8 @@ class MixDoctor:
         self,
         tracks: List[Dict[str, Any]],
         telemetry: Dict[str, Optional[float]],
+        bumps: Optional[List[Dict[str, Any]]] = None,
+        has_log_bands: bool = False,
     ) -> Tuple[Optional[float], List[MixIssue], List[Dict[str, Any]]]:
         """Audit Spectral Balance & Mud Accumulation (Max 20 pts). Scores None when no band was measured."""
         score = 20.0
@@ -493,7 +667,38 @@ class MixDoctor:
                 message=f"Air band (>10 kHz) is dark ({air:.0%}). Consider gentle high shelf boost (+1.5 dB at 12 kHz) on vocals or drum bus.",
             ))
 
-        measured = any(band is not None for band in (low_mid, high_mid, air))
+        # Reference-free tonal bumps / resonant peaks
+        bump_cost_total = 0.0
+        for bump in bumps or []:
+            severity = bump.get("severity", "ADVISORY")
+            cost = 3.0 if severity == "WARNING" else 1.5
+            # Cap cumulative tonal bump penalties to 8.0 working points so bumps don't wipe out the whole dimension
+            allowed_cost = max(0.0, min(cost, 8.0 - bump_cost_total))
+            bump_cost_total += allowed_cost
+            score -= allowed_cost
+            fc = bump.get("center_hz", 1000.0)
+            prominence = bump.get("prominence_db", 3.5)
+            band_str = f" in {bump['band_name']}" if "band_name" in bump else ""
+            issues.append(MixIssue(
+                points_lost=allowed_cost,
+                source=HOUSE_RULE,
+                severity=severity,
+                category="spectral",
+                message=f"Resonant tonal bump{band_str} detected at {int(fc)} Hz (+{prominence:.1f} dB prominence above adjacent bands).",
+                remediation_proposal=bump.get("remediation"),
+            ))
+            if bump.get("remediation"):
+                rem = bump["remediation"]
+                recs.append({
+                    "step": len(recs) + 1,
+                    "action": rem.get("action", "apply_eq_cut"),
+                    "frequency_hz": rem.get("frequency_hz", fc),
+                    "gain_delta_db": rem.get("gain_delta_db", -2.0),
+                    "q": rem.get("q", 2.0),
+                    "rationale": rem.get("rationale", f"Attenuate resonant tonal bump at {int(fc)} Hz."),
+                })
+
+        measured = any(band is not None for band in (low_mid, high_mid, air)) or bool(bumps) or has_log_bands
         return (max(0.0, score) if measured else None), issues, recs
 
     def _audit_stem_separation(

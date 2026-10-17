@@ -6,14 +6,23 @@ import struct
 import wave
 import pytest
 
+import sys
+from pathlib import Path
+
+SERVICE_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(SERVICE_ROOT / "core"))
+
 from reference_matching import (
+    analyze_mix_without_reference,
     compare_mix_to_reference,
+    compare_mix_to_reference_spread,
     compute_7band_spectrum,
     compute_dynamics_profile,
     compute_stereo_profile,
     compute_eq_matching_curve,
-    generate_eq8_preset_xml,
+    detect_tonal_bumps,
     export_eq8_preset_adv,
+    generate_eq8_preset_xml,
 )
 
 
@@ -293,3 +302,122 @@ def test_bass_free_stereo_does_not_earn_low_end_correlation_points(right_gain):
         # Identical channels also have no side energy, so their old -90 dB width floor earns no points.
         assert result["stereo"]["mix"]["side_mid_ratio_db"] is None
         assert "stereo_width" in score["unscored"]
+
+
+def test_detect_tonal_bumps_identifies_local_peaks_and_ignores_smooth_slopes():
+    # A smooth pink-noise slope (-3 dB/octave) has zero prominence and triggers no bumps
+    smooth_slope = [float(-i * 1.5) for i in range(40)]
+    assert detect_tonal_bumps(smooth_slope) == []
+
+    # 40-band LTAS with an isolated 6.0 dB resonant peak at index 20
+    spiky_spectrum = [-18.0] * 40
+    spiky_spectrum[20] = -12.0  # +6.0 dB prominence above -18 dB baseline
+    bumps = detect_tonal_bumps(spiky_spectrum, threshold_db=3.5)
+    assert len(bumps) == 1
+    assert bumps[0]["band_index"] == 20
+    assert bumps[0]["prominence_db"] == 6.0
+    assert bumps[0]["severity"] == "WARNING"  # >= 5.0 dB is WARNING
+    assert bumps[0]["remediation"]["action"] == "apply_eq_cut"
+    assert bumps[0]["remediation"]["gain_delta_db"] < 0.0
+
+    # 7-band dict with low-mids resonance
+    bands_dict = {"sub": 0.05, "bass": 0.15, "low_mids": 0.50, "mids": 0.15, "presence": 0.07, "sibilance": 0.04, "air": 0.04}
+    bumps_7 = detect_tonal_bumps(bands_dict, threshold_db=3.5)
+    assert len(bumps_7) == 1
+    assert bumps_7[0]["band_name"] == "low_mids"
+    assert bumps_7[0]["center_hz"] == 350.0
+
+
+def test_analyze_mix_without_reference_evaluates_tonal_bumps_and_absolute_boundaries():
+    # 1 kHz tone (Mids band) with moderate level
+    mix_wav = _make_wav(duration_s=1.0, freq_left=1000.0, freq_right=1000.0, gain_left=0.6, gain_right=0.6)
+    result = analyze_mix_without_reference(mix_wav, mix_name="Standalone Mix")
+
+    assert result["ok"] is True
+    assert result["schema"] == "kenn.mix_review.no_reference_analysis.v1"
+    assert len(result["tonal_balance"]) == 7
+    assert "tonal_bumps" in result
+    assert "coaching_summary" in result
+    assert "recommendations" in result
+    # Reference match score must be unscored with explicit reason
+    ref_score = result["reference_match_score"]
+    assert ref_score["points"] == 0.0
+    assert ref_score["points_available"] == 0.0
+    assert "no reference track supplied" in ref_score["note"]
+
+
+def test_analyze_mix_without_reference_withholds_on_silent_sources():
+    silent_wav = _make_wav(duration_s=0.5, gain_left=0.0, gain_right=0.0)
+    result = analyze_mix_without_reference(silent_wav, mix_name="Silent Mix")
+
+    assert result["ok"] is True
+    assert result["recommendations"] == []
+    assert result["tonal_balance"] == []
+    assert result["tonal_bumps"] == []
+    assert "withheld" in result["coaching_summary"]["tonal_assessment"].lower()
+    assert result["reference_match_score"]["points_available"] == 0.0
+
+
+def test_compare_mix_to_reference_spread_distribution_matching_wilson_fazenda():
+    # Test Wilson & Fazenda (2016) multi-reference distribution matching.
+    # 3 references at 800 Hz (mids), 1000 Hz (mids), and 1200 Hz (mids)
+    ref1 = _make_wav(duration_s=1.0, freq_left=800.0, freq_right=800.0, gain_left=0.6, gain_right=0.6)
+    ref2 = _make_wav(duration_s=1.0, freq_left=1000.0, freq_right=1000.0, gain_left=0.6, gain_right=0.6)
+    ref3 = _make_wav(duration_s=1.0, freq_left=1200.0, freq_right=1200.0, gain_left=0.6, gain_right=0.6)
+
+    # Mix is closely aligned in mids (1000 Hz)
+    mix = _make_wav(duration_s=1.0, freq_left=1000.0, freq_right=1000.0, gain_left=0.6, gain_right=0.6)
+
+    result = compare_mix_to_reference_spread(
+        mix, [ref1, ref2, ref3], mix_name="User Mix", ref_names=["Ref 1", "Ref 2", "Ref 3"]
+    )
+
+    assert result["ok"] is True
+    assert result["schema"] == "kenn.mix_review.reference_spread_match.v1"
+    assert result["reference_count"] == 3
+    assert len(result["band_distribution"]) == 7
+    # Each band distribution row contains mean, std dev, z-score, and suggested matching gain
+    for row in result["band_distribution"]:
+        assert "ref_mean_pct" in row
+        assert "ref_std_pct" in row
+        assert "z_score" in row
+        assert "suggested_eq_gain_db" in row
+    # Mids band should be well within 2.0 sigma of the references
+    mids_row = next(r for r in result["band_distribution"] if r["band"] == "mids")
+    assert abs(mids_row["z_score"]) < 2.0
+    assert mids_row["suggested_eq_gain_db"] == 0.0  # Zero penalty and zero suggested move inside corridor
+
+    # Scored out of 40 full marks
+    score = result["reference_match_score"]
+    assert score["full_marks"] == 40.0
+    assert score["points"] > 30.0
+
+
+def test_compare_mix_to_reference_spread_withholds_on_silent_reference():
+    ref_active = _make_wav(duration_s=1.0, freq_left=440.0, freq_right=440.0, gain_left=0.6, gain_right=0.6)
+    ref_silent = _make_wav(duration_s=1.0, gain_left=0.0, gain_right=0.0)
+    mix = _make_wav(duration_s=1.0, freq_left=440.0, freq_right=440.0, gain_left=0.6, gain_right=0.6)
+
+    result = compare_mix_to_reference_spread(mix, [ref_active, ref_silent], mix_name="User Mix")
+    assert result["ok"] is True
+    assert result["recommendations"] == []
+    assert result["band_distribution"] == []
+    assert "withheld" in result["coaching_summary"]["tonal_assessment"].lower()
+    assert result["reference_match_score"]["points_available"] == 0.0
+
+
+def test_compare_mix_to_reference_withholds_recommendations_and_presets_on_quiet_mix():
+    # -60 dBFS significance gate: quiet mix or quiet reference withholds recommendations,
+    # EQ preset, matching gains, and tonal breakdown.
+    silent_mix = _make_wav(duration_s=1.0, gain_left=0.0, gain_right=0.0)
+    ref = _make_wav(duration_s=1.0, freq_left=1000.0, freq_right=1000.0, gain_left=0.7, gain_right=0.7)
+
+    result = compare_mix_to_reference(silent_mix, ref, mix_name="Silent Mix", ref_name="Pro Ref")
+    assert result["ok"] is True
+    assert result["recommendations"] == []
+    assert result["matching_gains_db"] == {}
+    assert result["eq8_preset_adv_base64"] is None
+    assert result["tonal_balance"] == []
+    assert "withheld" in result["coaching_summary"]["tonal_assessment"].lower()
+    assert result["reference_match_score"]["points_available"] == 0.0
+

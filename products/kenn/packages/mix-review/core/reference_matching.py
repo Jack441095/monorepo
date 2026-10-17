@@ -240,6 +240,106 @@ def compute_stereo_profile(channels_list: list[Any], sample_rate: int) -> dict[s
     }
 
 
+def detect_tonal_bumps(
+    spectrum: list[float] | tuple[float, ...] | dict[str, float] | None,
+    threshold_db: float = 3.5,
+) -> list[dict[str, Any]]:
+    """Flag resonant peaks that stick up relative to their immediate frequency neighbours.
+
+    Operates on 40-band logarithmic LTAS or 7 standard mixing bands. A smooth broadband slope
+    has zero prominence and triggers no findings; only resonant peaks deviating by >= threshold_db
+    from the local neighbour baseline are flagged.
+    """
+    if not spectrum:
+        return []
+
+    bumps: list[dict[str, Any]] = []
+
+    if isinstance(spectrum, (list, tuple)):
+        bands = [float(v) for v in spectrum if isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)]
+        n = len(bands)
+        if n < 3:
+            return []
+        f_min, f_max = 20.0, 20000.0
+        centers = [f_min * ((f_max / f_min) ** (i / float(max(1, n - 1)))) for i in range(n)]
+
+        for i in range(1, n - 1):
+            baseline = (bands[i - 1] + bands[i + 1]) * 0.5
+            prominence = bands[i] - baseline
+            if bands[i] > bands[i - 1] and bands[i] > bands[i + 1] and prominence >= threshold_db:
+                fc = centers[i]
+                gain_cut = -round(min(6.0, max(1.0, prominence * 0.7)), 1)
+                severity = "WARNING" if prominence >= 5.0 else "ADVISORY"
+                bumps.append({
+                    "band_index": i,
+                    "center_hz": round(fc, 1),
+                    "prominence_db": round(prominence, 2),
+                    "level_db": round(bands[i], 2),
+                    "baseline_db": round(baseline, 2),
+                    "severity": severity,
+                    "remediation": {
+                        "action": "apply_eq_cut",
+                        "frequency_hz": round(fc, 1),
+                        "gain_delta_db": gain_cut,
+                        "q": 2.5,
+                        "rationale": f"Attenuate resonant tonal bump at {int(fc)} Hz (+{prominence:.1f} dB prominence above adjacent bands).",
+                    },
+                })
+        return bumps
+
+    if isinstance(spectrum, dict):
+        band_order = ["sub", "bass", "low_mids", "mids", "presence", "sibilance", "air"]
+        centers_7 = {
+            "sub": 45.0,
+            "bass": 120.0,
+            "low_mids": 350.0,
+            "mids": 1000.0,
+            "presence": 3000.0,
+            "sibilance": 6000.0,
+            "air": 12000.0,
+        }
+        present_bands = [b for b in band_order if b in spectrum]
+        if len(present_bands) < 3:
+            return []
+
+        raw_vals = [float(spectrum[b]) for b in present_bands if isinstance(spectrum[b], (int, float)) and not isinstance(spectrum[b], bool) and math.isfinite(spectrum[b])]
+        if len(raw_vals) != len(present_bands):
+            return []
+
+        if all(v <= 1.0 for v in raw_vals) and sum(raw_vals) > 0.0:
+            db_vals = [10.0 * math.log10(max(1e-6, v)) for v in raw_vals]
+        else:
+            db_vals = raw_vals
+
+        for i in range(1, len(present_bands) - 1):
+            baseline = (db_vals[i - 1] + db_vals[i + 1]) * 0.5
+            prominence = db_vals[i] - baseline
+            if db_vals[i] > db_vals[i - 1] and db_vals[i] > db_vals[i + 1] and prominence >= threshold_db:
+                b_name = present_bands[i]
+                fc = centers_7.get(b_name, 1000.0)
+                gain_cut = -round(min(6.0, max(1.0, prominence * 0.7)), 1)
+                severity = "WARNING" if prominence >= 5.0 else "ADVISORY"
+                bumps.append({
+                    "band_index": i,
+                    "band_name": b_name,
+                    "center_hz": round(fc, 1),
+                    "prominence_db": round(prominence, 2),
+                    "level_db": round(db_vals[i], 2),
+                    "baseline_db": round(baseline, 2),
+                    "severity": severity,
+                    "remediation": {
+                        "action": "apply_eq_cut",
+                        "frequency_hz": round(fc, 1),
+                        "gain_delta_db": gain_cut,
+                        "q": 2.0,
+                        "rationale": f"Attenuate resonant tonal bump in {b_name} band at {int(fc)} Hz (+{prominence:.1f} dB prominence).",
+                    },
+                })
+        return bumps
+
+    return []
+
+
 def compute_eq_matching_curve(mix_bands: dict[str, float], ref_bands: dict[str, float]) -> dict[str, float]:
     """Calculate target EQ gains (in dB) to align mix spectral balance with reference."""
     matching_gains = {}
@@ -537,6 +637,57 @@ def compare_mix_to_reference(
     mix_stereo = compute_stereo_profile(mix_channels, mix_sr)
     ref_stereo = compute_stereo_profile(ref_channels, ref_sr)
 
+    # Stem significance gate: silent or near-silent sources at or below -60.0 dBFS
+    # or cancelling mixes withhold recommendations, matching gains, and EQ preset.
+    mix_rms = mix_dyn.get("rms_dbfs")
+    ref_rms = ref_dyn.get("rms_dbfs")
+
+    def _measured_rms(val: Any) -> bool:
+        return isinstance(val, (int, float)) and not isinstance(val, bool) and math.isfinite(val)
+
+    is_quiet = (
+        not _measured_rms(mix_rms)
+        or mix_rms <= REFERENCE_MIN_RMS_DBFS
+        or not _measured_rms(ref_rms)
+        or ref_rms <= REFERENCE_MIN_RMS_DBFS
+        or mix_cancels
+        or ref_cancels
+    )
+    if is_quiet:
+        quiet_source = "mix" if (not _measured_rms(mix_rms) or mix_rms <= REFERENCE_MIN_RMS_DBFS or mix_cancels) else "reference"
+        reason = (
+            f"{quiet_source} cancels in mono: left and right are opposite polarity, so flip one channel before comparing"
+            if (mix_cancels or ref_cancels)
+            else f"{quiet_source} RMS missing, non-finite or at/below {REFERENCE_MIN_RMS_DBFS:g} dBFS"
+        )
+        return {
+            "ok": True,
+            "schema": "kenn.mix_review.reference_match.v1",
+            "mix_name": mix_name,
+            "reference_name": ref_name,
+            "coaching_summary": {
+                "tonal_assessment": f"Tonal analysis withheld: {reason}.",
+                "dynamics_assessment": f"Dynamics analysis withheld: {reason}.",
+                "stereo_assessment": f"Stereo analysis withheld: {reason}.",
+            },
+            "tonal_balance": [],
+            "matching_gains_db": {},
+            "dynamics": {
+                "mix": mix_dyn,
+                "reference": ref_dyn,
+                "crest_factor_delta_db": crest_delta,
+                "assessment": f"Dynamics analysis withheld: {reason}.",
+            },
+            "stereo": {
+                "mix": mix_stereo,
+                "reference": ref_stereo,
+                "assessment": f"Stereo analysis withheld: {reason}.",
+            },
+            "recommendations": [],
+            "eq8_preset_adv_base64": None,
+            "reference_match_score": _unscored_reference_match(reason),
+        }
+
     # 6. Actionable recommendations & coaching
     recommendations: list[dict[str, Any]] = []
 
@@ -647,3 +798,436 @@ def compare_mix_to_reference(
         else _unscored_reference_match("reference-match analysis requires NumPy")
     )
     return result
+
+
+def analyze_mix_without_reference(
+    mix_bytes: bytes,
+    mix_name: str = "User Mix",
+) -> dict[str, Any]:
+    """Analyze a single mixdown without a reference track.
+
+    Evaluates reference-free tonal-bump resonant peaks (3.5 dB local prominence),
+    spectral mud/harshness/air balance, dynamics, and stereo mono compatibility.
+    """
+    val_mix = validate_wav_upload(mix_bytes, mix_name, label="User Mix")
+    if not val_mix.get("ok"):
+        return {"ok": False, "error": val_mix.get("error")}
+
+    mix_channels, mix_sr, mix_num_ch = _decode_channels(mix_bytes)
+    if np is not None:
+        mix_channels = _equal_length(mix_channels)
+    mix_mono, mix_cancels = _spectral_signal(mix_channels, mix_num_ch)
+    mix_levels = np.stack(mix_channels[:2]) if mix_num_ch >= 2 and np is not None else mix_channels[0]
+
+    mix_dyn = compute_dynamics_profile(mix_levels, mix_sr)
+    mix_dyn["mono_cancels"] = mix_cancels
+    mix_stereo = compute_stereo_profile(mix_channels, mix_sr)
+
+    mix_rms = mix_dyn.get("rms_dbfs")
+
+    def _measured_rms(val: Any) -> bool:
+        return isinstance(val, (int, float)) and not isinstance(val, bool) and math.isfinite(val)
+
+    if not _measured_rms(mix_rms) or mix_rms <= REFERENCE_MIN_RMS_DBFS or mix_cancels:
+        reason = (
+            "mix cancels in mono: left and right are opposite polarity"
+            if mix_cancels
+            else f"mix RMS missing, non-finite or at/below {REFERENCE_MIN_RMS_DBFS:g} dBFS"
+        )
+        return {
+            "ok": True,
+            "schema": "kenn.mix_review.no_reference_analysis.v1",
+            "mix_name": mix_name,
+            "coaching_summary": {
+                "tonal_assessment": f"Tonal analysis withheld: {reason}.",
+                "dynamics_assessment": f"Dynamics analysis withheld: {reason}.",
+                "stereo_assessment": f"Stereo analysis withheld: {reason}.",
+            },
+            "tonal_balance": [],
+            "tonal_bumps": [],
+            "dynamics": mix_dyn,
+            "stereo": mix_stereo,
+            "recommendations": [],
+            "reference_match_score": _unscored_reference_match("no reference track supplied"),
+        }
+
+    mix_bands = compute_7band_spectrum(mix_mono, mix_sr)
+    bumps = detect_tonal_bumps(mix_bands)
+
+    tonal_breakdown = []
+    for name, f_low, f_high in BANDS_7:
+        m_p = mix_bands.get(name, 0.0) * 100.0
+        tonal_breakdown.append({
+            "band": name,
+            "range_hz": f"{int(f_low)}-{int(f_high)} Hz",
+            "mix_energy_pct": round(m_p, 1),
+            "center_hz": BAND_CENTER_FREQS.get(name, 1000.0),
+        })
+
+    recommendations: list[dict[str, Any]] = []
+
+    # 1. Tonal bumps
+    for bump in bumps:
+        rem = bump.get("remediation", {})
+        recommendations.append({
+            "target_device": "EQ Eight",
+            "parameter": f"{bump.get('band_name', 'Notch').capitalize()} Gain",
+            "suggested_value": f"{rem.get('gain_delta_db', -2.0):+.1f} dB",
+            "center_frequency": f"{int(rem.get('frequency_hz', bump.get('center_hz', 1000.0)))} Hz",
+            "reason": rem.get("rationale", f"Attenuate resonant tonal bump (+{bump.get('prominence_db', 3.5):.1f} dB prominence)."),
+        })
+
+    # 2. Low-mid boxiness
+    if mix_bands.get("low_mids", 0.0) > 0.38:
+        recommendations.append({
+            "target_device": "EQ Eight",
+            "parameter": "Low-Mid Gain",
+            "suggested_value": "-2.0 dB",
+            "center_frequency": "350 Hz",
+            "reason": f"Low-mid energy accumulation detected ({mix_bands['low_mids'] * 100.0:.0f}% in 250-500 Hz). Mix may sound boxy.",
+        })
+
+    # 3. High-mid harshness
+    high_mid = mix_bands.get("presence", 0.0) + 0.5 * mix_bands.get("sibilance", 0.0)
+    if high_mid > 0.40:
+        recommendations.append({
+            "target_device": "EQ Eight",
+            "parameter": "Presence Gain",
+            "suggested_value": "-1.5 dB",
+            "center_frequency": "3500 Hz",
+            "reason": f"High-mid harshness detected ({high_mid * 100.0:.0f}% in 2-6 kHz). May cause ear fatigue.",
+        })
+
+    # 4. Air darkness
+    if mix_bands.get("air", 0.0) < 0.10:
+        recommendations.append({
+            "target_device": "EQ Eight",
+            "parameter": "Air High Shelf",
+            "suggested_value": "+1.5 dB",
+            "center_frequency": "12000 Hz",
+            "reason": f"Air band (>8 kHz) is dark ({mix_bands['air'] * 100.0:.0f}%). Consider a gentle high-shelf lift.",
+        })
+
+    # 5. Dynamics
+    crest = mix_dyn["crest_factor_db"]
+    if crest < 6.0:
+        recommendations.append({
+            "target_device": "Limiter / Compressor",
+            "parameter": "Threshold / Drive",
+            "suggested_value": "Ease limiter drive by 1.5 - 2.0 dB",
+            "reason": f"Mix is hyper-compressed (crest factor {crest:.1f} dB < 6.0 dB). Transients are flattened.",
+        })
+
+    # 6. Low-end mono
+    if mix_stereo.get("low_mono_correlation") is not None and mix_stereo["low_mono_correlation"] < 0.85:
+        recommendations.append({
+            "target_device": "Utility",
+            "parameter": "Bass Mono",
+            "suggested_value": "Enabled @ 120 Hz",
+            "reason": f"Sub-120 Hz correlation is {mix_stereo['low_mono_correlation']:.2f}. Mono-centering prevents phase cancellation on mono playback.",
+        })
+
+    # 7. True peak ceiling
+    if mix_dyn["peak_dbfs"] > -0.3:
+        recommendations.append({
+            "target_device": "Limiter",
+            "parameter": "Ceiling",
+            "suggested_value": "-1.0 dBFS",
+            "reason": f"Peak is hot ({mix_dyn['peak_dbfs']:.1f} dBFS). Lowering ceiling to -1.0 dBFS avoids intersample clipping.",
+        })
+
+    tonal_msg = (
+        f"Reference-free tonal audit across 7 mixing bands. {len(bumps)} resonant tonal bumps detected."
+        if bumps else "Reference-free tonal audit across 7 mixing bands: no excessive resonant peaks detected."
+    )
+    dyn_msg = f"Mix crest factor is {crest:.1f} dB with peak at {mix_dyn['peak_dbfs']:.1f} dBFS."
+    st_msg = (
+        f"Low-end correlation is {mix_stereo['low_mono_correlation']:.2f}."
+        if mix_stereo.get("low_mono_correlation") is not None else "Mono audio: stereo imaging unmeasured."
+    )
+
+    return {
+        "ok": True,
+        "schema": "kenn.mix_review.no_reference_analysis.v1",
+        "mix_name": mix_name,
+        "coaching_summary": {
+            "tonal_assessment": tonal_msg,
+            "dynamics_assessment": dyn_msg,
+            "stereo_assessment": st_msg,
+        },
+        "tonal_balance": tonal_breakdown,
+        "tonal_bumps": bumps,
+        "dynamics": mix_dyn,
+        "stereo": mix_stereo,
+        "recommendations": recommendations,
+        "reference_match_score": _unscored_reference_match("no reference track supplied"),
+    }
+
+
+def compare_mix_to_reference_spread(
+    mix_bytes: bytes,
+    ref_bytes_list: list[bytes],
+    mix_name: str = "User Mix",
+    ref_names: list[str] | None = None,
+) -> dict[str, Any]:
+    """Compare user mixdown against a spread of commercial references (Wilson and Fazenda 2016).
+
+    Rather than penalizing deviations from a single reference curve, this compares the mix
+    against the mean and variance across multiple references in 7-band feature space. A band
+    falling within 1 standard deviation of the reference spread incurs zero penalty.
+    """
+    if len(ref_bytes_list) < 2:
+        if len(ref_bytes_list) == 1:
+            r_name = ref_names[0] if ref_names else "Reference"
+            return compare_mix_to_reference(mix_bytes, ref_bytes_list[0], mix_name=mix_name, ref_name=r_name)
+        return {"ok": False, "error": "At least 2 references are required to establish a reference spread."}
+
+    val_mix = validate_wav_upload(mix_bytes, mix_name, label="User Mix")
+    if not val_mix.get("ok"):
+        return {"ok": False, "error": val_mix.get("error")}
+
+    mix_channels, mix_sr, mix_num_ch = _decode_channels(mix_bytes)
+    if np is not None:
+        mix_channels = _equal_length(mix_channels)
+    mix_mono, mix_cancels = _spectral_signal(mix_channels, mix_num_ch)
+    mix_levels = np.stack(mix_channels[:2]) if mix_num_ch >= 2 and np is not None else mix_channels[0]
+    mix_dyn = compute_dynamics_profile(mix_levels, mix_sr)
+    mix_dyn["mono_cancels"] = mix_cancels
+    mix_stereo = compute_stereo_profile(mix_channels, mix_sr)
+
+    def _measured_rms(val: Any) -> bool:
+        return isinstance(val, (int, float)) and not isinstance(val, bool) and math.isfinite(val)
+
+    mix_rms = mix_dyn.get("rms_dbfs")
+    if not _measured_rms(mix_rms) or mix_rms <= REFERENCE_MIN_RMS_DBFS or mix_cancels:
+        reason = (
+            "mix cancels in mono: left and right are opposite polarity, so flip one channel before comparing"
+            if mix_cancels
+            else f"mix RMS missing, non-finite or at/below {REFERENCE_MIN_RMS_DBFS:g} dBFS"
+        )
+        return {
+            "ok": True,
+            "schema": "kenn.mix_review.reference_spread_match.v1",
+            "mix_name": mix_name,
+            "reference_count": len(ref_bytes_list),
+            "coaching_summary": {
+                "tonal_assessment": f"Tonal analysis withheld: {reason}.",
+                "dynamics_assessment": f"Dynamics analysis withheld: {reason}.",
+                "stereo_assessment": f"Stereo analysis withheld: {reason}.",
+            },
+            "band_distribution": [],
+            "matching_gains_db": {},
+            "dynamics": {"mix": mix_dyn, "reference_spread": {}},
+            "stereo": {"mix": mix_stereo, "reference_spread": {}},
+            "recommendations": [],
+            "eq8_preset_adv_base64": None,
+            "reference_match_score": _unscored_reference_match(reason),
+        }
+
+    ref_bands_list: list[dict[str, float]] = []
+    ref_dyn_list: list[dict[str, Any]] = []
+    ref_stereo_list: list[dict[str, Any]] = []
+
+    for idx, ref_bytes in enumerate(ref_bytes_list):
+        r_label = (ref_names[idx] if ref_names and idx < len(ref_names) else f"Reference {idx + 1}")
+        val_ref = validate_wav_upload(ref_bytes, r_label, label=r_label)
+        if not val_ref.get("ok"):
+            return {"ok": False, "error": f"Invalid reference '{r_label}': {val_ref.get('error')}"}
+        r_ch, r_sr, r_nch = _decode_channels(ref_bytes)
+        if np is not None:
+            r_ch = _equal_length(r_ch)
+        r_mono, r_cancels = _spectral_signal(r_ch, r_nch)
+        r_levels = np.stack(r_ch[:2]) if r_nch >= 2 and np is not None else r_ch[0]
+        r_dyn = compute_dynamics_profile(r_levels, r_sr)
+        r_dyn["mono_cancels"] = r_cancels
+        r_rms = r_dyn.get("rms_dbfs")
+        if not _measured_rms(r_rms) or r_rms <= REFERENCE_MIN_RMS_DBFS or r_cancels:
+            reason = (
+                f"reference '{r_label}' cancels in mono"
+                if r_cancels
+                else f"reference '{r_label}' RMS missing, non-finite or at/below {REFERENCE_MIN_RMS_DBFS:g} dBFS"
+            )
+            return {
+                "ok": True,
+                "schema": "kenn.mix_review.reference_spread_match.v1",
+                "mix_name": mix_name,
+                "reference_count": len(ref_bytes_list),
+                "coaching_summary": {
+                    "tonal_assessment": f"Reference spread comparison withheld: {reason}.",
+                    "dynamics_assessment": f"Dynamics analysis withheld: {reason}.",
+                    "stereo_assessment": f"Stereo analysis withheld: {reason}.",
+                },
+                "band_distribution": [],
+                "matching_gains_db": {},
+                "dynamics": {"mix": mix_dyn, "reference_spread": {}},
+                "stereo": {"mix": mix_stereo, "reference_spread": {}},
+                "recommendations": [],
+                "eq8_preset_adv_base64": None,
+                "reference_match_score": _unscored_reference_match(reason),
+            }
+        ref_bands_list.append(compute_7band_spectrum(r_mono, r_sr))
+        ref_dyn_list.append(r_dyn)
+        ref_stereo_list.append(compute_stereo_profile(r_ch, r_sr))
+
+    mix_bands = compute_7band_spectrum(mix_mono, mix_sr)
+
+    band_distribution: list[dict[str, Any]] = []
+    matching_gains: dict[str, float] = {}
+    recommendations: list[dict[str, Any]] = []
+
+    losses = []
+    for band_name, f_low, f_high in BANDS_7:
+        band_vals = [rb.get(band_name, 0.0) for rb in ref_bands_list]
+        mean_val = float(np.mean(band_vals)) if np is not None else (sum(band_vals) / len(band_vals))
+        std_val = float(np.std(band_vals)) if np is not None else 0.02
+        std_val = max(0.015, std_val)  # Floor at 1.5% energy to prevent division by zero
+
+        mix_val = mix_bands.get(band_name, 0.0)
+        delta = mix_val - mean_val
+        z_score = delta / std_val
+
+        # Bands inside +/- 1.0 sigma incur no penalty
+        if abs(z_score) <= 1.0:
+            gain_db = 0.0
+            loss = 0.0
+        else:
+            loss = min(1.0, (abs(z_score) - 1.0) / 2.0)
+            raw_gain = -10.0 * math.log10(max(1e-6, mix_val) / max(1e-6, mean_val)) if mix_val > 0 else 0.0
+            raw_gain = max(-6.0, min(6.0, raw_gain))
+            corridor_db = 1.0
+            if raw_gain > corridor_db:
+                gain_db = round(raw_gain - corridor_db, 1)
+            elif raw_gain < -corridor_db:
+                gain_db = round(raw_gain + corridor_db, 1)
+            else:
+                gain_db = 0.0
+
+        matching_gains[band_name] = gain_db
+        losses.append(loss)
+
+        band_distribution.append({
+            "band": band_name,
+            "range_hz": f"{int(f_low)}-{int(f_high)} Hz",
+            "mix_energy_pct": round(mix_val * 100.0, 1),
+            "ref_mean_pct": round(mean_val * 100.0, 1),
+            "ref_std_pct": round(std_val * 100.0, 1),
+            "z_score": round(z_score, 2),
+            "suggested_eq_gain_db": gain_db,
+        })
+
+        if abs(z_score) >= 2.0 and abs(gain_db) >= 1.0:
+            c_freq = BAND_CENTER_FREQS.get(band_name, 1000.0)
+            direction = "above" if z_score > 0 else "below"
+            recommendations.append({
+                "target_device": "EQ Eight",
+                "parameter": f"{band_name.capitalize()} Band Gain",
+                "suggested_value": f"{gain_db:+.1f} dB",
+                "center_frequency": f"{int(c_freq)} Hz",
+                "reason": (
+                    f"Mix energy in {band_name} ({int(f_low)}-{int(f_high)} Hz) is {abs(z_score):.1f}σ "
+                    f"{direction} the reference spread mean ({mean_val * 100.0:.1f}% ± {std_val * 100.0:.1f}%)."
+                ),
+            })
+
+    tonal_points = round(20.0 * (1.0 - sum(losses) / len(losses)), 1)
+    worst_band = max(band_distribution, key=lambda b: abs(b["z_score"]))
+
+    ref_crests = [rd["crest_factor_db"] for rd in ref_dyn_list if rd.get("crest_factor_db") is not None]
+    ref_crest_mean = float(np.mean(ref_crests)) if np is not None and ref_crests else 8.0
+    crest_delta = round(mix_dyn["crest_factor_db"] - ref_crest_mean, 2)
+
+    parts = [
+        {
+            "part": "tonal_balance",
+            "points": tonal_points,
+            "points_available": 20.0,
+            "gap": round(abs(worst_band["z_score"]), 2),
+            "unit": "σ (largest deviation)",
+            "detail": f"largest deviation is {worst_band['band']} at {worst_band['z_score']:+.1f}σ from reference spread",
+            "source": f"spread of {len(ref_bytes_list)} commercial reference tracks (Wilson and Fazenda 2016)",
+        }
+    ]
+
+    dyn_lost = 10.0 * _loss_fraction(abs(crest_delta), CREST_TOLERANCE_DB, CREST_FULL_LOSS_DB)
+    parts.append({
+        "part": "dynamics",
+        "points": round(10.0 - dyn_lost, 1),
+        "points_available": 10.0,
+        "gap": round(crest_delta, 2),
+        "unit": "dB crest factor",
+        "detail": f"crest factor differs from reference spread mean by {crest_delta:+.1f} dB",
+        "source": f"spread of {len(ref_bytes_list)} commercial reference tracks",
+    })
+
+    unscored = []
+    low_corrs = [rs["low_mono_correlation"] for rs in ref_stereo_list if rs.get("low_mono_correlation") is not None]
+    if mix_stereo.get("low_mono_correlation") is not None and low_corrs:
+        mean_low_corr = float(np.mean(low_corrs)) if np is not None else 0.95
+        shortfall = max(0.0, mean_low_corr - mix_stereo["low_mono_correlation"])
+        mono_lost = 5.0 * _loss_fraction(shortfall, LOW_CORR_TOLERANCE, LOW_CORR_FULL_LOSS)
+        parts.append({
+            "part": "low_end_mono",
+            "points": round(5.0 - mono_lost, 1),
+            "points_available": 5.0,
+            "gap": round(shortfall, 2),
+            "unit": "correlation below reference mean",
+            "detail": f"correlation below 120 Hz is {mix_stereo['low_mono_correlation']:.2f} against spread mean {mean_low_corr:.2f}",
+            "source": f"spread of {len(ref_bytes_list)} commercial reference tracks",
+        })
+    else:
+        unscored.append("low_end_mono")
+
+    sm_ratios = [rs["side_mid_ratio_db"] for rs in ref_stereo_list if rs.get("side_mid_ratio_db") is not None]
+    if mix_stereo.get("side_mid_ratio_db") is not None and sm_ratios:
+        mean_sm = float(np.mean(sm_ratios)) if np is not None else -9.0
+        width_gap = mix_stereo["side_mid_ratio_db"] - mean_sm
+        width_lost = 5.0 * _loss_fraction(abs(width_gap), WIDTH_TOLERANCE_DB, WIDTH_FULL_LOSS_DB)
+        parts.append({
+            "part": "stereo_width",
+            "points": round(5.0 - width_lost, 1),
+            "points_available": 5.0,
+            "gap": round(width_gap, 2),
+            "unit": "dB side/mid",
+            "detail": f"side/mid ratio is {width_gap:+.1f} dB from spread mean",
+            "source": f"spread of {len(ref_bytes_list)} commercial reference tracks",
+        })
+    else:
+        unscored.append("stereo_width")
+
+    pts_avail = sum(p["points_available"] for p in parts)
+    score_payload = {
+        "points": round(sum(p["points"] for p in parts), 1),
+        "points_available": pts_avail,
+        "full_marks": 40.0,
+        "parts": parts,
+        "unscored": unscored,
+        "note": "" if pts_avail > 0 else "no comparable reference measurements",
+    }
+
+    preset_adv_bytes = export_eq8_preset_adv(matching_gains)
+    preset_b64 = base64.b64encode(preset_adv_bytes).decode("ascii")
+
+    return {
+        "ok": True,
+        "schema": "kenn.mix_review.reference_spread_match.v1",
+        "mix_name": mix_name,
+        "reference_count": len(ref_bytes_list),
+        "coaching_summary": {
+            "tonal_assessment": f"Wilson & Fazenda (2016) distribution matching across {len(ref_bytes_list)} references. Max deviation: {worst_band['z_score']:+.1f}σ ({worst_band['band']}).",
+            "dynamics_assessment": f"Mix crest factor is {mix_dyn['crest_factor_db']:.1f} dB (spread mean {ref_crest_mean:.1f} dB, Δ {crest_delta:+.1f} dB).",
+            "stereo_assessment": "Stereo imaging compared with commercial reference distribution.",
+        },
+        "band_distribution": band_distribution,
+        "matching_gains_db": matching_gains,
+        "dynamics": {
+            "mix": mix_dyn,
+            "reference_crest_mean_db": round(ref_crest_mean, 2),
+            "crest_factor_delta_db": crest_delta,
+        },
+        "stereo": {
+            "mix": mix_stereo,
+        },
+        "recommendations": recommendations,
+        "eq8_preset_adv_base64": preset_b64,
+        "reference_match_score": score_payload,
+    }
