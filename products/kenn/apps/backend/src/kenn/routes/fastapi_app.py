@@ -691,4 +691,100 @@ async def abandon_curriculum_lesson_endpoint(req: CurriculumActionRequest):
     return JSONResponse(status_code=200, content={"ok": True, "status": "abandoned"})
 
 
+# --- Expert Network Endpoints (Milestone E11) ---------------------------------
+
+
+class ExpertContributionSubmitRequest(BaseModel):
+    contributor_name: str
+    credentials: str
+    content_type: str
+    topic: str
+    title: str
+    content_markdown: str
+    target_standards: Optional[list[str]] = None
+
+
+class ExpertContributionReviewRequest(BaseModel):
+    contribution_id: str
+    decision: str
+    reviewer_name: str
+    feedback: Optional[str] = ""
+
+
+@app.get("/api/expert-network/contributions")
+async def get_expert_contributions_endpoint(
+    topic: Optional[str] = None,
+    content_type: Optional[str] = None,
+):
+    """Return vetted, peer-approved expert engineering contributions."""
+    from kenn.core.expert_network import ExpertNetworkStore
+
+    store = ExpertNetworkStore()
+    contributions = store.list_surfaced_expert_content(
+        topic=topic,
+        content_type=content_type,
+    )
+    return JSONResponse(status_code=200, content={"ok": True, "contributions": contributions})
+
+
+@app.post("/api/expert-network/submit")
+async def submit_expert_contribution_endpoint(req: ExpertContributionSubmitRequest):
+    """Submit a new expert engineering contribution for peer review."""
+    from kenn.core.expert_network import ExpertNetworkStore
+
+    store = ExpertNetworkStore()
+    try:
+        contrib = store.submit_contribution(
+            contributor_name=req.contributor_name,
+            credentials=req.credentials,
+            content_type=req.content_type,
+            topic=req.topic,
+            title=req.title,
+            content_markdown=req.content_markdown,
+            target_standards=req.target_standards,
+        )
+        return JSONResponse(status_code=201, content={"ok": True, "contribution": contrib})
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.post("/api/expert-network/review")
+async def review_expert_contribution_endpoint(req: ExpertContributionReviewRequest):
+    """Adjudicate an expert submission. Only approved contributions pass the vetting gate."""
+    from kenn.core.expert_network import ExpertNetworkStore
+
+    store = ExpertNetworkStore()
+    try:
+        contrib = store.review_contribution(
+            contribution_id=req.contribution_id,
+            decision=req.decision,
+            reviewer_name=req.reviewer_name,
+            feedback=req.feedback or "",
+        )
+        return JSONResponse(status_code=200, content={"ok": True, "contribution": contrib})
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.get("/api/expert-network/history/{contribution_id}")
+async def get_expert_history_endpoint(contribution_id: str):
+    """Retrieve full version history and cryptographic hashes for an expert contribution."""
+    from kenn.core.expert_network import ExpertNetworkStore
+
+    store = ExpertNetworkStore()
+    history = store.get_contribution_history(contribution_id)
+    if not history:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No revision history found for contribution '{contribution_id}'",
+        )
+    return JSONResponse(
+        status_code=200,
+        content={"ok": True, "contribution_id": contribution_id, "history": history},
+    )
+
+
+
 

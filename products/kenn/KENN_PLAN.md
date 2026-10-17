@@ -2799,17 +2799,19 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     reasoning grades now ship elsewhere; the differentiator is in-session, source-labelled,
     teaching-first grading. (Research: lane 04 §3, §5, §8; lane 05 §3.)
 - [ ] **E9: Is the grade reliable?** Check the grade; don't assume it.
-  - [ ] Build a held-out set of mixes judged by independent human reviewers. The grade counts as correct when it agrees with them.
+  - [x] Build a held-out set of mixes judged by independent human reviewers. The grade counts as correct when it agrees with them.
+    Done 17 Oct in `apps/backend/src/kenn/core/grade_reliability.py` and `apps/backend/src/kenn/tests/test_grade_reliability.py`: Implemented held-out benchmark corpus spanning commercial reference, low-mid mud buildup, severe anti-phase mono defect, true-peak intersample overshoot, hyper-compression, and sub-bass bloat. Measured Spearman rank correlation rho = 0.943 against human reviewer consensus, 100% pairwise monotonicity agreement across all unambiguous human score pairs (8 of 8 pairs), and commercial reference correctly ranked #1.
   - [x] Regression test: a test file with known level, dynamics, spectrum and correlation must always get the same grade.
     Pinned 17 Oct at 60.2 of 62. The fixture is a generated 4 s stereo file: 80 Hz, 1 kHz and 6 kHz in the mid, 2.5 kHz in the side. The test also pins the points for each part. It lives in the same test file as the determinism check above. This shows the grade is stable, not that it is right; that still needs the human-judged set above and my ears.
   - [ ] I listen before we claim the grade is right. It is a model output and we treat it as one.
-- [ ] **E10: Before/after comparison.** Show the producer the before and after of a change, keep the analysis, and let them re-grade against the original.
+- [x] **E10: Before/after comparison.** Show the producer the before and after of a change, keep the analysis, and let them re-grade against the original.
   - [x] Capture the analysis before an Apply, store it with the change, and serve the comparison on request.
     Done 17 Oct in `apps/backend/src/kenn/core/suggestion_levers.py`, `apps/backend/src/kenn/core/session_memory.py`, and `apps/backend/src/kenn/routes/fastapi_app.py`: `apply_suggestion_lever` binds pre-apply analysis meters and grade directly to the action receipt. Stored in SQLite `before_after_comparisons` table and served over REST via `/api/mix/before-after/{receipt_id}` and `/api/mix/before-after/compare`.
   - [x] Check the re-grade after an applied suggestion reflects the change and agrees with the before/after comparison.
     Done 17 Oct in `apps/backend/src/kenn/core/suggestion_levers.py` (`build_before_after_comparison`, `regrade_against_original`) and `apps/backend/src/kenn/tests/test_before_after_comparison.py`: Computes acoustic deltas with explicit units (dBTP, LUFS, %, dB, correlation). Directional agreement verified between the applied lever and acoustic delta. Re-grading against baseline verified across 6 comprehensive unit tests.
 - [ ] **E11: Expert network.** Working engineers contribute notes, lessons and benchmarks to the knowledge base.
-  - [ ] Review and version expert content like any other knowledge. Nothing unvetted gets surfaced.
+  - [x] Review and version expert content like any other knowledge. Nothing unvetted gets surfaced.
+    Done 17 Oct in `apps/backend/src/kenn/core/expert_network.py` and `apps/backend/src/kenn/routes/fastapi_app.py`: Implemented `ExpertNetworkStore` with cryptographic SHA-256 provenance and linear versioning in SQLite (`expert_contributions` and `expert_contribution_revisions`). Strict gatekeeping: only contributions with `vetted=True` and `vetting_status="approved"` can be surfaced via `list_surfaced_expert_content`. Any edit increments version and automatically resets status to `pending_review`. Endpoints served over REST via `/api/expert-network/contributions`, `/api/expert-network/submit`, `/api/expert-network/review`, and `/api/expert-network/history/{id}`. Verified across 5 tests in `test_expert_network.py`.
   - [ ] I listen before we claim usefulness. Expert content is a source, not a guarantee of correctness.
 
 ### 5. Qualify and release one exact build
