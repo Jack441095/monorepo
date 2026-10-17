@@ -206,10 +206,11 @@ so a release build must rebuild first.
 extension falls back to the reference. Everything that calls `analyze_wav`
 moves with it: the audio upload and AudioGen routes, Live session advice, and
 the extra spectral pass in mix review and the mix-review adapter. The main
-mix-review report runs `local_engine` and does not change. Loudness
-(`KENN_DSP_LOUDNESS_NATIVE`), mix-review decode and masking keep their own
-default-off gates; the 15 Oct qualification held those back over an LRA rounding
-difference, and this run did not re-measure them. The AutoMix kernels share the
+mix-review report runs `local_engine` and does not change. Mix-review decode
+and masking keep their own default-off gates. Loudness
+(`KENN_DSP_LOUDNESS_NATIVE`) was also default-off here, then went default-on
+the same day after its own corpus run; see the 17 Oct section of
+`CPP_DSP_PHASE4_MIX_REVIEW_LOUDNESS_RECEIPT.md`. The AutoMix kernels share the
 `KENN_DSP_NATIVE` name but keep a default of off, since this corpus never ran
 them. Not covered by the corpus: 32-bit integer PCM (native decodes to float32,
 so it differs at the noise floor) and NaN samples in float files. Still open:

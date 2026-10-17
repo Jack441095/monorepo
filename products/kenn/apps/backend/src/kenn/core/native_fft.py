@@ -25,9 +25,9 @@ def _load() -> Any | None:
     # 1.1 GB against 4.6 GB (extension rebuilt from source the same day). That
     # covers analyze_wav, so the audio upload and AudioGen routes, Live session
     # advice and the extra spectral pass in mix review take the native path; the
-    # main mix-review report runs local_engine and is unaffected. Loudness, mix-review decode and masking stay behind their own flags:
-    # the 15 Oct qualification kept those opt-in over an LRA rounding gap, and
-    # nothing here re-measured them.
+    # main mix-review report runs local_engine and is unaffected. Mix-review
+    # loudness has its own flag, default-on since its own corpus run the same day
+    # (see local_engine); mix-review decode and masking stay opt-in.
     # A missing extension still falls through to the reference below.
     if os.environ.get("KENN_DSP_NATIVE", "1").strip().lower() in {"0", "false", "off", "no"}:
         return None
@@ -158,11 +158,10 @@ def channel_metrics(channels: list[list[float]] | Any) -> dict[str, Any] | None:
 
 
 def loudness_metrics(channels: list[list[float]] | Any, sample_rate: int) -> dict[str, Any] | None:
-    """Compute an opt-in native K-weighted loudness/LRA candidate.
+    """Compute native K-weighted loudness, LRA and 8x true peak; None when unavailable.
 
-    The native candidate mirrors pyloudnorm's default K-weighting, gating, and
-    8x true-peak FIR contract (scipy resample_poly's default filter). Callers must compare rounded LUFS/LRA/true-peak
-    output before promoting it.
+    Mirrors pyloudnorm's K-weighting and gating and scipy resample_poly's
+    default 8x filter, so rounded output matches the Python fallback.
     """
     module = _load()
     function = None if module is None else getattr(module, "loudness_metrics", None)

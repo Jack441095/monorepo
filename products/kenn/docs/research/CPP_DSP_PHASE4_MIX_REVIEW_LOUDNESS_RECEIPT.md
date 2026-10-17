@@ -33,6 +33,9 @@ pyloudnorm/scipy implementation remain the oracle and fallback. The native
 true-peak path uses the same 81-tap Kaiser FIR and zero-padded boundaries as
 `scipy.signal.resample_poly(x, 4, 1)`.
 
+(Superseded 17 Oct 2026: loudness is default-on and true peak is 8x with the
+161-tap filter; see the section at the end.)
+
 ## Reproduction
 
 ```text
@@ -86,22 +89,31 @@ use scipy's default `resample_poly(x, 8, 1)` filter (161-tap Kaiser, beta 5).
 The C++ builds that filter at load instead of carrying a table, and matches
 scipy 8x to 5e-15 dB on random and near-Nyquist test signals.
 
-Worth knowing: the 28-of-98 tone failures behind the 4x/8x question came from
-the plug-in's short 48-tap 4x FIR. scipy's 81-tap 4x filter was already close:
-on 459 tones (44.1, 48 and 96 kHz, up to 20 kHz, 17 phases) its worst
-under-read was 0.016 dB, against 0.0004 dB at 8x. So for this meter 8x is a
-small accuracy gain. Cost: about 0.8 s more scipy time on a 4-minute stereo
-mix; the native call takes 0.34 s for the whole loudness measurement.
+Accuracy, from a sine sweep in 100 Hz steps to 20 kHz, 17 phases, at 44.1, 48
+and 96 kHz, edges trimmed: scipy's filter under-reads by up to 0.40 dB at 4x
+and 0.13 dB at 8x, both near 20 kHz; up to 16 kHz the figures are 0.25 and
+0.05 dB. 8x is a real gain but still reads a little low on the top octave.
+(A first, coarser 459-tone grid missed those frequencies and reported 0.016 dB
+at 4x; review caught it.) Cost: about 0.8 s more scipy time on a 4-minute
+stereo mix; the native loudness call took 0.34 s on 4 minutes of 44.1 kHz
+stereo noise. All timings are single runs on Jack's Mac.
 
 The no-scipy fallback `_numpy_true_peak_dbtp` was zero-padding the time signal,
 not the spectrum, so it returned the sample peak (3 dB low on a quarter-rate
-sine). Fixed, with a regression test.
+sine). The first fix interpolated each chunk periodically, which review showed
+reading a crest-cut loop at +1.23 dBTP against scipy's +0.20; each chunk now
+carries 4096 samples of real or zero context per side and only its interior is
+read, and the Nyquist bin is halved. Both have regression tests. Its ideal-sinc
+interpolation still reads 0.17 dB above scipy on full-band white noise.
 
-Real-file promotion: on the owner's Audio-Assets corpus (25 files under the
+Real-file promotion, one local run on Jack's Mac with a scratch runner (the
+corpus is owner data and stays out of the repo, so this is recorded, not
+reproducible from Git): on the owner's Audio-Assets corpus (25 files under the
 150 MB cap, 24 measurable: ten full mixdowns and every sample-pack format) the
 native meter matched pyloudnorm on rounded integrated LUFS, LRA and true peak
 for every file. Full mix review took 8.3 s native against 38.3 s with
 pyloudnorm. `KENN_DSP_LOUDNESS_NATIVE` now defaults to on; `=0`, or
 `KENN_DSP_NATIVE=0`, falls back to pyloudnorm, as does a missing extension.
-Not changed: `kenn.core.loudness_analysis` (track diagnostic) still measures
+Extension built from this commit's source with `make native-build` (nanobind
+3.1.0), SHA-256 `a99c93c9…0f66b4`. Not changed: `kenn.core.loudness_analysis` (track diagnostic) still measures
 with pyloudnorm directly, now at 8x.

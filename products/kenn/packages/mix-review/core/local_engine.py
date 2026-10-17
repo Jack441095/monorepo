@@ -68,13 +68,13 @@ PHASE_CORRELATION_FLAG = -0.5      # Pearson correlation below this suggests a p
 MONO_SUM_DROP_FLAG_DB = 3.0
 HOT_LOUDNESS_ESTIMATE_DBFS = -14.0  # unweighted RMS proxy threshold, not a calibrated LUFS target
 DC_OFFSET_FLAG = 0.02
-# 8x since 17 Oct 2026, the owner's 4x/8x call. BS.1770-4 Annex 2 allows 4x, and
-# scipy's long 81-tap 4x filter was already close: on 459 sine tones (44.1, 48
-# and 96 kHz, up to 20 kHz, 17 phases) its worst under-read was 0.016 dB, against
-# 0.0004 dB at 8x. The 28-of-98 failures that prompted the call were the plug-in's
-# short 4x FIR, not this one. 8x costs about 0.8 s more scipy time on a 4-minute
-# stereo mix and nothing measurable natively. loudness_bindings.cpp uses the
-# same factor and filter.
+# 8x since 17 Oct 2026, the owner's 4x/8x call. BS.1770-4 Annex 2 allows 4x, but
+# scipy's default filter under-reads near Nyquist. Sine sweep, 100 Hz steps to
+# 20 kHz, 17 phases, at 44.1/48/96 kHz: worst under-read 0.40 dB at 4x and 0.13 dB
+# at 8x (both near 20 kHz); up to 16 kHz, 0.25 dB at 4x and 0.05 dB at 8x. So 8x
+# still reads a little low on the top octave. scipy takes about 0.8 s more per
+# 4-minute stereo mix at 8x on Jack's Mac. loudness_bindings.cpp uses the same
+# factor and filter.
 TRUE_PEAK_OVERSAMPLE_FACTOR = 8
 TARGET_INTEGRATED_LUFS = -14.0  # common streaming reference; informational only, not a pass/fail gate
 TRUE_PEAK_CEILING_DBTP = -1.0   # common delivery ceiling; informational only, not a pass/fail gate
@@ -1258,38 +1258,47 @@ def _numpy_integrated_lufs_and_lra(
 def _numpy_true_peak_dbtp(channels: list[Any]) -> float | None:
     """Oversampled true peak by spectral zero-padding, for hosts without scipy.
 
-    Zero-padding the spectrum is periodic sinc interpolation, so inter-sample
-    overshoot reads at or above the sample peak; the wrap only touches the
-    first and last few samples of each chunk. Chunked with overlap for long
-    inputs. Returns None only for all-empty input.
+    Zero-padding the spectrum is sinc interpolation, but a periodic one: the
+    end of a chunk interpolates against its start. Each chunk therefore carries
+    real neighbouring samples as context, plus zeros past the ends of the file
+    (scipy's boundary), and only the interior is read. Returns None only for
+    all-empty input.
+
+    The interpolation is ideal sinc, where scipy's Kaiser filter rolls off near
+    Nyquist, so content close to fs/2 reads high here: 0.17 dB on full-band
+    white noise, more on a tone gated hard at Nyquist (17 Oct 2026 probes).
+    That errs towards flagging a peak, the safe side for a ceiling advisory.
     """
+    factor = TRUE_PEAK_OVERSAMPLE_FACTOR
+    # 2**20 samples (about 24 s at 44.1 kHz) per FFT keeps memory bounded on
+    # long files. 4096 samples of context each side, because the wrap error
+    # falls off like a sinc tail, about 1/(pi * distance): 4096 samples puts it
+    # near 1e-4 of full scale, well under the 0.01 dB the report rounds to.
+    chunk = 1 << 20
+    margin = 4096
     peak = 0.0
     for ch in channels:
         x = _np.ravel(ch).astype(_np.float64)
         n = int(x.shape[0])
-        if n == 0:
-            continue
-        chunk = 1 << 20
-        overlap = 1024
-        if n <= chunk:
-            pieces = [(0, n)]
-        else:
-            pieces = []
-            pos = 0
-            while pos < n:
-                start = max(0, pos - overlap)
-                pieces.append((start, min(n, pos + chunk)))
-                pos += chunk
-        for start, end in pieces:
-            seg = x[start:end]
+        for pos in range(0, n, chunk):
+            end = min(n, pos + chunk)
+            lo, hi = max(0, pos - margin), min(n, end + margin)
+            seg = _np.concatenate((
+                _np.zeros(margin - (pos - lo)), x[lo:hi], _np.zeros(margin - (hi - end)),
+            ))
             m = int(seg.shape[0])
+            spectrum = _np.fft.rfft(seg)
+            # An even-length spectrum's last bin is Nyquist, folded from two
+            # bins; padded, it would count twice and read a Nyquist tone 6 dB hot.
+            if m % 2 == 0:
+                spectrum[-1] *= 0.5
             # Until 17 Oct 2026 this zero-padded the time signal instead
             # (rfft(seg, n=4m)), which interpolates nothing and returned the
             # sample peak. Padding the spectrum and scaling by the factor is
             # the interpolation.
-            factor = TRUE_PEAK_OVERSAMPLE_FACTOR
-            up = _np.fft.irfft(_np.fft.rfft(seg), n=factor * m) * factor
-            peak = max(peak, float(_np.max(_np.abs(up))) if up.size else 0.0)
+            up = _np.fft.irfft(spectrum, n=factor * m) * factor
+            interior = up[factor * margin: factor * (margin + end - pos)]
+            peak = max(peak, float(_np.max(_np.abs(interior))))
     if peak <= 0.0:
         return None
     return 20.0 * math.log10(peak)

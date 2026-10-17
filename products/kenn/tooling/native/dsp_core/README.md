@@ -33,8 +33,8 @@ has a separate parity/performance receipt; portable scalar builds remain
 available for compatibility but are not promoted as a speed claim.
 
 The Mix Review calibrated loudness path has a separate candidate gate:
-``KENN_DSP_LOUDNESS_NATIVE=1`` enables the C++ K-weighting/LRA/8x true-peak
-kernel (``KENN_DSP_NATIVE=0`` still turns it off with the rest). Its rounded LUFS/LRA/true-peak
+the C++ K-weighting/LRA/8x true-peak kernel, on by default since 17 Oct 2026;
+``KENN_DSP_LOUDNESS_NATIVE=0`` (or ``KENN_DSP_NATIVE=0``) falls back to pyloudnorm. Its rounded LUFS/LRA/true-peak
 output is parity-tested against pyloudnorm. Complete-request
 timing and promotion evidence are recorded in
 ``CPP_DSP_PHASE4_MIX_REVIEW_LOUDNESS_RECEIPT.md``.

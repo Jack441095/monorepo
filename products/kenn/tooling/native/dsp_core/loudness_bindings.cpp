@@ -39,7 +39,8 @@ struct BlockMeasurement {
 
 // True peak is read at 8x since 17 Oct 2026 (owner's call), in step with
 // TRUE_PEAK_OVERSAMPLE_FACTOR in local_engine.py, which records the tone sweep.
-// The whole loudness call takes about 0.34 s on a 4-minute stereo mix at 8x.
+// The whole loudness call took 0.34 s on 4 minutes of 44.1 kHz stereo noise
+// (Jack's Mac, Accelerate build, 17 Oct 2026).
 constexpr std::size_t kTruePeakUp = 8;
 // scipy.signal.resample_poly(x, 8, 1) designs firwin(2 * 10 * 8 + 1, 1 / 8,
 // window=("kaiser", 5.0)) * 8 by default. We design the same filter here rather
@@ -51,7 +52,7 @@ constexpr std::size_t kTruePeakTaps = 2 * kTruePeakHalfLength + 1;
 // half-length + 1 outputs, which keeps the interpolation zero-phase.
 constexpr std::size_t kTruePeakPadded = kTruePeakTaps + 1;
 constexpr std::size_t kTruePeakDelay = kTruePeakHalfLength + 1;
-constexpr std::size_t kTruePeakPhaseTaps = kTruePeakTaps / kTruePeakUp + 1;
+[[maybe_unused]] constexpr std::size_t kTruePeakPhaseTaps = kTruePeakTaps / kTruePeakUp + 1;
 
 double bessel_i0(double x)
 {
@@ -467,5 +468,5 @@ void init_loudness_bindings(nb::module_& module)
 {
     module.def("loudness_metrics", &loudness_metrics,
                nb::arg("samples"), nb::arg("sample_rate"),
-               "Compute opt-in BS.1770 K-weighted integrated loudness and LRA.");
+               "Compute BS.1770 K-weighted integrated loudness, LRA and 8x true peak.");
 }

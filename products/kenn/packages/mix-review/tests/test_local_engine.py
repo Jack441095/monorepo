@@ -524,7 +524,6 @@ def test_waveform_and_spectral_analysis_metrics_emitted() -> None:
     assert len(timeline["timestamps"]) == len(timeline["correlation"]) == len(timeline["balance"])
 
 
-
 def test_numpy_true_peak_fallback_reads_between_the_samples() -> None:
     # Until 17 Oct 2026 the no-scipy fallback zero-padded the time signal, so it
     # returned the sample peak. A quarter-rate sine sampled at +/-45 degrees has
@@ -532,6 +531,11 @@ def test_numpy_true_peak_fallback_reads_between_the_samples() -> None:
     np = pytest.importorskip("numpy")
     n = 4096
     tone = 0.5 * np.sin(np.pi / 2 * np.arange(n) + np.pi / 4)
+    # 512-sample fades, so the file edges add no Gibbs overshoot of their own
+    # and the reading is the steady crest in the middle.
+    ramp = np.sin(np.linspace(0.0, np.pi / 2, 512)) ** 2
+    tone[:512] *= ramp
+    tone[-512:] *= ramp[::-1]
     assert local_engine._numpy_true_peak_dbtp([tone]) == pytest.approx(20 * math.log10(0.5), abs=0.05)
 
 
@@ -552,3 +556,18 @@ def test_calibrated_loudness_takes_the_native_meter_by_default(monkeypatch) -> N
     monkeypatch.setenv("KENN_DSP_LOUDNESS_NATIVE", "0")
     assert local_engine.analyze_wav(payload, filename="rollback.wav")["metrics"]["integrated_lufs"] != -9.0
     assert calls == [44100]
+
+
+def test_numpy_true_peak_fallback_does_not_wrap_a_chunk_onto_itself() -> None:
+    # The first 17 Oct fix interpolated each chunk periodically, so a loop cut
+    # at its crest read +1.23 dBTP where scipy reads +0.20, and a sine crossing
+    # the 2**20-sample chunk edge read 0.83 dB hot.
+    np = pytest.importorskip("numpy")
+    signal = pytest.importorskip("scipy.signal")
+    rate = 44100
+    loop = 0.9 * np.sin(2 * np.pi * 440.0 * np.arange(rate) / rate)
+    crest = int(np.argmax(loop[:2000]))
+    long_sine = 0.5 * np.sin(2 * np.pi * 1000.0 * np.arange((1 << 20) + 5000) / rate)
+    for tone in (np.concatenate((loop[crest:], loop[:crest])), long_sine):
+        scipy_dbtp = 20 * math.log10(np.max(np.abs(signal.resample_poly(tone, 8, 1))))
+        assert local_engine._numpy_true_peak_dbtp([tone]) == pytest.approx(scipy_dbtp, abs=0.05)
