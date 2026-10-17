@@ -618,3 +618,21 @@ def test_a_trailing_partial_frame_is_dropped_on_the_python_decoder(monkeypatch) 
     channels, _rate, _count = local_engine._decode_channels(padded)
     assert len(channels[0]) == len(channels[1]) == int(3.0 * 44100)
     assert local_engine.analyze_wav(padded, filename="stray.wav")["ok"] is not False
+
+
+def test_32bit_float_wav_with_nan_or_inf_is_rejected_by_validator_and_engine(monkeypatch) -> None:
+    import json
+
+    for poison in (float("nan"), float("inf"), float("-inf")):
+        payload = _wav_bytes_float32([[0.1, poison, -0.1, 0.2] * 4096] * 2, framerate=44100)
+        val = local_engine.validate_wav_upload(payload, "poison.wav")
+        assert val["ok"] is False
+        assert "NaN or infinite" in val["error"]
+
+        for decode_flag in ("1", "0"):
+            monkeypatch.setenv("KENN_DSP_MIX_REVIEW_DECODE_NATIVE", decode_flag)
+            report = local_engine.analyze_wav(payload, filename="poison.wav")
+            assert report["ok"] is False
+            assert "NaN or infinite" in report["error"]
+            json.dumps(report, allow_nan=False)
+

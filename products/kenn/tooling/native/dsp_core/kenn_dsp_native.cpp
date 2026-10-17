@@ -98,6 +98,10 @@ constexpr std::array<std::pair<double, double>, 7> kMaskingBands {{
 
 constexpr double kClipThreshold = 0.9660508789898133; // 10^(-0.3/20)
 constexpr double kSilenceThreshold = 0.001; // 10^(-60/20)
+// 1024 frames (~21.3 ms at 48 kHz, ~23.2 ms at 44.1 kHz) spans at least a full
+// cycle down to 47 Hz and half a cycle down to 23.4 Hz, preventing individual
+// zero-crossing samples in a continuous tone from being counted as silence.
+constexpr std::size_t kSilenceBlockSamples = 1024;
 
 std::uint16_t read_u16(const std::uint8_t* data)
 {
@@ -329,6 +333,8 @@ DecodedWav decode_pcm(
                 std::uint32_t bits = little_endian ? read_u32(sample) : read_be_u32(sample);
                 float decoded;
                 std::memcpy(&decoded, &bits, sizeof(decoded));
+                if (!std::isfinite(decoded))
+                    throw nb::value_error("invalid WAV: IEEE float data contains NaN or infinite samples");
                 value = decoded;
             } else {
                 const auto integer = static_cast<std::int32_t>(
@@ -350,26 +356,36 @@ ChannelSummary summarize_channel(const float* samples, std::size_t length)
     double sum = 0.0;
     double sum_squares = 0.0;
     bool in_clip_run = false;
-    for (std::size_t index = 0; index < length; ++index)
+    for (std::size_t block_start = 0; block_start < length; block_start += kSilenceBlockSamples)
     {
-        const double value = static_cast<double>(samples[index]);
-        const double magnitude = std::abs(value);
-        sum += value;
-        sum_squares += value * value;
-        result.peak = std::max(result.peak, magnitude);
-        if (magnitude >= kClipThreshold)
+        const std::size_t block_end = std::min(length, block_start + kSilenceBlockSamples);
+        double block_squares = 0.0;
+        for (std::size_t index = block_start; index < block_end; ++index)
         {
-            ++result.clipped_sample_count;
-            if (!in_clip_run)
-                ++result.clipped_run_count;
-            in_clip_run = true;
+            const double value = static_cast<double>(samples[index]);
+            if (!std::isfinite(value))
+                throw std::invalid_argument("audio samples must be finite");
+            const double magnitude = std::abs(value);
+            sum += value;
+            const double sq = value * value;
+            sum_squares += sq;
+            block_squares += sq;
+            result.peak = std::max(result.peak, magnitude);
+            if (magnitude >= kClipThreshold)
+            {
+                ++result.clipped_sample_count;
+                if (!in_clip_run)
+                    ++result.clipped_run_count;
+                in_clip_run = true;
+            }
+            else
+            {
+                in_clip_run = false;
+            }
         }
-        else
-        {
-            in_clip_run = false;
-        }
-        if (magnitude < kSilenceThreshold)
-            ++result.silence_count;
+        const std::size_t block_len = block_end - block_start;
+        if (std::sqrt(block_squares / static_cast<double>(block_len)) < kSilenceThreshold)
+            result.silence_count += block_len;
     }
     result.rms = std::sqrt(sum_squares / static_cast<double>(length));
     result.dc_offset = sum / static_cast<double>(length);
@@ -500,7 +516,15 @@ std::vector<SpectralPeak> find_dominant_peaks(
         const double denominator = left - 2.0 * center + right;
         double offset = std::abs(denominator) < 1e-12 ? 0.0 : 0.5 * (left - right) / denominator;
         offset = std::max(-0.5, std::min(0.5, offset));
-        const double peak_power = std::max(powers[index], 1e-30);
+        // Evaluate the vertex of the log-power parabola so off-bin tones do not
+        // Divide out the Hann mainlobe attenuation W(d) = sin(pi*d)/(pi*d*(1-d^2))
+        // at the fractional bin offset d so off-bin tones do not lose up to
+        // 1.42 dB (0.62 dB at 1/3-bin offset) to Hann scalloping.
+        const double pi_d = std::numbers::pi * offset;
+        const double hann_gain = std::abs(offset) < 1e-9
+            ? 1.0
+            : std::sin(pi_d) / (pi_d * (1.0 - offset * offset));
+        const double peak_power = std::max(powers[index] / (hann_gain * hann_gain), 1e-30);
         const double amplitude = 2.0 * std::sqrt(peak_power) / std::max(window_sum, 1.0);
         candidates.push_back({
             (static_cast<double>(index) + offset) * static_cast<double>(sample_rate) / static_cast<double>(fft_size),
@@ -555,6 +579,10 @@ SpectralResult compute_window_powers(
     std::size_t sample_rate,
     bool include_ltas)
 {
+    for (std::size_t i = 0; i < length; ++i) {
+        if (!std::isfinite(samples[i]))
+            throw std::invalid_argument("audio samples must be finite");
+    }
     const auto fft_size = std::min<std::size_t>(kenn::dsp::next_power_of_two(std::max<std::size_t>(256, requested_fft_size)), 131072);
     const auto starts = kenn::dsp::window_starts(length, fft_size);
     const auto bins = fft_size / 2 + 1;
@@ -689,6 +717,10 @@ BandEnergyResult compute_band_energy(
 {
     if (sample_rate == 0 || fft_size == 0 || hop == 0)
         throw std::invalid_argument("sample_rate, fft_size, and hop must be positive");
+    for (std::size_t i = 0; i < length; ++i) {
+        if (!std::isfinite(samples[i]))
+            throw std::invalid_argument("audio samples must be finite");
+    }
 
     BandEnergyResult result;
     result.frames = 1 + (length > fft_size ? (length - fft_size) / hop : 0);
@@ -807,22 +839,43 @@ nb::dict stereo_metrics(FloatInput left, FloatInput right)
     std::size_t frame_silence_count = 0;
     {
         nb::gil_scoped_release release;
-        left_summary = summarize_channel(left.data(), left.shape(0));
-        right_summary = summarize_channel(right.data(), right.shape(0));
+        const std::size_t length = left.shape(0);
+        left_summary = summarize_channel(left.data(), length);
+        right_summary = summarize_channel(right.data(), length);
         channel_correlation = correlation_with_offsets(
-            left.data(), right.data(), left.shape(0), left_summary.dc_offset, right_summary.dc_offset);
-        for (std::size_t index = 0; index < left.shape(0); ++index)
+            left.data(), right.data(), length, left_summary.dc_offset, right_summary.dc_offset);
+        constexpr double kSilencePowerThreshold = kSilenceThreshold * kSilenceThreshold;
+        double mono_block_sum_squares = 0.0;
+        double left_block_sum_squares = 0.0;
+        double right_block_sum_squares = 0.0;
+        std::size_t block_len = 0;
+        for (std::size_t index = 0; index < length; ++index)
         {
-            const double mid = (static_cast<double>(left(index)) + static_cast<double>(right(index))) * 0.5;
-            const double side = (static_cast<double>(left(index)) - static_cast<double>(right(index))) * 0.5;
+            const double l = static_cast<double>(left(index));
+            const double r = static_cast<double>(right(index));
+            const double mid = (l + r) * 0.5;
+            const double side = (l - r) * 0.5;
             mono_sum_squares += mid * mid;
             side_sum_squares += side * side;
-            if (std::abs(mid) < kSilenceThreshold)
-                ++mono_silence_count;
-            // A frame is silent only when both channels are. The mono-sum count
-            // alone reads a polarity-flipped file (L = -R) as silent.
-            if (std::abs(left(index)) < kSilenceThreshold && std::abs(right(index)) < kSilenceThreshold)
-                ++frame_silence_count;
+            mono_block_sum_squares += mid * mid;
+            left_block_sum_squares += l * l;
+            right_block_sum_squares += r * r;
+            ++block_len;
+            if (block_len == kSilenceBlockSamples || index + 1 == length)
+            {
+                const double block_threshold = static_cast<double>(block_len) * kSilencePowerThreshold;
+                if (mono_block_sum_squares < block_threshold)
+                    mono_silence_count += block_len;
+                // A frame block is silent only when both channels fall below
+                // -60 dBFS RMS. The mono-sum count alone reads a polarity-flipped
+                // file (L = -R) as silent.
+                if (left_block_sum_squares < block_threshold && right_block_sum_squares < block_threshold)
+                    frame_silence_count += block_len;
+                mono_block_sum_squares = 0.0;
+                left_block_sum_squares = 0.0;
+                right_block_sum_squares = 0.0;
+                block_len = 0;
+            }
         }
     }
 

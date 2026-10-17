@@ -74,3 +74,29 @@ def test_loudness_analysis_raises_when_native_extension_disabled(monkeypatch: py
         true_peak_dbtp(np.zeros((128, 1), dtype=np.float32))
     with pytest.raises(RuntimeError, match="Native loudness_range_lu kernel is required"):
         loudness_range_lu([-20.0, -25.0])
+
+
+def test_measure_loudness_supports_multichannel_bs1770_weights_and_rejects_nan() -> None:
+    import struct
+
+    t = np.arange(RATE * 2) / RATE
+    tone = (10 ** (-20 / 20)) * np.sin(2 * math.pi * 997.0 * t)
+    zeros = np.zeros_like(tone)
+    # 5.1 layout (L, R, C, LFE, Ls, Rs): LFE (index 3) has weight 0.0, Ls (index 4) has weight 1.41 (+1.49 dB).
+    lfe_only = np.stack([zeros, zeros, zeros, tone, zeros, zeros], axis=1)
+    assert measure_loudness(_wav(lfe_only))["integrated_lufs"] is None
+
+    ls_only = np.stack([zeros, zeros, zeros, zeros, tone, zeros], axis=1)
+    front_only = np.stack([tone, zeros, zeros, zeros, zeros, zeros], axis=1)
+    front_lufs = measure_loudness(_wav(front_only))["integrated_lufs"]
+    ls_lufs = measure_loudness(_wav(ls_only))["integrated_lufs"]
+    assert front_lufs is not None and ls_lufs is not None
+    assert (ls_lufs - front_lufs) == pytest.approx(10.0 * math.log10(1.41), abs=0.05)
+
+    raw_data = struct.pack("<ff", 0.1, float("nan")) * 4096
+    fmt_chunk = struct.pack("<4sIHHIIHH", b"fmt ", 16, 3, 2, RATE, RATE * 8, 8, 32)
+    data_chunk = struct.pack("<4sI", b"data", len(raw_data)) + raw_data
+    nan_wav = struct.pack("<4sI4s", b"RIFF", 4 + len(fmt_chunk) + len(data_chunk), b"WAVE") + fmt_chunk + data_chunk
+    with pytest.raises(ValueError, match="NaN or infinite"):
+        measure_loudness(nan_wav)
+

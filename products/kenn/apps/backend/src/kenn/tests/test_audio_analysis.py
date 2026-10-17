@@ -247,3 +247,59 @@ def test_a_silent_channel_has_no_correlation_on_either_path(monkeypatch) -> None
     monkeypatch.setenv("KENN_DSP_NATIVE", "0")
     reference = [analyze_wav(payload, filename="flat.wav")["metrics"]["correlation"] for payload in (one_side, all_silent)]
     assert native == reference == [None, None]
+
+
+def test_float_wav_with_nan_or_infinity_is_rejected_cleanly(monkeypatch) -> None:
+    import json
+    import pytest
+
+    for poison in (float("nan"), float("inf"), float("-inf")):
+        raw_data = struct.pack("<ffff", 0.1, poison, -0.1, 0.2) * 1024
+        fmt_chunk = struct.pack("<4sIHHIIHH", b"fmt ", 16, 3, 2, 48000, 48000 * 8, 8, 32)
+        data_chunk = struct.pack("<4sI", b"data", len(raw_data)) + raw_data
+        payload = struct.pack("<4sI4s", b"RIFF", 4 + len(fmt_chunk) + len(data_chunk), b"WAVE") + fmt_chunk + data_chunk
+
+        monkeypatch.delenv("KENN_DSP_NATIVE", raising=False)
+        native_report = analyze_wav(payload, filename="poison.wav")
+        assert native_report["ok"] is False
+        assert "NaN or infinite" in native_report["error"]
+        json.dumps(native_report, allow_nan=False)
+
+        monkeypatch.setenv("KENN_DSP_NATIVE", "0")
+        ref_report = analyze_wav(payload, filename="poison.wav")
+        assert ref_report["ok"] is False
+        assert "NaN or infinite" in ref_report["error"]
+        json.dumps(ref_report, allow_nan=False)
+
+    monkeypatch.delenv("KENN_DSP_NATIVE", raising=False)
+    from kenn.core import native_fft
+
+    mod = native_fft._load()
+    if mod is not None:
+        import numpy as np
+
+        bad = np.array([0.1, float("nan"), -0.1], dtype=np.float32)
+        good = np.array([0.1, 0.2, -0.1], dtype=np.float32)
+        with pytest.raises(ValueError, match="finite"):
+            mod.mono_metrics(bad)
+        with pytest.raises(ValueError, match="finite"):
+            mod.stereo_metrics(good, bad)
+        with pytest.raises(ValueError, match="finite"):
+            mod.spectral_power(bad, 256, 48000, False)
+
+
+def test_steady_tone_reports_zero_silence_and_accurate_off_bin_peak_level(monkeypatch) -> None:
+    # A continuous -20 dBFS 1 kHz sine at 48 kHz falls 1/3 of a bin off the
+    # 16384-point FFT grid (bin 341.333). Before log-parabola vertex evaluation
+    # and 1024-sample block-RMS silence counting, it reported ~4% silence from
+    # zero crossings and -20.61 dBFS peak from Hann scalloping loss.
+    payload = wav([sine(2.0, 1000.0, amplitude=0.1, rate=48000)], 48000)
+    for native_flag in ("1", "0"):
+        monkeypatch.setenv("KENN_DSP_NATIVE", native_flag)
+        report = analyze_wav(payload, filename="sine_1k.wav")
+        assert report["ok"] is True
+        assert report["metrics"]["silence_percentage"] == 0.0
+        top_peak = report["spectral"]["dominant_peaks"][0]
+        assert abs(top_peak["frequency_hz"] - 1000.0) < 0.1
+        assert abs(top_peak["level_dbfs"] - (-20.0)) < 0.1
+

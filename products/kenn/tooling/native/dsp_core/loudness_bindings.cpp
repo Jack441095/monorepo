@@ -145,13 +145,41 @@ void apply_biquad(std::vector<double>& values, const Biquad& filter)
 }
 #endif
 
+void ensure_finite_matrix(const float* samples, std::size_t sample_count)
+{
+    for (std::size_t index = 0; index < sample_count; ++index) {
+        if (!std::isfinite(samples[index]))
+            throw nb::value_error("samples contain NaN or infinite values");
+    }
+}
+
+constexpr double channel_loudness_weight(std::size_t channel, std::size_t channel_count) noexcept
+{
+    // ITU-R BS.1770-4 Table 3 / EBU Tech 3341 channel weights:
+    //   1-3 channels (M, L/R, L/R/C): 1.0 on all channels.
+    //   4-5 channels (quad / 5.0 L, R, C, Ls, Rs): 1.41 (+1.5 dB) on surround indices 3 and 4.
+    //   6 channels (5.1 L, R, C, LFE, Ls, Rs): LFE (index 3) is excluded (0.0); Ls/Rs (4, 5) are 1.41.
+    if (channel_count == 6) {
+        if (channel == 3)
+            return 0.0;
+        if (channel == 4 || channel == 5)
+            return 1.41;
+        return 1.0;
+    }
+    if (channel == 3 || channel == 4)
+        return 1.41;
+    return 1.0;
+}
+
 std::vector<std::vector<double>> k_weight_channels(
     const float* samples,
     std::size_t frame_count,
     std::size_t channel_count,
-    double sample_rate)
+    double sample_rate,
+    std::size_t tail_frames = 0)
 {
-    std::vector<std::vector<double>> channels(channel_count, std::vector<double>(frame_count));
+    const std::size_t total_frames = frame_count + tail_frames;
+    std::vector<std::vector<double>> channels(channel_count, std::vector<double>(total_frames, 0.0));
     const auto shelf = rbj_filter(4.0, 1.0 / std::sqrt(2.0), 1500.0, sample_rate, true);
     const auto highpass = rbj_filter(0.0, 0.5, 38.0, sample_rate, false);
 #if defined(KENN_HAS_ACCELERATE)
@@ -168,11 +196,14 @@ std::vector<std::vector<double>> k_weight_channels(
         for (std::size_t frame = 0; frame < frame_count; ++frame)
             output[frame] = static_cast<double>(samples[frame * channel_count + channel]);
         // These are the exact RBJ K-weighting stages used by pyloudnorm's
-        // default Meter("K-weighting") path.
+        // default Meter("K-weighting") path. Because both biquads are causal,
+        // filtering through tail_frames trailing zeros leaves [0, frame_count)
+        // bit-identical for integrated/momentary/short-term windows while
+        // letting the high-pass state ring out into the 1.5 s LRA tail.
 #if defined(KENN_HAS_ACCELERATE)
         std::array<double, 6> delay {};
         vDSP_biquadD(setup, delay.data(), output.data(), 1, output.data(), 1,
-                     static_cast<vDSP_Length>(frame_count));
+                     static_cast<vDSP_Length>(total_frames));
 #else
         apply_biquad(output, shelf);
         apply_biquad(output, highpass);
@@ -186,8 +217,8 @@ std::vector<std::vector<double>> k_weight_channels(
 
 // The BS.1770 and EBU Tech 3341/3342 windows overlap heavily (75% for
 // integrated/momentary, 67% for 1 Hz short-term, and 97% for pyloudnorm LRA).
-// Build one double-precision prefix sum of squares per channel so every block
-// power in all four passes is two reads instead of another full scan.
+// Build one double-precision prefix sum of weighted squares per channel so
+// every block power in all four passes is two reads instead of another scan.
 std::vector<std::vector<double>> build_squared_prefix(
     const std::vector<std::vector<double>>& channels)
 {
@@ -196,10 +227,16 @@ std::vector<std::vector<double>> build_squared_prefix(
     std::vector<std::vector<double>> squared_prefix(channel_count);
     for (std::size_t channel = 0; channel < channel_count; ++channel) {
         const auto& source = channels[channel];
+        const double weight = channel_loudness_weight(channel, channel_count);
         auto& prefix = squared_prefix[channel];
         prefix.resize(frame_count + 1, 0.0);
-        for (std::size_t index = 0; index < frame_count; ++index)
-            prefix[index + 1] = prefix[index] + source[index] * source[index];
+        if (weight == 1.0) {
+            for (std::size_t index = 0; index < frame_count; ++index)
+                prefix[index + 1] = prefix[index] + source[index] * source[index];
+        } else if (weight > 0.0) {
+            for (std::size_t index = 0; index < frame_count; ++index)
+                prefix[index + 1] = prefix[index] + weight * (source[index] * source[index]);
+        }
     }
     return squared_prefix;
 }
@@ -513,6 +550,7 @@ nb::object true_peak_dbtp_binding(FloatMatrixInput samples)
 {
     if (samples.ndim() != 2 || samples.shape(0) == 0 || samples.shape(1) == 0)
         throw nb::value_error("samples must be a non-empty 2D float32 matrix");
+    ensure_finite_matrix(samples.data(), samples.shape(0) * samples.shape(1));
     std::optional<double> result;
     {
         nb::gil_scoped_release release;
@@ -543,13 +581,14 @@ std::vector<double> windowed_loudness_binding(
     double window_s,
     double hop_s)
 {
-    if (samples.ndim() != 2 || samples.shape(0) == 0 || samples.shape(1) == 0 || samples.shape(1) > 2)
-        throw nb::value_error("samples must be a non-empty float32 matrix with one or two channels");
+    if (samples.ndim() != 2 || samples.shape(0) == 0 || samples.shape(1) == 0 || samples.shape(1) > 64)
+        throw nb::value_error("samples must be a non-empty float32 matrix with 1..64 channels");
     if (sample_rate == 0 || window_s <= 0.0 || hop_s <= 0.0)
         throw nb::value_error("sample_rate, window_s and hop_s must be positive");
     const auto frame_count = samples.shape(0);
     const auto channel_count = samples.shape(1);
     const float* data = samples.data();
+    ensure_finite_matrix(data, frame_count * channel_count);
     std::vector<double> result;
     {
         nb::gil_scoped_release release;
@@ -563,8 +602,8 @@ std::vector<double> windowed_loudness_binding(
 
 nb::dict loudness_metrics(FloatMatrixInput samples, std::size_t sample_rate)
 {
-    if (samples.ndim() != 2 || samples.shape(0) == 0 || samples.shape(1) == 0 || samples.shape(1) > 2)
-        throw nb::value_error("samples must be a non-empty float32 matrix with one or two channels");
+    if (samples.ndim() != 2 || samples.shape(0) == 0 || samples.shape(1) == 0 || samples.shape(1) > 64)
+        throw nb::value_error("samples must be a non-empty float32 matrix with 1..64 channels");
     if (sample_rate == 0)
         throw nb::value_error("sample_rate must be positive");
     const auto frame_count = samples.shape(0);
@@ -573,6 +612,7 @@ nb::dict loudness_metrics(FloatMatrixInput samples, std::size_t sample_rate)
         throw nb::value_error("samples are shorter than the 400 ms BS.1770 gating block");
 
     const float* data = samples.data();
+    ensure_finite_matrix(data, frame_count * channel_count);
     std::optional<double> true_peak;
     std::optional<double> sample_peak;
     std::optional<double> integrated;
@@ -583,10 +623,13 @@ nb::dict loudness_metrics(FloatMatrixInput samples, std::size_t sample_rate)
     {
         nb::gil_scoped_release release;
         const double rate = static_cast<double>(sample_rate);
+        const auto silence_count = static_cast<std::size_t>(1.5 * sample_rate);
+        const bool compute_lra = (frame_count + silence_count) > static_cast<std::size_t>(3.0 * sample_rate);
         true_peak = true_peak_dbtp(data, frame_count, channel_count);
         sample_peak = sample_peak_dbfs(data, frame_count * channel_count);
-        const auto filtered = k_weight_channels(data, frame_count, channel_count, rate);
-        auto squared_prefix = build_squared_prefix(filtered);
+        const auto filtered = k_weight_channels(
+            data, frame_count, channel_count, rate, compute_lra ? silence_count : 0);
+        const auto squared_prefix = build_squared_prefix(filtered);
 
         const auto integrated_blocks = measure_blocks(squared_prefix, frame_count, rate, 0.4, 0.75);
         integrated = integrated_loudness(integrated_blocks);
@@ -602,15 +645,11 @@ nb::dict loudness_metrics(FloatMatrixInput samples, std::size_t sample_rate)
                 short_term_windows.data(), short_term_windows.size());
         }
 
-        // pyloudnorm appends 1.5 s of silence for its 97%-overlap LRA pass;
-        // extending the prefix sum with its final value avoids resizing the
-        // channel buffers or rescanning the K-weighted frames a second time.
-        const auto silence_count = static_cast<std::size_t>(1.5 * sample_rate);
-        for (auto& prefix : squared_prefix)
-            prefix.resize(frame_count + silence_count + 1, prefix.back());
-        const auto lra_blocks = measure_blocks(
-            squared_prefix, frame_count + silence_count, rate, 3.0, 0.97);
-        lra = loudness_range(lra_blocks);
+        if (compute_lra) {
+            const auto lra_blocks = measure_blocks(
+                squared_prefix, frame_count + silence_count, rate, 3.0, 0.97);
+            lra = loudness_range(lra_blocks);
+        }
     }
 
     nb::dict output;

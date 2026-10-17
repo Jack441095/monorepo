@@ -500,13 +500,21 @@ def analyze_track_diagnostic(
             "track_index": track_index,
         }
 
-    features = native_fft.track_diagnostic_features(
-        channels,
-        sample_rate,
-        SPECTROGRAM_FREQUENCIES_HZ,
-        time_slices=SPECTROGRAM_TIME_SLICES,
-        waveform_points=WAVEFORM_POINTS,
-    )
+    try:
+        features = native_fft.track_diagnostic_features(
+            channels,
+            sample_rate,
+            SPECTROGRAM_FREQUENCIES_HZ,
+            time_slices=SPECTROGRAM_TIME_SLICES,
+            waveform_points=WAVEFORM_POINTS,
+        )
+    except ValueError as exc:
+        return {
+            "ok": False,
+            "error": f"Invalid audio samples: {exc}",
+            "track_name": track_name,
+            "track_index": track_index,
+        }
     if features is None:
         # available() is true but the loaded extension predates track_diagnostic_features.
         return {
@@ -530,7 +538,7 @@ def analyze_track_diagnostic(
     ]
 
     lufs_integrated: Optional[float] = None
-    if len(channels) in (1, 2):
+    if 1 <= len(channels) <= 64:
         try:
             loudness = native_fft.loudness_metrics(channels, sample_rate)
             if loudness is not None and loudness.get("integrated_lufs") is not None:

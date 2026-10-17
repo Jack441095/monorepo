@@ -334,3 +334,20 @@ def test_eight_bit_and_multichannel_wavs_decode_natively() -> None:
     assert abs(res_4ch["metrics"]["peak_dbfs"] - (-6.02)) < 0.2
     # Mean of channel RMS across 1 active (0.3536 RMS) and 3 silent channels is 0.0884 (-21.07 dBFS).
     assert abs(res_4ch["metrics"]["rms_dbfs"] - (-21.07)) < 0.2
+    # 1 active front channel at 0.5 peak (-9.03 dBFS RMS) has BS.1770 LUFS = -0.691 - 9.03 = -9.72 LUFS.
+    assert res_4ch["metrics"]["lufs_integrated"] == pytest.approx(-9.72, abs=0.1)
+
+
+def test_nan_float_wav_fails_track_diagnostic_cleanly() -> None:
+    import json
+
+    raw_data = struct.pack("<ff", 0.25, float("nan")) * 4096
+    fmt_chunk = struct.pack("<4sIHHIIHH", b"fmt ", 16, 3, 2, 48000, 48000 * 8, 8, 32)
+    data_chunk = struct.pack("<4sI", b"data", len(raw_data)) + raw_data
+    payload = struct.pack("<4sI4s", b"RIFF", 4 + len(fmt_chunk) + len(data_chunk), b"WAVE") + fmt_chunk + data_chunk
+
+    res = analyze_track_diagnostic(payload)
+    assert res["ok"] is False
+    assert "NaN or infinite" in res["error"]
+    json.dumps(res, allow_nan=False)
+

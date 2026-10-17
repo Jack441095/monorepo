@@ -116,9 +116,13 @@ def decode_pcm(
             )
         else:
             result = dict(module.decode_pcm(values))
-    except (TypeError, ValueError, RuntimeError):
+    except ValueError as exc:
+        if "NaN or infinite" in str(exc):
+            raise
         # Let the caller produce its stable public error or abstention reason
         # for malformed or unsupported audio containers.
+        return None
+    except (TypeError, RuntimeError):
         return None
     result["channels"] = [np.asarray(channel, dtype=np.float32, order="C") for channel in result["channels"]]
     result["input_copied"] = False
@@ -220,8 +224,8 @@ def loudness_metrics(channels: list[list[float]] | Any, sample_rate: int) -> dic
     import numpy as np
 
     values = [np.asarray(channel, dtype=np.float32, order="C") for channel in channels]
-    if len(values) not in (1, 2):
-        raise ValueError("native loudness supports only mono and stereo input")
+    if not (1 <= len(values) <= 64):
+        raise ValueError("native loudness supports 1..64 channels")
     if any(value.ndim != 1 or value.size == 0 for value in values):
         raise ValueError("native loudness requires non-empty one-dimensional channels")
     if any(value.shape != values[0].shape for value in values[1:]):

@@ -41,11 +41,6 @@ try:
 except ImportError:  # pragma: no cover - exercised only in minimal environments.
     _resample_poly = None
 
-try:
-    from scipy.io import wavfile as _scipy_wavfile
-except ImportError:  # pragma: no cover - exercised only in minimal environments.
-    _scipy_wavfile = None
-
 ANALYSIS_VERSION = "kenn.mix_review.local_engine.v1"
 RECEIPT_SCHEMA = "kenn.mix_review.local_analysis.v1"
 
@@ -231,6 +226,13 @@ def validate_wav_upload(payload: bytes, filename: str, *, label: str = "Local mi
         }
     if framerate <= 0 or len(data_bytes) == 0:
         return {"ok": False, "error": f"{label} has no audio frames."}
+    if audio_format == 3 and sampwidth == 4:
+        usable = (len(data_bytes) // 4) * 4
+        if _np is not None:
+            if not bool(_np.all(_np.isfinite(_np.frombuffer(data_bytes[:usable], dtype="<f4")))):
+                return {"ok": False, "error": f"{label} contains NaN or infinite float samples."}
+        elif any(not math.isfinite(val) for (val,) in struct.iter_unpack("<f", data_bytes[:usable])):
+            return {"ok": False, "error": f"{label} contains NaN or infinite float samples."}
     return {"ok": True}
 
 
@@ -252,7 +254,11 @@ def _decode_channels(payload: bytes) -> tuple[list[array], int, int]:
             from kenn.core.native_fft import decode_pcm
 
             native_result = decode_pcm(payload)
-        except (ImportError, OSError, RuntimeError, TypeError, ValueError):
+        except ValueError as exc:
+            if "NaN or infinite" in str(exc):
+                raise UnsupportedAudioError(str(exc)) from exc
+            native_result = None
+        except (ImportError, OSError, RuntimeError, TypeError):
             native_result = None
         if native_result is not None and _np is not None:
             try:
@@ -334,9 +340,13 @@ def _decode_channels(payload: bytes) -> tuple[list[array], int, int]:
         if audio_format == 3:  # IEEE 754 32-bit float
             if _np is not None:
                 values = _np.frombuffer(raw[:usable], dtype="<f4").astype(_np.float64)
+                if not bool(_np.all(_np.isfinite(values))):
+                    raise UnsupportedAudioError("WAV contains NaN or infinite float samples")
                 return [values[channel::channels] for channel in range(channels)], framerate, channels
             floats = array("f")
             floats.frombytes(raw[:usable])
+            if any(not math.isfinite(val) for val in floats):
+                raise UnsupportedAudioError("WAV contains NaN or infinite float samples")
             channel_data = [
                 array("d", (float(floats[index]) for index in range(channel, len(floats), channels)))
                 for channel in range(channels)
@@ -1355,15 +1365,7 @@ def _calibrated_loudness_and_true_peak(
         for channel in channel_data
     ):
         native_arrays = [_np.ravel(_np.asarray(channel, dtype=_np.float32)) for channel in channel_data]
-    # pyloudnorm's LRA path appends 1.5 s of silence and requires a signal
-    # longer than its 3 s short-term block. Keep the opt-in candidate on the
-    # same abstention boundary when the pyloudnorm oracle is installed.
-    pyloudnorm_lra_compatible = not (
-        _pyln is not None
-        and _resample_poly is not None
-        and len(arrays[0]) + int(1.5 * framerate) <= int(3.0 * framerate)
-    )
-    if native_loudness_enabled and pyloudnorm_lra_compatible:
+    if native_loudness_enabled:
         try:
             from kenn.core.native_fft import loudness_metrics
 
@@ -1372,6 +1374,10 @@ def _calibrated_loudness_and_true_peak(
             native_result = None
         if native_result is not None:
             native_integrated = native_result.get("integrated_lufs")
+            if native_integrated is None:
+                if _pyln is not None and _resample_poly is not None:
+                    return None, "integrated loudness was not finite (audio is likely silent or near-silent)"
+                return None, "no 400 ms block above the -70 LUFS absolute gate (audio is likely silent or near-silent)"
             if isinstance(native_integrated, (int, float)) and math.isfinite(float(native_integrated)):
                 native_lra = native_result.get("loudness_range_lu")
                 native_true_peak = native_result.get("true_peak_dbtp")

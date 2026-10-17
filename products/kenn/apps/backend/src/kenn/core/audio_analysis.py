@@ -32,6 +32,7 @@ PINK_NOISE_ANCHOR_FREQUENCY_HZ = 1000.0
 PINK_NOISE_SLOPE_DB_PER_OCTAVE = -3.0
 CLIP_THRESHOLD = 10 ** (-0.3 / 20.0)
 SILENCE_THRESHOLD = 10 ** (-60.0 / 20.0)
+SILENCE_BLOCK_SAMPLES = 1024
 
 
 class AudioAnalysisError(ValueError):
@@ -109,7 +110,11 @@ def _decode(payload: bytes) -> tuple[list[list[float]], int, int, int]:
         from .native_fft import decode_pcm
 
         native_result = decode_pcm(payload)
-    except (ImportError, OSError, RuntimeError, TypeError, ValueError):
+    except ValueError as exc:
+        if "NaN or infinite" in str(exc):
+            raise AudioAnalysisError(f"invalid WAV: {exc}") from exc
+        native_result = None
+    except (ImportError, OSError, RuntimeError, TypeError):
         native_result = None
     if native_result is not None:
         channels = _DecodedChannels(native_result["channels"])
@@ -161,6 +166,8 @@ def _decode(payload: bytes) -> tuple[list[list[float]], int, int, int]:
         if audio_format == 3:  # IEEE 754 32-bit float
             values = struct.iter_unpack("<f", raw[:expected])
             for index, (value,) in enumerate(values):
+                if not math.isfinite(value):
+                    raise AudioAnalysisError("invalid WAV: WAV contains NaN or infinite float samples")
                 channel_data[index % channels].append(float(value))
         else:  # 32-bit integer PCM
             values = struct.iter_unpack("<i", raw[:expected])
@@ -222,8 +229,9 @@ def _dominant_peaks(
     def frequency(index: float) -> float:
         return index * sample_rate / fft_size
 
-    # Local maxima above a conservative noise floor.  The parabolic offset is
-    # calculated in log-power space, which improves accuracy for off-bin tones.
+    # Local maxima above a conservative noise floor.  The parabolic offset and
+    # vertex power are calculated in log-power space, compensating Hann-window
+    # scalloping loss (up to 1.42 dB between bins) for off-bin tones.
     max_power = max(powers[1:], default=0.0)
     candidates: list[tuple[float, float]] = []
     for index in range(2, len(powers) - 1):
@@ -237,7 +245,9 @@ def _dominant_peaks(
         denominator = left - 2.0 * center + right
         offset = 0.0 if abs(denominator) < 1e-12 else 0.5 * (left - right) / denominator
         offset = max(-0.5, min(0.5, offset))
-        peak_power = max(powers[index], 1e-30)
+        pi_d = math.pi * offset
+        hann_gain = 1.0 if abs(offset) < 1e-9 else math.sin(pi_d) / (pi_d * (1.0 - offset * offset))
+        peak_power = max(powers[index] / (hann_gain * hann_gain), 1e-30)
         amplitude = 2.0 * math.sqrt(peak_power) / max(window_sum, 1.0)
         candidates.append((frequency(index + offset), _db(amplitude)))
     candidates.sort(key=lambda item: item[1], reverse=True)
@@ -592,14 +602,26 @@ def analyze_wav(
                 if clipped and not in_run:
                     clip_runs += 1
                 in_run = clipped
-        # A frame is silent only when every channel is below -60 dBFS. Counting
-        # on the mono sum read a polarity-flipped stereo file (L = -R) as 100%
-        # silent and skipped its spectrum (found 16 Oct 2026).
-        silent_frames = sum(
-            1 for frame in zip(*channels) if all(abs(value) < SILENCE_THRESHOLD for value in frame)
-        )
-        silence_percentage = 100.0 * silent_frames / max(1, len(channels[0]))
-        mono_silence_percentage = 100.0 * sum(1 for value in mono if abs(value) < SILENCE_THRESHOLD) / max(1, len(mono))
+        # Silence is measured over contiguous 1024-sample RMS blocks below
+        # -60 dBFS (SILENCE_THRESHOLD) so zero crossings on a continuous tone
+        # do not register as silent frames.
+        silence_power_threshold = SILENCE_THRESHOLD * SILENCE_THRESHOLD
+        total_frames = len(channels[0])
+        silent_frames = 0
+        mono_silent_frames = 0
+        for start in range(0, total_frames, SILENCE_BLOCK_SAMPLES):
+            end = min(total_frames, start + SILENCE_BLOCK_SAMPLES)
+            block_len = end - start
+            block_limit = block_len * silence_power_threshold
+            if all(
+                sum(float(channel[idx]) * float(channel[idx]) for idx in range(start, end)) < block_limit
+                for channel in channels
+            ):
+                silent_frames += block_len
+            if sum(float(mono[idx]) * float(mono[idx]) for idx in range(start, end)) < block_limit:
+                mono_silent_frames += block_len
+        silence_percentage = 100.0 * silent_frames / max(1, total_frames)
+        mono_silence_percentage = 100.0 * mono_silent_frames / max(1, len(mono))
         dc_offsets = [sum(channel) / len(channel) for channel in channels]
     elif channel_count == 1:
         summary = native_channel_metrics

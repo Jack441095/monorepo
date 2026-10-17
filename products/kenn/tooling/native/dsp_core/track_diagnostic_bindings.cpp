@@ -67,6 +67,8 @@ Signal analysis_signal(const float* data, std::size_t frames, std::size_t channe
         for (std::size_t frame = 0; frame < frames; ++frame)
         {
             const double value = data[frame * channels + channel];
+            if (!std::isfinite(value))
+                throw std::invalid_argument("samples contain NaN or infinite values");
             squares += value * value;
             signal.peak = std::max(signal.peak, std::abs(value));
         }

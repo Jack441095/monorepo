@@ -20,7 +20,7 @@ from kenn.core import native_fft
 def _load(source: Path | str | bytes | bytearray | memoryview) -> tuple[list[np.ndarray], int]:
     """Decode WAV or AIFF/AIFC audio into contiguous float32 channel arrays via the C++ decoder."""
     raw = bytes(source) if isinstance(source, (bytes, bytearray, memoryview)) else Path(source).read_bytes()
-    decoded = native_fft.decode_pcm(raw, allow_8bit=True, max_channels=2, allow_aiff=True)
+    decoded = native_fft.decode_pcm(raw, allow_8bit=True, max_channels=64, allow_aiff=True)
     if decoded is None:
         if not native_fft.available():
             raise RuntimeError("Native decode_pcm kernel is required for loudness measurement")
