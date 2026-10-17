@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The canonical NITE DSP engineering estate. **Everything is tracked directly in this single repository** — there are no git submodules on `main` (no `.gitmodules`, no gitlinks; the `submodule.*` entries in `.git/config` are vestigial from the Sept 2026 consolidation). The machine-readable current-state file is `docs/NITE_DSP_STATE.json`; the operating-decision document is `docs/NITE_DSP_FOUNDER_MASTER_PLAN.md`.
 
-Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `products/nite-submit`, `products/kenn-evaluation`, `backend/`, `website/`, `shared/`, `Audio_Too/` (preserved legacy), `audio-technology/`, `autonomous-systems/`, `validation/`.
+Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `products/nite-submit`, `backend/`, `website/`, `shared/`, `audio-technology/`, `autonomous-systems/`, `validation/`.
 
 **KENN lives here.** `products/kenn/` is the KENN source of truth, tracked directly in this monorepo (backend under `products/kenn/apps/backend`, tooling, plugins, docs). The former standalone repo (`Shenrendao/KENN`) was absorbed during the Sept 2026 consolidation; a frozen pre-monorepo snapshot is kept outside git under the local `Products/Kenn/archive/` data home.
 
@@ -15,7 +15,7 @@ Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `pro
 - **Never add an AI attribution trailer to commits in this repo.** Commits here must not contain `Co-Authored-By: Claude ...` or similar (the `commit-metadata.yml` gate exists on the `kenn-production-hardening` branch; its script `tools/check_commit_metadata.py` is not currently present on `main` — re-add before re-enabling CI enforcement). This overrides the default Claude Code commit-attribution behavior — do not append `Co-Authored-By: Claude ...` when committing here.
 - **Commit as Jack441095.** Author and committer are `Jack441095 <jack.gandy@gmail.com>`, the owner's GitHub account, never `Claude <noreply@anthropic.com>`. Cloud sessions start with the Claude identity configured, so set it first: `git config user.name "Jack441095" && git config user.email "jack.gandy@gmail.com"`.
 - New worktrees go under `workspace/worktrees/<project>/<task>/`; builds/caches go under `workspace/` or already-ignored project-local dirs.
-- `Audio_Too` is a preserved legacy boundary that was *not* bulk-migrated during the Sept 2026 cleanup — it overlaps heavily with `products/slo` (both descend from the SLO codebase) but is kept as a frozen reference; don't assume they mirror each other.
+- `Audio_Too/` (the legacy platform that `products/slo` and Thursday grew out of) was removed on 18 Oct 2026. Its last state is the tag `archive/audio-too-final`; check that out in a worktree if you need to read it.
 - Owner audio and corpora are data, not source — kept outside this code estate entirely.
 - **Agent skills**: Matt Pocock's engineering skills are vendored in `.claude/skills` (Claude Code, opencode) and `.agents/skills` (Codex, opencode) — same files in both, see the README beside them. Reach for them to grill a plan, run a diagnosis loop, do TDD, or review a diff on standards and spec. They must not spawn competing plans or tickets: `products/kenn/KENN_PLAN.md` stays the single roadmap.
 
@@ -90,4 +90,4 @@ There's no root-level build/test/lint config — each product (`products/kenn`, 
 
 ## CI
 
-`.github/workflows/`: `backend.yml`, `website.yml`, `kenn-core.yml`, `kenn-dsp-native.yml`, `kenn-integration.yml`, `smart-sample-manager.yml`, `nite-submit-ci.yml`, `audio-too-ci.yml`, and `mirror-to-personal.yml` (mirrors every push to `main` from `Nite-DSP/monorepo` to the personal `Jack441095/monorepo`, which is what Vercel actually deploys from — see `REPO_NOTES.md` for the deploy chain).
+`.github/workflows/`: `backend.yml`, `website.yml`, `kenn-core.yml`, `kenn-dsp-native.yml`, `kenn-integration.yml`, `smart-sample-manager.yml`, `nite-submit-ci.yml`, `kenn-app-sync.yml`, `kenn-weekly.yml`, and `mirror-to-personal.yml` (mirrors every push to `main` from `Nite-DSP/monorepo` to the personal `Jack441095/monorepo`, which is what Vercel actually deploys from — see `REPO_NOTES.md` for the deploy chain).
