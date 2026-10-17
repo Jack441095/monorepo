@@ -1,9 +1,10 @@
 """Optional nanobind bridge for KENN's native PCM and DSP kernels.
 
 The module is deliberately optional: a missing or incompatible extension keeps
-the pure-Python reference path available. Set ``KENN_DSP_NATIVE=1`` to enable
-the native candidate explicitly, or ``KENN_DSP_NATIVE=0`` to force the
-reference implementation for parity tests and rollback.
+the pure-Python reference path available. The native path is on by default
+when the extension is built; set ``KENN_DSP_NATIVE=0`` to force the reference
+implementation for parity tests and rollback. Loudness, mix-review decode and
+masking keep their own opt-in flags on top of this one.
 """
 
 from __future__ import annotations
@@ -17,9 +18,14 @@ _load_attempted = False
 
 def _load() -> Any | None:
     global _native, _load_attempted
-    # Keep the measured Python/NumPy reference as the release default. Native
-    # candidates are enabled explicitly during qualification or benchmarking.
-    if os.environ.get("KENN_DSP_NATIVE", "0").strip().lower() in {"0", "false", "off", "no"}:
+    # Native is the default since 17 Oct 2026. On 26 real files (16/24-bit and
+    # float, 11-96 kHz, mono and stereo, ten full mixdowns) the audio analysis
+    # matched the Python reference everywhere except one peak bandwidth
+    # (70.312 vs 70.313 Hz), and ran 1.6 s against 152.7 s with peak RSS
+    # 1.3 GB against 4.6 GB. The 15 Oct decision to stay opt-in measured an
+    # older build that still did decode and summary loops in Python.
+    # A missing extension still falls through to the reference below.
+    if os.environ.get("KENN_DSP_NATIVE", "1").strip().lower() in {"0", "false", "off", "no"}:
         return None
     if _load_attempted:
         return _native

@@ -191,6 +191,25 @@ def test_32_bit_float_wav_is_supported_in_audio_analysis() -> None:
     assert any(abs(peak["frequency_hz"] - 440.0) < 44100 / 16384 for peak in report["spectral"]["dominant_peaks"])
 
 
+def test_native_analysis_is_the_default_and_zero_still_forces_the_reference(monkeypatch) -> None:
+    # Native became the default on 17 Oct 2026; KENN_DSP_NATIVE=0 is the rollback and must keep working.
+    from kenn.core import native_fft
+
+    monkeypatch.setattr(native_fft, "_load_attempted", False)
+    monkeypatch.setattr(native_fft, "_native", None)
+    monkeypatch.delenv("KENN_DSP_NATIVE", raising=False)
+    try:
+        from kenn.core import _kenn_dsp_native  # noqa: F401
+    except (ImportError, OSError):
+        # Without a built extension there is nothing to default to; the reference runs either way.
+        assert native_fft.available() is False
+    else:
+        assert native_fft.available() is True
+    monkeypatch.setenv("KENN_DSP_NATIVE", "0")
+    assert native_fft.available() is False
+    assert analyze_wav(wav([sine(0.5, 440.0)], 48000), filename="rollback.wav")["spectral"]["implementation"] == "python-reference"
+
+
 def test_native_peak_and_ltas_reports_match_reference(monkeypatch) -> None:
     from kenn.core import native_fft
 

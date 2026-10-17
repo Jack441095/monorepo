@@ -169,5 +169,33 @@ The automated native-wheel check is defined in
 `.github/workflows/kenn-dsp-native.yml`; it is evidence for the Python native
 package only, not a substitute for Windows VST3 host validation.
 
-The native spectral path remains opt-in (`KENN_DSP_NATIVE=1`) until this
-qualification receipt records a passing real-mix and cross-platform result.
+The native spectral path remained opt-in (`KENN_DSP_NATIVE=1`) until the
+17 Oct real-file result below.
+
+## 17 Oct 2026: native audio analysis becomes the default
+
+Owner-approved corpus from `Audio-Assets/SLO-Testing` (read in place, nothing
+copied into Git): ten AutoMix full mixdowns (24-bit stereo, 44.1 kHz, about
+4 minutes each), the longest file of each sample-pack format (16-bit, 24-bit
+and 32-bit float PCM at 11.025, 44.1, 48, 88.2 and 96 kHz, mono and stereo),
+two near-silent stems (reverse cymbal, SFX), a 24-bit DI bass, and one
+21-minute file over the 150 MB input cap. 26 files in all.
+
+`analyze_wav(..., include_ltas=True, include_pink_noise_reference=True)` ran in
+one fresh process per mode on an M-series Mac with Live open (timings are
+observational, parity is not load-sensitive):
+
+- Output: identical on 25 of 26 files after removing timestamps, receipt ids
+  and the implementation label. The one difference in the corpus is a single
+  dominant-peak bandwidth, 70.312 vs 70.313 Hz (float32 vs float64 rounding).
+  The oversized file is refused identically on both paths.
+- Time: 152.7 s Python against 1.6 s native for the corpus; a 4-minute mix
+  takes about 10 s against 0.08 s.
+- Peak RSS: 4.6 GB Python against 1.3 GB native for the whole run.
+
+The 15 Oct opt-in decision measured an older build that still decoded and
+summarised in Python. `KENN_DSP_NATIVE` now defaults to on; `=0` is the
+rollback, and a missing extension falls back to the reference. This covers
+audio analysis only: loudness (`KENN_DSP_LOUDNESS_NATIVE`), mix-review decode
+and masking keep their own default-off gates. Still open: Windows and Linux
+builds, and the native-wheel CI job (blocked by GitHub billing on 17 Oct).

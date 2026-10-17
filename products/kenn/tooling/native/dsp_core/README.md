@@ -63,9 +63,9 @@ make native-wheel NATIVE_PYTHON=/path/to/python NATIVE_BUILD_DIR=/tmp/kenn-dsp-n
 python tooling/scripts/test_native_dsp.py
 ```
 
-The Python/NumPy reference is the release default. Set `KENN_DSP_NATIVE=1` to
-enable the optional native module for qualification or benchmarking, or set
-`KENN_DSP_NATIVE=0` to force the reference implementation. The native module
+Since 17 Oct 2026 the native module is the default for audio analysis when it is
+built (see the 17 Oct section of `docs/research/CPP_DSP_PHASE4_RELEASE_QUALIFICATION.md`);
+set `KENN_DSP_NATIVE=0` to force the reference implementation. The native module
 is optional and is not compiled at runtime. With the flag enabled, the
 nanobind boundary decodes supported PCM WAV payloads into contiguous float32
 channels before dispatching bulk metrics and spectral kernels. Decoder channel
