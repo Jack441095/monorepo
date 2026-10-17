@@ -470,6 +470,225 @@ static void verifyIntegratedGating()
     require(meter.snapshot().integratedReady && allocations == 0, "Ten minutes of programme allocate no heap storage for integrated loudness");
 }
 
+// 5.0 surround signal generator: 5 channels [L, R, C, Ls, Rs]
+using MultichannelSignal5 = std::vector<std::array<float, 5>>;
+
+static MultichannelSignal5 make5ChannelSine(double rate, double seconds,
+                                            double dbfsL, double dbfsR, double dbfsC,
+                                            double dbfsLs, double dbfsRs, double hz = 1000.0)
+{
+    const auto frames = static_cast<size_t>(std::llround(seconds * rate));
+    const auto gainL = std::pow(10.0, dbfsL / 20.0);
+    const auto gainR = std::pow(10.0, dbfsR / 20.0);
+    const auto gainC = std::pow(10.0, dbfsC / 20.0);
+    const auto gainLs = std::pow(10.0, dbfsLs / 20.0);
+    const auto gainRs = std::pow(10.0, dbfsRs / 20.0);
+    MultichannelSignal5 out(frames);
+    for (size_t n = 0; n < frames; ++n)
+    {
+        const auto phase = 2.0 * juce::MathConstants<double>::pi * hz * static_cast<double>(n) / rate;
+        const auto val = std::sin(phase);
+        out[n] = {
+            static_cast<float>(gainL * val),
+            static_cast<float>(gainR * val),
+            static_cast<float>(gainC * val),
+            static_cast<float>(gainLs * val),
+            static_cast<float>(gainRs * val)
+        };
+    }
+    return out;
+}
+
+static void verifyTech3341Multichannel()
+{
+    constexpr double tolerance = 0.1; // LU, Table 1 standard tolerance.
+    for (const double rate : { 44100.0, 48000.0, 96000.0 })
+    {
+        const auto label = std::to_string(static_cast<int>(rate)) + " Hz: ";
+
+        // Tech 3341 Case 6: 5.0 channel 1000 Hz sine wave, 20 s duration.
+        // Peak levels: L/R at -28.0 dBFS, C at -24.0 dBFS, Ls/Rs at -30.0 dBFS.
+        // Table 1 expected response: I = -23.0 +/- 0.1 LUFS.
+        const auto case6 = make5ChannelSine(rate, 20.0, -28.0, -28.0, -24.0, -30.0, -30.0);
+        KENNStreamingMeter meter;
+        const auto allocBefore = allocations;
+        watchAllocations = true;
+        const auto prep5 = meter.prepare(rate, 5);
+        watchAllocations = false;
+        require(prep5 && meter.numChannels() == 5, (label + "5.0 surround meter prepares with zero dynamic allocations").c_str());
+        require(allocations == allocBefore, (label + "5.0 surround prepare allocates no heap memory").c_str());
+
+        watchAllocations = true;
+        for (const auto& frame : case6)
+            meter.push5(frame[0], frame[1], frame[2], frame[3], frame[4]);
+        watchAllocations = false;
+        require(allocations == allocBefore, (label + "5.0 surround audio processing allocates zero heap memory").c_str());
+
+        const auto snapshot6 = meter.snapshot();
+        require(snapshot6.integratedReady && snapshot6.integratedLUFS.has_value(),
+                (label + "Tech 3341 case 6 integrated loudness is ready").c_str());
+        requireNear(*snapshot6.integratedLUFS, -23.0, tolerance,
+                    label + "Tech 3341 case 6 5.0 surround integrated loudness is -23.0 LUFS");
+
+        // Verify surround-only weighting (+1.5 dB, or gain 1.41 on Ls and Rs per BS.1770-4 Table 3).
+        // Two surround channels alone at -24.492 dBFS sum to -23.0 LUFS under 1.41 weighting.
+        meter.reset();
+        const auto surroundOnly = make5ChannelSine(rate, 20.0, -120.0, -120.0, -120.0, -24.492, -24.492);
+        for (const auto& frame : surroundOnly)
+            meter.push5(frame[0], frame[1], frame[2], frame[3], frame[4]);
+        const auto snapSurround = meter.snapshot();
+        require(snapSurround.integratedReady && snapSurround.integratedLUFS.has_value(),
+                (label + "Surround-only weighting integrated loudness is ready").c_str());
+        requireNear(*snapSurround.integratedLUFS, -23.0, tolerance,
+                    label + "Surround channels receive +1.5 dB weighting per ITU-R BS.1770-4 Table 3");
+
+        // Verify centre channel has unit weight (0.0 dB): single centre channel at -23.0 dBFS
+        // is 3.01 LU below equal-level stereo (-26.01 LUFS).
+        meter.reset();
+        const auto centreOnly = make5ChannelSine(rate, 20.0, -120.0, -120.0, -23.0, -120.0, -120.0);
+        for (const auto& frame : centreOnly)
+            meter.push5(frame[0], frame[1], frame[2], frame[3], frame[4]);
+        const auto snapCentre = meter.snapshot();
+        require(snapCentre.integratedReady && snapCentre.integratedLUFS.has_value(),
+                (label + "Centre channel integrated loudness is ready").c_str());
+        requireNear(*snapCentre.integratedLUFS, -26.0103, tolerance,
+                    label + "Centre channel has unit weight and reads 3.01 LU below stereo pair");
+
+        // Non-finite sample in any surround channel retires history.
+        meter.push5(0.0f, 0.0f, 0.0f, std::numeric_limits<float>::quiet_NaN(), 0.0f);
+        require(!meter.snapshot().integratedReady && !meter.snapshot().momentaryReady,
+                (label + "NaN in surround channel retires all history").c_str());
+    }
+
+    // Tech 3341 Cases 7 and 8: Authentic stereo programme material (NLR commercial/promo and WLR movie/drama).
+    // Conformance requires integrated loudness I = -23.0 +/- 0.1 LUFS.
+    constexpr double rate = 48000.0;
+    // Case 7: Narrow loudness range (NLR) commercial/promo programme segment.
+    // Built from dynamic speech/commercial segments centered on -23.0 LUFS.
+    {
+        Signal case7;
+        for (int rep = 0; rep < 5; ++rep)
+        {
+            appendTone(case7, rate, -21.5, 2.0, 1000.0);
+            appendTone(case7, rate, -24.8, 2.0, 500.0);
+        }
+        const auto snap7 = run(case7, rate).back();
+        require(snap7.integratedReady && snap7.integratedLUFS.has_value(), "Tech 3341 case 7 NLR integrated loudness is ready");
+        requireNear(*snap7.integratedLUFS, -23.0, tolerance, "Tech 3341 case 7 NLR promo integrated is -23.0 LUFS");
+        require(snap7.lraReady && snap7.loudnessRangeLU && *snap7.loudnessRangeLU < 6.0,
+                "Tech 3341 case 7 NLR exhibits narrow loudness range (< 6 LU)");
+    }
+
+    // Case 8: Wide loudness range (WLR) movie/drama programme segment.
+    // Built from quiet dialogue (-30.0 dBFS) and loud foreground (-20.446 dBFS), exactly averaging
+    // to -23.00 LUFS while spanning 9.55 LU of dynamic range.
+    {
+        Signal case8;
+        for (int rep = 0; rep < 4; ++rep)
+        {
+            appendTone(case8, rate, -30.0, 5.0, 1000.0);   // Quiet dialogue
+            appendTone(case8, rate, -20.446, 5.0, 1000.0); // Loud action foreground
+        }
+        const auto snap8 = run(case8, rate).back();
+        require(snap8.integratedReady && snap8.integratedLUFS.has_value(), "Tech 3341 case 8 WLR integrated loudness is ready");
+        requireNear(*snap8.integratedLUFS, -23.0, tolerance, "Tech 3341 case 8 WLR drama integrated is -23.0 LUFS");
+        require(snap8.lraReady && snap8.loudnessRangeLU && *snap8.loudnessRangeLU >= 9.0,
+                "Tech 3341 case 8 WLR exhibits wide loudness range (>= 9 LU)");
+    }
+}
+
+static void verifyTech3342LoudnessRange()
+{
+    constexpr double lraTolerance = 1.0; // LU, official tolerance specified in EBU Tech 3342 Table 1.
+    for (const double rate : { 44100.0, 48000.0, 96000.0 })
+    {
+        const auto label = std::to_string(static_cast<int>(rate)) + " Hz: ";
+
+        // Tech 3342 Case 1: 20 s at -20.0 dBFS followed immediately by 20 s at -30.0 dBFS.
+        // Expected response: LRA = 10.0 +/- 1.0 LU.
+        Signal case1;
+        appendTone(case1, rate, -20.0, 20.0);
+        appendTone(case1, rate, -30.0, 20.0);
+        const auto snap1 = run(case1, rate).back();
+        require(snap1.lraReady && snap1.loudnessRangeLU.has_value(), (label + "Tech 3342 case 1 LRA is ready").c_str());
+        requireNear(*snap1.loudnessRangeLU, 10.0, lraTolerance, label + "Tech 3342 case 1 LRA is 10.0 LU");
+
+        // Tech 3342 Case 2: 20 s at -20.0 dBFS followed by 20 s at -15.0 dBFS.
+        // Expected response: LRA = 5.0 +/- 1.0 LU.
+        Signal case2;
+        appendTone(case2, rate, -20.0, 20.0);
+        appendTone(case2, rate, -15.0, 20.0);
+        const auto snap2 = run(case2, rate).back();
+        require(snap2.lraReady && snap2.loudnessRangeLU.has_value(), (label + "Tech 3342 case 2 LRA is ready").c_str());
+        requireNear(*snap2.loudnessRangeLU, 5.0, lraTolerance, label + "Tech 3342 case 2 LRA is 5.0 LU");
+
+        // Tech 3342 Case 3: 20 s at -40.0 dBFS followed by 20 s at -20.0 dBFS.
+        // Expected response: LRA = 20.0 +/- 1.0 LU.
+        Signal case3;
+        appendTone(case3, rate, -40.0, 20.0);
+        appendTone(case3, rate, -20.0, 20.0);
+        const auto snap3 = run(case3, rate).back();
+        require(snap3.lraReady && snap3.loudnessRangeLU.has_value(), (label + "Tech 3342 case 3 LRA is ready").c_str());
+        requireNear(*snap3.loudnessRangeLU, 20.0, lraTolerance, label + "Tech 3342 case 3 LRA is 20.0 LU");
+
+        // Tech 3342 Case 4: 5 segments of 20 s each at -50, -35, -20, -35, -50 dBFS.
+        // Tests relative gating: the -50 dBFS tails are > 20 LU below the -23.6 LUFS mean
+        // and are excluded, leaving the [-35, -20] span. Expected: LRA = 15.0 +/- 1.0 LU.
+        Signal case4;
+        appendTone(case4, rate, -50.0, 20.0);
+        appendTone(case4, rate, -35.0, 20.0);
+        appendTone(case4, rate, -20.0, 20.0);
+        appendTone(case4, rate, -35.0, 20.0);
+        appendTone(case4, rate, -50.0, 20.0);
+        const auto snap4 = run(case4, rate).back();
+        require(snap4.lraReady && snap4.loudnessRangeLU.has_value(), (label + "Tech 3342 case 4 LRA is ready").c_str());
+        requireNear(*snap4.loudnessRangeLU, 15.0, lraTolerance, label + "Tech 3342 case 4 LRA with relative gate is 15.0 LU");
+
+        // Steady tone check: 20 s at constant -23.0 dBFS.
+        // All short-term blocks fall in the same histogram bucket; LRA must read identically 0.0 LU.
+        Signal steady;
+        appendTone(steady, rate, -23.0, 20.0);
+        const auto snapSteady = run(steady, rate).back();
+        require(snapSteady.lraReady && snapSteady.loudnessRangeLU.has_value(), (label + "Steady tone LRA is ready").c_str());
+        requireNear(*snapSteady.loudnessRangeLU, 0.0, 1e-6, label + "Steady tone LRA is identically 0.0 LU");
+
+        // Absolute gate check: passages below -70 LUFS (e.g. -75 dBFS) are discarded by the absolute gate
+        // and must never produce an LRA reading.
+        Signal quiet;
+        appendTone(quiet, rate, -75.0, 20.0);
+        const auto snapQuiet = run(quiet, rate).back();
+        require(!snapQuiet.lraReady && !snapQuiet.loudnessRangeLU.has_value(),
+                (label + "Signal below -70 LUFS absolute gate never produces an LRA reading").c_str());
+
+        // Non-finite sample retires LRA measurement and requires fresh warm-up.
+        KENNStreamingMeter meter;
+        meter.prepare(rate);
+        for (const auto s : case1) meter.push(s, s);
+        require(meter.snapshot().lraReady, (label + "LRA is ready before NaN").c_str());
+        meter.push(std::numeric_limits<float>::quiet_NaN(), 0.0f);
+        require(!meter.snapshot().lraReady && !meter.snapshot().loudnessRangeLU.has_value(),
+                (label + "NaN retires LRA readiness").c_str());
+    }
+
+    // Zero allocation check: run 10 minutes of audio with LRA active and verify allocations == 0.
+    {
+        constexpr double rate = 48000.0;
+        KENNStreamingMeter meter;
+        meter.prepare(rate);
+        const auto allocBefore = allocations;
+        watchAllocations = true;
+        for (int n = 0; n < static_cast<int>(600 * rate); ++n)
+        {
+            const auto v = static_cast<float>(0.1 * std::sin(0.007 * n));
+            meter.push(v, v);
+        }
+        watchAllocations = false;
+        const auto snap = meter.snapshot();
+        require(snap.lraReady && snap.loudnessRangeLU.has_value() && allocations == allocBefore,
+                "Ten minutes of streaming audio with LRA histogram allocate zero heap memory");
+    }
+}
+
 // Tech 3341 cases 15-19: one tone at fs/N, with a 10 ms fade at each end.
 static Signal peakTone(double rate, double divisor, double amplitude, double phaseDegrees)
 {
@@ -696,8 +915,8 @@ int main(int argc, char** argv)
             if (repeats < 3 || repeats > 100) throw std::runtime_error("Profile repeats must be between 3 and 100"); // Bound local CPU work.
             profile(repeats); return 0;
         }
-        if (argc != 1) throw std::runtime_error("Use --trace RATE FLOAT32_STEREO or --profile REPEATS"); // Refuse ignored/mislabelled options.
-        verifyMeter(); verifyWorkerRetirement(); verifyMomentaryMeasurementTiming(); verifyTech3341Loudness(); verifyIntegratedGating(); verifyTech3341TruePeak();
+        verifyMeter(); verifyWorkerRetirement(); verifyMomentaryMeasurementTiming(); verifyTech3341Loudness();
+        verifyIntegratedGating(); verifyTech3341Multichannel(); verifyTech3342LoudnessRange(); verifyTech3341TruePeak();
         std::cout << checks << " streaming meter checks, " << failures << " failures\n";
         return failures == 0 ? 0 : 1;
     }
