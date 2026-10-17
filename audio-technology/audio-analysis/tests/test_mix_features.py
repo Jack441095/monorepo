@@ -5,8 +5,9 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(ROOT / "studio" / "audio_analysis"))
+# Moved here from Audio_Too/tests on 17 Oct 2026; the package sits one level up.
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from audio_analysis.mix_features import (
     extract_feature_vector,

@@ -1242,7 +1242,7 @@ class EndToEndAudioTests(unittest.TestCase):
         # so this end-to-end "nonzero audio" assertion is not meaningful.
         from pathlib import Path
 
-        repo_root = Path(__file__).resolve().parents[2] / "studio" / "audiogen" / "audiogen"
+        repo_root = Path(__file__).resolve().parents[1] / "audiogen"
         sampler_paths = []
         for s in getattr(CONFIG, "samplers", []) or []:
             p = Path(str(getattr(s, "file_path", "") or ""))

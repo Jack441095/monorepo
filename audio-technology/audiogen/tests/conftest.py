@@ -9,8 +9,10 @@ from pathlib import Path
 
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-_ROOT = REPO_ROOT / "studio" / "audiogen" / "audiogen"
+# These tests lived in Audio_Too/tests/audiogen until 17 Oct 2026 and reached the
+# package through the studio/audiogen symlink; now they sit beside it.
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+_ROOT = PROJECT_DIR / "audiogen"
 root_str = str(_ROOT)
 sys.path[:] = [entry for entry in sys.path if entry != root_str]
 sys.path.insert(0, root_str)
@@ -43,7 +45,7 @@ def pytest_sessionstart(session):
 def pytest_runtest_setup(item: pytest.Item) -> None:
     """Keep local ``import main`` pointed at LLM_AudioGen/main.py for subproject tests."""
     nodeid = getattr(item, "nodeid", "") or ""
-    if not nodeid.startswith("tests/audiogen/"):
+    if not nodeid.startswith("tests/"):
         return
     root_str = str(_ROOT)
     sys.path[:] = [entry for entry in sys.path if entry != root_str]
@@ -106,7 +108,7 @@ def _run_isolated_subprocess(item: pytest.Item) -> None:
 
     proc = subprocess.run(
         cmd,
-        cwd=str(REPO_ROOT),
+        cwd=str(PROJECT_DIR),
         env=env,
         capture_output=True,
         text=True,

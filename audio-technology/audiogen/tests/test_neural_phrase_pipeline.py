@@ -11,12 +11,12 @@ try:
     )
     from training.train_phrase_gru import train_phrase_gru_model
 except ModuleNotFoundError:
-    from studio.audiogen.audiogen.training.export_midi_tokens import (
+    from training.export_midi_tokens import (
         encode_event_to_token,
         decode_token_to_event,
         export_events_to_tokens_dataset,
     )
-    from studio.audiogen.audiogen.training.train_phrase_gru import train_phrase_gru_model
+    from training.train_phrase_gru import train_phrase_gru_model
 
 from composition.neural_phrase_generator import NeuralPhraseGenerator
 

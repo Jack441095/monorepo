@@ -7,7 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2] / "studio" / "audiogen" / "audiogen"
+ROOT = Path(__file__).resolve().parents[1] / "audiogen"
 
 
 def _run_main_llm(*args: str) -> tuple[int, dict]:

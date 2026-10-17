@@ -34,7 +34,7 @@ class NeuralPhrasesTests(unittest.TestCase):
         
         has_loaded = gen._load_neural_model()
         
-        root_dir = Path(__file__).resolve().parents[2] / "studio" / "audiogen" / "audiogen"
+        root_dir = Path(__file__).resolve().parents[1] / "audiogen"
         model_path = root_dir / "training_data" / "active_models" / "phrase_gru.pt"
         
         if model_path.exists():

@@ -5,8 +5,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-AUDIOGEN_DIR = ROOT / "studio" / "audiogen"
+# tests/ sits directly inside the audiogen project (moved out of Audio_Too/tests on 17 Oct 2026).
+AUDIOGEN_DIR = Path(__file__).resolve().parents[1]
 if str(AUDIOGEN_DIR) not in sys.path:
     sys.path.insert(0, str(AUDIOGEN_DIR))
 

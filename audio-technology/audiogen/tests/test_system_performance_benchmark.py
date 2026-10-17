@@ -12,7 +12,7 @@ pytestmark = [pytest.mark.benchmark, pytest.mark.slow]
 
 class TestSystemPerformanceBenchmark(unittest.TestCase):
     def test_orchestrator_gate_smoke(self):
-        root = Path(__file__).resolve().parents[2] / "studio" / "audiogen" / "audiogen"
+        root = Path(__file__).resolve().parents[1] / "audiogen"
         py = root / ".venv" / "bin" / "python"
         if not py.is_file():
             py = Path(sys.executable)

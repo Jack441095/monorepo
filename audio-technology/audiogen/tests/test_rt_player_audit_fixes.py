@@ -7,7 +7,7 @@ import numpy as np
 from audio.RT_player.drone_manager import DroneManager
 from audio.RT_player.render_pipeline import RenderPipeline
 from audiogen_core.mixer_config import AUDIO_MIXER_CHANNEL_COUNT
-from tests.audiogen.test_player_runtime import PlayerRuntimeTests
+from tests.test_player_runtime import PlayerRuntimeTests
 
 
 class TestDroneManagerIntegrity(unittest.TestCase):
@@ -79,7 +79,7 @@ class TestRuntimeModeLadder(PlayerRuntimeTests):
 
     def test_callback_underflow_does_not_increment_ring_underruns(self):
         player = self._make_player()
-        from tests.audiogen.test_player_runtime import FakeStatus
+        from tests.test_player_runtime import FakeStatus
 
         n0 = player.telemetry.buffer_underruns
         player._log_stream_status(FakeStatus(output_underflow=True, priming_output=False))
