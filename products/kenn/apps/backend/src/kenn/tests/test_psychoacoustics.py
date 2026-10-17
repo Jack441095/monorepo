@@ -116,3 +116,38 @@ def test_track_masking_matrix_and_carving_proposals():
     # Strict Hardware Safety Policy check: cut must be <= 3.0 dB
     assert -3.0 <= prop["suggested_cut_db"] < 0.0
     assert prop["proposed_osc_mutation"]["gain_delta_db"] >= -3.0
+
+
+def test_compute_erb_spectrum_accepts_numpy_array_and_matches_list():
+    """Passing a 1D NumPy array directly (used to fail truth-value check) matches a Python list."""
+    mags_list = [0.25 * ((i % 7) + 1) for i in range(2049)]
+    mags_arr = np.asarray(mags_list, dtype=np.float64)
+
+    from_list = compute_erb_spectrum(mags_list, sample_rate=48000, fft_size=4096, num_bands=40)
+    from_arr = compute_erb_spectrum(mags_arr, sample_rate=48000, fft_size=4096, num_bands=40)
+
+    assert len(from_list) == 40
+    assert from_list == from_arr
+    assert sum(from_list) > 0.0
+
+
+def test_compute_erb_spectrum_boundary_and_invalid_inputs():
+    """Empty inputs, non-positive geometry, and out-of-range bins return zeros; NaN/Inf raises ValueError."""
+    assert compute_erb_spectrum([], sample_rate=44100, fft_size=4096, num_bands=40) == [0.0] * 40
+    assert compute_erb_spectrum([1.0, 2.0], sample_rate=0, fft_size=4096, num_bands=40) == [0.0] * 40
+    assert compute_erb_spectrum([1.0, 2.0], sample_rate=44100, fft_size=0, num_bands=40) == [0.0] * 40
+    assert compute_erb_spectrum([1.0, 2.0], sample_rate=44100, fft_size=4096, num_bands=0) == []
+
+    # At 44.1 kHz / 4096, bin 0 is 0 Hz and bin 1 is 10.77 Hz (both < 20 Hz);
+    # bins >= 1858 exceed 20 kHz. Energy in those bins is excluded from the 20 Hz..20 kHz grid.
+    mags = [0.0] * 2049
+    mags[0] = 5.0
+    mags[1] = 5.0
+    mags[1900] = 5.0
+    assert compute_erb_spectrum(mags, sample_rate=44100, fft_size=4096, num_bands=40) == [0.0] * 40
+
+    with pytest.raises(ValueError, match="finite"):
+        compute_erb_spectrum([1.0, float("nan"), 0.5], sample_rate=44100, fft_size=4096, num_bands=40)
+    with pytest.raises(ValueError, match="1..4096"):
+        compute_erb_spectrum([1.0, 0.5], sample_rate=44100, fft_size=4096, num_bands=5000)
+

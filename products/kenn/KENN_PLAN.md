@@ -151,9 +151,8 @@ Decisions already made:
       - 140 scoped tests pass; full suite is 6404 passed, 48 skipped, 3
         pre-existing failures (`test_mixing_doctor` x2,
         `test_fixed_session_grounded_benchmark_qualifies`).
-  - [ ] Move `track_diagnostic.py` (the audio-upload track diagnostic) to C++
-    (implemented on `feature/native-track-diagnostic`, 17 Oct; awaiting
-    adversary review before merge).
+  - [x] Move `track_diagnostic.py` (the audio-upload track diagnostic) to C++
+    (17 Oct, landed `bba52453`).
     - Wired `tooling/native/dsp_core/track_diagnostic_bindings.cpp` into
       `_kenn_dsp_native` and `native_fft.track_diagnostic_features`, switched
       `track_diagnostic.py` to `native_fft.decode_pcm`,
@@ -183,7 +182,20 @@ Decisions already made:
       (`-DKENN_USE_ACCELERATE=OFF`) builds, and the full suite is 6408 passed,
       48 skipped, 3 pre-existing failures (`test_mixing_doctor` x2,
       `test_fixed_session_grounded_benchmark_qualifies`).
-  - [ ] Then `compute_erb_spectrum`, and the librosa load in `sample_embeddings.py`.
+  - [x] Move `compute_erb_spectrum` in `psychoacoustics.py` to C++ (17 Oct,
+    `docs/research/CPP_DSP_ERB_SPECTRUM_RECEIPT.md`).
+    - Added `erb_spectrum` to `tooling/native/dsp_core/kenn_dsp_native.cpp` and
+      `native_fft.py`, routed `compute_erb_spectrum` through it, and removed
+      `import numpy as np` from `psychoacoustics.py`.
+    - Parity against the deleted NumPy implementation: max abs difference
+      `2.274e-13` across 80 synthetic spectra (`22.05..96 kHz`, `1024..16384`
+      FFT, `24..64` bands) and `5.421e-20` across 20 real corpus stems
+      (`105.23 ms` → `79.33 ms` over 2000 calls).
+    - Added 2 tests in `test_psychoacoustics.py` (1D NumPy array input and
+      boundary/NaN/band-count validation); all 29 tests across
+      `test_psychoacoustics.py` and `test_reference_matcher.py` pass on both
+      Accelerate and scalar (`-DKENN_USE_ACCELERATE=OFF`) builds.
+  - [ ] Move the `librosa.load` decode/resample in `sample_embeddings.py` to C++.
 - AbletonOSC is the Live transport owner. UI, HTTP, voice and MCP must share the
   same typed policy and execution services, without a second write authority.
 - Preferences require explicit opt-in. Session inference, diagnostic hypotheses

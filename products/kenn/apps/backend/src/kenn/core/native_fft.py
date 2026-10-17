@@ -277,10 +277,31 @@ def track_diagnostic_features(
     )
 
 
+def erb_spectrum(
+    magnitudes: Any,
+    sample_rate: int = 44100,
+    fft_size: int = 4096,
+    num_bands: int = 40,
+) -> list[float] | None:
+    """Group one-sided FFT magnitudes into discrete Glasberg & Moore ERB band energies; None when unavailable."""
+    module = _load()
+    function = None if module is None else getattr(module, "erb_spectrum", None)
+    if function is None:
+        # An older or disabled extension lacks the kernel; let the caller raise or abstain.
+        return None
+    import numpy as np
+
+    values = np.ascontiguousarray(magnitudes, dtype=np.float64)
+    if values.ndim != 1:
+        raise ValueError("native erb_spectrum requires a one-dimensional magnitude sequence")
+    return [float(x) for x in function(values, int(sample_rate), int(fft_size), int(num_bands))]
+
+
 __all__ = [
     "available",
     "channel_metrics",
     "decode_pcm",
+    "erb_spectrum",
     "key_tempo_features",
     "loudness_metrics",
     "masking_band_energy",

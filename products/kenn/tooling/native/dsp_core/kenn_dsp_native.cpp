@@ -28,6 +28,7 @@
 
 namespace nb = nanobind;
 using FloatInput = nb::ndarray<nb::numpy, const float, nb::ndim<1>, nb::c_contig, nb::device::cpu>;
+using DoubleInput = nb::ndarray<nb::numpy, const double, nb::ndim<1>, nb::c_contig, nb::device::cpu>;
 using ByteInput = nb::ndarray<nb::numpy, const std::uint8_t, nb::ndim<1>, nb::c_contig, nb::device::cpu>;
 using FloatOutput = nb::ndarray<nb::numpy, double, nb::shape<-1, -1>, nb::device::cpu>;
 using FloatVectorOutput = nb::ndarray<nb::numpy, float, nb::shape<-1>, nb::device::cpu>;
@@ -856,6 +857,75 @@ nb::dict masking_band_energy(
     return output;
 }
 
+std::vector<double> compute_erb_spectrum_kernel(
+    const double* magnitudes,
+    std::size_t bin_count,
+    std::int64_t sample_rate,
+    std::int64_t fft_size,
+    std::int64_t num_bands)
+{
+    const auto band_count = static_cast<std::size_t>(num_bands);
+    std::vector<double> energies(band_count, 0.0);
+    for (std::size_t i = 0; i < bin_count; ++i) {
+        if (!std::isfinite(magnitudes[i])) {
+            throw std::invalid_argument("magnitudes must contain only finite values");
+        }
+    }
+    if (bin_count == 0 || sample_rate <= 0 || fft_size <= 0) {
+        // An empty spectrum or non-positive rate/FFT size maps no bins into 20 Hz..20 kHz,
+        // so returning all-zero band energies matches the psychoacoustic contract.
+        return energies;
+    }
+
+    // Glasberg & Moore (1990) ERB-rate scale: E(f) = 21.4 * log10(0.00437 * f + 1.0),
+    // partitioned into num_bands equal-ERB steps across the 20 Hz..20 kHz audible range.
+    constexpr double kMinFreqHz = 20.0;
+    constexpr double kMaxFreqHz = 20000.0;
+    constexpr double kErbScale = 21.4;
+    constexpr double kErbSlopePerHz = 0.00437;
+    const double e_min = kErbScale * std::log10(kErbSlopePerHz * kMinFreqHz + 1.0);
+    const double e_max = kErbScale * std::log10(kErbSlopePerHz * kMaxFreqHz + 1.0);
+    const double e_span = e_max - e_min;
+    const double bin_freq_step_hz = static_cast<double>(sample_rate) / static_cast<double>(fft_size);
+
+    for (std::size_t i = 0; i < bin_count; ++i) {
+        const double freq_hz = static_cast<double>(i) * bin_freq_step_hz;
+        if (freq_hz < kMinFreqHz || freq_hz > kMaxFreqHz) {
+            // Bins outside 20 Hz..20 kHz sit outside the auditory band grid.
+            continue;
+        }
+        const double erb = kErbScale * std::log10(kErbSlopePerHz * freq_hz + 1.0);
+        const auto band_idx = static_cast<std::int64_t>(
+            (erb - e_min) / e_span * static_cast<double>(num_bands));
+        if (band_idx >= 0 && band_idx < num_bands) {
+            const double mag = magnitudes[i];
+            energies[static_cast<std::size_t>(band_idx)] += mag * mag;
+        }
+    }
+    return energies;
+}
+
+DoubleVectorOutput erb_spectrum(
+    DoubleInput magnitudes,
+    std::int64_t sample_rate,
+    std::int64_t fft_size,
+    std::int64_t num_bands)
+{
+    if (magnitudes.ndim() != 1)
+        throw nb::value_error("magnitudes must be a one-dimensional float64 NumPy array");
+    // Cap at 4096 bands so a corrupted band-count argument cannot allocate unbounded memory.
+    if (num_bands <= 0 || num_bands > 4096)
+        throw nb::value_error("num_bands must be in 1..4096");
+
+    std::vector<double> energies;
+    {
+        nb::gil_scoped_release release;
+        energies = compute_erb_spectrum_kernel(
+            magnitudes.data(), magnitudes.shape(0), sample_rate, fft_size, num_bands);
+    }
+    return make_owned_double_vector_output(std::move(energies));
+}
+
 } // namespace
 
 NB_MODULE(_kenn_dsp_native, module)
@@ -872,6 +942,10 @@ NB_MODULE(_kenn_dsp_native, module)
                nb::arg("samples"), nb::arg("sample_rate"),
                nb::arg("fft_size") = 4096, nb::arg("hop") = 2048,
                "Compute per-frame masking-band RMS magnitudes for a contiguous float32 array.");
+    module.def("erb_spectrum", &erb_spectrum,
+               nb::arg("magnitudes"), nb::arg("sample_rate") = 44100,
+               nb::arg("fft_size") = 4096, nb::arg("num_bands") = 40,
+               "Group one-sided FFT magnitudes into discrete Glasberg & Moore ERB band energies.");
     module.def("mono_metrics", &mono_metrics,
                nb::arg("samples"),
                "Compute bulk mono channel statistics for an opt-in native analysis path.");

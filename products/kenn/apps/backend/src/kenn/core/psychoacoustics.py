@@ -11,7 +11,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional, Tuple
 
-import numpy as np
+from . import native_fft
 
 
 def hz_to_erb(f: float) -> float:
@@ -64,26 +64,22 @@ def compute_erb_spectrum(
     num_bands: int = 40,
 ) -> List[float]:
     """Group FFT magnitude spectrum bins into discrete ERB bands and return energy per band."""
-    energies = [0.0] * num_bands
-    if not magnitudes or sample_rate <= 0 or fft_size <= 0:
-        return energies
+    if num_bands <= 0:
+        # Zero or negative band count has no ERB bands to populate.
+        return []
+    if len(magnitudes) == 0 or sample_rate <= 0 or fft_size <= 0:
+        # An empty spectrum or non-positive rate/FFT size maps no bins into 20 Hz..20 kHz.
+        return [0.0] * num_bands
 
-    bin_freq_step = sample_rate / fft_size
-    mags = np.asarray(magnitudes, dtype=np.float64)
-    freqs = np.arange(len(mags), dtype=np.float64) * bin_freq_step
-    valid = (freqs >= 20.0) & (freqs <= 20000.0)
-    if not np.any(valid):
-        return energies
-
-    e_min = hz_to_erb(20.0)
-    e_max = hz_to_erb(20000.0)
-    erb_vals = 21.4 * np.log10(0.00437 * freqs[valid] + 1.0)
-    band_idx = ((erb_vals - e_min) / (e_max - e_min) * num_bands).astype(np.int64)
-    in_range = (band_idx >= 0) & (band_idx < num_bands)
-
-    weights = mags[valid][in_range] ** 2
-    summed = np.bincount(band_idx[in_range], weights=weights, minlength=num_bands)[:num_bands]
-    return summed.tolist()
+    energies = native_fft.erb_spectrum(
+        magnitudes,
+        sample_rate=sample_rate,
+        fft_size=fft_size,
+        num_bands=num_bands,
+    )
+    if energies is None:
+        raise RuntimeError("Native erb_spectrum kernel is required for ERB band accumulation")
+    return energies
 
 
 def compute_combined_masking_threshold(
