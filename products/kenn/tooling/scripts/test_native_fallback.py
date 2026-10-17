@@ -6,7 +6,12 @@ from __future__ import annotations
 import io
 import math
 import struct
+import os
 import wave
+
+# Native is on by default where the extension is built, so this check forces the
+# rollback flag itself rather than relying on CI to export it.
+os.environ["KENN_DSP_NATIVE"] = "0"
 
 from kenn.core.audio_analysis import analyze_wav
 from kenn.core.native_fft import available, channel_metrics, spectral_powers

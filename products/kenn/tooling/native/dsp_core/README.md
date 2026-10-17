@@ -4,7 +4,7 @@ This directory contains the first offline DSP vertical slice: a portable C++20
 Hann-windowed FFT/power kernel and an optional nanobind module consumed by
 `kenn.core.audio_analysis`. Apple builds also link Accelerate/vDSP for the
 spectral hot path and retain the scalar implementation as the portable
-fallback. The module also exposes opt-in bulk mono/stereo statistics and
+fallback. The module also exposes bulk mono/stereo statistics and
 correlation kernels plus a bounded PCM WAV decoder; complete-request evidence
 for those slices is recorded in
 `products/kenn/docs/research/CPP_DSP_PHASE4_NATIVE_BULK_METRICS_RECEIPT.md`

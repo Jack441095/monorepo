@@ -39,7 +39,7 @@ class AudioAnalysisError(ValueError):
 
 
 class _DecodedChannels(list[list[float]]):
-    """Channel container carrying whether the opt-in native decoder ran."""
+    """Channel container carrying whether the native decoder ran."""
 
     native: bool = False
 
@@ -571,8 +571,8 @@ def analyze_wav(
 
     duration = len(channels[0]) / sample_rate
     if getattr(channels, "native", False):
-        # NumPy is already required by the native wheel. Keep this branch
-        # opt-in so the reference path remains standard-library-only.
+        # NumPy is already required by the native wheel. Only the native
+        # branch imports it, so the reference path stays standard-library-only.
         import numpy as np
 
         mono = channels[0] if channel_count == 1 else (channels[0] + channels[1]) * np.float32(0.5)
@@ -662,7 +662,9 @@ def analyze_wav(
             mid_rms = float(native_channel_metrics["mono_rms"])
             side_rms = float(native_channel_metrics["side_rms"])
             mono_rms = mid_rms
-            correlation = float(native_channel_metrics["correlation"])
+            # None when either channel is flat, the same as _correlation above.
+            native_correlation = native_channel_metrics["correlation"]
+            correlation = None if native_correlation is None else float(native_correlation)
         metrics.update({
             "left_rms_dbfs": round(left_db, 3),
             "right_rms_dbfs": round(right_db, 3),

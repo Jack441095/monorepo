@@ -22,8 +22,11 @@ def _load() -> Any | None:
     # float, 11-96 kHz, mono and stereo, ten full mixdowns) the audio analysis
     # matched the Python reference everywhere except one peak bandwidth
     # (70.312 vs 70.313 Hz), and ran 1.6 s against 152.7 s with peak RSS
-    # 1.3 GB against 4.6 GB. The 15 Oct decision to stay opt-in measured an
-    # older build that still did decode and summary loops in Python.
+    # 1.3 GB against 4.6 GB. That covers analyze_wav, so the audio upload and
+    # AudioGen routes, Live session advice and mix review all take the native
+    # path. Loudness, mix-review decode and masking stay behind their own flags:
+    # the 15 Oct qualification kept those opt-in over an LRA rounding gap, and
+    # nothing here re-measured them.
     # A missing extension still falls through to the reference below.
     if os.environ.get("KENN_DSP_NATIVE", "1").strip().lower() in {"0", "false", "off", "no"}:
         return None
@@ -137,7 +140,7 @@ def masking_band_energy(
 
 
 def channel_metrics(channels: list[list[float]] | Any) -> dict[str, Any] | None:
-    """Compute bulk channel statistics through the opt-in native boundary."""
+    """Compute bulk channel statistics natively; None when the extension is off or missing."""
     module = _load()
     if module is None:
         return None

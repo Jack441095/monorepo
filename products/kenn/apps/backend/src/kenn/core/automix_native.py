@@ -15,6 +15,9 @@ _load_attempted = False
 
 def _load() -> Any | None:
     global _native, _load_attempted
+    # Still default-off, unlike native_fft: the 17 Oct 2026 real-file parity run
+    # that made native audio analysis the default never exercised these kernels.
+    # The flag is shared, so KENN_DSP_NATIVE=1 turns both on.
     if os.environ.get("KENN_DSP_NATIVE", "0").strip().lower() in {"0", "false", "off", "no"}:
         return None
     if _load_attempted:

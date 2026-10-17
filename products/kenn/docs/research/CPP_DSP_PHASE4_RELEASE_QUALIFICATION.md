@@ -193,9 +193,24 @@ observational, parity is not load-sensitive):
   takes about 10 s against 0.08 s.
 - Peak RSS: 4.6 GB Python against 1.3 GB native for the whole run.
 
-The 15 Oct opt-in decision measured an older build that still decoded and
-summarised in Python. `KENN_DSP_NATIVE` now defaults to on; `=0` is the
-rollback, and a missing extension falls back to the reference. This covers
-audio analysis only: loudness (`KENN_DSP_LOUDNESS_NATIVE`), mix-review decode
-and masking keep their own default-off gates. Still open: Windows and Linux
-builds, and the native-wheel CI job (blocked by GitHub billing on 17 Oct).
+The first native run used a locally built extension from 21 Sep, older than the
+16 Oct source change (`477ee636`). Review caught that, and also that native
+reported correlation 0.0 where the reference reports None (one channel flat).
+The C++ now returns None there too. We rebuilt from source at that fix
+(`make native-build`, nanobind 3.1.0, extension SHA-256 `bb6155f8…eebe3a`) and
+reran the native half: same single bandwidth difference, 1.4 s, 1.1 GB peak RSS.
+`build_kenn_app.py` bundles whatever extension is on disk without a hash check,
+so a release build must rebuild first.
+
+`KENN_DSP_NATIVE` now defaults to on; `=0` is the rollback, and a missing
+extension falls back to the reference. Everything that calls `analyze_wav`
+moves with it: the audio upload and AudioGen routes, Live session advice,
+local mix review and the mix-review adapter. Loudness
+(`KENN_DSP_LOUDNESS_NATIVE`), mix-review decode and masking keep their own
+default-off gates; the 15 Oct qualification held those back over an LRA rounding
+difference, and this run did not re-measure them. The AutoMix kernels share the
+`KENN_DSP_NATIVE` name but keep a default of off, since this corpus never ran
+them. Not covered by the corpus: 32-bit integer PCM (native decodes to float32,
+so it differs at the noise floor) and NaN samples in float files. Still open:
+Windows and Linux builds, and the native-wheel CI job (blocked by GitHub billing
+on 17 Oct).

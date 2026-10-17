@@ -259,8 +259,12 @@ double correlation_with_offsets(
         right_energy += right_delta * right_delta;
     }
     const double denominator = std::sqrt(left_energy * right_energy);
+    // A flat channel (digital silence, or pure DC) has no correlation at all.
+    // NaN carries that out so stereo_metrics can report None, as the Python
+    // reference does; returning 0.0 here read as "fully decorrelated" and
+    // disagreed with the reference on a file with one silent side.
     if (denominator == 0.0)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
     return std::max(-1.0, std::min(1.0, numerator / denominator));
 }
 
@@ -687,7 +691,10 @@ nb::dict stereo_metrics(FloatInput left, FloatInput right)
     nb::dict output;
     output["left"] = channel_summary_dict(left_summary, left.shape(0));
     output["right"] = channel_summary_dict(right_summary, right.shape(0));
-    output["correlation"] = channel_correlation;
+    if (std::isnan(channel_correlation))
+        output["correlation"] = nb::none();
+    else
+        output["correlation"] = channel_correlation;
     output["mono_rms"] = std::sqrt(mono_sum_squares / static_cast<double>(left.shape(0)));
     output["side_rms"] = std::sqrt(side_sum_squares / static_cast<double>(left.shape(0)));
     output["mono_silence_percentage"] = 100.0 * static_cast<double>(mono_silence_count) / static_cast<double>(left.shape(0));

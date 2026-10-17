@@ -205,6 +205,8 @@ def test_native_analysis_is_the_default_and_zero_still_forces_the_reference(monk
         assert native_fft.available() is False
     else:
         assert native_fft.available() is True
+        default = analyze_wav(wav([sine(0.5, 440.0)], 48000), filename="default.wav")
+        assert default["spectral"]["implementation"].startswith("cpp-")
     monkeypatch.setenv("KENN_DSP_NATIVE", "0")
     assert native_fft.available() is False
     assert analyze_wav(wav([sine(0.5, 440.0)], 48000), filename="rollback.wav")["spectral"]["implementation"] == "python-reference"
@@ -229,3 +231,16 @@ def test_native_peak_and_ltas_reports_match_reference(monkeypatch) -> None:
     assert native_spectral == reference_spectral
     assert native_report["metrics"] == reference_report["metrics"]
     assert native_report["findings"] == reference_report["findings"]
+
+
+def test_a_silent_channel_has_no_correlation_on_either_path(monkeypatch) -> None:
+    # Until 17 Oct 2026 the native path reported 0.0 here and the reference None,
+    # so one silent side read as "fully decorrelated" only when native was built.
+    from kenn.core import native_fft
+
+    one_side = wav([sine(1.0, 440.0), [0.0] * 48000])
+    all_silent = wav([[0.0] * 48000, [0.0] * 48000])
+    native = [analyze_wav(payload, filename="flat.wav")["metrics"]["correlation"] for payload in (one_side, all_silent)]
+    monkeypatch.setenv("KENN_DSP_NATIVE", "0")
+    reference = [analyze_wav(payload, filename="flat.wav")["metrics"]["correlation"] for payload in (one_side, all_silent)]
+    assert native == reference == [None, None]

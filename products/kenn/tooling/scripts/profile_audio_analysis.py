@@ -27,6 +27,7 @@ SOURCE_ROOT = SCRIPT_ROOT.parents[1] / "apps" / "backend" / "src"
 if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
+from kenn.core import native_fft
 from kenn.core.audio_analysis import analyze_wav
 
 
@@ -65,7 +66,9 @@ def run(*, seconds: float, repeats: int) -> dict[str, Any]:
     profile.disable()
     stages = _stage_stats(profile)
     total_ms = float(stages.get("analyze_wav", {}).get("cumulative_ms", 0.0))
-    native_enabled = os.environ.get("KENN_DSP_NATIVE", "0").strip().lower() in {"1", "true", "on", "yes"}
+    # Ask the bridge rather than the environment: native is the default now, so
+    # an unset flag with the extension built is a native run.
+    native_enabled = native_fft.available()
     dominant_candidates = {
         name: float(value.get("exclusive_ms", 0.0))
         for name, value in stages.items()
@@ -75,7 +78,7 @@ def run(*, seconds: float, repeats: int) -> dict[str, Any]:
     return {
         "schema": "kenn.dsp_profile.v1",
         "source_revision": benchmark._source_revision(),
-        "candidate": "cpp-native-opt-in" if native_enabled else "python-stdlib-reference",
+        "candidate": "cpp-native" if native_enabled else "python-stdlib-reference",
         "machine": benchmark._machine_metadata(),
         "fixture": {
             "generator": "deterministic 440 Hz mono PCM16 WAV",
