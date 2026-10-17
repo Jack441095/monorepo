@@ -40,8 +40,8 @@ rules.
 
 The C++/nanobind audio-analysis path (decode, channel metrics, FFT) is the default
 wherever the extension is built, since 17 Oct 2026; `KENN_DSP_NATIVE=0` forces the
-Python reference. Loudness, mix-review decode and masking stay behind their own
-opt-in flags. Windows and Linux builds still lack cross-platform evidence. Earlier spectral-only
+Python reference. Mix-review loudness and decode followed the same day, each on
+its own flag; stem masking is native by default on the macOS Accelerate build only. Windows and Linux builds still lack cross-platform evidence. Earlier spectral-only
 and later decoder/bulk-metrics measurements cover different implementations;
 consult the exact workload and receipt before quoting a speedup. Historical AutoMix
 kernels have been recovered as a

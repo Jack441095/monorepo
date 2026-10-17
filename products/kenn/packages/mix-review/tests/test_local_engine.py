@@ -242,6 +242,8 @@ def test_24bit_pcm_is_supported() -> None:
 
 
 def test_16bit_fast_decode_matches_standard_library_decode(monkeypatch) -> None:
+    # Pins the numpy decoder; the native decoder's float32 output has its own test.
+    monkeypatch.setenv("KENN_DSP_MIX_REVIEW_DECODE_NATIVE", "0")
     payload = _healthy_stereo_wav(seconds=1.0)
     fast_channels, fast_rate, fast_count = local_engine._decode_channels(payload)
     fast_values = [list(channel) for channel in fast_channels]
@@ -262,6 +264,8 @@ def test_24bit_fast_decode_matches_standard_library_decode(monkeypatch) -> None:
     files are common in professional mixing/mastering, unlike this
     module's 16-bit-only synthetic benchmark fixtures, which never
     exercised this path's performance at all."""
+    # Pins the numpy decoder; the native decoder's float32 output has its own test.
+    monkeypatch.setenv("KENN_DSP_MIX_REVIEW_DECODE_NATIVE", "0")
     payload = _wav_bytes(
         [_sine(int(1.0 * 44100), 440.0, 44100, amplitude=0.4)] * 2,
         framerate=44100,
@@ -378,11 +382,36 @@ def test_32bit_float_wav_is_supported_and_validated() -> None:
     assert report["metrics"]["peak_dbfs"] is not None
 
 
+def test_native_decode_is_the_default_and_agrees_to_float32_rounding(monkeypatch) -> None:
+    native_fft = pytest.importorskip("kenn.core.native_fft")
+    if not native_fft.available():
+        pytest.skip("native extension not built")
+    monkeypatch.delenv("KENN_DSP_MIX_REVIEW_DECODE_NATIVE", raising=False)
+    payload = _wav_bytes(
+        [_sine(int(1.0 * 44100), 440.0, 44100, amplitude=0.4)] * 2,
+        framerate=44100,
+        sampwidth=3,
+    )
+    native_channels, native_rate, native_count = local_engine._decode_channels(payload)
+    assert all(str(channel.dtype) == "float32" for channel in native_channels)
+
+    monkeypatch.setenv("KENN_DSP_MIX_REVIEW_DECODE_NATIVE", "0")
+    python_channels, python_rate, python_count = local_engine._decode_channels(payload)
+
+    assert (native_rate, native_count) == (python_rate, python_count)
+    # 6e-8 is half a float32 ulp at full scale; a 24-bit sample needs 24
+    # mantissa bits, so anything wider means the decoder is wrong, not rounding.
+    for native, python in zip(native_channels, python_channels):
+        assert list(native) == pytest.approx(list(python), abs=6e-8)
+
+
 def test_32bit_float_fast_decode_matches_standard_library_decode(monkeypatch) -> None:
     n = int(1.0 * 44100)
     left = _sine(n, 440.0, 44100, amplitude=0.3)
     right = _sine(n, 440.0, 44100, amplitude=0.3, phase=0.1)
     payload = _wav_bytes_float32([left, right], framerate=44100)
+    # Pins the numpy decoder; the native decoder's float32 output has its own test.
+    monkeypatch.setenv("KENN_DSP_MIX_REVIEW_DECODE_NATIVE", "0")
 
     fast_channels, fast_rate, fast_count = local_engine._decode_channels(payload)
     fast_values = [list(channel) for channel in fast_channels]
@@ -571,3 +600,21 @@ def test_numpy_true_peak_fallback_does_not_wrap_a_chunk_onto_itself() -> None:
     for tone in (np.concatenate((loop[crest:], loop[:crest])), long_sine):
         scipy_dbtp = 20 * math.log10(np.max(np.abs(signal.resample_poly(tone, 8, 1))))
         assert local_engine._numpy_true_peak_dbtp([tone]) == pytest.approx(scipy_dbtp, abs=0.05)
+
+
+def test_a_trailing_partial_frame_is_dropped_on_the_python_decoder(monkeypatch) -> None:
+    # Three stray bytes after the last 24-bit stereo frame left the Python
+    # decoder's channels one sample apart and crashed analyze_wav (review, 17 Oct).
+    monkeypatch.setenv("KENN_DSP_MIX_REVIEW_DECODE_NATIVE", "0")
+    payload = _wav_bytes(
+        [_sine(int(3.0 * 44100), 440.0, 44100, amplitude=0.4)] * 2,
+        framerate=44100,
+        sampwidth=3,
+    )
+    data_at = payload.index(b"data")
+    size = struct.unpack("<I", payload[data_at + 4 : data_at + 8])[0] + 3
+    padded = payload[: data_at + 4] + struct.pack("<I", size) + payload[data_at + 8 :] + b"\x01\x02\x03"
+
+    channels, _rate, _count = local_engine._decode_channels(padded)
+    assert len(channels[0]) == len(channels[1]) == int(3.0 * 44100)
+    assert local_engine.analyze_wav(padded, filename="stray.wav")["ok"] is not False

@@ -13,6 +13,8 @@ import wave
 from pathlib import Path
 import sys
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from core import masking_analysis  # noqa: E402
@@ -225,3 +227,37 @@ def test_abstains_honestly_when_numpy_is_unavailable(monkeypatch) -> None:
     result = masking_analysis.analyze_stem_masking([("a", a), ("b", b)])
     assert result["ok"] is False
     assert "numpy" in result["error"].lower()
+
+
+
+@pytest.mark.parametrize(
+    ("backend", "setting", "expect_native"),
+    [
+        ("cpp-accelerate", None, True),
+        ("cpp-scalar", None, False),
+        ("cpp-accelerate", "0", False),
+        ("cpp-scalar", "1", True),
+    ],
+)
+def test_masking_takes_native_by_default_only_on_the_accelerate_build(
+    monkeypatch, backend, setting, expect_native
+) -> None:
+    # The scalar build measured slower than NumPy, so only Accelerate defaults
+    # to native. Gating on the OS was wrong: a Mac can build scalar (review, 17 Oct).
+    native_fft = pytest.importorskip("kenn.core.native_fft")
+
+    class FakeModule:
+        @staticmethod
+        def masking_band_energy(values, sample_rate, fft_size, hop):
+            return {"energy": [[0.0]], "backend": backend}
+
+    monkeypatch.setattr(native_fft, "_load", lambda: FakeModule)
+    monkeypatch.setattr(native_fft, "_masking_backend_label", None)
+    if setting is None:
+        monkeypatch.delenv("KENN_DSP_MASKING_NATIVE", raising=False)
+    else:
+        monkeypatch.setenv("KENN_DSP_MASKING_NATIVE", setting)
+
+    result = native_fft.masking_band_energy([0.0] * 4096, 44100)
+
+    assert (result is not None) == expect_native

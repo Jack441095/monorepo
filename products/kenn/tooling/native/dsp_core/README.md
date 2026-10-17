@@ -27,10 +27,10 @@ is disabled or unavailable; the existing Python AutoMix path remains the
 release default until complete-request parity and rights-cleared corpus gates
 are satisfied.
 
-Stem-masking analysis can opt into the seven-band native path with
-``KENN_DSP_MASKING_NATIVE=1``. On macOS Accelerate builds this uses vDSP and
-has a separate parity/performance receipt; portable scalar builds remain
-available for compatibility but are not promoted as a speed claim.
+Stem-masking analysis takes the seven-band native path by default when the
+module is the Accelerate/vDSP build, since 17 Oct 2026;
+``KENN_DSP_MASKING_NATIVE=0`` forces NumPy. The portable scalar build measured
+slower than NumPy, so it stays off unless ``KENN_DSP_MASKING_NATIVE=1``.
 
 The Mix Review calibrated loudness path has a separate candidate gate:
 the C++ K-weighting/LRA/8x true-peak kernel, on by default since 17 Oct 2026;
@@ -38,10 +38,9 @@ the C++ K-weighting/LRA/8x true-peak kernel, on by default since 17 Oct 2026;
 output is parity-tested against pyloudnorm. Complete-request
 timing and promotion evidence are recorded in
 ``CPP_DSP_PHASE4_MIX_REVIEW_LOUDNESS_RECEIPT.md``.
-Mix Review WAV decoding can be enabled independently with
-``KENN_DSP_MIX_REVIEW_DECODE_NATIVE=1`` (and ``KENN_DSP_NATIVE=1``); it uses
-the same native float32 decoder while retaining the Python parser as the
-fallback.
+Mix Review WAV decoding uses the same native float32 decoder by default since
+17 Oct 2026; ``KENN_DSP_MIX_REVIEW_DECODE_NATIVE=0`` (or ``KENN_DSP_NATIVE=0``)
+returns to the Python parser, which also remains the fallback.
 The full optimization-pass evidence, including 24-bit testing-assets runs,
 is recorded in ``CPP_DSP_MEGA_OPTIMIZATION_PASS_RECEIPT.md``.
 

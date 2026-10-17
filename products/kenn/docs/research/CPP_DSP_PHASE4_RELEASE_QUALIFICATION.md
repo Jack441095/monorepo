@@ -207,7 +207,8 @@ extension falls back to the reference. Everything that calls `analyze_wav`
 moves with it: the audio upload and AudioGen routes, Live session advice, and
 the extra spectral pass in mix review and the mix-review adapter. The main
 mix-review report runs `local_engine` and does not change. Mix-review decode
-and masking keep their own default-off gates. Loudness
+and masking kept their own default-off gates at this point; both changed later
+the same day (see the next section). Loudness
 (`KENN_DSP_LOUDNESS_NATIVE`) was also default-off here, then went default-on
 the same day after its own corpus run; see the 17 Oct section of
 `CPP_DSP_PHASE4_MIX_REVIEW_LOUDNESS_RECEIPT.md`. The AutoMix kernels share the
@@ -216,3 +217,28 @@ them. Not covered by the corpus: 32-bit integer PCM (native decodes to float32,
 so it differs at the noise floor) and NaN samples in float files. Still open:
 Windows and Linux builds, and the native-wheel CI job (blocked by GitHub billing
 on 17 Oct).
+
+### Mix-review decode and stem masking, same day
+
+Mix-review decode (`KENN_DSP_MIX_REVIEW_DECODE_NATIVE`): the full
+`local_engine.analyze_wav` report over the 25 corpus files under the 150 MB
+cap, one fresh
+process per mode, with native loudness on in both. Apart from timestamps, two
+values differ, both float32 rounding: one correlation-timeline point (0.408 vs
+0.409) and one peak (0.0524 vs 0.0523). 8.9 s Python against 6.5 s native.
+Both decoders accept the same formats, 32-bit integer PCM included. Review
+found one case that did change: a file with a trailing partial frame. Native
+drops the stray bytes; the Python decoder gave the channels different lengths
+and `analyze_wav` crashed. That was already broken before this change; the Python
+decoder now drops the partial frame too, with a regression test. Now
+default-on; `=0` is the rollback.
+
+Stem masking (`KENN_DSP_MASKING_NATIVE`): `analyze_stem_masking` over every
+stem in eight `testing_track_stems` songs (260 stems, 26 groups of up to the
+12-stem cap). Reports are identical apart from the implementation label;
+29.0 s NumPy against 10.0 s Accelerate, on one arm64 Mac (Intel Macs are
+untimed). Default-on only when the loaded module reports the Accelerate
+backend, because the portable scalar build measured slower than NumPy
+(`CPP_DSP_PHASE4_MASKING_NATIVE_POC_RECEIPT.md`). The gate reads the backend,
+not the OS, since a Mac can be built with `-DKENN_USE_ACCELERATE=OFF`. `=1`
+forces native on any build, `=0` forces NumPy.

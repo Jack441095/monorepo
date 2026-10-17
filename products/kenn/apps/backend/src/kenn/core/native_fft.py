@@ -4,7 +4,7 @@ The module is deliberately optional: a missing or incompatible extension keeps
 the pure-Python reference path available. The native path is on by default
 when the extension is built; set ``KENN_DSP_NATIVE=0`` to force the reference
 implementation for parity tests and rollback. Loudness, mix-review decode and
-masking keep their own opt-in flags on top of this one.
+masking have their own flags on top of this one.
 """
 
 from __future__ import annotations
@@ -26,8 +26,9 @@ def _load() -> Any | None:
     # covers analyze_wav, so the audio upload and AudioGen routes, Live session
     # advice and the extra spectral pass in mix review take the native path; the
     # main mix-review report runs local_engine and is unaffected. Mix-review
-    # loudness has its own flag, default-on since its own corpus run the same day
-    # (see local_engine); mix-review decode and masking stay opt-in.
+    # loudness and decode have their own flags, default-on after their own
+    # corpus runs the same day (see local_engine); masking is default-on for
+    # the Accelerate build only (see masking_band_energy).
     # A missing extension still falls through to the reference below.
     if os.environ.get("KENN_DSP_NATIVE", "1").strip().lower() in {"0", "false", "off", "no"}:
         return None
@@ -106,6 +107,29 @@ def decode_pcm(payload: bytes | bytearray | memoryview) -> dict[str, Any] | None
     return result
 
 
+_masking_backend_label: str | None = None
+
+
+def _masking_backend(module: Any) -> str:
+    """Return the backend label the loaded module reports for masking, probing once.
+
+    The extension has no build-info export, so we run it on one 4096-sample
+    frame of silence (93 ms at 44.1 kHz, about a millisecond) and keep the label.
+    """
+    global _masking_backend_label
+    if _masking_backend_label is None:
+        import numpy as np
+
+        try:
+            probe = module.masking_band_energy(np.zeros(4096, dtype=np.float32), 44100, 4096, 2048)
+            _masking_backend_label = str(dict(probe).get("backend") or "")
+        except (AttributeError, RuntimeError, TypeError, ValueError):
+            # An extension without a working masking kernel is not one we
+            # measured, so it keeps the NumPy default.
+            _masking_backend_label = ""
+    return _masking_backend_label
+
+
 def masking_band_energy(
     samples: list[float] | Any,
     sample_rate: int,
@@ -119,16 +143,24 @@ def masking_band_energy(
     callers must retain their reference implementation when the extension is
     unavailable or explicitly disabled.
     """
-    # The Apple Accelerate build is faster than the NumPy reference on the
-    # qualification host, while the portable scalar build is not. Keep this
-    # path explicitly opt-in so installing the native spectral wheel cannot
-    # change stem-masking behavior without a measured backend choice.
-    if os.environ.get("KENN_DSP_MASKING_NATIVE", "0").strip().lower() not in {"1", "true", "on", "yes"}:
+    # Default-on for the Accelerate build since 17 Oct 2026: on 260 real stems
+    # (8 songs, 26 groups of up to 12, one arm64 Mac) the masking report was
+    # identical to the NumPy reference apart from the implementation label, in
+    # 10.0 s against 29.0 s. The portable scalar build measured slower than
+    # NumPy (see CPP_DSP_PHASE4_MASKING_NATIVE_POC_RECEIPT.md), so it stays off
+    # by default. We gate on the backend the module reports, not the OS, because
+    # a Mac build with -DKENN_USE_ACCELERATE=OFF is scalar too. =1 forces native
+    # on any build, =0 forces NumPy.
+    setting = os.environ.get("KENN_DSP_MASKING_NATIVE", "").strip().lower()
+    if setting in {"0", "false", "off", "no"}:
         return None
     module = _load()
     if module is None:
         return None
     import numpy as np
+
+    if setting not in {"1", "true", "on", "yes"} and _masking_backend(module) != "cpp-accelerate":
+        return None
 
     source = samples
     values = np.asarray(source, dtype=np.float32, order="C")

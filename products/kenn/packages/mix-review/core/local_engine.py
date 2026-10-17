@@ -235,14 +235,18 @@ def validate_wav_upload(payload: bytes, filename: str, *, label: str = "Local mi
 
 
 def _decode_channels(payload: bytes) -> tuple[list[array], int, int]:
-    # The Mix Review engine keeps its audited Python decoder as the default,
-    # but can opt into the same native PCM decoder used by the spectral path.
-    # This avoids the Python integer-to-float64 decode pass on large uploads;
-    # the native loudness path can keep these float32 channels end-to-end.
-    # The exact parser/error fallback remains in place when the optional wheel
-    # is absent or rejects the container.
-    if os.environ.get("KENN_DSP_MIX_REVIEW_DECODE_NATIVE", "0").strip().lower() in {
-        "1", "true", "on", "yes",
+    # The native PCM decoder (the one the spectral path uses) is the default
+    # since 17 Oct 2026. On the 25 corpus files under the 150 MB cap the full
+    # report matched the
+    # Python decoder apart from timestamps and two float32 roundings (one
+    # correlation-timeline point 0.408 vs 0.409, one peak 0.0524 vs 0.0523),
+    # and the corpus ran 6.5 s against 8.9 s. The float32 channels also feed
+    # the native loudness meter without another conversion.
+    # KENN_DSP_MIX_REVIEW_DECODE_NATIVE=0 (or KENN_DSP_NATIVE=0) is the
+    # rollback. A missing extension or a container the native parser rejects
+    # falls through to the Python parser, which owns the public error text.
+    if os.environ.get("KENN_DSP_MIX_REVIEW_DECODE_NATIVE", "1").strip().lower() not in {
+        "0", "false", "off", "no",
     }:
         try:
             from kenn.core.native_fft import decode_pcm
@@ -268,6 +272,12 @@ def _decode_channels(payload: bytes) -> tuple[list[array], int, int]:
                 pass
 
     channels, sampwidth, framerate, raw, audio_format = _parse_wav(payload)
+    # Drop a trailing partial frame, as the native decoder does. Without this a
+    # 24-bit stereo file with 3 stray bytes decoded to channels one sample
+    # apart, and analyze_wav crashed on the broadcast (found in review, 17 Oct).
+    # A zero width or channel count is left for the checks below to refuse.
+    if channels > 0 and sampwidth > 0:
+        raw = raw[: len(raw) - len(raw) % (channels * sampwidth)]
 
     if sampwidth == 2:
         if _np is not None:
