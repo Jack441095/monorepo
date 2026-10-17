@@ -2779,9 +2779,12 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   - [x] Grading against the producer's own stored reference must not expose other producers' or other sessions' mixes.
     Done 17 Oct in `apps/backend/src/kenn/core/mix_archive.py`: Strict tenant partition by `producer_id` on all queries; `grade_against_reference` refuses cross-tenant reference lookups with `PermissionError`, and grading yields grounded 100-point combined grades with 40-point reference match components. Verified by 10 comprehensive unit tests in `test_mix_archive.py`.
 - [ ] **E7: Remembering the session.** The system keeps context across turns and sessions.
-  - [ ] Keep corrections ("I told you to reduce the low-mids; what's the grade now?"), advice the producer followed ("I lowered the low-mids and the grade went from 42 to 61") and preferences.
-  - [ ] Check a correction is stored in the session, readable in a later turn and invisible to other sessions.
-  - [ ] Check export and reset: one session's data can be exported and deleted without touching another session or producer.
+  - [x] Keep corrections ("I told you to reduce the low-mids; what's the grade now?"), advice the producer followed ("I lowered the low-mids and the grade went from 42 to 61") and preferences.
+    Done 17 Oct in `apps/backend/src/kenn/core/session_memory.py`: Implemented `parse_session_learning`, `record_session_correction`, and `record_session_followed_advice`. Automatically captures corrections and followed advice with topics and grade deltas from natural language statements.
+  - [x] Check a correction is stored in the session, readable in a later turn and invisible to other sessions.
+    Done 17 Oct in `apps/backend/src/kenn/core/session_memory.py` and `apps/backend/src/kenn/tests/test_session_memory_corrections.py`: SQLite `session_corrections` table stores corrections with turn IDs and timestamps. Verified that a correction recorded in session A is readable in future turns and completely invisible to session B.
+  - [x] Check export and reset: one session's data can be exported and deleted without touching another session or producer.
+    Done 17 Oct in `apps/backend/src/kenn/core/session_memory.py` and `apps/backend/src/kenn/tests/test_session_memory_corrections.py`: Implemented `export_session_data` (bundling state, preferences, episodes, corrections, advice, and versions) and `reset_session_data` (purging all session records across 8 tables without touching other sessions). Verified across 7 tests in `test_session_memory_corrections.py`.
 - [ ] **E8: Learning path versus one-off help.** Keep a formal curriculum separate from ad-hoc questions.
   - [ ] Define the curriculum: session objectives, before and after grades, lesson notes, and gaps found from suggestions that failed.
   - [ ] Add a simple session: the producer picks a topic and gets an objective, a starting grade and a suggested path.

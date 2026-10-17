@@ -41,6 +41,32 @@ def handle_ask(
 
     # A chat turn from this route also supersedes its earlier background answer.
     answer_upgrades.begin_turn(session_id)
+    if session_id:
+        from kenn.core.session_memory import (
+            parse_session_learning,
+            record_session_correction,
+            record_session_followed_advice,
+        )
+        learning = parse_session_learning(question)
+        if learning.get("is_correction") and learning.get("correction_data"):
+            c_data = learning["correction_data"]
+            record_session_correction(
+                session_id=session_id,
+                user_statement=question,
+                topic=c_data["topic"],
+                correction_text=c_data["correction_text"],
+                source_turn_id=request_id,
+            )
+        elif learning.get("is_followed_advice") and learning.get("followed_advice_data"):
+            adv_data = learning["followed_advice_data"]
+            record_session_followed_advice(
+                session_id=session_id,
+                user_statement=question,
+                action=adv_data["action"],
+                grade_before=adv_data.get("grade_before"),
+                grade_after=adv_data.get("grade_after"),
+                source_turn_id=request_id,
+            )
     result = answer_payload(
         question,
         session_id=session_id,
@@ -180,4 +206,97 @@ def handle_clear_memory(session_id: str) -> tuple[int, dict[str, Any]]:
     store = AssistantProfileStore()
     cleared = store.clear_profile(clean_id)
     return 200, {"ok": True, "session_id": clean_id, "cleared": cleared}
+
+
+def handle_record_correction(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Record a producer correction for a session."""
+    session_id = str(payload.get("session_id", "")).strip()
+    user_statement = str(payload.get("user_statement", "")).strip()
+    topic = str(payload.get("topic", "general")).strip()
+    correction_text = str(payload.get("correction_text", "")).strip()
+    source_turn_id = str(payload.get("source_turn_id", "turn-ui")).strip()
+
+    if not session_id or not correction_text:
+        return 400, {"ok": False, "error": "session_id and correction_text are required."}
+
+    from kenn.core.session_memory import record_session_correction
+    result = record_session_correction(
+        session_id=session_id,
+        user_statement=user_statement or correction_text,
+        topic=topic,
+        correction_text=correction_text,
+        source_turn_id=source_turn_id,
+    )
+    status = 201 if result.get("ok") else 400
+    return status, result
+
+
+def handle_get_corrections(session_id: str, limit: int = 32) -> tuple[int, dict[str, Any]]:
+    """Retrieve all corrections stored in a session."""
+    clean_id = str(session_id or "").strip()
+    if not clean_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+
+    from kenn.core.session_memory import get_session_corrections
+    corrections = get_session_corrections(clean_id, limit=limit)
+    return 200, {"ok": True, "session_id": clean_id, "corrections": corrections}
+
+
+def handle_record_followed_advice(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Record advice the producer followed along with before and after grades."""
+    session_id = str(payload.get("session_id", "")).strip()
+    user_statement = str(payload.get("user_statement", "")).strip()
+    action = str(payload.get("action", "")).strip()
+    grade_before = payload.get("grade_before")
+    grade_after = payload.get("grade_after")
+    source_turn_id = str(payload.get("source_turn_id", "turn-ui")).strip()
+
+    if not session_id or not action:
+        return 400, {"ok": False, "error": "session_id and action are required."}
+
+    from kenn.core.session_memory import record_session_followed_advice
+    result = record_session_followed_advice(
+        session_id=session_id,
+        user_statement=user_statement or action,
+        action=action,
+        grade_before=grade_before,
+        grade_after=grade_after,
+        source_turn_id=source_turn_id,
+    )
+    status = 201 if result.get("ok") else 400
+    return status, result
+
+
+def handle_get_followed_advice(session_id: str, limit: int = 32) -> tuple[int, dict[str, Any]]:
+    """Retrieve all followed advice records stored in a session."""
+    clean_id = str(session_id or "").strip()
+    if not clean_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+
+    from kenn.core.session_memory import get_session_followed_advice
+    advice_list = get_session_followed_advice(clean_id, limit=limit)
+    return 200, {"ok": True, "session_id": clean_id, "followed_advice": advice_list}
+
+
+def handle_export_session_data(session_id: str) -> tuple[int, dict[str, Any]]:
+    """Export complete context and history for a single session."""
+    clean_id = str(session_id or "").strip()
+    if not clean_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+
+    from kenn.core.session_memory import export_session_data
+    exported = export_session_data(clean_id)
+    return 200, exported
+
+
+def handle_reset_session_data(session_id: str) -> tuple[int, dict[str, Any]]:
+    """Completely reset all data for a single session, keeping others intact."""
+    clean_id = str(session_id or "").strip()
+    if not clean_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+
+    from kenn.core.session_memory import reset_session_data
+    cleared_counts = reset_session_data(clean_id)
+    return 200, {"ok": True, "session_id": clean_id, "cleared_counts": cleared_counts}
+
 

@@ -33,6 +33,12 @@ from kenn.routes.chat_routes import (
     handle_restore_preference,
     handle_delete_episode,
     handle_clear_memory,
+    handle_record_correction,
+    handle_get_corrections,
+    handle_record_followed_advice,
+    handle_get_followed_advice,
+    handle_export_session_data,
+    handle_reset_session_data,
 )
 from kenn.routes.daw_routes import handle_confirmation_revoke, handle_live_command, handle_parameter_inspection, handle_parameter_proposal, handle_session_card, handle_osc_undo, handle_offline_scan_proposal, handle_offline_scan_start, handle_offline_scan_status, handle_offline_scan_cancel
 from kenn.routes.mix_review_routes import (
@@ -150,6 +156,28 @@ class MemoryClearRequest(BaseModel):
     session_id: str
 
 
+class CorrectionRecordRequest(BaseModel):
+    session_id: str
+    user_statement: Optional[str] = ""
+    topic: Optional[str] = "general"
+    correction_text: str
+    source_turn_id: Optional[str] = "turn-ui"
+
+
+class FollowedAdviceRecordRequest(BaseModel):
+    session_id: str
+    user_statement: Optional[str] = ""
+    action: str
+    grade_before: Optional[float] = None
+    grade_after: Optional[float] = None
+    source_turn_id: Optional[str] = "turn-ui"
+
+
+class SessionResetRequest(BaseModel):
+    session_id: str
+
+
+
 # --- Core Endpoints ----------------------------------------------------------
 
 @app.get("/api/health")
@@ -234,6 +262,45 @@ async def delete_episode_endpoint(session_id: str, episode_id: str):
 async def clear_memory_endpoint(req: MemoryClearRequest):
     status, result = handle_clear_memory(req.session_id)
     return JSONResponse(status_code=status, content=result)
+
+
+# --- Milestone E7: Remembering the Session Endpoints -------------------------
+
+@app.post("/api/session/correction")
+async def record_correction_endpoint(req: CorrectionRecordRequest):
+    status, result = handle_record_correction(req.model_dump())
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.get("/api/session/corrections")
+async def get_corrections_endpoint(session_id: str, limit: Optional[int] = 32):
+    status, result = handle_get_corrections(session_id, limit=limit or 32)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/session/followed-advice")
+async def record_followed_advice_endpoint(req: FollowedAdviceRecordRequest):
+    status, result = handle_record_followed_advice(req.model_dump())
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.get("/api/session/followed-advice")
+async def get_followed_advice_endpoint(session_id: str, limit: Optional[int] = 32):
+    status, result = handle_get_followed_advice(session_id, limit=limit or 32)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.get("/api/session/export")
+async def export_session_endpoint(session_id: str):
+    status, result = handle_export_session_data(session_id)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/session/reset")
+async def reset_session_endpoint(req: SessionResetRequest):
+    status, result = handle_reset_session_data(req.session_id)
+    return JSONResponse(status_code=status, content=result)
+
 
 
 # --- Ableton Live 12 DAW Endpoints -------------------------------------------

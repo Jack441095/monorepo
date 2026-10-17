@@ -105,6 +105,44 @@ def _get_db() -> sqlite3.Connection:
     )
     conn.execute(
         """
+        CREATE TABLE IF NOT EXISTS session_corrections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            correction_id TEXT UNIQUE NOT NULL,
+            session_id TEXT NOT NULL,
+            user_statement TEXT NOT NULL,
+            topic TEXT NOT NULL,
+            correction_text TEXT NOT NULL,
+            source_turn_id TEXT NOT NULL,
+            created_at REAL NOT NULL
+        )
+        """
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_session_corrections_session "
+        "ON session_corrections(session_id, created_at DESC)"
+    )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS session_followed_advice (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            advice_id TEXT UNIQUE NOT NULL,
+            session_id TEXT NOT NULL,
+            user_statement TEXT NOT NULL,
+            action TEXT NOT NULL,
+            grade_before REAL,
+            grade_after REAL,
+            grade_delta REAL,
+            source_turn_id TEXT NOT NULL,
+            created_at REAL NOT NULL
+        )
+        """
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_session_followed_advice_session "
+        "ON session_followed_advice(session_id, created_at DESC)"
+    )
+    conn.execute(
+        """
         CREATE TABLE IF NOT EXISTS semantic_cache (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             session_id TEXT NOT NULL DEFAULT '',
@@ -524,6 +562,8 @@ EMPTY_SESSION: dict[str, Any] = {
     "track_names": [],
     "current_project": "",
     "preferences": {},
+    "corrections": [],
+    "followed_advice": [],
     "followup_count": 0,
     "turn_count": 0,
     "last_updated": 0,
@@ -1440,3 +1480,343 @@ def list_audition_feedback(session_id: str = "", limit: int = 20) -> list[dict[s
         return result
     except (sqlite3.Error, OSError):
         return []
+
+
+# ---------------------------------------------------------------------------
+# Milestone E7: Remembering the Session (Corrections, Followed Advice, Reset)
+# ---------------------------------------------------------------------------
+
+_CORRECTION_RE = re.compile(
+    r"(?:i\s+(?:already\s+)?(?:told|asked)\s+you\s+to|correction:?|actually,?\s+(?:don'?t|instead\s+of))\s+([^?.!]+)",
+    re.I,
+)
+
+_FOLLOWED_ADVICE_RE = re.compile(
+    r"(?:i\s+(?:lowered|reduced|cut|boosted|increased|applied|adjusted|set|fixed|tamed)\s+([^?.!]+?)\s+and\s+the\s+(?:grade|score)\s+(?:went|improved|moved|changed|rose)\s+from\s+(\d+(?:\.\d+)?)\s+to\s+(\d+(?:\.\d+)?))",
+    re.I,
+)
+
+
+def _infer_learning_topic(text: str) -> str:
+    """Classify mix dimension topic from user statement."""
+    lowered = text.lower()
+    if any(k in lowered for k in ("low-mid", "low mid", "mud", "boxy", "300 hz", "400 hz")):
+        return "low_mids"
+    if any(k in lowered for k in ("vocal", "voice", "sing", "lead")):
+        return "vocal"
+    if any(k in lowered for k in ("reverb", "delay", "space", "ambience")):
+        return "reverb"
+    if any(k in lowered for k in ("sub", "808", "sub-bass", "rumble")):
+        return "sub"
+    if any(k in lowered for k in ("bass", "kick")):
+        return "low_end"
+    if any(k in lowered for k in ("high", "air", "sizzle", "treble", "dull", "bright")):
+        return "high_end"
+    if any(k in lowered for k in ("compress", "squash", "crest", "dynamic", "punch")):
+        return "dynamics"
+    if any(k in lowered for k in ("phase", "mono", "correlation", "width")):
+        return "phase"
+    if any(k in lowered for k in ("loudness", "lufs", "ceiling", "dbtp", "peak")):
+        return "target_loudness"
+    return "general_mix"
+
+
+def parse_session_learning(user_statement: str) -> dict[str, Any]:
+    """Parse user statements for mix corrections and followed advice."""
+    stmt = str(user_statement or "").strip()
+    result: dict[str, Any] = {
+        "is_correction": False,
+        "correction_data": None,
+        "is_followed_advice": False,
+        "followed_advice_data": None,
+    }
+    if not stmt:
+        return result
+
+    # 1. Followed advice check ("I lowered the low-mids and the grade went from 42 to 61")
+    adv_match = _FOLLOWED_ADVICE_RE.search(stmt)
+    if adv_match:
+        action_part = adv_match.group(1).strip()
+        before_val = float(adv_match.group(2))
+        after_val = float(adv_match.group(3))
+        delta_val = round(after_val - before_val, 2)
+        result["is_followed_advice"] = True
+        result["followed_advice_data"] = {
+            "action": f"Adjusted {action_part}",
+            "topic": _infer_learning_topic(action_part),
+            "grade_before": before_val,
+            "grade_after": after_val,
+            "grade_delta": delta_val,
+        }
+        return result
+
+    # 2. Correction check ("I told you to reduce the low-mids; what's the grade now?")
+    corr_match = _CORRECTION_RE.search(stmt)
+    if corr_match:
+        correction_text = corr_match.group(1).strip()
+        result["is_correction"] = True
+        result["correction_data"] = {
+            "correction_text": correction_text,
+            "topic": _infer_learning_topic(correction_text),
+        }
+
+    return result
+
+
+def record_session_correction(
+    session_id: str,
+    user_statement: str,
+    topic: str,
+    correction_text: str,
+    source_turn_id: str = "turn-0",
+) -> dict[str, Any]:
+    """Store a producer correction in the session, readable in later turns."""
+    clean_session = str(session_id or "").strip()[:128]
+    if not clean_session:
+        return {"ok": False, "error": "session_id is required"}
+
+    correction_id = f"corr-{uuid.uuid4().hex[:12]}"
+    now = time.time()
+    clean_topic = str(topic or "general").strip().lower()[:64]
+    clean_corr = str(correction_text or "")[:1024]
+    clean_turn = str(source_turn_id or "turn-0")[:64]
+
+    conn = _get_db()
+    try:
+        conn.execute(
+            """INSERT INTO session_corrections (
+                   correction_id, session_id, user_statement, topic, correction_text, source_turn_id, created_at
+               ) VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (
+                correction_id,
+                clean_session,
+                str(user_statement or "")[:1024],
+                clean_topic,
+                clean_corr,
+                clean_turn,
+                now,
+            ),
+        )
+        conn.commit()
+    except (sqlite3.Error, OSError) as exc:
+        return {"ok": False, "error": str(exc)}
+
+    # Update in-memory session object
+    state = load_session(clean_session)
+    corrections = state.get("corrections", [])
+    corrections.append({
+        "correction_id": correction_id,
+        "topic": clean_topic,
+        "correction_text": clean_corr,
+        "created_at": now,
+    })
+    state["corrections"] = corrections[-32:]  # Keep latest 32 corrections
+    save_session(state)
+
+    return {
+        "ok": True,
+        "correction": {
+            "correction_id": correction_id,
+            "session_id": clean_session,
+            "topic": clean_topic,
+            "correction_text": clean_corr,
+            "created_at": now,
+        },
+    }
+
+
+def get_session_corrections(session_id: str, limit: int = 32) -> list[dict[str, Any]]:
+    """Retrieve corrections stored in a session, newest first."""
+    clean_session = str(session_id or "").strip()[:128]
+    if not clean_session:
+        return []
+    bounded_limit = max(1, min(64, int(limit)))
+    try:
+        conn = _get_db()
+        rows = conn.execute(
+            """SELECT correction_id, session_id, user_statement, topic, correction_text, source_turn_id, created_at
+               FROM session_corrections WHERE session_id = ?
+               ORDER BY created_at DESC LIMIT ?""",
+            (clean_session, bounded_limit),
+        ).fetchall()
+        return [
+            {
+                "schema": "kenn.session_correction.v1",
+                "correction_id": row["correction_id"],
+                "session_id": row["session_id"],
+                "user_statement": row["user_statement"],
+                "topic": row["topic"],
+                "correction_text": row["correction_text"],
+                "source_turn_id": row["source_turn_id"],
+                "created_at": row["created_at"],
+            }
+            for row in rows
+        ]
+    except (sqlite3.Error, OSError):
+        return []
+
+
+def record_session_followed_advice(
+    session_id: str,
+    user_statement: str,
+    action: str,
+    grade_before: Optional[float] = None,
+    grade_after: Optional[float] = None,
+    source_turn_id: str = "turn-0",
+) -> dict[str, Any]:
+    """Store advice the producer followed with before/after grade progression."""
+    clean_session = str(session_id or "").strip()[:128]
+    if not clean_session:
+        return {"ok": False, "error": "session_id is required"}
+
+    advice_id = f"adv-{uuid.uuid4().hex[:12]}"
+    now = time.time()
+    before_val = float(grade_before) if grade_before is not None else None
+    after_val = float(grade_after) if grade_after is not None else None
+    delta_val = round(after_val - before_val, 2) if (before_val is not None and after_val is not None) else None
+
+    clean_action = str(action or "")[:1024]
+    clean_turn = str(source_turn_id or "turn-0")[:64]
+
+    conn = _get_db()
+    try:
+        conn.execute(
+            """INSERT INTO session_followed_advice (
+                   advice_id, session_id, user_statement, action, grade_before, grade_after, grade_delta, source_turn_id, created_at
+               ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                advice_id,
+                clean_session,
+                str(user_statement or "")[:1024],
+                clean_action,
+                before_val,
+                after_val,
+                delta_val,
+                clean_turn,
+                now,
+            ),
+        )
+        conn.commit()
+    except (sqlite3.Error, OSError) as exc:
+        return {"ok": False, "error": str(exc)}
+
+    # Update in-memory session object
+    state = load_session(clean_session)
+    followed = state.get("followed_advice", [])
+    followed.append({
+        "advice_id": advice_id,
+        "action": clean_action,
+        "grade_before": before_val,
+        "grade_after": after_val,
+        "grade_delta": delta_val,
+        "created_at": now,
+    })
+    state["followed_advice"] = followed[-32:]  # Keep latest 32 records
+    save_session(state)
+
+    return {
+        "ok": True,
+        "followed_advice": {
+            "advice_id": advice_id,
+            "session_id": clean_session,
+            "action": clean_action,
+            "grade_before": before_val,
+            "grade_after": after_val,
+            "grade_delta": delta_val,
+            "created_at": now,
+        },
+    }
+
+
+def get_session_followed_advice(session_id: str, limit: int = 32) -> list[dict[str, Any]]:
+    """Retrieve followed advice records for a session, newest first."""
+    clean_session = str(session_id or "").strip()[:128]
+    if not clean_session:
+        return []
+    bounded_limit = max(1, min(64, int(limit)))
+    try:
+        conn = _get_db()
+        rows = conn.execute(
+            """SELECT advice_id, session_id, user_statement, action, grade_before, grade_after, grade_delta, source_turn_id, created_at
+               FROM session_followed_advice WHERE session_id = ?
+               ORDER BY created_at DESC LIMIT ?""",
+            (clean_session, bounded_limit),
+        ).fetchall()
+        return [
+            {
+                "schema": "kenn.session_followed_advice.v1",
+                "advice_id": row["advice_id"],
+                "session_id": row["session_id"],
+                "user_statement": row["user_statement"],
+                "action": row["action"],
+                "grade_before": row["grade_before"],
+                "grade_after": row["grade_after"],
+                "grade_delta": row["grade_delta"],
+                "source_turn_id": row["source_turn_id"],
+                "created_at": row["created_at"],
+            }
+            for row in rows
+        ]
+    except (sqlite3.Error, OSError):
+        return []
+
+
+def export_session_data(session_id: str) -> dict[str, Any]:
+    """Export complete session context: state, preferences, corrections, advice, and versions."""
+    clean_session = str(session_id or "").strip()[:128]
+    if not clean_session:
+        return {"ok": False, "error": "session_id is required"}
+
+    from kenn.core.assistant_profile_memory import AssistantProfileStore
+
+    profile_store = AssistantProfileStore()
+    return {
+        "schema": "kenn.session_export.v1",
+        "exported_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "session_id": clean_session,
+        "state": load_session(clean_session),
+        "preferences": profile_store.current_preferences(clean_session),
+        "preference_history": profile_store.preference_history(clean_session),
+        "episodes": profile_store.recent_episodes(clean_session, limit=64),
+        "corrections": get_session_corrections(clean_session),
+        "followed_advice": get_session_followed_advice(clean_session),
+        "mix_versions": list_mix_versions(clean_session),
+        "audition_feedback": list_audition_feedback(clean_session),
+    }
+
+
+def reset_session_data(session_id: str) -> dict[str, int]:
+    """Completely wipe one session's data without touching any other session or producer.
+
+    Purges across:
+    - sessions
+    - session_corrections
+    - session_followed_advice
+    - producer_preferences
+    - production_episodes
+    - mix_versions
+    - audition_feedback
+    - semantic_cache
+    """
+    clean_session = str(session_id or "").strip()[:128]
+    if not clean_session:
+        return {"deleted": 0}
+
+    counts: dict[str, int] = {}
+    try:
+        conn = _get_db()
+        counts["sessions"] = conn.execute("DELETE FROM sessions WHERE session_id = ?", (clean_session,)).rowcount
+        counts["corrections"] = conn.execute("DELETE FROM session_corrections WHERE session_id = ?", (clean_session,)).rowcount
+        counts["followed_advice"] = conn.execute("DELETE FROM session_followed_advice WHERE session_id = ?", (clean_session,)).rowcount
+        counts["preferences"] = conn.execute("DELETE FROM producer_preferences WHERE session_id = ?", (clean_session,)).rowcount
+        counts["episodes"] = conn.execute("DELETE FROM production_episodes WHERE session_id = ?", (clean_session,)).rowcount
+        counts["mix_versions"] = conn.execute("DELETE FROM mix_versions WHERE session_id = ?", (clean_session,)).rowcount
+        counts["audition_feedback"] = conn.execute("DELETE FROM audition_feedback WHERE session_id = ?", (clean_session,)).rowcount
+        counts["semantic_cache"] = conn.execute("DELETE FROM semantic_cache WHERE session_id = ?", (clean_session,)).rowcount
+        conn.commit()
+    except (sqlite3.Error, OSError):
+        pass
+
+    drop_session_semantic_cache(clean_session)
+    return counts
+
