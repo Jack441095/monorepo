@@ -494,3 +494,72 @@ async def mix_archive_grade_reference_endpoint(req: MixGradeReferenceRequest):
     status, result = handle_grade_against_reference(req.model_dump())
     return JSONResponse(status_code=status, content=result)
 
+
+# --- Milestone E10: Before/After Comparison Endpoints -------------------------
+
+class BeforeAfterCompareRequest(BaseModel):
+    before_snapshot: dict[str, Any]
+    after_snapshot: dict[str, Any]
+    before_grade: Optional[dict[str, Any]] = None
+    after_grade: Optional[dict[str, Any]] = None
+    lever: Optional[dict[str, Any]] = None
+    receipt_id: Optional[str] = None
+    session_id: Optional[str] = "default-session"
+
+
+class BeforeAfterRegradeRequest(BaseModel):
+    current_meters: dict[str, Any]
+    original_meters: dict[str, Any]
+    original_grade: Optional[dict[str, Any]] = None
+    technical_report: Optional[dict[str, Any]] = None
+    request_text: Optional[str] = ""
+    applied_lever: Optional[dict[str, Any]] = None
+
+
+@app.get("/api/mix/before-after/{receipt_id}")
+async def get_before_after_endpoint(receipt_id: str):
+    from kenn.core.session_memory import get_before_after_comparison
+    comparison = get_before_after_comparison(receipt_id)
+    if comparison is None:
+        raise HTTPException(status_code=404, detail=f"No comparison found for receipt '{receipt_id}'")
+    return JSONResponse(status_code=200, content={"ok": True, "receipt_id": receipt_id, "comparison": comparison})
+
+
+@app.post("/api/mix/before-after/compare")
+async def compare_before_after_endpoint(req: BeforeAfterCompareRequest):
+    from kenn.core.suggestion_levers import build_before_after_comparison
+    from kenn.core.session_memory import save_before_after_comparison
+
+    comparison = build_before_after_comparison(
+        before_snapshot=req.before_snapshot,
+        after_snapshot=req.after_snapshot,
+        before_grade=req.before_grade,
+        after_grade=req.after_grade,
+        lever=req.lever,
+    )
+    if req.receipt_id:
+        save_before_after_comparison(
+            receipt_id=req.receipt_id,
+            session_id=req.session_id or "default-session",
+            before_snapshot=req.before_snapshot,
+            after_snapshot=req.after_snapshot,
+            comparison=comparison,
+        )
+    return JSONResponse(status_code=200, content={"ok": True, "comparison": comparison})
+
+
+@app.post("/api/mix/before-after/regrade")
+async def regrade_against_original_endpoint(req: BeforeAfterRegradeRequest):
+    from kenn.core.suggestion_levers import regrade_against_original
+
+    result = regrade_against_original(
+        current_meters=req.current_meters,
+        original_meters=req.original_meters,
+        original_grade=req.original_grade,
+        technical_report=req.technical_report,
+        request_text=req.request_text or "",
+        applied_lever=req.applied_lever,
+    )
+    return JSONResponse(status_code=200, content={"ok": True, "result": result})
+
+

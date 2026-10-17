@@ -143,6 +143,23 @@ def _get_db() -> sqlite3.Connection:
     )
     conn.execute(
         """
+        CREATE TABLE IF NOT EXISTS before_after_comparisons (
+            comparison_id TEXT PRIMARY KEY,
+            receipt_id TEXT UNIQUE NOT NULL,
+            session_id TEXT NOT NULL,
+            before_snapshot_json TEXT NOT NULL,
+            after_snapshot_json TEXT NOT NULL,
+            comparison_json TEXT NOT NULL,
+            created_at REAL NOT NULL
+        )
+        """
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_before_after_session "
+        "ON before_after_comparisons(session_id, created_at DESC)"
+    )
+    conn.execute(
+        """
         CREATE TABLE IF NOT EXISTS semantic_cache (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             session_id TEXT NOT NULL DEFAULT '',
@@ -1812,6 +1829,7 @@ def reset_session_data(session_id: str) -> dict[str, int]:
         counts["episodes"] = conn.execute("DELETE FROM production_episodes WHERE session_id = ?", (clean_session,)).rowcount
         counts["mix_versions"] = conn.execute("DELETE FROM mix_versions WHERE session_id = ?", (clean_session,)).rowcount
         counts["audition_feedback"] = conn.execute("DELETE FROM audition_feedback WHERE session_id = ?", (clean_session,)).rowcount
+        counts["before_after"] = conn.execute("DELETE FROM before_after_comparisons WHERE session_id = ?", (clean_session,)).rowcount
         counts["semantic_cache"] = conn.execute("DELETE FROM semantic_cache WHERE session_id = ?", (clean_session,)).rowcount
         conn.commit()
     except (sqlite3.Error, OSError):
@@ -1819,4 +1837,64 @@ def reset_session_data(session_id: str) -> dict[str, int]:
 
     drop_session_semantic_cache(clean_session)
     return counts
+
+
+def save_before_after_comparison(
+    *,
+    receipt_id: str,
+    session_id: str,
+    before_snapshot: dict[str, Any],
+    after_snapshot: dict[str, Any],
+    comparison: dict[str, Any],
+) -> dict[str, Any]:
+    """Store an acoustic before/after comparison linked to a suggestion receipt."""
+    clean_receipt = str(receipt_id or "").strip()[:128]
+    clean_session = str(session_id or "default-session").strip()[:128]
+    if not clean_receipt:
+        return {"ok": False, "error": "receipt_id is required"}
+
+    comp_id = f"cmp-{uuid.uuid4().hex[:12]}"
+    now = time.time()
+    try:
+        conn = _get_db()
+        conn.execute(
+            """INSERT OR REPLACE INTO before_after_comparisons (
+                   comparison_id, receipt_id, session_id, before_snapshot_json,
+                   after_snapshot_json, comparison_json, created_at
+               ) VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (
+                comp_id,
+                clean_receipt,
+                clean_session,
+                json.dumps(before_snapshot, sort_keys=True),
+                json.dumps(after_snapshot, sort_keys=True),
+                json.dumps(comparison, sort_keys=True),
+                now,
+            ),
+        )
+        conn.commit()
+        return {"ok": True, "comparison_id": comp_id, "receipt_id": clean_receipt}
+    except (sqlite3.Error, OSError) as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+def get_before_after_comparison(receipt_id: str) -> Optional[dict[str, Any]]:
+    """Fetch stored before/after comparison for a suggestion receipt."""
+    clean_receipt = str(receipt_id or "").strip()[:128]
+    if not clean_receipt:
+        return None
+    try:
+        conn = _get_db()
+        row = conn.execute(
+            """SELECT comparison_id, receipt_id, session_id, before_snapshot_json,
+                      after_snapshot_json, comparison_json, created_at
+               FROM before_after_comparisons WHERE receipt_id = ?""",
+            (clean_receipt,),
+        ).fetchone()
+        if row is None:
+            return None
+        return json.loads(row["comparison_json"])
+    except (sqlite3.Error, OSError, json.JSONDecodeError):
+        return None
+
 

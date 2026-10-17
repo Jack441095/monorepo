@@ -907,10 +907,12 @@ def apply_suggestion_lever(
     lever: Dict[str, Any],
     service: Any,
     session_id: str = "mix-advice",
+    pre_apply_meters: Optional[Dict[str, Any]] = None,
+    pre_apply_grade: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Execute a Live-targeted suggestion lever through LiveActionService.
 
-    Returns the execution result dictionary containing receipt and ok status.
+    Captures pre-apply analysis meters and grade, storing them directly on the receipt.
     """
     if not isinstance(lever, dict) or not lever.get("is_live_target"):
         return {"ok": False, "error": "This suggestion lever is informational or outside Live."}
@@ -920,6 +922,7 @@ def apply_suggestion_lever(
     t_idx = action_spec.get("track_index")
     t_name = action_spec.get("track_name", "")
 
+    result: Dict[str, Any]
     if act == "set_volume":
         target_raw = action_spec.get("target_raw")
         if target_raw is None:
@@ -933,12 +936,12 @@ def apply_suggestion_lever(
         if not prop_res.get("ok"):
             return prop_res
         prop = prop_res["proposal"]
-        return service.execute(
+        result = service.execute(
             prop, confirm_token=prop["confirmation_token"],
             session_id=session_id, idempotency_key=prop.get("action_id"),
         )
 
-    if act == "set_pan":
+    elif act == "set_pan":
         target_pan = float(action_spec.get("target_pan", 0.0))
         prop_res = service.propose_track_action(
             "set_pan", track_index=int(t_idx), value=target_pan,
@@ -947,19 +950,19 @@ def apply_suggestion_lever(
         if not prop_res.get("ok"):
             return prop_res
         prop = prop_res["proposal"]
-        return service.execute(
+        result = service.execute(
             prop, confirm_token=prop["confirmation_token"],
             session_id=session_id, idempotency_key=prop.get("action_id"),
         )
 
-    if act == "set_device_parameter":
+    elif act == "set_device_parameter":
         d_idx = action_spec.get("device_index", 0)
         p_name = action_spec.get("parameter_name", "Gain")
         p_val = float(action_spec.get("delta_db", -2.0))
         # Use service or mock device parameter write
         if hasattr(service.client, "set_device_parameter"):
             service.client.set_device_parameter(int(t_idx), int(d_idx), 0, p_val)
-        return {
+        result = {
             "ok": True,
             "receipt": {
                 "action": "set_device_parameter",
@@ -971,8 +974,21 @@ def apply_suggestion_lever(
                 "status": "applied",
             }
         }
+    else:
+        return {"ok": False, "error": f"Unsupported lever action: {act}"}
 
-    return {"ok": False, "error": f"Unsupported lever action: {act}"}
+    # Bind pre-apply baseline analysis and grade to the receipt and result
+    if result.get("ok"):
+        receipt = result.get("receipt")
+        if isinstance(receipt, dict):
+            receipt["before_snapshot"] = pre_apply_meters
+            receipt["before_grade"] = pre_apply_grade
+            receipt["lever_applied"] = lever
+        result["before_snapshot"] = pre_apply_meters
+        result["before_grade"] = pre_apply_grade
+        result["lever_applied"] = lever
+
+    return result
 
 
 def undo_suggestion_lever(
@@ -995,6 +1011,203 @@ def undo_suggestion_lever(
         session_id=session_id,
         idempotency_key=undo_prop.get("action_id"),
     )
+
+
+def build_before_after_comparison(
+    before_snapshot: Dict[str, Any],
+    after_snapshot: Dict[str, Any],
+    before_grade: Optional[Dict[str, Any]] = None,
+    after_grade: Optional[Dict[str, Any]] = None,
+    lever: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Calculate acoustic deltas between before and after mix analysis windows.
+
+    Guarantees:
+    - Every literal carries its measurement unit (dBTP, LUFS, dB, %, ratio).
+    - Checks that re-grading reflects the applied suggestion lever.
+    - Generates human pedagogical auditory guidance for listening verification.
+    """
+    deltas: Dict[str, Any] = {}
+    auditory_cues: List[str] = []
+
+    # 1. True Peak (dBTP)
+    b_tp = before_snapshot.get("true_peak_dbtp")
+    a_tp = after_snapshot.get("true_peak_dbtp")
+    if isinstance(b_tp, (int, float)) and isinstance(a_tp, (int, float)):
+        tp_delta = round(a_tp - b_tp, 2)
+        deltas["true_peak_dbtp"] = {
+            "before": round(b_tp, 2),
+            "after": round(a_tp, 2),
+            "delta": tp_delta,
+            "unit": "dBTP",
+        }
+        if tp_delta < 0.0:
+            auditory_cues.append(f"True peak decreased by {abs(tp_delta):.2f} dBTP, creating safe headroom below clipping.")
+        elif tp_delta > 0.0:
+            auditory_cues.append(f"True peak increased by {tp_delta:+.2f} dBTP.")
+
+    # 2. Integrated Loudness (LUFS)
+    b_lufs = before_snapshot.get("integrated_lufs")
+    a_lufs = after_snapshot.get("integrated_lufs")
+    if isinstance(b_lufs, (int, float)) and isinstance(a_lufs, (int, float)):
+        lufs_delta = round(a_lufs - b_lufs, 1)
+        deltas["integrated_lufs"] = {
+            "before": round(b_lufs, 1),
+            "after": round(a_lufs, 1),
+            "delta": lufs_delta,
+            "unit": "LUFS",
+        }
+
+    # 3. Stereo Correlation ([-1.0, +1.0])
+    b_corr = before_snapshot.get("correlation", before_snapshot.get("phase_correlation"))
+    a_corr = after_snapshot.get("correlation", after_snapshot.get("phase_correlation"))
+    if isinstance(b_corr, (int, float)) and isinstance(a_corr, (int, float)):
+        corr_delta = round(a_corr - b_corr, 2)
+        deltas["correlation"] = {
+            "before": round(b_corr, 2),
+            "after": round(a_corr, 2),
+            "delta": corr_delta,
+            "unit": "correlation",
+        }
+        if corr_delta > 0.0:
+            auditory_cues.append(f"Stereo correlation improved by {corr_delta:+.2f}, strengthening center image in mono.")
+
+    # 4. Spectral Bands: Low-Mid, Sub, Air
+    b_spec = before_snapshot.get("bands") or before_snapshot.get("spectral_energy") or {}
+    a_spec = after_snapshot.get("bands") or after_snapshot.get("spectral_energy") or {}
+
+    b_lm = b_spec.get("low_mid", b_spec.get("low_mid_200_500hz"))
+    a_lm = a_spec.get("low_mid", a_spec.get("low_mid_200_500hz"))
+    if isinstance(b_lm, (int, float)) and isinstance(a_lm, (int, float)):
+        lm_delta = round((a_lm - b_lm) * 100.0, 1)
+        deltas["low_mid_energy_pct"] = {
+            "before": round(b_lm * 100.0, 1),
+            "after": round(a_lm * 100.0, 1),
+            "delta": lm_delta,
+            "unit": "%",
+        }
+        if lm_delta < 0.0:
+            auditory_cues.append(f"Low-mid energy dropped by {abs(lm_delta):.1f}%, clearing boxy build-up around 200-500 Hz.")
+
+    b_sub = b_spec.get("sub", b_spec.get("sub_20_60hz"))
+    a_sub = a_spec.get("sub", a_spec.get("sub_20_60hz"))
+    if isinstance(b_sub, (int, float)) and isinstance(a_sub, (int, float)):
+        sub_delta = round((a_sub - b_sub) * 100.0, 1)
+        deltas["sub_energy_pct"] = {
+            "before": round(b_sub * 100.0, 1),
+            "after": round(a_sub * 100.0, 1),
+            "delta": sub_delta,
+            "unit": "%",
+        }
+
+    b_air = b_spec.get("air", b_spec.get("air_10_20khz"))
+    a_air = a_spec.get("air", a_spec.get("air_10_20khz"))
+    if isinstance(b_air, (int, float)) and isinstance(a_air, (int, float)):
+        air_delta = round((a_air - b_air) * 100.0, 1)
+        deltas["air_energy_pct"] = {
+            "before": round(b_air * 100.0, 1),
+            "after": round(a_air * 100.0, 1),
+            "delta": air_delta,
+            "unit": "%",
+        }
+        if air_delta > 0.0:
+            auditory_cues.append(f"Air (>10 kHz) energy increased by {air_delta:+.1f}%, adding open high-frequency sheen.")
+
+    # 5. Crest factor (dB)
+    b_cf = before_snapshot.get("crest_factor_db", before_snapshot.get("crest_db"))
+    a_cf = after_snapshot.get("crest_factor_db", after_snapshot.get("crest_db"))
+    if isinstance(b_cf, (int, float)) and isinstance(a_cf, (int, float)):
+        cf_delta = round(a_cf - b_cf, 1)
+        deltas["crest_factor_db"] = {
+            "before": round(b_cf, 1),
+            "after": round(a_cf, 1),
+            "delta": cf_delta,
+            "unit": "dB",
+        }
+        if cf_delta > 0.0:
+            auditory_cues.append(f"Crest factor expanded by {cf_delta:+.1f} dB, recovering transient dynamic punch.")
+
+    # 6. Grade Score Delta
+    grade_delta_pts: Optional[float] = None
+    if before_grade and after_grade:
+        b_pts = before_grade.get("points")
+        a_pts = after_grade.get("points")
+        if isinstance(b_pts, (int, float)) and isinstance(a_pts, (int, float)):
+            grade_delta_pts = round(a_pts - b_pts, 1)
+            deltas["grade_score"] = {
+                "before": round(b_pts, 1),
+                "after": round(a_pts, 1),
+                "delta": grade_delta_pts,
+                "unit": "points",
+            }
+            if grade_delta_pts > 0.0:
+                auditory_cues.append(f"Grade score gained {grade_delta_pts:+.1f} points (from {b_pts:.1f} to {a_pts:.1f}).")
+
+    # 7. Regrade agreement verification
+    regrade_agrees = True
+    if lever:
+        lever_id = str(lever.get("lever_id", "")).lower()
+        if "true-peak" in lever_id:
+            # Must lower peak or gain grade
+            tp_d = deltas.get("true_peak_dbtp", {}).get("delta")
+            if tp_d is not None and tp_d > 0.0 and (grade_delta_pts is None or grade_delta_pts <= 0.0):
+                regrade_agrees = False
+        elif "low-mid" in lever_id:
+            # Must lower low-mid or gain grade
+            lm_d = deltas.get("low_mid_energy_pct", {}).get("delta")
+            if lm_d is not None and lm_d > 0.0 and (grade_delta_pts is None or grade_delta_pts <= 0.0):
+                regrade_agrees = False
+        elif "phase" in lever_id:
+            # Must improve correlation or gain grade
+            c_d = deltas.get("correlation", {}).get("delta")
+            if c_d is not None and c_d < 0.0 and (grade_delta_pts is None or grade_delta_pts <= 0.0):
+                regrade_agrees = False
+
+    summary_text = " ".join(auditory_cues) if auditory_cues else "Acoustic parameters remained stable within normal tolerances."
+
+    return {
+        "schema": "kenn.before_after_comparison.v1",
+        "deltas": deltas,
+        "grade_delta_points": grade_delta_pts,
+        "regrade_agrees": regrade_agrees,
+        "auditory_change_summary": summary_text,
+    }
+
+
+def regrade_against_original(
+    *,
+    current_meters: Dict[str, Any],
+    original_meters: Dict[str, Any],
+    original_grade: Optional[Dict[str, Any]] = None,
+    technical_report: Optional[Dict[str, Any]] = None,
+    request_text: str = "",
+    applied_lever: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Re-grade the current mix against the original baseline analysis snapshot."""
+    from kenn.core.grade import grade_session
+
+    current_grade = grade_session(
+        technical=technical_report or {},
+        meters=current_meters,
+        request=request_text,
+        include_levers=True,
+        include_explanation=True,
+    )
+
+    comparison = build_before_after_comparison(
+        before_snapshot=original_meters,
+        after_snapshot=current_meters,
+        before_grade=original_grade,
+        after_grade=current_grade,
+        lever=applied_lever,
+    )
+
+    return {
+        "current_grade": current_grade,
+        "original_grade": original_grade,
+        "comparison": comparison,
+        "regrade_agrees": comparison.get("regrade_agrees", True),
+    }
 
 
 def with_suggestion_levers(
@@ -1217,10 +1430,12 @@ __all__ = [
     "SuggestionLever",
     "WILSON_FAZENDA_RULE",
     "apply_suggestion_lever",
+    "build_before_after_comparison",
     "explain_grade",
     "explain_suggestion_lever",
     "generate_suggestion_levers",
     "is_grade_low_enough_for_help",
+    "regrade_against_original",
     "undo_suggestion_lever",
     "with_suggestion_levers",
 ]

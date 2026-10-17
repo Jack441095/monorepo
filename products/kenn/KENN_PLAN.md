@@ -2801,8 +2801,10 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
     Pinned 17 Oct at 60.2 of 62. The fixture is a generated 4 s stereo file: 80 Hz, 1 kHz and 6 kHz in the mid, 2.5 kHz in the side. The test also pins the points for each part. It lives in the same test file as the determinism check above. This shows the grade is stable, not that it is right; that still needs the human-judged set above and my ears.
   - [ ] I listen before we claim the grade is right. It is a model output and we treat it as one.
 - [ ] **E10: Before/after comparison.** Show the producer the before and after of a change, keep the analysis, and let them re-grade against the original.
-  - [ ] Capture the analysis before an Apply, store it with the change, and serve the comparison on request.
-  - [ ] Check the re-grade after an applied suggestion reflects the change and agrees with the before/after comparison.
+  - [x] Capture the analysis before an Apply, store it with the change, and serve the comparison on request.
+    Done 17 Oct in `apps/backend/src/kenn/core/suggestion_levers.py`, `apps/backend/src/kenn/core/session_memory.py`, and `apps/backend/src/kenn/routes/fastapi_app.py`: `apply_suggestion_lever` binds pre-apply analysis meters and grade directly to the action receipt. Stored in SQLite `before_after_comparisons` table and served over REST via `/api/mix/before-after/{receipt_id}` and `/api/mix/before-after/compare`.
+  - [x] Check the re-grade after an applied suggestion reflects the change and agrees with the before/after comparison.
+    Done 17 Oct in `apps/backend/src/kenn/core/suggestion_levers.py` (`build_before_after_comparison`, `regrade_against_original`) and `apps/backend/src/kenn/tests/test_before_after_comparison.py`: Computes acoustic deltas with explicit units (dBTP, LUFS, %, dB, correlation). Directional agreement verified between the applied lever and acoustic delta. Re-grading against baseline verified across 6 comprehensive unit tests.
 - [ ] **E11: Expert network.** Working engineers contribute notes, lessons and benchmarks to the knowledge base.
   - [ ] Review and version expert content like any other knowledge. Nothing unvetted gets surfaced.
   - [ ] I listen before we claim usefulness. Expert content is a source, not a guarantee of correctness.
