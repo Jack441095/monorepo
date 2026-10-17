@@ -36,7 +36,7 @@ PORT = os.environ.get("KENN_SERVER_PORT", "22")
 SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ControlMaster=no", "-p", PORT, HOST]
 SCP = ["scp", "-o", "BatchMode=yes", "-o", "ControlMaster=no", "-P", PORT, "-q"]
 REMOTE = "/mnt/data/kenn-bakeoff/ci"
-TARGETS = ("apps/backend/src/kenn/tests", "chat/tests", "mix-review/tests", "automix/tests")
+TARGETS = ("apps/backend/src/kenn/tests", "chat/tests", "packages/mix-review/tests")
 DATA_PATHS = ("Training_Data_Notes", "artifacts/models/minilm")  # plus the active index version
 
 
@@ -120,7 +120,7 @@ if [ "$(cat {REMOTE}/venv/.req 2>/dev/null)" != "{req_digest}" ]; then
   echo {req_digest} > {REMOTE}/venv/.req
 fi
 cd tree/products/kenn
-export PATH="{REMOTE}/venv/bin:$PATH" CUDA_VISIBLE_DEVICES="" PYTHONPATH="apps/backend/src:tooling:packages/chat:packages/mix-review:packages/automix"
+export PATH="{REMOTE}/venv/bin:$PATH" CUDA_VISIBLE_DEVICES="" PYTHONPATH="apps/backend/src:tooling:packages/chat:packages/mix-review"
 python_bin={REMOTE}/venv/bin/python
 echo '{{"commit": "{commit}", "results": [' > {run_dir}/results.json
 first=1

@@ -5,11 +5,8 @@ optional NumPy accelerator and a Python standard-library fallback. This module
 has no runtime dependency on any external ``Audio_Too`` checkout and runs
 standalone from this repository alone.
 
-An optional, explicitly opt-in legacy engine around a preserved external
-Audio_Too checkout is also supported, for controlled parity comparison only.
-It is never reached unless ``KENN_MIX_REVIEW_ENGINE=audio_too_legacy`` is set
-explicitly, and it is not part of the default beta product path -- see
-docs/KENN_BETA_GAP_MATRIX.md.
+The opt-in ``KENN_MIX_REVIEW_ENGINE=audio_too_legacy`` parity engine was removed
+with Audio_Too on 17 Oct 2026; the C++ analysis path replaced it.
 """
 
 from __future__ import annotations
@@ -40,35 +37,6 @@ from core.local_engine import analyze_wav as engine_analyze_wav  # noqa: E402
 from core.local_engine import validate_wav_upload as engine_validate_wav_upload  # noqa: E402
 
 ENGINE_NAME = "kenn-owned mix-review/core/local_engine.py (no external dependency)"
-
-if os.environ.get("KENN_MIX_REVIEW_ENGINE", "local").strip().lower() == "audio_too_legacy":
-    # Explicit, non-default optional adapter kept only for controlled parity
-    # comparisons against the preserved (external) Audio_Too engine. Never
-    # reached by the default beta product path.
-    AUDIO_TOO_ROOT = Path(
-        os.environ.get("KENN_AUDIO_TOO_ROOT", str(REPO_ROOT / "Audio_Too"))
-    ).expanduser().resolve()
-    if not AUDIO_TOO_ROOT.is_dir():
-        raise RuntimeError(
-            f"KENN_MIX_REVIEW_ENGINE=audio_too_legacy was set but no Audio_Too checkout "
-            f"was found at {AUDIO_TOO_ROOT}. This optional legacy path is not part of the "
-            "default beta product; unset KENN_MIX_REVIEW_ENGINE to use the KENN-owned engine."
-        )
-    for import_root in (
-        AUDIO_TOO_ROOT,
-        AUDIO_TOO_ROOT / "studio",
-        AUDIO_TOO_ROOT / "studio" / "audio_analysis",
-        AUDIO_TOO_ROOT / "business" / "app",
-    ):
-        if str(import_root) not in sys.path:
-            sys.path.insert(0, str(import_root))
-    os.environ.setdefault("AUDIO_TOO_MIX_REVIEW_DATA_ROOT", str(RUNTIME_DIR / "mix-review-data"))
-    from audio_analysis.mix_review.mix_review import (  # type: ignore  # noqa: E402
-        analyze_wav as engine_analyze_wav,
-        validate_wav_upload as engine_validate_wav_upload,
-    )
-    ENGINE_NAME = "Audio_Too/studio/audio_analysis (legacy, explicit opt-in only, not beta-default)"
-
 
 BOUNDARY = MixReviewBoundary(
     product_root=SERVICE_ROOT,

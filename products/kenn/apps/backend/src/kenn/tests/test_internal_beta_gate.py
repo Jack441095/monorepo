@@ -325,7 +325,6 @@ def test_automated_gate_passes_repository_import_paths_to_pytest(monkeypatch) ->
     pythonpath = captured["kwargs"]["env"]["PYTHONPATH"].split(__import__("os").pathsep)
     assert str(gate.REPO_ROOT / "apps" / "backend" / "src") in pythonpath
     assert str(gate.REPO_ROOT / "packages" / "mix-review") in pythonpath
-    assert str(gate.REPO_ROOT / "packages" / "automix") in pythonpath
 
 
 def test_automated_gate_scopes_pytest_to_kenns_own_suite_only(monkeypatch) -> None:
@@ -354,7 +353,7 @@ def test_automated_gate_scopes_pytest_to_kenns_own_suite_only(monkeypatch) -> No
 
     assert result.status == "pass"
     # One process per target, so one project's sys.path cannot shadow another's modules.
-    targets = ("apps/backend/src/kenn/tests", "chat/tests", "mix-review/tests", "automix/tests")
+    targets = ("apps/backend/src/kenn/tests", "chat/tests", "packages/mix-review/tests")
     assert len(commands) == len(targets)
     for target, command in zip(targets, commands):
         assert target in command and not any(other in command for other in targets if other != target)

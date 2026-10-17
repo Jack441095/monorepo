@@ -501,7 +501,9 @@ def _plugin_distribution_gate(archive: Path, host_report: Path | None = None) ->
 # "fail" that has nothing to do with KENN's actual test health -- found and
 # fixed 2026-09-06 after --run-suite reported 84 errors that were entirely
 # from such a folder, not from this repository's own tests.
-_SUITE_TARGETS = ("apps/backend/src/kenn/tests", "chat/tests", "mix-review/tests", "automix/tests")
+# The old top-level mix-review/ and automix/ copies, and AutoMix itself, went with
+# Audio_Too on 17 Oct 2026; the package copy under packages/ is the live one.
+_SUITE_TARGETS = ("apps/backend/src/kenn/tests", "chat/tests", "packages/mix-review/tests")
 _SUITE_COMMAND_DISPLAY = "python3 -m pytest <target> -q, one process per target: " + ", ".join(_SUITE_TARGETS)
 
 _DURABLE_QUALIFICATION_REPORTS = {
@@ -537,8 +539,6 @@ _HUMAN_REVIEW_ANSWER_INPUTS = (
 _QUALIFICATION_SOURCE_PREFIXES = (
     "source/",
     "chat/",
-    "mix-review/",
-    "automix/",
     "tooling/scripts/",
     "third_party/",
     "common/",
@@ -607,14 +607,15 @@ def _automated_gate(run_suite: bool, receipt_path: Path | None = None) -> Gate:
         return _gate("automated_suite", "Automated regression suite", "pending", ("pilot", "qualified"), [_SUITE_COMMAND_DISPLAY], "Not run by this invocation; pass --run-suite to execute it.")
     try:
         environment = os.environ.copy()
-        import_paths = [str(REPO_ROOT / "apps" / "backend" / "src"), str(REPO_ROOT / "packages" / "chat"), str(REPO_ROOT / "packages" / "mix-review"), str(REPO_ROOT / "packages" / "automix")]
+        import_paths = [str(REPO_ROOT / "apps" / "backend" / "src"), str(REPO_ROOT / "packages" / "chat"), str(REPO_ROOT / "packages" / "mix-review")]
         existing_pythonpath = environment.get("PYTHONPATH")
         if existing_pythonpath:
             import_paths.append(existing_pythonpath)
         environment["PYTHONPATH"] = os.pathsep.join(import_paths)
-        # One pytest process per target: mix-review/ puts Audio_Too's packages
-        # first on sys.path, whose names (audio_analysis, ...) shadow KENN's own
-        # modules, so a shared process fails tests that pass on their own.
+        # One pytest process per target, so one target's sys.path setup cannot
+        # shadow another's modules. The old top-level mix-review/ copy forced
+        # this by putting Audio_Too's audio_analysis ahead of KENN's own; it is
+        # gone since 17 Oct 2026, but test dirs still insert their own paths.
         runs = [
             (target, subprocess.run(
                 [sys.executable, "-m", "pytest", target, "-q"],
