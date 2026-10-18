@@ -25,7 +25,7 @@ def test_data_availability_is_honest_without_db_url(monkeypatch):
     avail = adv.data_availability()
     assert "waitlist_entries" in avail["schema_tables"]
     assert "unavailable" in avail["live_counts"]
-    assert "Plausible" in avail["traffic"]
+    assert "plausible" in avail["traffic"].lower()
 
 
 def test_business_brief_uses_live_facts():

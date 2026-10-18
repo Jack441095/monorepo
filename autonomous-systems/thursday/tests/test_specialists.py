@@ -154,7 +154,7 @@ def test_qa_gathers_real_beta_readiness_evidence(monkeypatch):
     _install_fake_llm_provider(monkeypatch, content="Not ready yet.")
     result = run_grounded_specialist(_grounded_task("qa", "are we ready for beta"))
     assert result.status == "SUCCESS"
-    assert "BETA READINESS" in result.evidence["raw"] or "Evidence missing" in result.evidence["raw"]
+    assert "SUBMIT PRIVATE PREVIEW HANDOFF CHECK" in result.evidence["raw"] or "Evidence missing" in result.evidence["raw"]
 
 
 def test_support_gathers_real_faq_and_known_issues_evidence(monkeypatch):
@@ -168,7 +168,7 @@ def test_documentation_gathers_real_tracker_and_search_evidence(monkeypatch):
     _install_fake_llm_provider(monkeypatch, content="Here's the doc status.")
     result = run_grounded_specialist(_grounded_task("documentation", "how is the launch tracker looking"))
     assert result.status == "SUCCESS"
-    assert "LAUNCH TRACKER" in result.evidence["raw"]
+    assert "PAID LAUNCH BLOCKERS" in result.evidence["raw"]
     assert "DOC SEARCH RESULTS" in result.evidence["raw"]
 
 

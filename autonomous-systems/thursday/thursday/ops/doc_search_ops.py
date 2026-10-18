@@ -288,9 +288,13 @@ def _docs_root() -> Path:
 _ROUTER_RULES: tuple[tuple[str, str, tuple[str, ...], tuple[str, ...]], ...] = (
     ("money->sop", "any", ("price", "cost", "pricing", "much", "charge"), ("sop",)),
     ("money-word->sop", "any", ("quote", "stems", "deposit"), ("sop",)),
-    ("beta-version->truth-sheet", "all", ("beta", "version"), ("truth", "sheet")),
-    ("support-channel->truth-sheet", "all", ("support", "channel"), ("truth", "sheet")),
-    ("contact->truth-sheet", "any", ("contact",), ("truth", "sheet")),
+    # The truth sheet's title became "Submit beta drafting facts" on 10 Oct
+    # 2026 (ded10b4a), so "truth sheet" no longer appears in it and the SLO
+    # beta register outranked it. The anchors follow the title; the rule
+    # names stay, since callers may already log them.
+    ("beta-version->truth-sheet", "all", ("beta", "version"), ("drafting", "facts")),
+    ("support-channel->truth-sheet", "all", ("support", "channel"), ("drafting", "facts")),
+    ("contact->truth-sheet", "any", ("contact",), ("drafting", "facts")),
     ("template->feedback-template", "any", ("template", "mission", "feedback"), ("feedback", "template")),
     ("release->artifact", "any", ("release",), ("artifact", "submit")),
     ("escalation", "any", ("escalat", "refund", "complaint"), ("escalation",)),
@@ -377,16 +381,35 @@ def _blob_terms(blob: str) -> set[str]:
     return {_stem(t) for t in re.findall(r"\d+(?:\.\d+)+|[a-z0-9£]{2,}|[0-9]", blob)}
 
 
+def _sops_root() -> Path | None:
+    """The business SOPs (prices, turnarounds, revisions), or None when this
+    machine does not have them. They are owner data kept outside git, in
+    Nite-DSP/Business/ops-docs/sops/; by 28 Sept 2026 they had moved there from
+    Nite-DSP/thursday-sops/. We search upward from the monorepo root rather
+    than taking root.parent, so a worktree under workspace/worktrees/ still
+    finds them. CI has no Business/ folder, and the SOP questions then go
+    unanswered rather than citing something else.
+    """
+    target = Path("Business") / "ops-docs" / "sops"
+    for candidate in [nite_dsp_root(), *nite_dsp_root().resolve().parents][:8]:
+        if (candidate / target).is_dir():
+            return candidate / target
+    return None
+
+
 def _keyword_roots() -> list[Path]:
     """Corpus roots for live keyword search, business-first: monorepo
     docs, Thursday SOPs, then products (nite-submit first -- it is the
     live beta business), then website docs. Order matters: per-root caps
     mean later roots lose files first, so authoritative business sources
     are never starved by research corpora (found 2026-09-18: a global
-    400-file cap cut off thursday-sops entirely behind products/slo).
+    400-file cap cut off the SOPs entirely behind products/slo).
     """
     root = nite_dsp_root()
-    ordered = [root / "docs", root.parent / "thursday-sops"]
+    ordered = [root / "docs"]
+    sops = _sops_root()
+    if sops is not None:
+        ordered.append(sops)
     products = root / "products"
     if products.is_dir():
         prod_dirs = sorted(p for p in products.iterdir() if p.is_dir())

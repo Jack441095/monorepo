@@ -187,8 +187,13 @@ def traffic_status() -> dict:
                            f"in Plausible; backend counts (waitlist_entries, purchases) still need "
                            f"DATABASE_URL in the backend process."),
                 "error": None}
+    # Name the counter we found, so the advisory line says which dashboard to
+    # open. "analytics" alone is a generic marker (it matches a comment), so it
+    # never counts as a product name.
+    counters = sorted({m for h in hits for m in h["markers"]} - {"analytics"})
+    found = f" ({', '.join(counters)})" if counters else ""
     return {"ok": True, "instrumented": True, "hits": hits[:10],
-            "detail": ("Pageview analytics present but no custom funnel events found -- "
+            "detail": (f"Pageview analytics present{found} but no custom funnel events found -- "
                        "launch conversion is still blind. Next: WaitlistSubmit-style event calls "
                        "on waitlist/pricing/download/checkout actions."),
             "error": None}

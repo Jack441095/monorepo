@@ -4,7 +4,7 @@ Phase 1 (2026-09-18): every question must be answered from real files
 with the expected fact present in the returned snippets -- 0
 hallucinations means the facts come from cited sources, never the
 model. All expectations below were verified against the actual files
-(thursday-sops/*.md, docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md,
+(Business/ops-docs/sops/*.md, products/nite-submit/docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md,
 products/nite-submit/docs/BETA_FEEDBACK_TEMPLATE.md,
 products/nite-submit/RELEASE.md). Forces the keyword path (no index)
 so this runs identically on machines with and without GPU/model.
@@ -15,8 +15,10 @@ from __future__ import annotations
 import thursday.ops.doc_search_ops as dso
 
 
-QUESTIONS = [
-    # SOP pricing (thursday-sops/)
+# The SOPs are owner data outside git (Nite-DSP/Business/ops-docs/sops/), so
+# these questions only run on a machine that has them; CI asks the rest.
+SOP_QUESTIONS = [
+    # SOP pricing
     ("How much does mixing cost?", "£180"),
     ("Mastering price?", "£60"),
     ("Vocal recording price?", "£120"),
@@ -44,9 +46,12 @@ QUESTIONS = [
     ("What happens after final delivery?", "review + referral"),
     ("When does the turnaround clock start?", "clock starts"),
     ("What if the client wants extra mix revisions?", "new quote"),
-    # Truth sheet (docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md)
+]
+
+DOC_QUESTIONS = [
+    # Truth sheet (products/nite-submit/docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md)
     ("What is the current beta version?", "0.2.0"),
-    ("What is the support channel?", "audio_too@outlook.com"),
+    ("What is the support channel?", "nitedsp@outlook.com"),
     ("Are beta invites sent automatically?", "Draft-only"),
     # Beta feedback template (products/nite-submit/docs/)
     ("Where is the beta feedback template?", "BETA FEEDBACK TEMPLATE"),
@@ -55,6 +60,8 @@ QUESTIONS = [
     # distinct from the 0.2.0 private beta in the truth sheet)
     ("What is the NITE Submit release artifact version?", "1.0.0"),
 ]
+
+QUESTIONS = SOP_QUESTIONS + DOC_QUESTIONS
 
 
 def test_corpus_eval_30_questions_cited(monkeypatch):
@@ -72,7 +79,8 @@ def test_corpus_eval_30_questions_cited(monkeypatch):
     monkeypatch.setattr(dso, "_load_index", lambda: None)  # force keyword path
     root = _root()
     failures = []
-    for question, expected in QUESTIONS:
+    questions = QUESTIONS if dso._sops_root() is not None else DOC_QUESTIONS
+    for question, expected in questions:
         result = dso.search_docs(question, top_k=5)
         hits = result.get("hits", [])
         snippets = " ".join(h["snippet"] for h in hits).lower()
@@ -124,21 +132,24 @@ def test_expansions_reported_in_result_meta(monkeypatch):
 
 # Raw NL -> top-1 cited file must be the authoritative source.
 TOP1_CASES = [
-    ("How much does mixing cost?", "thursday-sops/sop-mixing.md"),
-    ("What is the current beta version?", "docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md"),
-    ("What is the support channel?", "docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md"),
+    ("How much does mixing cost?", "sops/sop-mixing.md"),
+    ("What is the current beta version?", "products/nite-submit/docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md"),
+    ("What is the support channel?", "products/nite-submit/docs/NITE_SUBMIT_LAUNCH_TRUTH_SHEET.md"),
     ("What is the first beta mission?", "products/nite-submit/docs/BETA_FEEDBACK_TEMPLATE.md"),
-    ("How many revision rounds does mixing include?", "thursday-sops/sop-mixing.md"),
-    ("What does podcast editing include?", "thursday-sops/sop-podcast.md"),
-    ("Consultation booking speed?", "thursday-sops/sop-consultation.md"),
-    ("What does a consultation deliver?", "thursday-sops/sop-consultation.md"),
+    ("How many revision rounds does mixing include?", "sops/sop-mixing.md"),
+    ("What does podcast editing include?", "sops/sop-podcast.md"),
+    ("Consultation booking speed?", "sops/sop-consultation.md"),
+    ("What does a consultation deliver?", "sops/sop-consultation.md"),
 ]
 
 
 def test_router_top1_cites_authoritative_source(monkeypatch):
     monkeypatch.setattr(dso, "_load_index", lambda: None)
     failures = []
+    have_sops = dso._sops_root() is not None
     for question, expected_suffix in TOP1_CASES:
+        if expected_suffix.startswith("sops/") and not have_sops:
+            continue
         result = dso.search_docs(question, top_k=1)
         top = result["hits"][0]["source"] if result.get("hits") else None
         if top is None or not top.endswith(expected_suffix):

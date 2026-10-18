@@ -22,13 +22,15 @@ def test_product_pricing_finds_pound_figures_with_citations():
     pricing = wo.product_pricing()
     assert pricing["ok"] is True
     figures = {f["figure"] for f in pricing["figures"]}
-    assert "£3" in figures
+    # Prices move (this pinned £3; on 18 Oct 2026 the site lists £2 and £9),
+    # so pin only that real pound figures are found, never a particular one.
+    assert figures and all(f.startswith("£") for f in figures)
     assert all(f["source"] and ":" in f["source"] for f in pricing["figures"])
 
 
 def test_pricing_check_compares_website_vs_truth_sheet():
     out = wo.pricing_check()
-    assert "£3" in out
+    assert any(f["figure"] in out for f in wo.product_pricing()["figures"])
     assert "0.2.0" in out  # truth-sheet beta, read live
     assert "Scope note" in out
 
@@ -43,14 +45,17 @@ def test_enquiry_surfaces_lists_routes_and_honest_db_status(monkeypatch):
     assert "unavailable, not zero" in surfaces["live_db"]
 
 
-def test_traffic_status_reports_pageviews_and_custom_events():
+def test_traffic_status_names_the_counter_and_any_custom_events():
+    # Until 18 Oct 2026 this pinned a WaitlistSubmit event that the canonical
+    # website has never had; it described the superseded root copy.
     traffic = wo.traffic_status()
     assert traffic["ok"] is True
     assert traffic["instrumented"] is True
-    assert "WaitlistSubmit" in traffic.get("custom_events", [])
-    assert "tagged-events" in " ".join(traffic.get("custom_events", [])).lower() \
-        or "tagged-events-build" in traffic.get("custom_events", [])
-    assert "URL goals" in traffic.get("detail", "")
+    if traffic.get("custom_events"):
+        assert "URL goals" in traffic["detail"]
+    else:
+        assert "plausible" in traffic["detail"]
+        assert "no custom funnel events" in traffic["detail"]
 
 
 def test_weekly_website_lines_never_raise():
