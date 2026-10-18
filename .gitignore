@@ -32,11 +32,12 @@ node_modules/
 # Local Mix Review uploads are operator data, not repository fixtures.
 audio-technology/audio-analysis/audio_analysis/agents/MixReview/data/mix_reviews/uploads/
 
-# Pure build/cache scratch space — not source, not final reports
-workspace/builds/
-workspace/caches/
-workspace/worktrees/
-workspace/tmp/
+# Local scratch: builds, caches, worktrees, salvage and cleanup quarantine. Ignored whole since
+# 18 Oct 2026 because salvage/ and cleanup-*/ kept showing as untracked; nothing under it is source.
+workspace/
+
+# AudioGen's system-performance benchmark writes a run_<timestamp> dir here on every test run.
+audio-technology/audiogen/audiogen/.cache/
 
 # Large binary/model/media artifacts that don't belong in git
 *.safetensors

@@ -40,7 +40,7 @@ Triggers: every push to `main` → mirrors to `Jack441095/monorepo`
 
 ## Stripe commerce
 
-Stripe is the only active provider. Checkout settings, webhook events, and migration instructions are in [docs/STRIPE_COMMERCE.md](docs/STRIPE_COMMERCE.md). Public SLO and Submit payment links use Stripe; the authenticated checkout endpoint is `/commerce/checkout`.
+Stripe is the only active provider. Checkout settings, webhook events, and migration instructions are in [docs/STRIPE_COMMERCE.md](../STRIPE_COMMERCE.md). Public SLO and Submit payment links use Stripe; the authenticated checkout endpoint is `/commerce/checkout`.
 
 ## Submodule URLs
 

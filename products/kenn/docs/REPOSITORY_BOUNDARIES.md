@@ -47,7 +47,7 @@ source of truth. Promote changes between repositories by an explicit PR that
 names the source commit, scope, tests, and any intentional divergence. Never
 copy the entire monorepo into this checkout or reverse-sync it wholesale.
 
-See `docs/PROMOTION_WORKFLOW.md` for the handoff procedure.
+See `docs/process/PROMOTION_WORKFLOW.md` at the monorepo root for the handoff procedure.
 
 ## Branch rule
 
