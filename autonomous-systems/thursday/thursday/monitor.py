@@ -256,19 +256,6 @@ def _hours_since(timestamp: str, now: datetime) -> float | None:
         return None
 
 
-def _default_list_mix_reviews() -> list[dict]:
-    """Lazy import — audio_analysis pulls in torch, must not break alerts if unavailable."""
-    try:
-        from audio_analysis.mix_review.mix_review import list_reviews
-        return list_reviews(limit=50)
-    except Exception:
-        logger.warning(
-            "_default_list_mix_reviews: audio_analysis unavailable, mix-review alerts disabled this pass",
-            exc_info=True,
-        )
-        return []
-
-
 def _default_list_audiogen_jobs() -> list[dict]:
     """Lazy import — mirrors thursday/client.py's audiogen_render_queue()."""
     try:
@@ -280,29 +267,6 @@ def _default_list_audiogen_jobs() -> list[dict]:
             exc_info=True,
         )
         return []
-
-
-def _check_flagged_mix_reviews(list_mix_reviews: Callable[[], list[dict]], hours: int = 24) -> list[dict]:
-    """Check for mix reviews completed recently that came back with technical flags."""
-    alerts = []
-    now = datetime.now()
-    try:
-        for review in list_mix_reviews():
-            flags = review.get("flags") or []
-            if not flags:
-                continue
-            hours_old = _hours_since(review.get("created_at", ""), now)
-            if hours_old is None or hours_old > hours:
-                continue
-            title = review.get("title") or review.get("id", "mix review")
-            alerts.append(_make_alert(
-                "mix_review_flagged", "warning",
-                f"Mix review '{title}' flagged {len(flags)} issue(s).",
-                review.get("id"),
-            ))
-    except Exception:
-        logger.warning("_check_flagged_mix_reviews failed; skipping this check", exc_info=True)
-    return alerts
 
 
 def _check_finished_renders(list_audiogen_jobs: Callable[[], list[dict]], hours: int = 24) -> list[dict]:
@@ -342,7 +306,6 @@ def _check_finished_renders(list_audiogen_jobs: Callable[[], list[dict]], hours:
 def run_checks(
     list_records: Callable,
     *,
-    list_mix_reviews: Callable[[], list[dict]] | None = None,
     list_audiogen_jobs: Callable[[], list[dict]] | None = None,
 ) -> list[dict]:
     """Run all monitoring checks and return new alerts."""
@@ -353,7 +316,6 @@ def run_checks(
     new_alerts.extend(_check_new_enquiries(list_records))
     new_alerts.extend(_check_expiring_links(list_records))
     new_alerts.extend(_check_financial_health(list_records))
-    new_alerts.extend(_check_flagged_mix_reviews(list_mix_reviews or _default_list_mix_reviews))
     new_alerts.extend(_check_finished_renders(list_audiogen_jobs or _default_list_audiogen_jobs))
 
     if new_alerts:
@@ -457,7 +419,6 @@ def format_alerts(alerts: list[dict]) -> str | None:
 # never trigger a mutation on its own — the command still routes through normal
 # classification (and would hit the confirmation gate if it were ever mutating).
 _ALERT_SUGGESTIONS: dict[str, tuple[str, str]] = {
-    "mix_review_flagged": ("list mix reviews", "show your flagged mix review"),
     "render_finished": ("list mix reviews", "show your finished renders"),
     "render_failed": ("audiogen status", "show the render status"),
     "overdue_invoice": ("show invoices", "show your overdue invoices"),

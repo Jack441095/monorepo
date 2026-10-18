@@ -14,7 +14,6 @@ import os
 import subprocess
 import sys
 import threading
-from pathlib import Path
 from typing import Any, Callable
 
 from thursday.repo_root import audio_too_root
@@ -514,15 +513,6 @@ def mix_review_generate_correction_rack(review_id: str) -> bytes | None:
         return None
 
 
-def mix_review_analyze_stems_masking(stems: list[dict]) -> dict:
-    """Analyze frequency masking between audio stems."""
-    try:
-        from audio_analysis.mix_review.mix_review import analyze_stems_masking
-        return analyze_stems_masking(stems)
-    except ImportError:
-        return {"ok": False, "error": "Stem analysis module not available."}
-
-
 def mix_review_list_references(limit: int = 50) -> list[dict]:
     """List saved reference tracks."""
     try:
@@ -532,37 +522,7 @@ def mix_review_list_references(limit: int = 50) -> list[dict]:
         return []
 
 
-def mix_review_batch_qa_summary(scan_payload: dict) -> dict:
-    """Rank scanned audio items by quality risk."""
-    try:
-        from audio_analysis.mix_review.mix_review import batch_qa_summary
-        return batch_qa_summary(scan_payload)
-    except ImportError:
-        return {"ok": False, "error": "Batch QA module not available."}
-
-
-def mix_review_batch_music_analysis(scan_payload: dict) -> dict:
-    """Run music-theory analysis over a scan result."""
-    try:
-        from audio_analysis.mix_review.mix_review import batch_music_analysis
-        return batch_music_analysis(scan_payload)
-    except ImportError:
-        return {"ok": False, "error": "Music analysis module not available."}
-
-
-def mix_review_refresh_closed_loop(review_id: str) -> dict:
-    """Refresh the closed-loop action plan for a review."""
-    try:
-        from audio_analysis.mix_review.mix_review import refresh_closed_loop_payloads, review_by_id
-        report = review_by_id(review_id)
-        if not report:
-            return {"ok": False, "error": f"Review not found: {review_id}"}
-        return refresh_closed_loop_payloads(report)
-    except ImportError:
-        return {"ok": False, "error": "Closed-loop module not available."}
-
-
-# ─── Ableton Bridge# ─── Ableton Bridge ───────────────────────────────────────────────────────
+# ─── Ableton Bridge ───────────────────────────────────────────────────────
 
 
 def ableton_web_health() -> str:
@@ -1173,88 +1133,6 @@ class APIClient:
 
     def discover_audio_files(self) -> dict:
         return self._call(portfolio_discover_audio_files)
-
-    # Mix review / audio analysis
-    def analyze_wav(self, file_bytes: bytes, filename: str = "mix.wav", **kwargs: Any) -> dict:
-        from audio_analysis.mix_review.mix_review import analyze_wav
-        return self._call(analyze_wav, file_bytes, filename, **kwargs)
-
-    def save_review(self, **kwargs: Any) -> dict:
-        from audio_analysis.mix_review.mix_review import save_review
-        return self._call(save_review, **kwargs)
-
-    def list_reviews(self, limit: int = 50) -> dict:
-        return self._call(list_mix_reviews, limit)
-
-    def review_by_id(self, review_id: str) -> dict:
-        return self._call(mix_review_by_id, review_id)
-
-    def scan_audio_files(self, root: str, **kwargs: Any) -> dict:
-        from audio_analysis.mix_review.mix_review import scan_audio_files
-        return self._call(scan_audio_files, Path(root).expanduser(), **kwargs)
-
-    def scan_audio_benchmark(self, payload: dict) -> dict:
-        from audio_analysis.mix_review.mix_review import scan_audio_benchmark
-        return self._call(scan_audio_benchmark, payload)
-
-    def batch_qa_summary(self, payload: dict) -> dict:
-        return self._call(mix_review_batch_qa_summary, payload)
-
-    def batch_music_analysis(self, payload: dict) -> dict:
-        return self._call(mix_review_batch_music_analysis, payload)
-
-    def version_diff(self, first: str, second: str | None = None) -> dict:
-        return self._call(mix_review_version_diff, first, second)
-
-    def track_timeline(self, title: str) -> dict:
-        return self._call(mix_review_track_timeline, title)
-
-    def report_html(self, review_id: str) -> dict:
-        return self._call(mix_review_report_html, review_id)
-
-    def report_json_bytes(self, review_id: str) -> dict:
-        from audio_analysis.mix_review.mix_review import report_json_bytes
-        return self._call(report_json_bytes, review_id)
-
-    def review_audio_path(self, review_id: str, type: str = "mix") -> dict:
-        from audio_analysis.mix_review.mix_review import review_audio_path
-        return self._call(review_audio_path, review_id, type)
-
-    def generate_correction_rack(self, review_id: str) -> dict:
-        return self._call(mix_review_generate_correction_rack, review_id)
-
-    def analyze_stems_masking(self, stems: list[dict]) -> dict:
-        return self._call(mix_review_analyze_stems_masking, stems)
-
-    def compare_metrics(self, mix: dict, reference: dict) -> dict:
-        from audio_analysis.mix_review.mix_review import compare_metrics
-        return self._call(compare_metrics, mix, reference)
-
-    def refresh_closed_loop_payloads(self, review_id: str) -> dict:
-        return self._call(mix_review_refresh_closed_loop, review_id)
-
-    def list_references(self, limit: int = 100) -> dict:
-        return self._call(mix_review_list_references, limit)
-
-    def save_reference(self, **kwargs: Any) -> dict:
-        from audio_analysis.mix_review.mix_review import save_reference
-        return self._call(save_reference, **kwargs)
-
-    def mix_review_status(self, review_id: str) -> dict:
-        from audio_analysis.mix_review.mix_review import mix_review_status
-        return self._call(mix_review_status, review_id)
-
-    def cleanup_audiogen_exports(self, dry_run: bool = True) -> dict:
-        from audio_analysis.mix_review.mix_review import cleanup_audiogen_exports
-        return self._call(cleanup_audiogen_exports, dry_run)
-
-    def cleanup_orphaned_uploads(self, dry_run: bool = True) -> dict:
-        from audio_analysis.mix_review.mix_review import cleanup_orphaned_uploads
-        return self._call(cleanup_orphaned_uploads, dry_run)
-
-    def get_storage_stats(self) -> dict:
-        from audio_analysis.mix_review.mix_review import get_storage_stats
-        return self._call(get_storage_stats)
 
     # Data, expenses, sessions, workflow
     def records(self, record_type: str) -> dict:

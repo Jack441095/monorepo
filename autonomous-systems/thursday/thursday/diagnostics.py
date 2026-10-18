@@ -157,12 +157,15 @@ def check_audiogen() -> dict:
 
 def check_audio_analysis() -> dict:
     """Check if audio analysis tool is importable."""
-    can_import = _is_importable("audio_analysis.mix_review.mix_review")
+    # analysis_core is what watcher.py actually calls. This used to probe
+    # mix_review.mix_review, which went with Audio_Too's server db, so it
+    # reported unhealthy on every machine.
+    can_import = _is_importable("audio_analysis.analysis_core.analysis_core")
     return {
         "name": "Audio Analysis",
         "healthy": can_import,
         "details": "Audio analysis tool module",
-        "fix_hint": "Check studio/audio_analysis/audio_analysis/mix_review/ directory exists and has mix_review.py",
+        "fix_hint": "Check audio-technology/audio-analysis is on PYTHONPATH and audio_analysis/analysis_core/analysis_core.py exists",
     }
 
 
