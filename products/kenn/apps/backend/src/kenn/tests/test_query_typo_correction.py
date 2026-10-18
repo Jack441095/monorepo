@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
+import pytest
+
 from kenn.core.chat_retrieval import correct_query_typos
 
 NOTES = {
@@ -55,6 +59,10 @@ def test_an_empty_index_changes_nothing():
 
 def test_typo_query_routes_to_production_and_avoids_weak_match_early_return():
     from kenn.core import chat_retrieval, chat_routing
+    # The correction reads its vocabulary from the built index, so a fresh
+    # clone or worktree without one routes "unknown" for want of words, not a bug.
+    if not (Path(__file__).resolve().parents[1] / "data" / "index" / "CURRENT").exists():
+        pytest.skip("Knowledge index not built, so there is no vocabulary to correct against")
     q = "hwo do i do paralel compresion on drms"
     assert chat_routing.route_query(q, allow_llm=False) == "production"
     chunks = chat_retrieval.load_chunks()
