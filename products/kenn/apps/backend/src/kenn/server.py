@@ -402,13 +402,9 @@ except ImportError:  # pragma: no cover - standalone fallback for unusual copies
 from kenn.core import request_validation
 from kenn.core.action_policy import action_allowed, action_denied_message
 
-try:
-    from audio_analysis.mix_review import mix_review
-except ImportError:  # pragma: no cover - standalone fallback for unusual copies
-    try:
-        from kenn.core.local_mix_review_service import local_mix_review as mix_review
-    except Exception:  # pragma: no cover - preserve a clean unavailable state
-        mix_review = None
+# audio_analysis.mix_review.mix_review was deleted when the C++ engine replaced it
+# (Oct 2026); the local service is the only Mix Review backend KENN has.
+from kenn.core.local_mix_review_service import local_mix_review as mix_review
 
 def _load_optional_audiogen_bridge():
     """Load the adjacent AudioGen bridge only when its root is configured.

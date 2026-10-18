@@ -2,7 +2,6 @@
 
 Covers:
 - M8.1  stereo_image_comparison()
-- M8.3  load_mix_modifiers() / quality_predictor integration
 - M8.4c apply_tpdf_dither()
 - M8.5  parse_mix_intent() / apply_intent_to_plan()
 """
@@ -134,26 +133,3 @@ class TestParseMixIntent:
         assert "parameter" in intent
         assert "direction" in intent
 
-
-# ---------------------------------------------------------------------------
-# M8.3 — load_mix_modifiers (stub test, no DB)
-# ---------------------------------------------------------------------------
-from audio_analysis.integration.quality_predictor import load_mix_modifiers
-
-
-class TestLoadMixModifiers:
-
-    def test_returns_empty_when_no_connect_func(self):
-        """No connect_func → empty dict."""
-        result = load_mix_modifiers("pop", connect_func=None)
-        assert result == {}
-
-    def test_returns_empty_for_insufficient_data(self):
-        """connect_func returning empty list → empty dict."""
-        def noop_connect():
-            pass
-
-        from unittest.mock import patch
-        with patch("audio_analysis.mix_review.review_store.load_feedback_training_data", return_value=[]):
-            result = load_mix_modifiers("pop", connect_func=noop_connect)
-        assert result == {}

@@ -18,13 +18,9 @@ from kenn.core.evidence import (
 )
 from kenn.plugin_handoff import live_context_summary
 
-try:
-    from audio_analysis.mix_review import mix_review
-except ImportError:
-    try:
-        from kenn.core.local_mix_review_service import local_mix_review as mix_review
-    except Exception:
-        mix_review = None
+# audio_analysis.mix_review.mix_review was deleted when the C++ engine replaced it
+# (Oct 2026); the local service is the only Mix Review backend KENN has.
+from kenn.core.local_mix_review_service import local_mix_review as mix_review
 
 
 def plugin_live_context_turn(session_id: str, context: dict | None = None) -> dict | None:

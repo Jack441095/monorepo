@@ -211,7 +211,6 @@ def generate_mix_plan(
     genre: str = "pop",
     target_lufs: float | None = None,
     reference_profile: dict | None = None,
-    connect_func=None,
     dynamics_flags: dict[str, dict] | None = None,
 ) -> MixPlan:
     """Generate a MixPlan based on stem profiles, genre requirements, and masking analysis.
@@ -246,23 +245,10 @@ def generate_mix_plan(
     mix_goal = GENRE_TO_MIX_GOAL[genre]
     goal_info = mix_goal_info(mix_goal)
 
-    # M8.3 — load feedback-derived corrections when a DB connection is available
-    _feedback_corrections: dict = {}
-    if connect_func is not None:
-        try:
-            from audio_analysis.integration.quality_predictor import load_mix_modifiers
-            _feedback_corrections = load_mix_modifiers(genre, connect_func=connect_func) or {}
-        except Exception:
-            pass
-
     decisions: list[str] = []
     if _genre_note:
         decisions.append(_genre_note)
     decisions.append(f"Starting automated mix generation for genre: '{genre}' targeting {target_lufs} LUFS.")
-    if _feedback_corrections:
-        decisions.append(
-            f"Applying {len(_feedback_corrections)} feedback-learned correction(s) from prior accepted/rejected mixes."
-        )
     decisions.append(
         f"Canonical target profile: {goal_info['label']} ({goal_info['key']}) — {goal_info['target']}"
     )
@@ -342,13 +328,6 @@ def generate_mix_plan(
                     f"(proposed {proposed_gain:+.1f} dB from target RMS {target_rms:.1f} dBFS; "
                     f"rough-intent limit +/-{ROUGH_INTENT_MAX_GAIN_DEVIATION_DB:.1f} dB around anchor)."
                 )
-
-        # A1. M8.3 — Apply feedback-learned gain correction (capped at ±2 dB)
-        gain_correction = _feedback_corrections.get("crest_factor_db", 0.0)
-        if gain_correction and abs(gain_correction) >= 0.1:
-            config.gain_db = config.gain_db + max(-2.0, min(2.0, gain_correction))
-            if not (anchor_profile and p.name == anchor_profile.name):
-                config.gain_db = bound_gain_to_rough_intent(config.gain_db, anchor_gain)
 
         # B. Panning
         config.pan = rule.get("pan", 0.0)

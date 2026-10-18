@@ -9,8 +9,7 @@ as more labelled data accumulates in the mix_feedback_features table.
 
 Usage:
     >>> from audio_analysis.integration.quality_predictor import predict_quality, train_from_history
-    >>> from audio_analysis.mix_review.review_store import load_feedback_training_data
-    >>> labelled = load_feedback_training_data(connect_func=connect)
+    >>> labelled = rows_from_mix_feedback_features()  # list of {"decision", "features"} dicts
     >>> model = train_from_history(labelled)
     >>> report = analyze_wav(file_bytes, "mix.wav")
     >>> from mix_features import extract_feature_vector
@@ -451,46 +450,3 @@ def compute_training_readiness(labelled_records: list[dict]) -> dict:
         "recommended": recommended,
     }
 
-
-def load_mix_modifiers(genre: str, *, connect_func, limit: int = 200) -> dict:
-    """Return small data-driven corrections for the mix decision engine.
-
-    M8.3 — Feedback Learning → Mix Rule Updates.
-
-    Loads recent feedback-labelled mixes for the requested genre (or all genres
-    if fewer than 10 genre-specific records exist), trains a quality predictor,
-    and returns a ``corrections`` dict mapping DSP feature keys to small ±dB
-    adjustments (capped at ±2 dB) that nudge future mixes toward accepted outcomes.
-
-    Returns {} when insufficient data is available.
-    """
-    try:
-        from audio_analysis.mix_review.review_store import load_feedback_training_data
-    except ImportError:
-        return {}
-
-    try:
-        records = load_feedback_training_data(connect_func=connect_func, limit=limit)
-        # Prefer genre-specific records; fall back to all if fewer than 10
-        genre_records = [r for r in records if str(r.get("mix_goal_key", "")) == genre]
-        training = genre_records if len(genre_records) >= 10 else records
-        if len(training) < 6:
-            return {}
-
-        model = train_from_history(training)
-        weights = model.get("feature_weights", {})
-        if not weights:
-            return {}
-
-        # Map feature effect sizes to DSP corrections (scale and cap)
-        corrections: dict[str, float] = {}
-        # Positive weight = higher value → accepted; nudge accepted direction by +0.5 dB
-        for feature, effect in weights.items():
-            if abs(effect) < 0.1:
-                continue  # negligible effect; skip
-            raw_correction = effect * 2.0  # scale: effect of 1.0 → 2 dB shift
-            corrections[feature] = max(-2.0, min(2.0, round(raw_correction, 2)))
-
-        return corrections
-    except Exception:
-        return {}

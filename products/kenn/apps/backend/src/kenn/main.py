@@ -47,7 +47,6 @@ def print_help() -> None:
         "  python main.py suggest-sources <topic>\n"
         "  python main.py list-pdf-catalog\n"
         "  python main.py download-pdfs [--essential] [--force] [--category standards]\n"
-        "  python main.py build-checklist\n"
         "  python main.py reasoning-history [query]\n"
         "  python main.py show-reasoning <trace_id>\n"
         "  python main.py corrections\n"
@@ -115,12 +114,6 @@ def main() -> int:
     if command == "download-pdfs":
         return subprocess.run(
             [sys.executable, str(TOOLING_ROOT / "scripts" / "setup" / "download_training_pdfs.py"), *rest],
-            cwd=REPO_ROOT,
-            check=False,
-        ).returncode
-    if command == "build-checklist":
-        return subprocess.run(
-            [sys.executable, str(TOOLING_ROOT / "scripts" / "build_audio_too_checklist.py"), *rest],
             cwd=REPO_ROOT,
             check=False,
         ).returncode

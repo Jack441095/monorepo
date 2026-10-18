@@ -9,8 +9,7 @@ datasets when numpy is available.
 
 Usage:
     >>> from audio_analysis.analysis_core.anomaly_detector import detect_anomalies
-    >>> from audio_analysis.mix_review.review_store import load_feature_history
-    >>> history = load_feature_history(connect_func=connect)
+    >>> history = past_feature_vectors()  # list of feature dicts from earlier reviews
     >>> report = analyze_wav(file_bytes, "mix.wav")
     >>> vector = extract_feature_vector(report["metrics"])
     >>> result = detect_anomalies(vector, history)

@@ -2,7 +2,7 @@
 
 The four analysis entries use ANALYSIS risk without a confirmation gate
 because they do not modify a live session or an existing delivered file.
-Mix review delegates to audio_analysis.mix_review.mix_review.save_review;
+Mix review delegates to kenn.core.local_mix_review_service.save_review;
 stem masking delegates to kenn.core.local_mix_review_service.analyze_stem_masking.
 AutoMix and stem separation retain registered compatibility entries that return
 explicit Public Beta unavailable responses. No DSP/business logic lives here.
@@ -18,13 +18,14 @@ from kenn.core.tool_registry import ActionRisk, ToolDef, register
 
 
 def _run_mix_review(*, file_bytes: bytes, filename: str, project_id: str = "", **kwargs) -> dict:
-    from audio_analysis.mix_review import mix_review
+    # The local service analyses synchronously and has no background flag; the
+    # old audio_analysis save_review this used to call no longer exists.
+    from kenn.core.local_mix_review_service import local_mix_review
 
-    return mix_review.save_review(
-        file_bytes=file_bytes,
-        filename=filename,
-        project_id=project_id,
-        background=True,
+    return local_mix_review.save_review(
+        file_bytes,
+        filename,
+        project_id_override=project_id,
         **kwargs,
     )
 

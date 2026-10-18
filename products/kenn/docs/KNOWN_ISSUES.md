@@ -177,9 +177,9 @@ remain unimplemented (stem separation needs an isolated Demucs ML venv,
 complex subsystems appropriately out of scope for this sprint, and already
 safe to leave unresolved because they fail cleanly.
 
-`apps/backend/src/kenn/main.py`'s `build-checklist` subcommand still
-references `scripts/build_audio_too_checklist.py`, which doesn't exist in
-this repo (see ISSUE-09/GAP-03). `download-pdfs` was restored 29 Sept 2026:
+`apps/backend/src/kenn/main.py`'s `build-checklist` subcommand was removed
+18 Oct 2026: it called `scripts/build_audio_too_checklist.py`, which never
+existed in this repo (see ISSUE-09/GAP-03). `download-pdfs` was restored 29 Sept 2026:
 `tooling/scripts/setup/download_training_pdfs.py` now exists, honors the
 catalog's `index_policy` gate (reference-only manuals are never fetched),
 refuses non-PDF response bodies, and is pinned in
