@@ -82,3 +82,10 @@ research/product-experience/Nite_DSP_Product_Experience_RnD/
 
 # Thursday's own secrets (server token, SMTP), moved out of Audio_Too/.env on 18 Oct 2026.
 autonomous-systems/thursday/.env
+
+# Build caches and git bundles that archived drafts committed by accident (18 Oct 2026):
+# SwiftPM .build/ and clang .pcm module caches, plus 82 MB repo bundles. The two small
+# tracked bundles under platform-support/ and design-system/ predate this and stay.
+.build/
+*.pcm
+*.bundle
