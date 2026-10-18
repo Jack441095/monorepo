@@ -192,8 +192,6 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--seed", type=int, default=None, help="Seed for deterministic generation.")
     p.add_argument("--k", type=int, default=1, help="Best-of-K candidates to generate and pick from.")
     p.add_argument("--time-budget-s", type=float, default=None, help="Optional wall-clock budget for best-of-K.")
-    p.add_argument("--closed-loop", action="store_true", help="Enable Phase 11 closed-loop self-correction.")
-    p.add_argument("--mix-goal", default="club", help="Mix goal for closed-loop analysis (default: club).")
 
     p.add_argument("--export-dir", default="exports", help="Output directory.")
     p.add_argument("--prefix", default="song", help="Filename prefix.")
@@ -309,8 +307,6 @@ def main() -> int:
         seed=args.seed,
         k=int(max(1, args.k)),
         time_budget_s=args.time_budget_s,
-        closed_loop=bool(args.closed_loop),
-        mix_goal=str(args.mix_goal),
     )
 
     outputs = write_full_song_outputs(

@@ -527,8 +527,6 @@ class GenerationMixin:
         seed: Optional[int] = None,
         k: int = 1,
         time_budget_s: Optional[float] = None,
-        closed_loop: bool = False,
-        mix_goal: str = "club",
     ) -> SongRender:
         """
         Generate K candidate full-song renders (varying seed) and return the best-scoring one.
@@ -537,7 +535,7 @@ class GenerationMixin:
         """
         rerank_on = resolve_config("composition", "whole_song_rerank_enabled", True, bool)
         kk = 1 if not rerank_on else max(1, int(k))
-        if kk == 1 and not closed_loop:
+        if kk == 1:
             return self.generate_song(
                 sections,
                 base_tempo_bpm=base_tempo_bpm,
@@ -653,79 +651,5 @@ class GenerationMixin:
                 best.metadata["self_eval_autotune"] = dict(tune_info)
         except Exception as e:
             logger.debug("maybe_auto_tune_from_render failed: %s", e, exc_info=True)
-
-        # Phase 11 closed-loop self-correction loop
-        if closed_loop:
-            try:
-                render_song_to_wav_file = getattr(__import__("audio.render_to_wav", fromlist=["render_song_to_wav_file"]), "render_song_to_wav_file")
-                analyze_rendered_wav = getattr(__import__("audio.auto_analyze", fromlist=["analyze_rendered_wav"]), "analyze_rendered_wav")
-                from composition.song_rerank_model import append_audio_rerank_row
-                from pathlib import Path
-                
-                temp_dir = Path("tmp").resolve()
-                temp_dir.mkdir(parents=True, exist_ok=True)
-                
-                logger.info("Closed-loop: rendering candidate to WAV for analysis...")
-                wav_path = render_song_to_wav_file(best, export_dir=temp_dir, name_prefix="cl_temp")
-                
-                logger.info("Closed-loop: analyzing rendered WAV...")
-                report = analyze_rendered_wav(wav_path, mix_goal=mix_goal)
-                
-                flags_list = [f.get("label") for f in report.get("flags", []) if f.get("label")]
-                logger.info("Closed-loop: analysis found flags: %s", flags_list)
-                
-                target_flags = {"Heavy sub", "Low dynamics", "Low presence", "Frequency masking"}
-                triggered = [f for f in flags_list if f in target_flags]
-                
-                final_metrics = report.get("metrics") or {}
-                
-                if triggered:
-                    logger.info("Closed-loop: target flags triggered: %s. Regenerating song...", triggered)
-                    new_song = self.generate_song(
-                        sections,
-                        base_tempo_bpm=base_tempo_bpm,
-                        arrangement_form=arrangement_form,
-                        seed=seed,
-                        feedback_constraints={"flags": flags_list},
-                    )
-                    
-                    logger.info("Closed-loop: rendering regenerated song to WAV...")
-                    new_wav_path = render_song_to_wav_file(new_song, export_dir=temp_dir, name_prefix="cl_temp_regen")
-                    
-                    logger.info("Closed-loop: analyzing regenerated WAV...")
-                    new_report = analyze_rendered_wav(new_wav_path, mix_goal=mix_goal)
-                    new_flags = [f.get("label") for f in new_report.get("flags", []) if f.get("label")]
-                    logger.info("Closed-loop: regenerated song flags: %s", new_flags)
-                    
-                    best = new_song
-                    final_metrics = new_report.get("metrics") or {}
-                    
-                    if best.metadata is None:
-                        best.metadata = {}
-                    best.metadata["closed_loop_regenerated"] = True
-                    best.metadata["closed_loop_flags_before"] = flags_list
-                    best.metadata["closed_loop_flags_after"] = new_flags
-                    
-                    try:
-                        new_wav_path.unlink()
-                    except Exception:
-                        pass
-                else:
-                    logger.info("Closed-loop: no target flags triggered. Keeping original composition.")
-                    if best.metadata is None:
-                        best.metadata = {}
-                    best.metadata["closed_loop_regenerated"] = False
-                    best.metadata["closed_loop_flags_before"] = flags_list
-                    best.metadata["closed_loop_flags_after"] = flags_list
-                
-                logger.info("Closed-loop: appending audio features to rerank dataset...")
-                append_audio_rerank_row(best, final_metrics)
-                
-                try:
-                    wav_path.unlink()
-                except Exception:
-                    pass
-            except Exception as e:
-                logger.exception("Closed-loop execution failed: %s", e)
 
         return best
