@@ -3,7 +3,7 @@
 
 Keeps long test runs off the owner's Mac and gives a clean, reproducible record:
 
-1. ``git archive`` of the commit (products/kenn, shared, Audio_Too and the audio-technology it links to): the box
+1. ``git archive`` of the commit (products/kenn, shared and the audio-technology it links to): the box
    has no GitHub access. The tree is committed into a throwaway local repo (on top of an empty base commit), since some tests
    read ``git HEAD`` and its parent;
 2. KENN's git-ignored runtime data (active knowledge index, notes, embedding model) from the
@@ -58,8 +58,9 @@ def main_checkout() -> Path:
 def pack_code(ref: str, out: Path) -> str:
     commit = _run(["git", "rev-parse", ref], cwd=MONOREPO, capture_output=True, text=True).stdout.strip()
     with out.open("wb") as handle:
-        _run(["git", "archive", "--format=tar.gz", commit, "products/kenn", "shared", "Audio_Too",
-              "audio-technology"],
+        # Audio_Too left the tree on 18 Oct 2026; git archive fails on a pathspec that
+        # matches nothing, so it must not be listed for commits after that.
+        _run(["git", "archive", "--format=tar.gz", commit, "products/kenn", "shared", "audio-technology"],
              cwd=MONOREPO, stdout=handle)
     return commit
 

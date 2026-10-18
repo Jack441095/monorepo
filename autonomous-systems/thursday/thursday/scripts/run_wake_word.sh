@@ -25,11 +25,10 @@ if [[ ! -x "$PYTHON" ]]; then
   exit 1
 fi
 
-# Load the same .env server.py reads (repo_root.audio_too_root()/.env), so
-# THURSDAY_BRAIN_ENABLED etc match the HTTP server. AUDIO_TOO_ROOT points
-# at it; with Audio_Too removed and the variable unset there is no file and
-# the defaults apply.
-ENV_FILE="${AUDIO_TOO_ROOT:-$THURSDAY_REPO_DIR/../../Audio_Too}/.env"
+# Load the same .env server.py reads (autonomous-systems/thursday/.env, moved
+# out of Audio_Too on 18 Oct 2026), so THURSDAY_BRAIN_ENABLED etc match the
+# HTTP server. With no file the defaults apply.
+ENV_FILE="$THURSDAY_REPO_DIR/.env"
 if [[ -f "$ENV_FILE" ]]; then
   while IFS='=' read -r key value; do
     [[ -z "$key" || "$key" == \#* ]] && continue

@@ -27,11 +27,9 @@ sys.path.insert(0, str(ROOT))
 
 from thursday_eval_v1 import GROUNDING_CORPUS, ROUTING_CORPUS  # noqa: E402
 
-# Resolve the preserved owner-runtime boundary from the canonical estate root.
-# This keeps the read-only qualification adapter portable after the estate move.
-AUDIO_TOO = Path(__file__).resolve().parents[3] / "Audio_Too"
-sys.path.insert(0, str(AUDIO_TOO))
-sys.path.insert(0, str(AUDIO_TOO / "studio" / "kenn"))
+# thursday.intent is read from Thursday's own tree. It came from Audio_Too until
+# that was removed on 18 Oct 2026; nite_ai is already on the path through ROOT.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "thursday"))
 
 OLLAMA = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
 MODEL = os.environ.get("EVAL_MODEL", "qwen2.5:0.5b")
