@@ -391,3 +391,13 @@ target and Thursday is parked until it gets its own environment.
 `server.py` now loads `THURSDAY_SERVER_TOKEN` from Thursday's own
 `autonomous-systems/thursday/.env` (gitignored), the same file `main.py`
 reads.
+
+**Before un-parking, found 18 Oct 2026:** the default LLM provider
+(`THURSDAY_LLM_PROVIDER` unset, which is how the live `.env` runs) is
+`AudioTooProvider`, and it imports `audio_too.model_runtime`. No such module
+is in git, and none is in `archive/audio-too-final` either. The singleton it
+wants is `DEFAULT_LLM` in `shared/nite_core/model_runtime.py`. As things stand,
+every default-provider call raises `LLMUnavailable`. `test_llm_provider.py`
+mocks `_resolve`, so the suite never notices. The fix goes with Thursday's
+own venv: import from `nite_core.model_runtime`, put `shared/` on the path,
+and add one test that imports the real module without mocking it.
