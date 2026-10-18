@@ -114,11 +114,6 @@ class ServiceDef:
 _ANALYSIS_SERVICES = {
     "kenn",
     "audio_analysis",
-    "mix_review",
-    "mix_review_detail",
-    "mix_review_timeline",
-    "mix_review_version_diff",
-    "kenn_review_handoff",
     "kenn_compare",
     "codebase_test",
 }

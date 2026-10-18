@@ -451,77 +451,6 @@ def audio_scan(path: str | None = None, timeout: int = 120) -> str:
     return _root_script("audio-scan", path, timeout=timeout)
 
 
-def mix_review_compare() -> str:
-    return _cli_cmd("mix-review", "compare")
-
-
-def mix_review_status() -> str:
-    return _cli_cmd("mix-review", "status")
-
-
-def list_mix_reviews(limit: int = 20) -> list[dict]:
-    """List the most recent mix reviews."""
-    try:
-        from audio_analysis.mix_review.mix_review import list_reviews
-        return list_reviews(limit=limit)
-    except ImportError:
-        return []
-
-
-def mix_review_by_id(review_id: str) -> dict | None:
-    """Fetch a single mix review by its ID."""
-    try:
-        from audio_analysis.mix_review.mix_review import review_by_id
-        return review_by_id(review_id)
-    except ImportError:
-        return None
-
-
-def mix_review_track_timeline(title: str) -> dict:
-    """Show the version timeline for a given track title."""
-    try:
-        from audio_analysis.mix_review.mix_review import track_timeline
-        return track_timeline(title, limit=80)
-    except ImportError:
-        return {"ok": False, "error": "Mix review module not available."}
-
-
-def mix_review_version_diff(review_id_a: str, review_id_b: str | None = None) -> dict:
-    """Compare two versions of a mix review."""
-    try:
-        from audio_analysis.mix_review.mix_review import version_diff
-        return version_diff(review_id_a, review_id_b)
-    except ImportError:
-        return {"ok": False, "error": "Mix review module not available."}
-
-
-def mix_review_report_html(review_id: str) -> str | None:
-    """Get the HTML report for a mix review."""
-    try:
-        from audio_analysis.mix_review.mix_review import report_html
-        return report_html(review_id)
-    except ImportError:
-        return None
-
-
-def mix_review_generate_correction_rack(review_id: str) -> bytes | None:
-    """Generate an Ableton correction rack for a mix review."""
-    try:
-        from audio_analysis.mix_review.mix_review import generate_correction_rack
-        return generate_correction_rack(review_id)
-    except ImportError:
-        return None
-
-
-def mix_review_list_references(limit: int = 50) -> list[dict]:
-    """List saved reference tracks."""
-    try:
-        from audio_analysis.mix_review.mix_review import list_references
-        return list_references(limit=limit)
-    except ImportError:
-        return []
-
-
 # ─── Ableton Bridge ───────────────────────────────────────────────────────
 
 
@@ -798,8 +727,6 @@ def automix_list_jobs(*, project_id: str | None = None, limit: int = 10) -> list
         return []
 
 
-# ─── Creative Lab
-
 # ─── Creative Lab ────────────────────────────────────────────────────────
 
 
@@ -956,30 +883,6 @@ def dashboard_list_improvements() -> dict:
         return list_improvements()
     except ImportError:
         return {"ok": False, "error": "Improvements module not available."}
-
-
-def mix_review_storage_stats() -> dict:
-    try:
-        from audio_analysis.mix_review.mix_review import get_storage_stats
-        return get_storage_stats()
-    except ImportError:
-        return {"ok": False, "error": "Mix review storage module not available."}
-
-
-def mix_review_cleanup_audiogen(dry_run: bool = True) -> dict:
-    try:
-        from audio_analysis.mix_review.mix_review import cleanup_audiogen_exports
-        return cleanup_audiogen_exports(dry_run=dry_run)
-    except ImportError:
-        return {"ok": False, "error": "Mix review cleanup module not available."}
-
-
-def mix_review_cleanup_orphans(dry_run: bool = True) -> dict:
-    try:
-        from audio_analysis.mix_review.mix_review import cleanup_orphaned_uploads
-        return cleanup_orphaned_uploads(dry_run=dry_run)
-    except ImportError:
-        return {"ok": False, "error": "Mix review cleanup module not available."}
 
 
 # ─── Data Store (generic) ────────────────────────────────────────────────

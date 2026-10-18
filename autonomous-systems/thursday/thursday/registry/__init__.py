@@ -27,7 +27,6 @@ from thursday.registry.core import (  # noqa: F401
 )
 from thursday.registry.handlers import (  # noqa: F401
     _handle_agent_workflow_chain,
-    _handle_audio_storage,
 )
 from thursday.registry.business import _register_business_services
 from thursday.registry.studio import _register_studio_services

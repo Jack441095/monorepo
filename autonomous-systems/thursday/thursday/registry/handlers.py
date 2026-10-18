@@ -420,21 +420,6 @@ def _handle_search(api, text: str, ctx: dict) -> str:
     return search_all(list_records, query)
 
 
-def _handle_mix_review(api, text: str, ctx: dict | None = None) -> str:
-    """Handle generic mix review requests ("review my mix", "mix review compare").
-
-    Delegates to the real, data-backed handlers in phase3_handlers.py rather than
-    the CLI ``mix-review status`` subcommand, which doesn't exist (only
-    plan/progress/compare/help do) and always fell back to a raw CLI usage dump
-    regardless of what was asked.
-    """
-    from thursday.phase3_handlers import handle_mix_review_list, handle_mix_review_version_diff
-
-    if any(w in text.lower() for w in ["compare", "version", "revision", "difference"]):
-        return handle_mix_review_version_diff(api, text, ctx or {})
-    return handle_mix_review_list(api, text)
-
-
 _AUTOMIX_JOB_ID_RE = re.compile(r"\b([a-f0-9]{8})\b")
 
 
@@ -537,16 +522,6 @@ def _handle_ableton_push(api, text: str) -> str:
     return f"Pushed to Ableton — {track_label}, device {device}, parameter {parameter} set to {value}."
 
 
-def _handle_kenn_review_handoff(api, text: str, ctx: dict) -> str:
-    review_id = ctx.get("current_mix_review")
-    review = api.mix_review_by_id(review_id) if review_id else None
-    if not review:
-        return f"Mix review not found: {review_id or 'unknown'}"
-    handoff = review.get("kenn_handoff") or review.get("closed_loop_action_plan") or review.get("priority_actions")
-    question = f"{text}\n\nMix review {review_id} context: {handoff or review.get('summary', review)}"
-    return api.ask_kenn(question)
-
-
 def _handle_kenn_save_note(api, ctx: dict) -> str:
     question = ctx.get("last_kenn_question")
     result = api.ableton_create_note(question) if question else {"ok": False, "error": "No KENN question in context."}
@@ -555,17 +530,6 @@ def _handle_kenn_save_note(api, ctx: dict) -> str:
             return "The KENN note could not be saved (error code: service_unavailable)."
         return str(result.get("message") or result)
     return str(result)
-
-
-def _handle_audio_storage(api, text: str) -> str:
-    lowered = text.lower()
-    # Cleanup remains a dry run by default; destructive deletion needs an
-    # explicit API/dashboard confirmation outside conversational routing.
-    if "orphan" in lowered:
-        return str(api.mix_review_cleanup_orphans(dry_run=True))
-    if "clean" in lowered and ("export" in lowered or "audiogen" in lowered):
-        return str(api.mix_review_cleanup_audiogen(dry_run=True))
-    return str(api.mix_review_storage_stats())
 
 
 def _handle_business_insights(text: str, ctx: dict) -> str:

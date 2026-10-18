@@ -11,14 +11,11 @@ from thursday.registry.core import ServiceDef
 from thursday.registry.handlers import (
     _extract_path,
     _handle_ableton_push,
-    _handle_audio_storage,
     _handle_automix,
     _handle_kenn_compare,
     _handle_kenn_explain_flag,
     _handle_kenn_explain_parameter,
-    _handle_kenn_review_handoff,
     _handle_kenn_save_note,
-    _handle_mix_review,
 )
 from thursday.phase3_handlers import (
     handle_audiogen_job,
@@ -26,12 +23,6 @@ from thursday.phase3_handlers import (
     handle_audiogen_status,
     handle_creative_lab,
     handle_creative_lab_repairs,
-    handle_mix_review_detail,
-    handle_mix_review_list,
-    handle_mix_review_rack,
-    handle_mix_review_references,
-    handle_mix_review_timeline,
-    handle_mix_review_version_diff,
 )
 
 
@@ -82,17 +73,6 @@ def _register_studio_services(services: dict, api: Any) -> None:
             "current_audio_scan": resp if "Audio directory" not in resp else None,
             "last_report": "audio_scan",
         }),
-    )
-
-    services["mix_review"] = ServiceDef(
-        name="Mix Review",
-        description="Mix review plans, progress, and version comparison",
-        examples=["mix review plan", "revision plan", "mix review compare"],
-        triggers=["mix review", "revision plan", "mix review compare",
-                   "check my mix", "mix analysis", "analyze my mix"],
-        intents=["mix_review_audio_analysis"],
-        action=lambda ctx, api, text: _handle_mix_review(api, text, ctx),
-        post_process=lambda ctx, resp: ctx.update({"last_report": "mix_review"}),
     )
 
     services["automix"] = ServiceDef(
@@ -157,86 +137,6 @@ def _register_studio_services(services: dict, api: Any) -> None:
         post_process=lambda ctx, resp: ctx.update({"last_report": "audiogen_job"}),
     )
 
-    # ── Phase 3: Mix Review Advanced ──────────────────────────────────
-
-    services["mix_review_list"] = ServiceDef(
-        name="List Mix Reviews",
-        description="List and browse recent mix reviews",
-        examples=["show my mix reviews", "list recent reviews", "what reviews do I have",
-                   "browse mix reviews"],
-        triggers=["list reviews", "all reviews", "show reviews", "list mix reviews",
-                   "my reviews", "recent reviews", "browse reviews",
-                   "show all reviews", "mix reviews list", "latest reviews", "latest mix reviews"],
-        intents=["mix_review_audio_analysis"],
-        action=lambda ctx, api, text: handle_mix_review_list(api, text),
-        post_process=lambda ctx, resp: ctx.update({"last_report": "mix_review_list"}),
-    )
-
-    services["mix_review_detail"] = ServiceDef(
-        name="Mix Review Detail",
-        description="Fetch a specific mix review by ID",
-        examples=["show review abc12345", "get mix review details", "review report",
-                   "what does review abc123 say"],
-        triggers=["review detail", "show review", "get review", "review report",
-                   "review html", "open review", "fetch review",
-                   "review status for", "review by id"],
-        intents=["mix_review_audio_analysis"],
-        action=lambda ctx, api, text: handle_mix_review_detail(api, text),
-        post_process=lambda ctx, resp: ctx.update({
-            "last_report": "mix_review_detail",
-            "current_mix_review": next((r.get("id") for r in ([resp] if isinstance(resp, dict) else []) if isinstance(r, dict)), None),
-        }),
-    )
-
-    services["mix_review_timeline"] = ServiceDef(
-        name="Mix Review Timeline",
-        description="Version timeline for a specific track",
-        examples=["show timeline for my track", "version history of mix", "track timeline"],
-        triggers=["track timeline", "version history", "version timeline",
-                   "mix timeline", "track versions", "song timeline",
-                   "revisions for", "revision history",
-                   "show timeline for", "timeline for", "history for"],
-        intents=["mix_review_audio_analysis"],
-        action=lambda ctx, api, text: handle_mix_review_timeline(api, text),
-        post_process=lambda ctx, resp: ctx.update({"last_report": "mix_review_timeline"}),
-    )
-
-    services["mix_review_version_diff"] = ServiceDef(
-        name="Mix Version Comparison",
-        description="Compare two versions of a mix review",
-        examples=["compare two reviews", "version diff", "what changed between versions"],
-        triggers=["compare reviews", "version diff", "compare versions", "version comparison",
-                   "diff between", "what changed", "compare mix", "revision diff"],
-        intents=["mix_review_audio_analysis"],
-        action=lambda ctx, api, text: handle_mix_review_version_diff(api, text, ctx),
-        post_process=lambda ctx, resp: ctx.update({"last_report": "mix_review_diff"}),
-    )
-
-    services["mix_review_correction_rack"] = ServiceDef(
-        name="Ableton Correction Rack",
-        description="Generate an Ableton correction rack from a mix review",
-        examples=["generate correction rack for review abc123", "ableton repair rack",
-                   "make a correction rack", "generate ableton rack for mix review"],
-        triggers=["correction rack", "repair rack", "ableton rack", "correction chain",
-                   "generate rack", "ableton correction", "repair template"],
-        intents=["mix_review_audio_analysis"],
-        action=lambda ctx, api, text: handle_mix_review_rack(api, text),
-        post_process=lambda ctx, resp: ctx.update({"last_report": "correction_rack"}),
-    )
-
-    services["mix_review_references"] = ServiceDef(
-        name="Reference Tracks",
-        description="List saved reference tracks for mix comparison",
-        examples=["show my reference tracks", "list references", "reference tracks",
-                   "upload a reference track"],
-        triggers=["reference tracks", "show references", "list references",
-                   "my references", "saved references", "reference list",
-                   "upload reference", "add reference"],
-        intents=["mix_review_audio_analysis"],
-        action=lambda ctx, api, text: handle_mix_review_references(api, text),
-        post_process=lambda ctx, resp: ctx.update({"last_report": "references"}),
-    )
-
     # ── Phase 3: Creative Lab ─────────────────────────────────────────
 
     services["creative_lab"] = ServiceDef(
@@ -268,18 +168,6 @@ def _register_studio_services(services: dict, api: Any) -> None:
 
     # ── Phase 3: Portfolio ────────────────────────────────────────────
 
-    services["kenn_review_handoff"] = ServiceDef(
-        name="KENN Mix Review Handoff",
-        description="Ask KENN for actions based on the current mix review",
-        examples=["based on my last mix review, what should I fix first?"],
-        triggers=["based on my last mix review", "based on that review", "ask kenn about the review",
-                  "what should i fix first", "kenn handoff"],
-        intents=["mix_review_audio_analysis"],
-        requires_context=["current_mix_review"],
-        action=lambda ctx, api, text: _handle_kenn_review_handoff(api, text, ctx),
-        post_process=lambda ctx, resp: ctx.update({"last_report": "kenn_review_handoff"}),
-    )
-
     services["kenn_save_note"] = ServiceDef(
         name="Save KENN Note",
         description="Create a draft training note from the last KENN question",
@@ -289,18 +177,6 @@ def _register_studio_services(services: dict, api: Any) -> None:
         requires_context=["last_kenn_question"],
         action=lambda ctx, api, text: _handle_kenn_save_note(api, ctx),
         post_process=lambda ctx, resp: ctx.update({"last_report": "kenn_note"}),
-    )
-
-    services["audio_storage"] = ServiceDef(
-        name="Audio Storage & Cleanup",
-        description="Review audio storage and safely preview cleanup operations",
-        examples=["how much storage are reviews using?", "clean up orphaned uploads"],
-        triggers=["storage are reviews using", "review storage", "audio storage", "storage stats",
-                  "clean up old audio exports", "cleanup audio exports", "orphaned uploads",
-                  "clean up orphaned uploads"],
-        intents=["mix_review_audio_analysis", "system"],
-        action=lambda ctx, api, text: _handle_audio_storage(api, text),
-        post_process=lambda ctx, resp: ctx.update({"last_report": "audio_storage"}),
     )
 
     services["kenn_compare"] = ServiceDef(

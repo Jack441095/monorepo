@@ -88,12 +88,6 @@ FOLLOW_UP_SUGGESTIONS = {
         "Ask KENN about the worst track",
         "Generate an Ableton correction rack",
     ],
-    "mix_review": [
-        "Compare versions of your mix",
-        "Check mix review progress",
-        "Ask KENN for mix advice based on the review",
-    ],
-    # ── Phase 3 follow-ups ──────────────────────────────────────────────
     "audiogen_status": [
         "Queue a full-song render",
         "Check the render queue",
@@ -108,26 +102,6 @@ FOLLOW_UP_SUGGESTIONS = {
         "Start another render",
         "Check AudioGen system status",
         "View render history",
-    ],
-    "mix_review_list": [
-        "Show a specific review by ID",
-        "Scan audio files for a new review",
-        "Generate a correction rack",
-    ],
-    "mix_review_detail": [
-        "Generate Ableton correction rack",
-        "Check reference tracks",
-        "Compare with another version",
-    ],
-    "mix_review_timeline": [
-        "Compare two versions",
-        "Show the latest review for that track",
-        "Ask KENN about the mix progress",
-    ],
-    "mix_review_diff": [
-        "Check the timeline for context",
-        "Generate a correction rack",
-        "Show review details",
     ],
     "correction_rack": [
         "Load the rack in Ableton",
