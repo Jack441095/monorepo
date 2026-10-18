@@ -14,7 +14,7 @@
 # `python -m thursday.server` resolves the `thursday` package from cwd
 # first. Audio_Too, which held the live integrations listed in
 # docs/EXTRACTION_COUPLING.md (Ableton bridge, Kokoro model files, the
-# business DB, .env), was removed on 18 Oct 2026, so Thursday is parked:
+# business DB), was removed on 18 Oct 2026, so Thursday is parked:
 # the server starts, but those integrations report missing until they get
 # a new home. See thursday/repo_root.py for the archive tag.
 #

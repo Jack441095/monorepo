@@ -1,4 +1,4 @@
-"""Stable public error taxonomy shared by every Audio_Too interface."""
+"""Stable public error taxonomy shared by every NITE DSP interface."""
 
 from __future__ import annotations
 

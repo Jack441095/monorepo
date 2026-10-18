@@ -1,4 +1,4 @@
-"""Versioned contracts shared across Audio_Too domain boundaries.
+"""Versioned contracts shared across NITE DSP domain boundaries.
 
 These models deliberately use only the Python standard library. They define
 wire-safe data, not domain behavior or persistence. Each contract validates on

@@ -12,7 +12,6 @@ and `backend/`.
 - `products/` — Product source, including Submit, SLO (Sample Library Optimizer), Para-phase, and KENN research.
 - `audio-technology/` — Shared audio analysis and research tools.
 - `autonomous-systems/` — Thursday and internal platform support.
-- `Audio_Too/` — Existing studio/server workspace; it does not host the public checkout.
 
 ## History
 

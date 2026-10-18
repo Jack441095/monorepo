@@ -9,7 +9,6 @@ NITE Submit, evaluation, shared services, and platform technology.
 - `products/kenn` — canonical KENN product (active apps/packages plus legacy runtime)
 - `products/slo` — Smart Sample Manager / SLO product
 - `products/nite-submit` — NITE Submit product
-- `products/kenn-evaluation` — KENN evaluation and benchmark harness
 - `audio-technology/` — shared audio engines and plugin technology
 - `backend/`, `website/`, `shared/` — platform services and web surfaces
 

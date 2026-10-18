@@ -3296,6 +3296,21 @@ autonomous mixing/arrangement and commercial distribution. Existing unfinished
 `live_command`/execution extractions and dead-tool removal need a new reachability
 audit before scheduling. No old phase number makes them prerequisites for conversation.
 
+Parked by the 18 Oct 2026 estate cleanup, each its own item when scheduled:
+
+- **`AUDIO_TOO_*` env names.** About 30 names across about 60 files keep the old prefix
+  after `Audio_Too/` was removed. They are set in live `.env` files, launchd plists and
+  on Fly, so a rename needs a period where code reads both the new and the old name on
+  every running machine. That is a feature change, not cleanup. The `audio_too.*.v1`
+  schema IDs stay, because stored data carries them.
+- **Python mix-review and mixdown retirement.** `audio_analysis/mixdown/` and the rest of
+  `audio_analysis/mix_review/` (about 11,150 lines) still have live callers: Thursday
+  `autonomous_producer` and `autonomous_dispatcher`, `integration/kenn_advisor` and
+  `advisor_preview`, `analysis_core.analyze_stems_masking`, `podcast_report`,
+  `utils/file_cleanup_api`, and KENN `autonomous_agent` (`calculate_40_band_ltas`).
+  Each moves to C++ or is retired with its caller. `mix_renderer.py` (M8.2 refine) and
+  `review_workflow.py` still name the deleted `review_store` and go with them.
+
 Open-source tools may save time only after a named bottleneck, relevant held-out
 baseline, license check and complete-request A/B demonstrate value. Reuse existing
 structured decoding and session slots first. Dependency installation, hosted services,

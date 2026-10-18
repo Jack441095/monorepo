@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-The canonical NITE DSP engineering estate. **Everything is tracked directly in this single repository** — there are no git submodules on `main` (no `.gitmodules`, no gitlinks; the `submodule.*` entries in `.git/config` are vestigial from the Sept 2026 consolidation). The machine-readable current-state file is `docs/NITE_DSP_STATE.json`; the operating-decision document is `docs/NITE_DSP_FOUNDER_MASTER_PLAN.md`.
+The canonical NITE DSP engineering estate. **Everything is tracked directly in this single repository** — there are no git submodules on `main` (no `.gitmodules`, no gitlinks; the vestigial `submodule.*` entries left in `.git/config` by the Sept 2026 consolidation were removed on 18 Oct 2026). The KENN roadmap and gate checklist is `products/kenn/KENN_PLAN.md`; estate-wide process notes are under `docs/process/`.
 
 Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `products/nite-submit`, `backend/`, `website/`, `shared/`, `audio-technology/`, `autonomous-systems/`, `validation/`.
 

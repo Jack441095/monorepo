@@ -12,12 +12,12 @@ Jack441095/monorepo        ← personal mirror (Vercel auto-deploy)
 **Project:** nite-dsp/website  
 **URL:** https://nitedsp.co.uk  
 **Connected repo:** Jack441095/monorepo (personal mirror, Hobby plan compatible)  
-**Root directory:** platform/website  
+**Root directory:** website  
 **Auto-deploy:** on push to main via GitHub Actions mirror
 
 ### Manual deploy (fallback)
 ```bash
-cd platform/website
+cd website
 vercel build --prod
 vercel deploy --prebuilt --prod
 ```

@@ -16,10 +16,8 @@
       (2026-09-02).
 
       Auth: THURSDAY_SERVER_TOKEN, loaded by server.py itself from
-      Audio_Too/.env (gitignored, not in this plist) via
-      thursday.repo_root.audio_too_root(). Audio_Too was removed on
-      18 Oct 2026, so until the .env has a new home set AUDIO_TOO_ROOT
-      to wherever it now lives (see thursday/repo_root.py).
+      autonomous-systems/thursday/.env (gitignored, not in this plist).
+      It lived in Audio_Too/.env until the 18 Oct 2026 removal.
 
       Kill switch: `launchctl unload ~/Library/LaunchAgents/com.nitedsp.thursday-server.plist`
       or remove this file. The server is read/write against local state

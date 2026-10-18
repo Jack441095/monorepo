@@ -384,3 +384,10 @@ header comment for why: duplicating every ML/audio dependency into a
 second venv isn't decoupling, just duplication) and `server.py` still
 loads `THURSDAY_SERVER_TOKEN` from `Audio_Too/.env` via `audio_too_root()`
 — real secrets stay real secrets, not vendored into this repo.
+
+**18 Oct 2026:** `Audio_Too/` was removed from the monorepo (last state is the
+tag `archive/audio-too-final`), so the `.venv` reuse above no longer has a
+target and Thursday is parked until it gets its own environment.
+`server.py` now loads `THURSDAY_SERVER_TOKEN` from Thursday's own
+`autonomous-systems/thursday/.env` (gitignored), the same file `main.py`
+reads.
