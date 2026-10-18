@@ -180,6 +180,10 @@ steps:
     - say: "Email drafted for your review."
 ```
 
+This macro and the `kenn_review_handoff` and `mix_review_correction_rack` services were
+removed on 18 Oct 2026, together with the deleted Python mix review. The example is
+kept here only to show the macro format.
+
 
 ---
 

@@ -369,8 +369,6 @@ ENTITY_PATTERNS = [
     ("project_name", r"(?:project|for)\s+([\w\s]+?)(?:\.|$|\s+(?:service|deadline|and|show|with))"),
     # Year
     ("year", r"(?:in |for |during )(20\d{2})"),
-    # Review ID (audio analysis)
-    ("review_id", r"(?:review|scan|analyze|track)\s+([a-f0-9]{8,12})"),
     # Audio path
     ("audio_path", r"(?:scan|analyze)\s+([\w\/\.~-]+)"),
     # AudioGen job ID

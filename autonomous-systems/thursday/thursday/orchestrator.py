@@ -1440,7 +1440,6 @@ def handle(
         "current_client": "client_name",
         "current_project": "project_name",
         "current_invoice": "invoice_id",
-        "current_mix_review": "review_id",
         "current_audio_scan": "audio_path",
         "current_audiogen_job": "audiogen_job_id",
     }
@@ -1531,7 +1530,6 @@ def handle(
         "current_client": "client_name",
         "current_project": "project_name",
         "current_invoice": "invoice_id",
-        "current_mix_review": "review_id",
         "current_audio_scan": "audio_path",
         "current_audiogen_job": "audiogen_job_id",
     }
@@ -1642,7 +1640,7 @@ def handle(
         for key, value in resolved_entities.items():
             if key in (
                 "current_client", "current_project", "current_invoice",
-                "current_mix_review", "current_audio_scan", "last_report",
+                "current_audio_scan", "last_report",
                 "last_search_query", "last_analyzed_track", "last_kenn_question",
             ):
                 context_updates[key] = value
@@ -1653,7 +1651,6 @@ def handle(
         for entity_key, context_key in {
             "project_name": "current_project",
             "invoice_id": "current_invoice",
-            "review_id": "current_mix_review",
             "audio_path": "current_audio_scan",
             "audiogen_job_id": "current_audiogen_job",
         }.items():

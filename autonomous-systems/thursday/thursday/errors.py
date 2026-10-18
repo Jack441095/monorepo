@@ -50,7 +50,6 @@ class MissingInfoError(ThursdayError):
             "client_name": "a client name",
             "project_name": "a project name",
             "invoice_id": "an invoice ID",
-            "review_id": "a review ID",
             "audio_path": "a file or folder path",
             "amount": "an amount",
         }
@@ -62,7 +61,6 @@ class MissingInfoError(ThursdayError):
             examples = {
                 "client_name": "You can say 'tell me about Jordan' or 'check invoices for Sarah'.",
                 "invoice_id": "You can say 'show invoice abc12345' or 'check invoice status'.",
-                "review_id": "Try 'show review abc12345' or 'check mix review progress'.",
                 "audio_path": "Try 'scan audio in ~/Music/my-project'.",
             }
             msg += f"\n\n{examples.get(self.missing_field, '')}"

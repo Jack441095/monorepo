@@ -341,8 +341,6 @@ def _get_context_suggestions(context: dict | None) -> list[str]:
     suggestions = []
     if context.get("current_client"):
         suggestions.append(f"Ask about '{context['current_client']}'")
-    if context.get("current_mix_review"):
-        suggestions.append("Check your mix review status")
     if context.get("last_search_query"):
         suggestions.append("Refine your last search")
 

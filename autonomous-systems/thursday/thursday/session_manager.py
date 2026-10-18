@@ -52,7 +52,6 @@ def _empty_session(session_id: str) -> dict:
             "active_session_id": None,
             "last_search_query": None,
             "last_report": None,
-            "current_mix_review": None,
             "current_audio_scan": None,
             "current_audiogen_job": None,
             "last_analyzed_track": None,
